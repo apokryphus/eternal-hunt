@@ -1,2 +1,2 @@
 # eternal-hunt
-Welcome to the second conjunction.
+Welcome to the latest conjunction.
