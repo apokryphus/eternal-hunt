@@ -190,8 +190,11 @@ These are challenging boss encounters of varying degrees.
 The full list includes:
 
 The Blade of the Unseen - Killing a bruxa.
+
 Khagmar, Monster of the Unseen - Defeating the Blade of the Unseen three times in a row.
+
 Melusine of the Storm, Scion of Fucusya - Defeating Melusine in Skellige or using Rioghan’s Amulet.
+
 Volos, Bringer of Chaos - Destroying the Altar of the Chaos Flame found in all major maps.
 
 The specifics of each enemy type may be found in the Glossary section of the EH menu, under Bestiary ---> Special Encounters.
