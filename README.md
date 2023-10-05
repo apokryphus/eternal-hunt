@@ -18,7 +18,7 @@ However, the default ACS setting applied on install is Equipment Mode, meaning t
 
 EH adds over 100+ weapons into the game, including but not limited to spears, halberds, two-handed axes, greatswords, maces, daggers, scythes, staffs, etc. 
 
-Among these weapons include special ones, such as Imlerith’s hammer and Eredin’s sword as well.
+Among these weapons include special ones, such as Imlerith’s hammer, Eredin’s sword, and Caranthir's staff as well.
 
 With Equipment Mode selected, these drop from enemies, with steel versions dropping from red-health enemies, and silver versions dropping from silver-health enemies. 
 
