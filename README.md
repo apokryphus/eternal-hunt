@@ -1,6 +1,6 @@
-# eternal-hunt
+# Eternal Hunt
 
-Overview
+## Overview
 
 The Eternal Hunt is a massive content pack that includes new animations, scenes, enemies, items, armor, weapons, lore, effects, pseudo-quests, a wide variety of support systems, and much, much more. 
 
@@ -8,9 +8,9 @@ The mod is designed for those that have already played the game all the way thro
 
 If you choose to use this mod, I encourage you to fully explore the mod menu, for there are a great number of features.
 
-Combat
+## Combat
 
-Animation System:
+### Animation System:
 
 EH is primarily combat-oriented, as it is the natural successor to the Advanced Combat System, and includes all of its features.
 
@@ -33,7 +33,7 @@ EH also supports potion drinking and eating animations when using quick items.
 Aside from the weapon-based animation system, each Witcher school has their own custom moveset (attacks, dodges, stance, etc)  if the player is using the default Witcher moveset. Only applies when wearing boots, armor, gloves, and pants belonging to the same school, regardless of tier, and then using the school's medallion that becomes available in the quickslots.
 
 
-Stamina System:
+### Stamina System:
 
 EH allows the user to fully customize stamina consumption and stamina regeneration delay on various actions, such as attacks, dodges, parries etc. though its own custom menu.
 
@@ -41,13 +41,13 @@ Parrying now consumes stamina by default, and stamina consumption increases depe
 
 The player’s guard will break if the player runs out of stamina.
 
-Parry System:
+### Parry System:
 
 By holding down a directional key and pressing the parry/counter button, the player is able to perform a parry/counter-attack skill on command. The input can be modified in its own dedicated menu in the EH mod menu.
 
 Each weapon type has its own parry moveset. 
 
-Finisher System:
+### Finisher System:
 
 EH allows for the player to customize which finisher they want to perform through directional input. 
 
@@ -65,13 +65,13 @@ By default:
 - Right key + Back key will perform a leg finisher from the right side.
 - Left key + Back key will perform a leg finisher from the left side.
 
-Enemy AI:
+### Enemy AI:
 
 Enemies in EH are very aggressive, but are also smart and learn from the player’s actions, and will alter their aggressiveness depending on their current health. 
 
 Enemy AI has been tuned to give the player a challenge no matter how insignificant the enemy might be.
 
-Rage system:
+### Rage system:
 
 EH includes a special Rage system, akin to Sekiro’s Perilous attack system, which periodically flashes a red wolf symbol above enemies and the player. 
 
@@ -85,51 +85,47 @@ Additionally, as long as the rage system is enabled, the player is capable of pa
 
 The rage system can be disabled in the menus.
 
-Reactive Dodging:
+### Reactive Dodging:
 
 Doding an enemy attack just before it lands will slow down time for a very short period of time.
 
-Base Enemy Changes:
+### Base Enemy Changes:
 
-Humans:
+#### Humans:
 Aside from base AI enhancements, EH also makes some  drastic changes to the behaviors of human type enemies. Apart from bandits and pirates, humans are capable of swapping behaviors based upon their health, including one-hand sword style, two-hand sword style, and shield.
 
 Human type enemies are also capable of throwing bombs and daggers at mid range as well.
 
-Drowners:
+#### Drowners:
 Drowners are capable of launching tentacle attacks at range, which may be parried, though will knock the player down if it connects.
 
-Ghouls:
+#### Ghouls:
 Ghouls and their subtypes are capable of launching projectile venom attacks, which can be lit on fire. Different types of ghouls have different patterns for venom attacks.
 
-Wild hunt hounds:
+#### Wild hunt hounds:
 Wild hunt hounds are capable of launching ice spikes from a distance, and will drop a delayed ice explosion upon death. 
 
-Nekkers:
+#### Nekkers:
 When three or more nekkers are present, the Nekker Guardian is summoned into battle, capable of healing surrounding nekkers by draining its own health.
 
-
-
-
-
-Novigrad higher vampires:
+#### Novigrad higher vampires:
 The two Novigrad higher vampires are no longer katakans, but full-fledged higher vampires with unique abilities.
 
-Werewolves:
+#### Werewolves:
 Werewolves are capable of summoning three additional wolves during battle when they drop below 50% health.
 
-Wolves:
+#### Wolves:
 Additionally, regular wolves are now neutral to the player unless the player gets too close. If they are killed, there is a chance they will spawn a shadow wraith if Garmr is alive on the map.
 
-Wild hunt bosses:
+#### Wild hunt bosses:
 
 Imlerith and Eredin now have increased damage resistance. 
 
-Additional Random Encounters:
+### Additional Random Encounters:
 
 EH adds custom encounters into the game, which can be enabled, disabled, or tweaked in the menus. 
 
-Wild Hunt Event:
+#### Wild Hunt Event:
 
 By default, there is a 10% chance that the Naglfar will appear in the sky every 14 minutes a short period after combat ends. If the player is not near a town, Wild Hunt Red Riders will portal in and give chase to the player after 7 seconds.
 
@@ -139,7 +135,7 @@ There is a small chance that Caranthir or Eredin himself will appear as well.
 
 The members of the wild hunt cannot stay for long, and will despawn a short while after.
 
-Night Hunter Event:
+#### Night Hunter Event:
 
 The Night Hunter stalks the player, with a chance of striking after every fight in Velen, Skellige, Kaer Morhen, and Toussaint. 
 
@@ -147,11 +143,11 @@ Its greatest strength lies not in its venomous claws, leaping strikes, psychic s
 
 However, while camouflaged, the Night Hunter's hide is less durable, and thus more susceptible to attacks.
 
-Forest God Shadow Event:
+#### Forest God Shadow Event:
 
 Shadows of Berstuk, the Forest God, has a chance of spawning after combat if the player is close to where Berstuk is currently located on the map. 
 
-Additional World Encounters:
+#### Additional World Encounters:
 
 Aside from random encounters, EH adds over 30+ different types of unique custom enemies spread out all over the different maps within the game. 
 
@@ -186,7 +182,7 @@ The Xeno Swarm
 
 The specifics of each enemy type may be found in the Glossary section of the EH menu, under Bestiary ---> Additional World Encounters.
 
-Special Encounters:
+#### Special Encounters:
 
 Special encounters are encounters that only spawn after fulfilling a specific requirement. 
 These are challenging boss encounters of varying degrees.
@@ -200,7 +196,7 @@ Volos, Bringer of Chaos - Destroying the Altar of the Chaos Flame found in all m
 
 The specifics of each enemy type may be found in the Glossary section of the EH menu, under Bestiary ---> Special Encounters.
 
-Blood and Gore:
+### Blood and Gore:
 
 EH is also a full-fledged blood and gore mod, adding in custom color-coded blood spray and blood trails for all weapons, regardless of type. 
 
@@ -210,11 +206,11 @@ Blood trails change depending upon the enemy hit, and will cover the player in b
 
 Additionally, depending on which finisher is used, humans will crawl on the ground for a short while after death. 
 
-Player Death Scene:
+### Player Death Scene:
 
 Upon player death, a special death cutscene will play, replacing the vanilla death animations.
 
-Unconsciousness:
+### Unconsciousness:
 
 If the player is defeated by a guard, the unconsciousness system will kick in, which is slightly faster than the vanilla one. The player will also lose a percentage of their total amount of money they currently possess.
 
