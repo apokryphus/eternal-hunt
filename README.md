@@ -155,30 +155,30 @@ Many of these are full-fledged boss encounters, with their own custom AI and dea
 
 The full list includes:
 
-Alexander, Lord of the Plague
-Berstuk, the Forgotten Forest God
-Blood Hyms
-Cat School Assassins
-The Cult of Melusine
-The Draug
-Draugirs
-The Duskwraith
-Fata Morgana, the Ancient Foglet
-The Fire Wyrm
-Garmr, Hound of the Infinite Darkness
-Ice Titans
-Incubi
-The Knightmare Eternum
-Loviatar, Matron of Decay
-Mulas
-The Nameless Demon
-The Omnes Moriendus
-The Opinicus Matriarch
-Rioghan of the Abyss
-Rogue Mages
-Svalblod, the Ursine God of War
-Vildkaarls (Berserkers)
-The Xeno Swarm
+- Alexander, Lord of the Plague
+- Berstuk, the Forgotten Forest God
+- Blood Hyms
+- Cat School Assassins
+- The Cult of Melusine
+- The Draug
+- Draugirs
+- The Duskwraith
+- Fata Morgana, the Ancient Foglet
+- The Fire Wyrm
+- Garmr, Hound of the Infinite Darkness
+- Ice Titans
+- Incubi
+- The Knightmare Eternum
+- Loviatar, Matron of Decay
+- Mulas
+- The Nameless Demon
+- The Omnes Moriendus
+- The Opinicus Matriarch
+- Rioghan of the Abyss
+- Rogue Mages
+- Svalblod, the Ursine God of War
+- Vildkaarls (Berserkers)
+- The Xeno Swarm
 
 The specifics of each enemy type may be found in the Glossary section of the EH menu, under Bestiary ---> Additional World Encounters.
 
