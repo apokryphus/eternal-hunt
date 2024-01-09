@@ -170,15 +170,16 @@ The members of the wild hunt cannot stay for long, and will despawn a short whil
 
 #### Night Hunter Event:
 
-The Night Hunter stalks the player, with a chance of striking after every fight in Velen, Skellige, Kaer Morhen, and Toussaint. 
+The Night Hunter stalks the player as the sky darkens, with a chance of striking after every fight in Velen, Skellige, Kaer Morhen, and Toussaint. 
 
 Its greatest strength lies not in its venomous claws, leaping strikes, psychic scream, or long range pounces, but in its ability to camouflage itself repeatedly in combat.
 
 However, while camouflaged, the Night Hunter's hide is less durable, and thus more susceptible to attacks.
 
+
 #### Forest God Shadow Event:
 
-Shadows of Berstuk, the Forest God, has a chance of spawning after combat if the player is close to where Berstuk is currently located on the map. 
+Shadows of Berstuk, the Forest God, have a chance of spawning after combat if the player is close to where Berstuk is currently located on the map. 
 
 #### Assassins of the Profaned Ichor Event:
 
