@@ -222,11 +222,13 @@ The full list includes:
 - The Nemean Panther
 - The Omnes Moriendus
 - The Opinicus Matriarch
+- Phooca
+- Plumards
 - Rioghan of the Abyss
 - Rogue Mages
-- Shadow Pixies
 - Svalblod, the Ursine God of War
 - Vildkaarls (Berserkers)
+- Viy of Maribor
 - The Xeno Swarm
 
 Additionally, if Shades of Iron is installed, a wide variety of custom enemies will also spawn in the world:
