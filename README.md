@@ -1,5 +1,5 @@
 
-![snek_red_banner_1](https://github.com/apokryphus/eternal-hunt/assets/98017171/2f138dfe-bdc8-4629-9784-70ec3b7d5e4e)
+![snek_red_banner_1](https://github.com/apokryphus/eternal-hunt/assets/98017171/5c2ed87c-30ca-47c4-b7c2-063ab7ba7585)
 
 ## Overview
 
