@@ -41,9 +41,9 @@ In addition, EH has animation override features that can be enabled/disabled to 
 
 The override feature is capable of letting the player customize their own rolls and dodges for each cardinal direction.
 
-EH also provides multiple options for passive taunting animations, alternate sword-walk animations, potion and food eating/drinking animations, and much more. These can all be enabled/disabled in the Additional Settings ---> Miscellaneous Settings menu. 
+Multiple options for passive taunting animations, enabling alternate sword-walk animations, enabling potion and food eating/drinking animations, and much more can be found in the Additional Settings ---> Miscellaneous Settings menu. 
 
-EH is the only animation system that supports full compatibility with other animation mods. If the user wishes, they may install SCAAR or E3ARP on top of EH, in which EH will proceed to adapt to these mods, though will override animations when certain features are activated.
+EH contains the only animation system that supports full compatibility with other animation mods. If the user wishes, they may install SCAAR or E3ARP on top of EH, in which EH will proceed to adapt to these mods, though will override animations when certain features are activated.
 
 ### Stamina System:
 
