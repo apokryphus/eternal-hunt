@@ -367,6 +367,8 @@ Humans and horses will breathe out mist in cold locations, such as Kaer Morhen, 
 
 Witcher sense can be customized to a small degree in the Additional Settings ---> Hud & Camera Settings menu, such as the option to use a different witcher sense camera that removes the default zoom, turning witcher sense into a toggle instead of holding down the button, or adjusting the dimness of witcher sense itself.
 
+By default, the player is able to sprint in witcher sense as well.
+
 ### HUD modules:
 
 By default, EH hides the minimap, quest, and buffs modules if the player is at full health. These are only displayed if witcher sense is active, or whenever the health module is displayed. Enabling them in Video ---> HUD configuration will revert them back to vanilla behavior. 
