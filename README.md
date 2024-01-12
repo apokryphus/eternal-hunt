@@ -1,4 +1,5 @@
-# Eternal Hunt
+
+![snek_red_banner_1](https://github.com/apokryphus/eternal-hunt/assets/98017171/2f138dfe-bdc8-4629-9784-70ec3b7d5e4e)
 
 ## Overview
 
