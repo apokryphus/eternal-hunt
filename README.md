@@ -24,33 +24,33 @@ However, there are some exceptions with certain other mods here and there, in wh
 
 ### Animation System:
 
-EH is primarily combat-oriented, as it is the natural successor to the Advanced Combat System, and includes all of its features.
+- EH is primarily combat-oriented, as it is the natural successor to the Advanced Combat System, and includes all of its features.
 
-However, the default ACS setting applied on install is Equipment Mode, meaning that unique weapon animations will only apply to the player’s currently held weapon.
+- However, the default ACS setting applied on install is Equipment Mode, meaning that unique weapon animations will only apply to the player’s currently held weapon.
 
-EH adds over 100+ weapons into the game, including but not limited to swords, short-swords, great-swords, spears, halberds, two-handed axes, maces, daggers, scythes, staffs, etc.
+- EH adds over 100+ weapons into the game, including but not limited to swords, short-swords, great-swords, spears, halberds, two-handed axes, maces, daggers, scythes, staffs, etc.
 
-Among these weapons include special ones, such as Imlerith’s hammer and Eredin’s sword as well.
+- Among these weapons include special ones, such as Imlerith’s hammer and Eredin’s sword as well.
 
-With Equipment Mode selected, these drop from enemies, with steel versions dropping from red-health enemies, and silver versions dropping from silver-health enemies.
+- With Equipment Mode selected, these drop from enemies, with steel versions dropping from red-health enemies, and silver versions dropping from silver-health enemies.
 
-Equipment Mode also supports a vast majority of custom DLC weapon mods made by other modders available on Nexus, if applicable.
+- Equipment Mode also supports a vast majority of custom DLC weapon mods made by other modders available on Nexus, if applicable.
 
-Each of these weapons have their own specific moveset, giving the player the freedom to choose however they want to play the game.
+- Each of these weapons have their own specific moveset, giving the player the freedom to choose however they want to play the game.
 
-Naturally, as EH has all of the features of ACS, it also includes Armiger, Focus, and Hybrid mode, which the specifics are detailed in the ACS mod page separately.
+- Naturally, as EH has all of the features of ACS, it also includes Armiger, Focus, and Hybrid mode, which the specifics are detailed in the ACS mod page separately.
 
-EH also supports potion drinking and eating animations when using quick items, though by default this is disabled in the Additional Settings ---> Miscellaneous Settings menu.
+- EH also supports potion drinking and eating animations when using quick items, though by default this is disabled in the Additional Settings ---> Miscellaneous Settings menu.
 
-Aside from the weapon-based animation system, each Witcher school has their own custom moveset (attacks, dodges, stance, etc)  if the player is using the default Witcher moveset. Only applies when wearing boots, armor, gloves, and pants belonging to the same school, regardless of tier, and then using the school's medallion that becomes available in the quickslots.
+- Aside from the weapon-based animation system, each Witcher school has their own custom moveset (attacks, dodges, stance, etc)  if the player is using the default Witcher moveset. Only applies when wearing boots, armor, gloves, and pants belonging to the same school, regardless of tier, and then using the school's medallion that becomes available in the quickslots.
 
-In addition, EH has an animation override feature that can be enabled/disabled to fully take over the vanilla Geralt sword animations, dodge animations, and roll animations. This system allows for quick, arcade-style animation canceling with minimal input delay. By default, this system is enabled, though can be disabled in the menus.
+- In addition, EH has an animation override feature that can be enabled/disabled to fully take over the vanilla Geralt sword animations, dodge animations, and roll animations. This system allows for quick, arcade-style animation canceling with minimal input delay. By default, this system is enabled, though can be disabled in the menus.
 
-The override feature is capable of letting the player customize their own rolls and dodges for each cardinal direction.
+- The override feature is capable of letting the player customize their own rolls and dodges for each cardinal direction.
 
-Multiple options for passive taunting animations, enabling alternate sword-walk animations, and much more can be found in the Additional Settings ---> Miscellaneous Settings menu.
+- Multiple options for passive taunting animations, enabling alternate sword-walk animations, and much more can be found in the Additional Settings ---> Miscellaneous Settings menu.
 
-EH contains the only animation system that supports full compatibility with other combat animation mods. If the user wishes, they may install SCAAR or E3ARP on top of EH, in which EH will proceed to adapt to these mods, though will override animations when certain features are activated. Other combat animation mods are not fully supported, and in certain cases EH will override them accordingly.
+- EH contains the only animation system that supports full compatibility with other combat animation mods. If the user wishes, they may install SCAAR or E3ARP on top of EH, in which EH will proceed to adapt to these mods, though will override animations when certain features are activated. Other combat animation mods are not fully supported, and in certain cases EH will override them accordingly.
 
 ### Targeting System:
 
