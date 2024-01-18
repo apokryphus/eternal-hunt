@@ -243,6 +243,7 @@ The full list includes:
 - Svalblod, the Ursine God of War
 - Vildkaarls (Berserkers)
 - Viy of Maribor
+- Vorefs
 - The Xeno Swarm
 
 Additionally, if Shades of Iron is installed, a wide variety of custom enemies will also spawn in the world:
@@ -363,10 +364,15 @@ The specifics of each enemy type may be found in the Glossary section of the EH 
 ### 3D Map Markers:
 - By default, holding down witcher sense will display a 3D marker for all available quest locations, the nearest point of interest on the map, and the user map pin.
 - The marker is displayed for 7 seconds after witcher sense is deactivated.
-- The despawn time can be extended/shortened in the Additional Settings ---> Hud & Camera Settings menu.
-- Setting the despawn time to 0 will disable the marker type.
-- Quest markers are colored a pale yellow. The currently tracked quest marker is colored gold. Markers for quests not located on the current map will instead be located on the nearest signpost.
-- Points of interest markers are colored white. Only the closest one to the player will be displayed. Points of interest include bandit camps, treasure, monster nests, as well as EH custom monster locations.
+- The despawn time of each marker type can be extended/shortened in the Additional Settings ---> Hud & Camera Settings menu.
+- Setting the despawn time to 0 of a particular marker type will disable the marker type.
+- The default display distance of untracked quest markers is 500m.
+- The default display distance of the rest of the markers is 5000m.
+
+- The currently tracked quest marker is colored gold. Untracked quest markers are colored pale yellow. Markers for quests not located on the current map will instead be located on the nearest signpost.
+
+- Points of interest markers are colored white. Only the closest one to the player will be displayed. Points of interest include bandit camps, treasure, monster nests, as well as EH custom monster locations, if any exist on the map.
+
 - The user map pin marker is colored green. Will remove itself once the player has reached its approximate location.
 
 ## Miscellaneous Features
