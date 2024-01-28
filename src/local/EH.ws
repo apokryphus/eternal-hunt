@@ -3,7 +3,7 @@
 
 function ACS_GetVersion() : float
 {
-	return 1.52;
+	return 1.65;
 }
 
 statemachine abstract class W3ACSWatcher extends CEntity
@@ -1254,6 +1254,8 @@ statemachine abstract class W3ACSWatcher extends CEntity
 	private var vACS_Setup_Combat_Action_Light 																								: cACS_Setup_Combat_Action_Light;
 	
 	private var vACS_Setup_Combat_Action_Heavy 																								: cACS_Setup_Combat_Action_Heavy;
+
+	private var vACS_Setup_Combat_Action_CastSign 																							: cACS_Setup_Combat_Action_CastSign;
 	
 	private var movementAdjustorWerewolf																									: CMovementAdjustor; 
 	private var ticketWerewolf 																												: SMovementAdjustmentRequestTicket; 
@@ -1277,8 +1279,15 @@ statemachine abstract class W3ACSWatcher extends CEntity
 	private var movementAdjustorToad																										: CMovementAdjustor; 
 	private var ticketToad 																													: SMovementAdjustmentRequestTicket; 
 
-	private var movementAdjustorToadWitcher																										: CMovementAdjustor; 
-	private var ticketToadWitcher 																													: SMovementAdjustmentRequestTicket; 
+	private var movementAdjustorToadWitcher																									: CMovementAdjustor; 
+	private var ticketToadWitcher 																											: SMovementAdjustmentRequestTicket; 
+
+	private var movementAdjustorRedMiasmal																									: CMovementAdjustor; 
+	private var ticketRedMiasmal 																											: SMovementAdjustmentRequestTicket; 
+
+	private var movementAdjustorRedMiasmalWitcher																							: CMovementAdjustor; 
+	private var ticketRedMiasmalWitcher																										: SMovementAdjustmentRequestTicket; 
+
 
 	private var snow_ent																													: CEntity;
 
@@ -1661,6 +1670,11 @@ statemachine abstract class W3ACSWatcher extends CEntity
 			DisableTransformationToad_Actual();
 		}
 
+		if (ACS_Transformation_Red_Miasmal_Check())
+		{
+			DisableRedMiasmal_Actual();
+		}
+
 		CloakToggleStartup();
 
 		if (FactsQuerySum("ACS_Mask_Enabled") > 0
@@ -1735,6 +1749,28 @@ statemachine abstract class W3ACSWatcher extends CEntity
 		{
 			FactsRemove("ACS_Rage_Sound_Played");
 		}
+
+		if (FactsQuerySum("ACS_Minimap_Module_Hide") > 0)
+		{
+			FactsRemove("ACS_Minimap_Module_Hide");
+		}
+
+		if (FactsQuerySum("ACS_Quest_Module_Hide") > 0)
+		{
+			FactsRemove("ACS_Quest_Module_Hide");
+		}
+
+		if (FactsQuerySum("ACS_Buffs_Module_Hide") > 0)
+		{
+			FactsRemove("ACS_Buffs_Module_Hide");
+		}
+
+		if (FactsQuerySum("ACS_Control_Hint_Module_Hide") > 0)
+		{
+			FactsRemove("ACS_Control_Hint_Module_Hide");
+		}
+
+		HudModuleHideStartup();
 
 		ACS_WispCheck();
 
@@ -2377,6 +2413,10 @@ statemachine abstract class W3ACSWatcher extends CEntity
 
 				theInput.RegisterListener( this, 'OnCbtLockAndGuard', 'LockAndGuard' );
 
+				theInput.UnregisterListener( thePlayer.GetInputHandler(), 'GPadLockandGuard' );
+
+				theInput.RegisterListener( this, 'OnCbtLockAndGuard', 'GPadLockandGuard' );
+
 				theInput.UnregisterListener( thePlayer.GetInputHandler(), 'CameraLock' );
 
 				theInput.RegisterListener( this, 'OnCbtCameraLock', 'CameraLock' );
@@ -2661,6 +2701,8 @@ statemachine abstract class W3ACSWatcher extends CEntity
 			{
 				if ( FactsQuerySum("ACS_AutoCat_Enabled") <= 0 )
 				{
+					ACS_Night_Vision_Tutorial();
+					
 					EnableCatViewFx( 0.5f );	
 					SetTintColorsCatViewFx(Vector(0.1f,0.12f,0.13f,0.6f),Vector(0.075f,0.1f,0.11f,0.6f),0.2f);
 					SetBrightnessCatViewFx(350.0f);
@@ -3559,7 +3601,6 @@ statemachine abstract class W3ACSWatcher extends CEntity
 
 	function ACS_Setup_Combat_Action_CastSign()
 	{
-		var vACS_Setup_Combat_Action_CastSign : cACS_Setup_Combat_Action_CastSign;
 		vACS_Setup_Combat_Action_CastSign = new cACS_Setup_Combat_Action_CastSign in this;
 
 		//WispSlotSwap();
@@ -3674,26 +3715,21 @@ statemachine abstract class W3ACSWatcher extends CEntity
 					{
 						ent_2.PlayEffectSingle('igni_icon_red');
 
-						ent_3.PlayEffect('cone');
-						ent_3.PlayEffect('cone_1_red');
-						ent_3.PlayEffect('cone_2_red');
-						//ent_3.PlayEffect('cone_melt_1_red');
-						ent_3.PlayEffect('cone_melt_2_red');
-						ent_3.PlayEffect('cone_superpower_1_red');
-						//ent_3.PlayEffect('cone_power_1_red');
-						ent_3.PlayEffect('cone_power_2_red');
+						ent_3.PlayEffectSingle('cone_1_red');
+						ent_3.PlayEffectSingle('cone_power_2_red');
+
+						ent_3.StopEffect('cone_1_red');
+						ent_3.StopEffect('cone_power_2_red');
 					}
 					else
 					{
 						ent_2.PlayEffectSingle('igni_icon');
 
-						ent_3.PlayEffect('cone_1');
-						ent_3.PlayEffect('cone_2');
-						ent_3.PlayEffect('cone_melt_1');
-						ent_3.PlayEffect('cone_melt_2');
-						ent_3.PlayEffect('cone_superpower_1');
-						ent_3.PlayEffect('cone_power_1');
-						ent_3.PlayEffect('cone_power_2');
+						ent_3.PlayEffectSingle('cone_1');
+						ent_3.PlayEffectSingle('cone_power_2');
+
+						ent_3.StopEffect('cone_1');
+						ent_3.StopEffect('cone_power_2');
 					}
 				}
 
@@ -4212,6 +4248,11 @@ statemachine abstract class W3ACSWatcher extends CEntity
 				DisableTransformationToad();
 			}
 
+			if (ACS_Transformation_Red_Miasmal_Check())
+			{
+				DisableRedMiasmal();
+			}
+
 			return false;
 		}
 
@@ -4725,6 +4766,13 @@ statemachine abstract class W3ACSWatcher extends CEntity
 					{
 						ACS_Transformation_Toad_Light_Attacks();
 					}
+
+					if (ACS_Transformation_Red_Miasmal_Check())
+					{
+						ACS_Transformation_Red_Miasmal_Light_Attacks();
+					}
+
+
 				}
 			}
 
@@ -4867,7 +4915,20 @@ statemachine abstract class W3ACSWatcher extends CEntity
 						{
 							ACS_Transformation_Toad_Special_Attack();
 						}
+
+						if (ACS_Transformation_Red_Miasmal_Check())
+						{
+							ACS_Transformation_Red_Miasmal_Special_Attack_Pressed();
+						}
 					}
+				}
+			}
+
+			if ( IsReleased( action )  )
+			{
+				if (ACS_Transformation_Red_Miasmal_Check())
+				{
+					ACS_Transformation_Red_Miasmal_Special_Attack_Released();
 				}
 			}
 
@@ -5396,6 +5457,11 @@ statemachine abstract class W3ACSWatcher extends CEntity
 						if (ACS_Transformation_Toad_Check())
 						{
 							ACS_Transformation_Toad_Heavy_Attacks();
+						}
+
+						if (ACS_Transformation_Red_Miasmal_Check())
+						{
+							ACS_Transformation_Red_Miasmal_Heavy_Attacks();
 						}
 					}
 				}
@@ -7173,7 +7239,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 
 			RemoveTimer('ACSTrackedQuestsEntsDestroyDelay');
 
-			if (ACS_POI_Marker_Despawn_Delay() != 0)
+			if (ACS_Untracked_Quest_Marker_Despawn_Delay() != 0)
 			{
 				GuidingEntities();
 			}
@@ -7193,7 +7259,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 
 			RemoveTimer('ACSTrackedQuestsEntsDestroyDelay');
 
-			if (ACS_POI_Marker_Despawn_Delay() != 0)
+			if (ACS_Untracked_Quest_Marker_Despawn_Delay() != 0)
 			{
 				GuidingEntities();
 			}
@@ -9025,7 +9091,14 @@ statemachine abstract class W3ACSWatcher extends CEntity
 				ACS_BruxaDodgeBackRightInit();
 			}
 		}
-	}	
+	}
+
+	public timer function SwordWalkUnblockInteractionDelay(deltaTime : float , id : int)
+	{
+		GetWitcherPlayer().UnblockAction(EIAB_InteractionAction, 		'ACS_Defalt_Swordwalk');
+		GetWitcherPlayer().UnblockAction( EIAB_Interactions, 			'ACS_Defalt_Swordwalk');
+		GetWitcherPlayer().UnblockAction( EIAB_InteractionContainers,  	'ACS_Defalt_Swordwalk');
+	}
 
 	public timer function DefaltSwordWalk(deltaTime : float , id : int)
 	{
@@ -9104,6 +9177,9 @@ statemachine abstract class W3ACSWatcher extends CEntity
 
 				thePlayer.RemoveTag('ACS_Manual_Combat_Control');
 
+				RemoveTimer('SwordWalkUnblockInteractionDelay');
+				AddTimer('SwordWalkUnblockInteractionDelay', 1.5, false);
+
 				thePlayer.RemoveTag('ACS_IsSwordWalking');
 			}
 		}
@@ -9147,6 +9223,9 @@ statemachine abstract class W3ACSWatcher extends CEntity
 					thePlayer.GetRootAnimatedComponent().PlaySlotAnimationAsync( '', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25, 0.25) );
 				//}
 
+				RemoveTimer('SwordWalkUnblockInteractionDelay');
+				AddTimer('SwordWalkUnblockInteractionDelay', 1.5, false);
+
 				thePlayer.RemoveTag('ACS_IsSwordWalkingFinished');
 			}
 		}
@@ -9156,6 +9235,9 @@ statemachine abstract class W3ACSWatcher extends CEntity
 	{
 		if (thePlayer.HasTag('ACS_IsSwordWalking'))
 		{
+			RemoveTimer('SwordWalkUnblockInteractionDelay');
+			AddTimer('SwordWalkUnblockInteractionDelay', 1.5, false);
+
 			thePlayer.RemoveTag('ACS_Is_Sneaking');
 
 			RemoveTimer('DefaltSwordWalk');
@@ -9192,6 +9274,9 @@ statemachine abstract class W3ACSWatcher extends CEntity
 	{
 		if (thePlayer.HasTag('ACS_IsSwordWalking'))
 		{
+			RemoveTimer('SwordWalkUnblockInteractionDelay');
+			AddTimer('SwordWalkUnblockInteractionDelay', 1.5, false);
+
 			thePlayer.ClearAnimationSpeedMultipliers();
 
 			thePlayer.RemoveTag('ACS_Is_Sneaking');
@@ -9310,6 +9395,11 @@ statemachine abstract class W3ACSWatcher extends CEntity
 		{
 			if (!thePlayer.HasTag('ACS_IsSwordWalking'))
 			{
+				RemoveTimer('SwordWalkUnblockInteractionDelay');
+				GetWitcherPlayer().BlockAction(EIAB_InteractionAction, 			'ACS_Defalt_Swordwalk');
+				GetWitcherPlayer().BlockAction( EIAB_Interactions, 				'ACS_Defalt_Swordwalk');
+				GetWitcherPlayer().BlockAction( EIAB_InteractionContainers,  	'ACS_Defalt_Swordwalk');
+
 				thePlayer.ClearAnimationSpeedMultipliers();
 
 				RemoveTimer('DefaltSwordWalkStart');
@@ -9354,6 +9444,12 @@ statemachine abstract class W3ACSWatcher extends CEntity
 		{
 			if (!thePlayer.HasTag('ACS_IsSwordWalking'))
 			{
+				RemoveTimer('SwordWalkUnblockInteractionDelay');
+
+				GetWitcherPlayer().BlockAction(EIAB_InteractionAction, 		'ACS_Defalt_Swordwalk');
+				GetWitcherPlayer().BlockAction( EIAB_Interactions, 			'ACS_Defalt_Swordwalk');
+				GetWitcherPlayer().BlockAction( EIAB_InteractionContainers,  'ACS_Defalt_Swordwalk');
+
 				thePlayer.ClearAnimationSpeedMultipliers();
 
 				RemoveTimer('DefaltSwordWalkStart');
@@ -9481,6 +9577,9 @@ statemachine abstract class W3ACSWatcher extends CEntity
 							//&& !ACS_SwordWalk_Enabled()
 							)
 							{
+								RemoveTimer('SwordWalkUnblockInteractionDelay');
+								AddTimer('SwordWalkUnblockInteractionDelay', 1.5, false);
+
 								thePlayer.ClearAnimationSpeedMultipliers();
 
 								thePlayer.RemoveTag('ACS_Is_Sneaking');
@@ -9568,6 +9667,9 @@ statemachine abstract class W3ACSWatcher extends CEntity
 						//&& !ACS_SwordWalk_Enabled()
 						)
 						{
+							RemoveTimer('SwordWalkUnblockInteractionDelay');
+							AddTimer('SwordWalkUnblockInteractionDelay', 1.5, false);
+
 							thePlayer.ClearAnimationSpeedMultipliers();
 
 							thePlayer.RemoveTag('ACS_Is_Sneaking');
@@ -9703,6 +9805,9 @@ statemachine abstract class W3ACSWatcher extends CEntity
 						//&& !ACS_SwordWalk_Enabled()
 						)
 						{
+							RemoveTimer('SwordWalkUnblockInteractionDelay');
+							AddTimer('SwordWalkUnblockInteractionDelay', 1.5, false);
+
 							thePlayer.ClearAnimationSpeedMultipliers();
 
 							thePlayer.RemoveTag('ACS_Is_Sneaking');
@@ -9787,6 +9892,9 @@ statemachine abstract class W3ACSWatcher extends CEntity
 						//&& !ACS_SwordWalk_Enabled()
 						)
 						{
+							RemoveTimer('SwordWalkUnblockInteractionDelay');
+							AddTimer('SwordWalkUnblockInteractionDelay', 1.5, false);
+
 							thePlayer.ClearAnimationSpeedMultipliers();
 
 							thePlayer.RemoveTag('ACS_Is_Sneaking');
@@ -9939,6 +10047,9 @@ statemachine abstract class W3ACSWatcher extends CEntity
 			RemoveTimer('DefaltSwordWalk');
 
 			thePlayer.RemoveTag('ACS_Manual_Combat_Control');
+
+			RemoveTimer('SwordWalkUnblockInteractionDelay');
+			AddTimer('SwordWalkUnblockInteractionDelay', 1.5, false);
 
 			thePlayer.RemoveTag('ACS_IsSwordWalking');
 
@@ -10259,6 +10370,17 @@ statemachine abstract class W3ACSWatcher extends CEntity
 							}
 						}
 					}
+
+					if (ACS_Transformation_Red_Miasmal_Check())
+					{
+						if ( IsPressed(action) )
+						{
+							if (!thePlayer.IsInInterior())
+							{
+								ACS_Transformation_Red_Miasmal_Dodge();
+							}
+						}
+					}
 				}
 			}
 
@@ -10562,6 +10684,17 @@ statemachine abstract class W3ACSWatcher extends CEntity
 							if (GetACSTransformationVampireMonster().HasTag('ACS_Vampire_Monster_Ground_Mode'))
 							{
 								ACS_Transformation_Vampire_Monster_Teleport_Dodge();
+							}
+						}
+					}
+
+					if (ACS_Transformation_Red_Miasmal_Check())
+					{
+						if ( IsPressed(action) )
+						{
+							if (!thePlayer.IsInInterior())
+							{
+								ACS_Transformation_Red_Miasmal_Dodge();
 							}
 						}
 					}
@@ -11894,7 +12027,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 
 		thePlayer.SetImmortalityMode( AIM_None, AIC_Combat ); 
 		thePlayer.SetCanPlayHitAnim(true);
-		thePlayer.EnableCharacterCollisions(true); 
+		//thePlayer.EnableCharacterCollisions(true); 
 		thePlayer.RemoveBuffImmunity_AllNegative('ACS_Finisher_Immune_Negative'); 
 		thePlayer.RemoveBuffImmunity_AllCritical('ACS_Finisher_Immune_Critical'); 
 
@@ -11903,7 +12036,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 			ACS_FinisherHeal();
 		}
 
-		ResetInteractionPriority();
+		//ResetInteractionPriority();
 
 		thePlayer.RemoveTag('ACS_IsPerformingFinisher');
 	}
@@ -12358,11 +12491,11 @@ statemachine abstract class W3ACSWatcher extends CEntity
 
 		thePlayer.SetImmortalityMode( AIM_Invulnerable, AIC_Combat ); 
 		thePlayer.SetCanPlayHitAnim(false); 
-		thePlayer.EnableCharacterCollisions(false); 
+		//thePlayer.EnableCharacterCollisions(false); 
 		thePlayer.AddBuffImmunity_AllNegative('ACS_Finisher_Immune_Negative', true); 
 		thePlayer.AddBuffImmunity_AllCritical('ACS_Finisher_Immune_Critical', true); 
 
-		ChangeInteractionPriority();
+		//ChangeInteractionPriority();
 		
 		RemoveTimer('ACS_Finisher_Unblock_Action');
 		AddTimer('ACS_Finisher_Unblock_Action', 1.5, false);
@@ -13162,7 +13295,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 				masterSequencePart.syncType				= AMST_SyncBeginning;
 				masterSequencePart.useRefBone			= 'Reference';
 				masterSequencePart.rotationTypeUsingRefBone = SRT_TowardsOtherEntity;
-				masterSequencePart.shouldSlide			= true;
+				masterSequencePart.shouldSlide			= false;
 				masterSequencePart.shouldRotate			= true;
 				
 				masterSequencePart.blendInTime			= 0.5f;
@@ -13193,7 +13326,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 				slaveSequencePart.syncType				= AMST_SyncBeginning;
 				slaveSequencePart.useRefBone			= 'Reference';	
 				slaveSequencePart.rotationTypeUsingRefBone = SRT_ToMatchOthersRotation;
-				slaveSequencePart.shouldRotate			= false;
+				slaveSequencePart.shouldRotate			= true;
 				slaveSequencePart.shouldSlide			= false;
 				slaveSequencePart.finalHeading			= thePlayer.GetHeading();
 				
@@ -13218,7 +13351,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 				masterSequencePart.syncType				= AMST_SyncBeginning;
 				masterSequencePart.useRefBone			= 'Reference';
 				masterSequencePart.rotationTypeUsingRefBone = SRT_TowardsOtherEntity;
-				masterSequencePart.shouldSlide			= true;
+				masterSequencePart.shouldSlide			= false;
 				masterSequencePart.shouldRotate			= true;
 				
 				masterSequencePart.blendInTime			= 0.5f;
@@ -13249,7 +13382,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 				slaveSequencePart.syncType				= AMST_SyncBeginning;
 				slaveSequencePart.useRefBone			= 'Reference';	
 				slaveSequencePart.rotationTypeUsingRefBone = SRT_ToMatchOthersRotation;
-				slaveSequencePart.shouldRotate			= false;
+				slaveSequencePart.shouldRotate			= true;
 				slaveSequencePart.shouldSlide			= false;
 				slaveSequencePart.finalHeading			= thePlayer.GetHeading();
 				
@@ -13274,7 +13407,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 				masterSequencePart.syncType				= AMST_SyncBeginning;
 				masterSequencePart.useRefBone			= 'Reference';
 				masterSequencePart.rotationTypeUsingRefBone = SRT_TowardsOtherEntity;
-				masterSequencePart.shouldSlide			= true;
+				masterSequencePart.shouldSlide			= false;
 				masterSequencePart.shouldRotate			= true;
 				
 				masterSequencePart.blendInTime			= 0.5f;
@@ -13305,7 +13438,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 				slaveSequencePart.syncType				= AMST_SyncBeginning;
 				slaveSequencePart.useRefBone			= 'Reference';	
 				slaveSequencePart.rotationTypeUsingRefBone = SRT_ToMatchOthersRotation;
-				slaveSequencePart.shouldRotate			= false;
+				slaveSequencePart.shouldRotate			= true;
 				slaveSequencePart.shouldSlide			= false;
 				slaveSequencePart.finalHeading			= thePlayer.GetHeading();
 				
@@ -13330,7 +13463,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 				masterSequencePart.syncType				= AMST_SyncBeginning;
 				masterSequencePart.useRefBone			= 'Reference';
 				masterSequencePart.rotationTypeUsingRefBone = SRT_TowardsOtherEntity;
-				masterSequencePart.shouldSlide			= true;
+				masterSequencePart.shouldSlide			= false;
 				masterSequencePart.shouldRotate			= true;
 				
 				masterSequencePart.blendInTime			= 0.5f;
@@ -13361,7 +13494,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 				slaveSequencePart.syncType				= AMST_SyncBeginning;
 				slaveSequencePart.useRefBone			= 'Reference';	
 				slaveSequencePart.rotationTypeUsingRefBone = SRT_ToMatchOthersRotation;
-				slaveSequencePart.shouldRotate			= false;
+				slaveSequencePart.shouldRotate			= true;
 				slaveSequencePart.shouldSlide			= false;
 				slaveSequencePart.finalHeading			= thePlayer.GetHeading();
 				
@@ -13390,7 +13523,14 @@ statemachine abstract class W3ACSWatcher extends CEntity
 				masterSequencePart.shouldRotate			= true;
 				
 				masterSequencePart.blendInTime			= 0.5f;
-				masterSequencePart.blendOutTime			= 2.5f;
+				if (thePlayer.IsLastEnemyKilled())
+				{
+					masterSequencePart.blendOutTime			= 0.5f;
+				}
+				else
+				{
+					masterSequencePart.blendOutTime			= 1.5f;
+				}
 				masterSequencePart.sequenceIndex		= 0;
 				
 				masterDef.parts.PushBack( masterSequencePart );
@@ -13446,7 +13586,16 @@ statemachine abstract class W3ACSWatcher extends CEntity
 				masterSequencePart.shouldRotate			= true;
 				
 				masterSequencePart.blendInTime			= 0.5f;
-				masterSequencePart.blendOutTime			= 2.5f;
+
+				if (thePlayer.IsLastEnemyKilled())
+				{
+					masterSequencePart.blendOutTime			= 0.5f;
+				}
+				else
+				{
+					masterSequencePart.blendOutTime			= 1.5f;
+				}
+				
 				masterSequencePart.sequenceIndex		= 0;
 				
 				masterDef.parts.PushBack( masterSequencePart );
@@ -13632,11 +13781,11 @@ statemachine abstract class W3ACSWatcher extends CEntity
 
 		thePlayer.SetImmortalityMode( AIM_Invulnerable, AIC_Combat ); 
 		thePlayer.SetCanPlayHitAnim(false); 
-		thePlayer.EnableCharacterCollisions(false); 
+		//thePlayer.EnableCharacterCollisions(false); 
 		thePlayer.AddBuffImmunity_AllNegative('ACS_Finisher_Immune_Negative', true); 
 		thePlayer.AddBuffImmunity_AllCritical('ACS_Finisher_Immune_Critical', true); 
 
-		ChangeInteractionPriority();
+		//ChangeInteractionPriority();
 		
 		RemoveTimer('ACS_Finisher_Unblock_Action');
 		AddTimer('ACS_Finisher_Unblock_Action', 1.5, false);
@@ -13788,7 +13937,14 @@ statemachine abstract class W3ACSWatcher extends CEntity
 
 					masterSequencePart.animation			= 'man_finisher_dlc_torso_lp';
 					masterSequencePart.blendInTime			= 0.5f;
-					masterSequencePart.blendOutTime			= 2.5f;
+					if (thePlayer.IsLastEnemyKilled())
+					{
+						masterSequencePart.blendOutTime			= 0.5f;
+					}
+					else
+					{
+						masterSequencePart.blendOutTime			= 1.5f;
+					}
 					cameraAnimName = ProcessFinisherCameraAnimName( 'man_finisher_dlc_torso_lp' );
 					break;	
 							
@@ -13796,7 +13952,14 @@ statemachine abstract class W3ACSWatcher extends CEntity
 
 					masterSequencePart.animation			= 'man_finisher_dlc_torso_rp';
 					masterSequencePart.blendInTime			= 0.5f;
-					masterSequencePart.blendOutTime			= 2.5f;
+					if (thePlayer.IsLastEnemyKilled())
+					{
+						masterSequencePart.blendOutTime			= 0.5f;
+					}
+					else
+					{
+						masterSequencePart.blendOutTime			= 1.5f;
+					}
 					cameraAnimName = ProcessFinisherCameraAnimName( 'man_finisher_dlc_torso_rp' );
 					break;	
 
@@ -14117,8 +14280,8 @@ statemachine abstract class W3ACSWatcher extends CEntity
 				if ( fear_actor 
 				&& fear_actor.IsHuman()
 				&& fear_actor.IsMan()
-				&& fear_actor.HasTag('ACS_Shades_Crusader')
-				&& fear_actor.HasTag('ACS_Shades_Hunter')
+				&& !fear_actor.HasTag('ACS_Shades_Crusader')
+				&& !fear_actor.HasTag('ACS_Shades_Hunter')
 				&& ((CNewNPC)fear_actor).GetNPCType() != ENGT_Quest
 				&& !fear_actor.HasTag('ACS_Swapped_To_Shield')
 				&& RandF() < 0.875
@@ -14420,6 +14583,8 @@ statemachine abstract class W3ACSWatcher extends CEntity
 				finisherDist += ACS_Player_Scale() * 0.75;
 			}
 
+			npc.SetBehaviorMimicVariable( 'gameplayMimicsMode', (float)(int)GMM_Tpose );
+
 			if ( npc.HasTag('ACS_Final_Fear_Stack') 
 			&& npc.IsHuman()
 			&& ACS_BuffCheck()
@@ -14697,6 +14862,8 @@ statemachine abstract class W3ACSWatcher extends CEntity
 					{
 						npc.RemoveAbility( 'ForceFinisher');
 					}
+
+					npc.SetBehaviorMimicVariable( 'gameplayMimicsMode', (float)(int)GMM_Tpose );
 
 					npc.GetComponent("Finish").SetEnabled(false);
 					
@@ -15034,6 +15201,8 @@ statemachine abstract class W3ACSWatcher extends CEntity
 				if ( npc.UsesVitality() && npc.GetStat( BCS_Vitality ) <= 0 )
 				{	
 					npc.GetComponent("Finish").SetEnabled(false);
+
+					npc.SetBehaviorMimicVariable( 'gameplayMimicsMode', (float)(int)GMM_Tpose );
 					
 					dismembermentComp = (CDismembermentComponent)(npc.GetComponentByClassName( 'CDismembermentComponent' ));
 					if(!dismembermentComp) return;
@@ -16072,7 +16241,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 
 				GetACSArmorEtherSword().Destroy();
 
-				thePlayer.SoundEvent("magic_sorceress_vfx_lightning_fx_loop_stop");
+				//thePlayer.SoundEvent("magic_sorceress_vfx_lightning_fx_loop_stop");
 
 			if (thePlayer.HasTag('ACS_Holster_Sword_Effect'))
 			{
@@ -17543,6 +17712,66 @@ statemachine abstract class W3ACSWatcher extends CEntity
 		*/
 	}
 
+	function HudSettingsCheck(nam : name) : string
+	{
+		var conf: CInGameConfigWrapper;
+		var value: string;
+		
+		conf = (CInGameConfigWrapper)theGame.GetInGameConfigWrapper();
+		
+		value = conf.GetVarValue('Hud', nam);
+
+		return value;
+	}
+
+	function BuffsHudEnabled(): bool 
+	{
+		var configValue :int;
+		var configValueString : string;
+		
+		configValueString = HudSettingsCheck('BuffsModule');
+		configValue =(int) configValueString;
+
+		if(configValueString=="" || configValue<0)
+		{
+			return true;
+		}
+
+		else return (bool)configValueString;
+	}
+
+	function WolfHeadHudEnabled(): bool 
+	{
+		var configValue :int;
+		var configValueString : string;
+		
+		configValueString = HudSettingsCheck('WolfHeadModule');
+		configValue =(int) configValueString;
+
+		if(configValueString=="" || configValue<0)
+		{
+			return true;
+		}
+
+		else return (bool)configValueString;
+	}
+
+	function ItemHudEnabled(): bool 
+	{
+		var configValue :int;
+		var configValueString : string;
+		
+		configValueString = HudSettingsCheck('ItemInfoModule');
+		configValue =(int) configValueString;
+
+		if(configValueString=="" || configValue<0)
+		{
+			return true;
+		}
+
+		else return (bool)configValueString;
+	}
+
 	function MinimapHudEnabled(): bool 
 	{
 		var configValue :int;
@@ -17591,32 +17820,58 @@ statemachine abstract class W3ACSWatcher extends CEntity
 		else return (bool)configValueString;
 	}
 
-	function MinimapAndQuestModuleAutoHide()
+	public timer function MinimapModuleDespawnDelay ( dt : float, id : int)
+	{
+		if (((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("Minimap2Module")).GetEnabled())
+		{
+			((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("Minimap2Module")).SetEnabled(false);
+			((CR4ScriptedHud)theGame.GetHud()).UpdateHUD();
+		}
+	}
+
+	public timer function QuestModuleDespawnDelay ( dt : float, id : int)
+	{
+		if (((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("QuestsModule")).GetEnabled())
+		{
+			((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("QuestsModule")).SetEnabled(false);
+			((CR4ScriptedHud)theGame.GetHud()).UpdateHUD();
+		}
+	}
+
+	public timer function ControlHintModuleDespawnDelay ( dt : float, id : int)
+	{
+		if (((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("ControlsFeedbackModule")).GetEnabled())
+		{
+			((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("ControlsFeedbackModule")).SetEnabled(false);
+			((CR4ScriptedHud)theGame.GetHud()).UpdateHUD();
+		}
+	}
+
+	public timer function BuffsModuleDespawnDelay ( dt : float, id : int)
+	{
+		if (((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("BuffsModule")).GetEnabled())
+		{
+			((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("BuffsModule")).SetEnabled(false);
+			((CR4ScriptedHud)theGame.GetHud()).UpdateHUD();
+		}
+	}
+
+	function HudModulesAutoHide()
 	{
 		var hud 						: CR4ScriptedHud;
-		var minimapModule 				: CR4HudModuleMinimap2;
-		var questModule 				: CR4HudModuleQuests;
-		var controlsFeedbackModule		: CR4HudModuleControlsFeedback;
-		var curToxicity 				: float;	
-		var curMaxToxicity 				: float;
-		var curLockedToxicity			: float;
+		var hudWolfHeadModule 			: CR4HudModuleWolfHead;	
+		var hudItemModule 				: CR4HudModuleItemInfo;	
 
 		hud = (CR4ScriptedHud)theGame.GetHud();
 
-		minimapModule = (CR4HudModuleMinimap2)hud.GetHudModule("Minimap2Module");
+		hudWolfHeadModule = (CR4HudModuleWolfHead)hud.GetHudModule( "WolfHeadModule" );
 
-		questModule = (CR4HudModuleQuests)hud.GetHudModule("QuestsModule");
-
-		controlsFeedbackModule = (CR4HudModuleControlsFeedback)hud.GetHudModule( "ControlsFeedbackModule" );
+		hudItemModule = (CR4HudModuleItemInfo)hud.GetHudModule("ItemInfoModule");
 
 		if ( hud )
 		{
 			if (!MinimapHudEnabled())
 			{
-				thePlayer.GetStats( BCS_Toxicity, curToxicity, curMaxToxicity );
-
-				curLockedToxicity = thePlayer.GetStat(BCS_Toxicity) - curToxicity;
-
 				if 
 				(
 				!ACS_CombatToExplorationCheck()
@@ -17624,32 +17879,45 @@ statemachine abstract class W3ACSWatcher extends CEntity
 				|| thePlayer.IsInCombatState()
 				|| theGame.IsFocusModeActive()
 				|| ((CR4HudModuleRadialMenu)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("RadialMenuModule")).IsRadialMenuOpened()
-				|| (curToxicity > 0.f || curLockedToxicity > 0.f)
 				|| thePlayer.GetStat(BCS_Vitality) < thePlayer.GetStatMax(BCS_Vitality)
 				)
 				{
-					if (!((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("Minimap2Module")).GetEnabled())
+					if (FactsQuerySum("ACS_Minimap_Module_Hide") > 0)
 					{
-						((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("Minimap2Module")).SetEnabled(true);
-						((CR4ScriptedHud)theGame.GetHud()).UpdateHUD();
+						RemoveTimer('MinimapModuleDespawnDelay');
+
+						if (!((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("Minimap2Module")).GetEnabled())
+						{
+							((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("Minimap2Module")).SetEnabled(true);
+							((CR4ScriptedHud)theGame.GetHud()).UpdateHUD();
+						}
+
+						FactsRemove("ACS_Minimap_Module_Hide");
 					}
 				}
 				else
 				{
-					if (((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("Minimap2Module")).GetEnabled())
+					if ( FactsQuerySum("ACS_Minimap_Module_Hide") <= 0 )
 					{
-						((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("Minimap2Module")).SetEnabled(false);
-						((CR4ScriptedHud)theGame.GetHud()).UpdateHUD();
+						RemoveTimer('MinimapModuleDespawnDelay');
+						AddTimer('MinimapModuleDespawnDelay', 3.125, false);
+
+						FactsAdd("ACS_Minimap_Module_Hide", 1, -1);
 					}
+				}
+			}
+			else
+			{
+				RemoveTimer('MinimapModuleDespawnDelay');
+
+				if (FactsQuerySum("ACS_Minimap_Module_Hide") > 0)
+				{
+					FactsRemove("ACS_Minimap_Module_Hide");
 				}
 			}
 
 			if (!QuestHudEnabled())
 			{
-				thePlayer.GetStats( BCS_Toxicity, curToxicity, curMaxToxicity );
-
-				curLockedToxicity = thePlayer.GetStat(BCS_Toxicity) - curToxicity;
-
 				if 
 				(
 				!ACS_CombatToExplorationCheck()
@@ -17657,32 +17925,45 @@ statemachine abstract class W3ACSWatcher extends CEntity
 				|| thePlayer.IsInCombatState()
 				|| theGame.IsFocusModeActive()
 				|| ((CR4HudModuleRadialMenu)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("RadialMenuModule")).IsRadialMenuOpened()
-				|| (curToxicity > 0.f || curLockedToxicity > 0.f)
 				|| thePlayer.GetStat(BCS_Vitality) < thePlayer.GetStatMax(BCS_Vitality)
 				)
 				{
-					if (!((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("QuestsModule")).GetEnabled())
+					if (FactsQuerySum("ACS_Quest_Module_Hide") > 0)
 					{
-						((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("QuestsModule")).SetEnabled(true);
-						((CR4ScriptedHud)theGame.GetHud()).UpdateHUD();
+						RemoveTimer('QuestModuleDespawnDelay');
+
+						if (!((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("QuestsModule")).GetEnabled())
+						{
+							((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("QuestsModule")).SetEnabled(true);
+							((CR4ScriptedHud)theGame.GetHud()).UpdateHUD();
+						}
+
+						FactsRemove("ACS_Quest_Module_Hide");
 					}
 				}
 				else
 				{
-					if (((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("QuestsModule")).GetEnabled())
+					if ( FactsQuerySum("ACS_Quest_Module_Hide") <= 0 )
 					{
-						((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("QuestsModule")).SetEnabled(false);
-						((CR4ScriptedHud)theGame.GetHud()).UpdateHUD();
+						RemoveTimer('QuestModuleDespawnDelay');
+						AddTimer('QuestModuleDespawnDelay', 3.125, false);
+
+						FactsAdd("ACS_Quest_Module_Hide", 1, -1);
 					}
+				}
+			}
+			else
+			{
+				RemoveTimer('QuestModuleDespawnDelay');
+
+				if (FactsQuerySum("ACS_Quest_Module_Hide") > 0)
+				{
+					FactsRemove("ACS_Quest_Module_Hide");
 				}
 			}
 
 			if (ControlHintsHudEnabled())
 			{
-				thePlayer.GetStats( BCS_Toxicity, curToxicity, curMaxToxicity );
-
-				curLockedToxicity = thePlayer.GetStat(BCS_Toxicity) - curToxicity;
-
 				if 
 				(
 				!ACS_CombatToExplorationCheck()
@@ -17690,23 +17971,374 @@ statemachine abstract class W3ACSWatcher extends CEntity
 				|| thePlayer.IsInCombatState()
 				|| theGame.IsFocusModeActive()
 				|| ((CR4HudModuleRadialMenu)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("RadialMenuModule")).IsRadialMenuOpened()
-				|| (curToxicity > 0.f || curLockedToxicity > 0.f)
 				|| thePlayer.GetStat(BCS_Vitality) < thePlayer.GetStatMax(BCS_Vitality)
 				)
 				{
-					if (!((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("ControlsFeedbackModule")).GetEnabled())
+					if (FactsQuerySum("ACS_Control_Hint_Module_Hide") > 0)
 					{
-						((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("ControlsFeedbackModule")).SetEnabled(true);
-						((CR4ScriptedHud)theGame.GetHud()).UpdateHUD();
+						RemoveTimer('ControlHintModuleDespawnDelay');
+
+						if (!((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("ControlsFeedbackModule")).GetEnabled())
+						{
+							((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("ControlsFeedbackModule")).SetEnabled(true);
+							((CR4ScriptedHud)theGame.GetHud()).UpdateHUD();
+						}
+
+						FactsRemove("ACS_Control_Hint_Module_Hide");
 					}
 				}
 				else
 				{
-					if (((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("ControlsFeedbackModule")).GetEnabled())
+					if ( FactsQuerySum("ACS_Control_Hint_Module_Hide") <= 0 )
 					{
-						((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("ControlsFeedbackModule")).SetEnabled(false);
-						((CR4ScriptedHud)theGame.GetHud()).UpdateHUD();
+						RemoveTimer('ControlHintModuleDespawnDelay');
+						AddTimer('ControlHintModuleDespawnDelay', 3.125, false);
+
+						FactsAdd("ACS_Control_Hint_Module_Hide", 1, -1);
 					}
+				}
+			}
+			else
+			{
+				RemoveTimer('ControlHintModuleDespawnDelay');
+
+				if (FactsQuerySum("ACS_Control_Hint_Module_Hide") > 0)
+				{
+					FactsRemove("ACS_Control_Hint_Module_Hide");
+				}
+			}
+
+			if (BuffsHudEnabled())
+			{
+				if 
+				(
+				!ACS_CombatToExplorationCheck()
+				|| thePlayer.IsInCombat()
+				|| thePlayer.IsInCombatState()
+				|| theGame.IsFocusModeActive()
+				|| ((CR4HudModuleRadialMenu)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("RadialMenuModule")).IsRadialMenuOpened()
+				|| thePlayer.GetStat(BCS_Vitality) < thePlayer.GetStatMax(BCS_Vitality)
+				)
+				{
+					if (FactsQuerySum("ACS_Buffs_Module_Hide") > 0)
+					{
+						RemoveTimer('BuffsModuleDespawnDelay');
+
+						if (!((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("BuffsModule")).GetEnabled())
+						{
+							((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("BuffsModule")).SetEnabled(true);
+							((CR4ScriptedHud)theGame.GetHud()).UpdateHUD();
+						}
+
+						FactsRemove("ACS_Buffs_Module_Hide");
+					}
+				}
+				else
+				{
+					if ( FactsQuerySum("ACS_Buffs_Module_Hide") <= 0 )
+					{
+						RemoveTimer('BuffsModuleDespawnDelay');
+						AddTimer('BuffsModuleDespawnDelay', 3.125, false);
+
+						FactsAdd("ACS_Buffs_Module_Hide", 1, -1);
+					}
+				}
+			}
+			else
+			{
+				RemoveTimer('BuffsModuleDespawnDelay');
+
+				if (FactsQuerySum("ACS_Buffs_Module_Hide") > 0)
+				{
+					FactsRemove("ACS_Buffs_Module_Hide");
+				}
+			}
+
+			if (WolfHeadHudEnabled())
+			{
+				if 
+				(
+				!ACS_CombatToExplorationCheck()
+				|| thePlayer.IsInCombat()
+				|| thePlayer.IsInCombatState()
+				|| theGame.IsFocusModeActive()
+				|| ((CR4HudModuleRadialMenu)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("RadialMenuModule")).IsRadialMenuOpened()
+				|| thePlayer.GetStat(BCS_Vitality) < thePlayer.GetStatMax(BCS_Vitality)
+				)
+				{
+					hudWolfHeadModule.SetAlwaysDisplayed(true);
+				}
+				else
+				{
+					hudWolfHeadModule.SetAlwaysDisplayed(false);
+				}
+			}
+
+			if (ItemHudEnabled())
+			{
+				if 
+				(
+				!ACS_CombatToExplorationCheck()
+				|| thePlayer.IsInCombat()
+				|| thePlayer.IsInCombatState()
+				|| theGame.IsFocusModeActive()
+				|| ((CR4HudModuleRadialMenu)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("RadialMenuModule")).IsRadialMenuOpened()
+				|| thePlayer.GetStat(BCS_Vitality) < thePlayer.GetStatMax(BCS_Vitality)
+				)
+				{
+					hudItemModule.SetAlwaysDisplayed(true);
+				}
+				else
+				{
+					hudItemModule.SetAlwaysDisplayed(false);
+				}
+			}
+		}
+		else
+		{
+			RemoveTimer('MinimapModuleDespawnDelay');
+
+			if (FactsQuerySum("ACS_Minimap_Module_Hide") > 0)
+			{
+				FactsRemove("ACS_Minimap_Module_Hide");
+			}
+
+			RemoveTimer('QuestModuleDespawnDelay');
+
+			if (FactsQuerySum("ACS_Quest_Module_Hide") > 0)
+			{
+				FactsRemove("ACS_Quest_Module_Hide");
+			}
+
+			RemoveTimer('ControlHintModuleDespawnDelay');
+
+			if (FactsQuerySum("ACS_Control_Hint_Module_Hide") > 0)
+			{
+				FactsRemove("ACS_Control_Hint_Module_Hide");
+			}
+
+			RemoveTimer('BuffsModuleDespawnDelay');
+
+			if (FactsQuerySum("ACS_Buffs_Module_Hide") > 0)
+			{
+				FactsRemove("ACS_Buffs_Module_Hide");
+			}
+		}
+	}
+
+	function HudModuleAutoHideAfterCombat()
+	{
+		if (!MinimapHudEnabled())
+		{
+			if (FactsQuerySum("ACS_Minimap_Module_Hide") > 0)
+			{
+				FactsRemove("ACS_Minimap_Module_Hide");
+			}
+
+			if ( FactsQuerySum("ACS_Minimap_Module_Hide") <= 0 )
+			{
+				RemoveTimer('MinimapModuleDespawnDelay');
+				AddTimer('MinimapModuleDespawnDelay', 0.125, false);
+
+				FactsAdd("ACS_Minimap_Module_Hide", 1, -1);
+			}
+		}
+		else
+		{
+			RemoveTimer('MinimapModuleDespawnDelay');
+
+			if (FactsQuerySum("ACS_Minimap_Module_Hide") > 0)
+			{
+				FactsRemove("ACS_Minimap_Module_Hide");
+			}
+		}
+
+		if (!QuestHudEnabled())
+		{
+			if (FactsQuerySum("ACS_Quest_Module_Hide") > 0)
+			{
+				FactsRemove("ACS_Quest_Module_Hide");
+			}
+
+			if ( FactsQuerySum("ACS_Quest_Module_Hide") <= 0 )
+			{
+				RemoveTimer('QuestModuleDespawnDelay');
+				AddTimer('QuestModuleDespawnDelay', 0.125, false);
+
+				FactsAdd("ACS_Quest_Module_Hide", 1, -1);
+			}
+		}
+		else
+		{
+			RemoveTimer('QuestModuleDespawnDelay');
+
+			if (FactsQuerySum("ACS_Quest_Module_Hide") > 0)
+			{
+				FactsRemove("ACS_Quest_Module_Hide");
+			}
+		}
+
+		if (ControlHintsHudEnabled())
+		{
+			if (FactsQuerySum("ACS_Control_Hint_Module_Hide") > 0)
+			{
+				FactsRemove("ACS_Control_Hint_Module_Hide");
+			}
+
+			if ( FactsQuerySum("ACS_Control_Hint_Module_Hide") <= 0 )
+			{
+				RemoveTimer('ControlHintModuleDespawnDelay');
+				AddTimer('ControlHintModuleDespawnDelay', 0.125, false);
+
+				FactsAdd("ACS_Control_Hint_Module_Hide", 1, -1);
+			}
+		}
+		else
+		{
+			RemoveTimer('ControlHintModuleDespawnDelay');
+
+			if (FactsQuerySum("ACS_Control_Hint_Module_Hide") > 0)
+			{
+				FactsRemove("ACS_Control_Hint_Module_Hide");
+			}
+		}
+
+		if (BuffsHudEnabled())
+		{
+			if (FactsQuerySum("ACS_Buffs_Module_Hide") > 0)
+			{
+				FactsRemove("ACS_Buffs_Module_Hide");
+			}
+
+			if ( FactsQuerySum("ACS_Buffs_Module_Hide") <= 0 )
+			{
+				RemoveTimer('BuffsModuleDespawnDelay');
+				AddTimer('BuffsModuleDespawnDelay', 0.125, false);
+
+				FactsAdd("ACS_Buffs_Module_Hide", 1, -1);
+			}
+		}
+		else
+		{
+			RemoveTimer('BuffsModuleDespawnDelay');
+
+			if (FactsQuerySum("ACS_Buffs_Module_Hide") > 0)
+			{
+				FactsRemove("ACS_Buffs_Module_Hide");
+			}
+		}
+	}
+
+	function HudModuleHideStartup()
+	{
+		if (!MinimapHudEnabled())
+		{
+			if 
+			(
+			!ACS_CombatToExplorationCheck()
+			|| thePlayer.IsInCombat()
+			|| thePlayer.IsInCombatState()
+			|| theGame.IsFocusModeActive()
+			|| ((CR4HudModuleRadialMenu)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("RadialMenuModule")).IsRadialMenuOpened()
+			|| thePlayer.GetStat(BCS_Vitality) < thePlayer.GetStatMax(BCS_Vitality)
+			)
+			{
+				if (!((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("Minimap2Module")).GetEnabled())
+				{
+					((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("Minimap2Module")).SetEnabled(true);
+					((CR4ScriptedHud)theGame.GetHud()).UpdateHUD();
+				}
+			}
+			else
+			{
+				if (((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("Minimap2Module")).GetEnabled())
+				{
+					((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("Minimap2Module")).SetEnabled(false);
+					((CR4ScriptedHud)theGame.GetHud()).UpdateHUD();
+				}
+			}
+		}
+
+		if (!QuestHudEnabled())
+		{
+			if 
+			(
+			!ACS_CombatToExplorationCheck()
+			|| thePlayer.IsInCombat()
+			|| thePlayer.IsInCombatState()
+			|| theGame.IsFocusModeActive()
+			|| ((CR4HudModuleRadialMenu)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("RadialMenuModule")).IsRadialMenuOpened()
+			|| thePlayer.GetStat(BCS_Vitality) < thePlayer.GetStatMax(BCS_Vitality)
+			)
+			{
+				if (!((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("QuestsModule")).GetEnabled())
+				{
+					((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("QuestsModule")).SetEnabled(true);
+					((CR4ScriptedHud)theGame.GetHud()).UpdateHUD();
+				}
+			}
+			else
+			{
+				if (((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("QuestsModule")).GetEnabled())
+				{
+					((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("QuestsModule")).SetEnabled(false);
+					((CR4ScriptedHud)theGame.GetHud()).UpdateHUD();
+				}
+			}
+		}
+
+		if (ControlHintsHudEnabled())
+		{
+			if 
+			(
+			!ACS_CombatToExplorationCheck()
+			|| thePlayer.IsInCombat()
+			|| thePlayer.IsInCombatState()
+			|| theGame.IsFocusModeActive()
+			|| ((CR4HudModuleRadialMenu)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("RadialMenuModule")).IsRadialMenuOpened()
+			|| thePlayer.GetStat(BCS_Vitality) < thePlayer.GetStatMax(BCS_Vitality)
+			)
+			{
+				if (!((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("ControlsFeedbackModule")).GetEnabled())
+				{
+					((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("ControlsFeedbackModule")).SetEnabled(true);
+					((CR4ScriptedHud)theGame.GetHud()).UpdateHUD();
+				}
+			}
+			else
+			{
+				if (((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("ControlsFeedbackModule")).GetEnabled())
+				{
+					((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("ControlsFeedbackModule")).SetEnabled(false);
+					((CR4ScriptedHud)theGame.GetHud()).UpdateHUD();
+				}
+			}
+		}
+
+		if (BuffsHudEnabled())
+		{
+			if 
+			(
+			!ACS_CombatToExplorationCheck()
+			|| thePlayer.IsInCombat()
+			|| thePlayer.IsInCombatState()
+			|| theGame.IsFocusModeActive()
+			|| ((CR4HudModuleRadialMenu)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("RadialMenuModule")).IsRadialMenuOpened()
+			|| thePlayer.GetStat(BCS_Vitality) < thePlayer.GetStatMax(BCS_Vitality)
+			)
+			{
+				if (!((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("BuffsModule")).GetEnabled())
+				{
+					((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("BuffsModule")).SetEnabled(true);
+					((CR4ScriptedHud)theGame.GetHud()).UpdateHUD();
+				}
+			}
+			else
+			{
+				if (((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("BuffsModule")).GetEnabled())
+				{
+					((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("BuffsModule")).SetEnabled(false);
+					((CR4ScriptedHud)theGame.GetHud()).UpdateHUD();
 				}
 			}
 		}
@@ -19517,7 +20149,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 
 	function ACS_Tracked_Quest_Ents_Control()
 	{
-		if (ACS_POI_Marker_Despawn_Delay() != 0)
+		if (ACS_Untracked_Quest_Marker_Despawn_Delay() != 0)
 		{
 			ACSTrackedQuestsEntsTeleportRotate();
 		}
@@ -19540,7 +20172,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 					Activate_Focus_Mode_Env();
 				}
 
-				if (ACS_POI_Marker_Despawn_Delay() != 0)
+				if (ACS_Untracked_Quest_Marker_Despawn_Delay() != 0)
 				{
 					GuidingEntities();
 				}
@@ -19557,7 +20189,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 				Deactivate_Focus_Mode_Env();
 
 				RemoveTimer('ACSTrackedQuestsEntsDestroyDelay');
-				AddTimer('ACSTrackedQuestsEntsDestroyDelay', ACS_POI_Marker_Despawn_Delay(), false);
+				AddTimer('ACSTrackedQuestsEntsDestroyDelay', ACS_Untracked_Quest_Marker_Despawn_Delay(), false);
 
 				FactsRemove("ACS_TrackedQuestEntsControl");
 			}
@@ -19686,74 +20318,6 @@ statemachine abstract class W3ACSWatcher extends CEntity
 		}
 	}
 
-	function HudSettingsCheck(nam : name) : string
-	{
-		var conf: CInGameConfigWrapper;
-		var value: string;
-		
-		conf = (CInGameConfigWrapper)theGame.GetInGameConfigWrapper();
-		
-		value = conf.GetVarValue('Hud', nam);
-
-		return value;
-	}
-
-	function BuffsHudEnabled(): bool 
-	{
-		var configValue :int;
-		var configValueString : string;
-		
-		configValueString = HudSettingsCheck('BuffsModule');
-		configValue =(int) configValueString;
-
-		if(configValueString=="" || configValue<0)
-		{
-			return true;
-		}
-
-		else return (bool)configValueString;
-	}
-
-	function ACS_BuffsDisplay()
-	{
-		var curToxicity 				: float;	
-		var curMaxToxicity 				: float;
-		var curLockedToxicity			: float;
-
-		if (((CR4ScriptedHud)theGame.GetHud())
-		&& BuffsHudEnabled())
-		{
-			thePlayer.GetStats( BCS_Toxicity, curToxicity, curMaxToxicity );
-
-			curLockedToxicity = thePlayer.GetStat(BCS_Toxicity) - curToxicity;
-
-			if 
-			(
-			!ACS_CombatToExplorationCheck()
-			|| thePlayer.IsInCombatState()
-			|| theGame.IsFocusModeActive()
-			|| ((CR4HudModuleRadialMenu)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("RadialMenuModule")).IsRadialMenuOpened()
-			|| (curToxicity > 0.f || curLockedToxicity > 0.f)
-			|| thePlayer.GetStat(BCS_Vitality) < thePlayer.GetStatMax(BCS_Vitality)
-			)
-			{
-				if (!((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("BuffsModule")).GetEnabled())
-				{
-					((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("BuffsModule")).SetEnabled(true);
-					((CR4ScriptedHud)theGame.GetHud()).UpdateHUD();
-				}
-			}
-			else
-			{
-				if (((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("BuffsModule")).GetEnabled())
-				{
-					((CR4HudModuleBase)((CR4ScriptedHud)theGame.GetHud()).GetHudModule("BuffsModule")).SetEnabled(false);
-					((CR4ScriptedHud)theGame.GetHud()).UpdateHUD();
-				}
-			}
-		}
-	}
-
 	function PlayerWerewolfTeleportation()
 	{
 		var werewolfPos : Vector;
@@ -19793,6 +20357,11 @@ statemachine abstract class W3ACSWatcher extends CEntity
 				if (ACS_Transformation_Toad_Check())
 				{
 					DisableTransformationToad_Actual();
+				}
+
+				if (ACS_Transformation_Red_Miasmal_Check())
+				{
+					DisableRedMiasmal_Actual();
 				}
 			}
 			else
@@ -19924,6 +20493,19 @@ statemachine abstract class W3ACSWatcher extends CEntity
 					if (FactsQuerySum("ACS_Transformation_Attached") <= 0)
 					{
 						thePlayer.CreateAttachment( GetACSTransformationToad(), 'attach_slot' , Vector( 0, 0, 1 ), EulerAngles(0,0,0) );
+
+						FactsAdd("ACS_Transformation_Attached", 1, -1);
+					}
+				}
+
+				if (ACS_Transformation_Red_Miasmal_Check()
+				&& GetACSTransformationRedMiasmal())
+				{
+					ACS_Transformation_Red_Miasmal_Move_Controls();
+
+					if (FactsQuerySum("ACS_Transformation_Attached") <= 0)
+					{
+						thePlayer.CreateAttachment( GetACSTransformationRedMiasmal(), 'attach_slot' , Vector( 0, 0, 1 ), EulerAngles(0,0,0) );
 
 						FactsAdd("ACS_Transformation_Attached", 1, -1);
 					}
@@ -25345,6 +25927,12 @@ statemachine abstract class W3ACSWatcher extends CEntity
 			GetACSShadesRogueEnemiesIdleAction();
 
 			GetACSShadowPixieIdleAction();
+
+			GetACSPlumardIdleAction();
+
+			GetACSMaerolornIdleAction();
+
+			GetACSHellhoundIdleAction();
 		}
 
 		XenoSwitch();
@@ -26105,7 +26693,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 				{
 					GetACSArmorEtherSword().Destroy();
 					ACS_ShowSwordWitoutScabbardStuff();
-					thePlayer.SoundEvent("magic_sorceress_vfx_lightning_fx_loop_stop");
+					//thePlayer.SoundEvent("magic_sorceress_vfx_lightning_fx_loop_stop");
 				}
 			}
 
@@ -26131,7 +26719,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 			{
 				GetACSArmorEtherSword().Destroy();
 
-				thePlayer.SoundEvent("magic_sorceress_vfx_lightning_fx_loop_stop");
+				//thePlayer.SoundEvent("magic_sorceress_vfx_lightning_fx_loop_stop");
 
 				if ((thePlayer.HasTag('igni_secondary_sword_equipped')
 				|| thePlayer.HasTag('igni_secondary_sword_equipped_TAG')
@@ -27311,13 +27899,9 @@ statemachine abstract class W3ACSWatcher extends CEntity
 
 	function Aerondight_Check()
 	{
-		if (thePlayer.IsAnyWeaponHeld() && ACS_GetItem_Aerondight() )
+		if (thePlayer.IsAnyWeaponHeld() && ACS_GetItem_Aerondight_Steel_Held() )
 		{
 			thePlayer.ManageAerondightBuff(true);
-		}
-		else
-		{
-			thePlayer.ManageAerondightBuff(false);
 		}
 	}
 
@@ -27862,11 +28446,13 @@ statemachine abstract class W3ACSWatcher extends CEntity
 
 				rot.Yaw += 180;
 
-				temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\fx\guiding_light_marker.w2ent", true );
+				temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\fx\guiding_light_marker_old.w2ent", true );
 
 				ent = (CEntity)theGame.CreateEntity( temp, pinPos, rot );
 
 				ent.AddTag('ACS_All_Tracked_Quest_Entity');
+
+				ent.AddTag('ACS_HUD_Marker_Entity');
 
 				acs_untracked_quest_names.PushBack( GetLocStringById(pinTitleID) );
 			}
@@ -28047,13 +28633,15 @@ statemachine abstract class W3ACSWatcher extends CEntity
 		{
 			temp = (CEntityTemplate)LoadResource( 
 				
-				"dlc\dlc_acs\data\fx\guiding_light_marker.w2ent"
+				"dlc\dlc_acs\data\fx\guiding_light_marker_old.w2ent"
 				
 				, true );
 
 			ent = (CEntity)theGame.CreateEntity( temp, position, rot );
 
 			ent.AddTag('ACS_Guiding_Light_Marker');
+
+			ent.AddTag('ACS_HUD_Marker_Entity');
 		}
 		else
 		{
@@ -28502,11 +29090,13 @@ statemachine abstract class W3ACSWatcher extends CEntity
 
 		if(!GetACSGuidingLightPOIMarker())
 		{
-			temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\fx\guiding_light_marker.w2ent", true );
+			temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\fx\guiding_light_marker_old.w2ent", true );
 
 			ent = (CEntity)theGame.CreateEntity( temp, position, rot );
 
 			ent.AddTag('ACS_Guiding_Light_POI_Marker');
+
+			ent.AddTag('ACS_HUD_Marker_Entity');
 		}
 		else
 		{
@@ -28903,7 +29493,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 		|| theGame.IsBlackscreen()
 		|| theGame.IsPaused() 
 		|| size <= 0
-		|| ACS_POI_Marker_Despawn_Delay() == 0
+		|| ACS_Untracked_Quest_Marker_Despawn_Delay() == 0
 		)
 		{
 			if(GetACSGuidingLightAvailableQuestMarker())
@@ -28926,11 +29516,13 @@ statemachine abstract class W3ACSWatcher extends CEntity
 
 		if(!GetACSGuidingLightAvailableQuestMarker())
 		{
-			temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\fx\guiding_light_marker.w2ent", true );
+			temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\fx\guiding_light_marker_old.w2ent", true );
 
 			ent = (CEntity)theGame.CreateEntity( temp, position, rot );
 
 			ent.AddTag('ACS_Guiding_Light_Available_Quest_Marker');
+
+			ent.AddTag('ACS_HUD_Marker_Entity');
 		}
 		else
 		{
@@ -29060,7 +29652,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 					{
 						AddTimer('GetACSGuidingLightAvailableQuestMarker_EffectStoppingDelay', 0.00000000000000000001, true);
 
-						AddTimer('GetACSGuidingLightAvailableQuestMarker_EffectStopDelay', ACS_POI_Marker_Despawn_Delay(), false);
+						AddTimer('GetACSGuidingLightAvailableQuestMarker_EffectStopDelay', ACS_Untracked_Quest_Marker_Despawn_Delay(), false);
 
 						FactsAdd("ACS_Guiding_Light_Available_Quest_Marker_Stopped", 1, -1);
 					}
@@ -29316,11 +29908,13 @@ statemachine abstract class W3ACSWatcher extends CEntity
 
 		if(!GetACSGuidingLightUserPinMarker())
 		{
-			temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\fx\guiding_light_marker.w2ent", true );
+			temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\fx\guiding_light_marker_old.w2ent", true );
 
 			ent = (CEntity)theGame.CreateEntity( temp, position, rot );
 
 			ent.AddTag('ACS_Guiding_Light_User_Pin_Marker');
+
+			ent.AddTag('ACS_HUD_Marker_Entity');
 		}
 		else
 		{
@@ -30975,6 +31569,389 @@ statemachine abstract class W3ACSWatcher extends CEntity
 		}
 	}
 
+	function HorseRiderFollowTargetTeleport()
+	{
+		var novigrad_pos1, novigrad_pos2, novigrad_pos3													: Vector;
+
+		var nilfgaard_pos1, nilfgaard_pos2, nilfgaard_pos3												: Vector;
+
+		var redania_pos1, redania_pos2, redania_pos3													: Vector;
+
+		if (GetACS_HorseRiderFollowTargetNovigrad())
+		{
+			if (ACS_horse_follow_target_novigrad_can_teleport())
+			{
+				ACS_refresh_horse_follow_target_novigrad_teleport_cooldown();
+
+				if (theGame.GetWorld().GetDepotPath() == "levels\novigrad\novigrad.w2w")
+				{
+					novigrad_pos3 = Vector(733.319580, 1393.808716, 14.814985, 1);
+
+					novigrad_pos2 = Vector(1032.619873, 2068.319824, 1.808512, 1);
+
+					novigrad_pos1 = Vector(453.506348, 2240.663330, 47.299950, 1);
+				}
+
+				if (!GetACS_HorseRiderFollowTargetNovigrad().HasTag('ACS_Horse_Rider_Follow_Target_Position_1')
+				&& !GetACS_HorseRiderFollowTargetNovigrad().HasTag('ACS_Horse_Rider_Follow_Target_Position_2')
+				&& !GetACS_HorseRiderFollowTargetNovigrad().HasTag('ACS_Horse_Rider_Follow_Target_Position_3')
+				)
+				{
+					GetACS_HorseRiderFollowTargetNovigrad().Teleport(novigrad_pos1);
+
+					GetACS_HorseRiderFollowTargetNovigrad().AddTag('ACS_Horse_Rider_Follow_Target_Position_1');
+				}
+				else if (GetACS_HorseRiderFollowTargetNovigrad().HasTag('ACS_Horse_Rider_Follow_Target_Position_1')
+				&& !GetACS_HorseRiderFollowTargetNovigrad().HasTag('ACS_Horse_Rider_Follow_Target_Position_2')
+				&& !GetACS_HorseRiderFollowTargetNovigrad().HasTag('ACS_Horse_Rider_Follow_Target_Position_3')
+				)
+				{
+					GetACS_HorseRiderFollowTargetNovigrad().Teleport(novigrad_pos2);
+
+					GetACS_HorseRiderFollowTargetNovigrad().AddTag('ACS_Horse_Rider_Follow_Target_Position_2');
+				}
+				else if (GetACS_HorseRiderFollowTargetNovigrad().HasTag('ACS_Horse_Rider_Follow_Target_Position_1')
+				&& GetACS_HorseRiderFollowTargetNovigrad().HasTag('ACS_Horse_Rider_Follow_Target_Position_2')
+				&& !GetACS_HorseRiderFollowTargetNovigrad().HasTag('ACS_Horse_Rider_Follow_Target_Position_3')
+				)
+				{
+					GetACS_HorseRiderFollowTargetNovigrad().Teleport(novigrad_pos3);
+
+					GetACS_HorseRiderFollowTargetNovigrad().AddTag('ACS_Horse_Rider_Follow_Target_Position_3');
+				}
+				else if (GetACS_HorseRiderFollowTargetNovigrad().HasTag('ACS_Horse_Rider_Follow_Target_Position_1')
+				&& GetACS_HorseRiderFollowTargetNovigrad().HasTag('ACS_Horse_Rider_Follow_Target_Position_2')
+				&& GetACS_HorseRiderFollowTargetNovigrad().HasTag('ACS_Horse_Rider_Follow_Target_Position_3')
+				)
+				{
+					GetACS_HorseRiderFollowTargetNovigrad().Teleport(novigrad_pos1);
+
+					GetACS_HorseRiderFollowTargetNovigrad().RemoveTag('ACS_Horse_Rider_Follow_Target_Position_1');
+					GetACS_HorseRiderFollowTargetNovigrad().RemoveTag('ACS_Horse_Rider_Follow_Target_Position_2');
+					GetACS_HorseRiderFollowTargetNovigrad().RemoveTag('ACS_Horse_Rider_Follow_Target_Position_3');
+				}
+			}
+		}
+
+		if (GetACS_HorseRiderFollowTargetNilfgaard())
+		{
+			if (ACS_horse_follow_target_nilfgaard_can_teleport())
+			{
+				ACS_refresh_horse_follow_target_nilfgaard_teleport_cooldown();
+
+				if (theGame.GetWorld().GetDepotPath() == "levels\novigrad\novigrad.w2w")
+				{
+					nilfgaard_pos1 = Vector(2194.010010, -717.697571, 0.935780, 1);
+
+					nilfgaard_pos2 = Vector(2587.317139, -977.438538, 4.314292, 1);
+
+					nilfgaard_pos3 = Vector(2503.556152, -863.483826, 2.293803, 1);
+				}
+
+				if (!GetACS_HorseRiderFollowTargetNilfgaard().HasTag('ACS_Horse_Rider_Follow_Target_Position_1')
+				&& !GetACS_HorseRiderFollowTargetNilfgaard().HasTag('ACS_Horse_Rider_Follow_Target_Position_2')
+				&& !GetACS_HorseRiderFollowTargetNilfgaard().HasTag('ACS_Horse_Rider_Follow_Target_Position_3')
+				)
+				{
+					GetACS_HorseRiderFollowTargetNilfgaard().Teleport(nilfgaard_pos1);
+
+					GetACS_HorseRiderFollowTargetNilfgaard().AddTag('ACS_Horse_Rider_Follow_Target_Position_1');
+				}
+				else if (GetACS_HorseRiderFollowTargetNilfgaard().HasTag('ACS_Horse_Rider_Follow_Target_Position_1')
+				&& !GetACS_HorseRiderFollowTargetNilfgaard().HasTag('ACS_Horse_Rider_Follow_Target_Position_2')
+				&& !GetACS_HorseRiderFollowTargetNilfgaard().HasTag('ACS_Horse_Rider_Follow_Target_Position_3')
+				)
+				{
+					GetACS_HorseRiderFollowTargetNilfgaard().Teleport(nilfgaard_pos2);
+
+					GetACS_HorseRiderFollowTargetNilfgaard().AddTag('ACS_Horse_Rider_Follow_Target_Position_2');
+				}
+				else if (GetACS_HorseRiderFollowTargetNilfgaard().HasTag('ACS_Horse_Rider_Follow_Target_Position_1')
+				&& GetACS_HorseRiderFollowTargetNilfgaard().HasTag('ACS_Horse_Rider_Follow_Target_Position_2')
+				&& !GetACS_HorseRiderFollowTargetNilfgaard().HasTag('ACS_Horse_Rider_Follow_Target_Position_3')
+				)
+				{
+					GetACS_HorseRiderFollowTargetNilfgaard().Teleport(nilfgaard_pos3);
+
+					GetACS_HorseRiderFollowTargetNilfgaard().AddTag('ACS_Horse_Rider_Follow_Target_Position_3');
+				}
+				else if (GetACS_HorseRiderFollowTargetNilfgaard().HasTag('ACS_Horse_Rider_Follow_Target_Position_1')
+				&& GetACS_HorseRiderFollowTargetNilfgaard().HasTag('ACS_Horse_Rider_Follow_Target_Position_2')
+				&& GetACS_HorseRiderFollowTargetNilfgaard().HasTag('ACS_Horse_Rider_Follow_Target_Position_3')
+				)
+				{
+					GetACS_HorseRiderFollowTargetNilfgaard().Teleport(nilfgaard_pos1);
+
+					GetACS_HorseRiderFollowTargetNilfgaard().RemoveTag('ACS_Horse_Rider_Follow_Target_Position_1');
+					GetACS_HorseRiderFollowTargetNilfgaard().RemoveTag('ACS_Horse_Rider_Follow_Target_Position_2');
+					GetACS_HorseRiderFollowTargetNilfgaard().RemoveTag('ACS_Horse_Rider_Follow_Target_Position_3');
+				}
+			}
+		}
+
+		if (GetACS_HorseRiderFollowTargetRedania())
+		{
+			if (ACS_horse_follow_target_redania_can_teleport())
+			{
+				ACS_refresh_horse_follow_target_redania_teleport_cooldown();
+
+				if (theGame.GetWorld().GetDepotPath() == "levels\novigrad\novigrad.w2w")
+				{
+					redania_pos3 = Vector(1224.159180, 644.492615, 34.799957, 1);
+
+					redania_pos2 = Vector(1808.964233, 511.915314, 3.037488, 1);
+
+					redania_pos1 = Vector(2059.403564, 1120.827759, 4.660693, 1);
+				}
+
+				if (!GetACS_HorseRiderFollowTargetRedania().HasTag('ACS_Horse_Rider_Follow_Target_Position_1')
+				&& !GetACS_HorseRiderFollowTargetRedania().HasTag('ACS_Horse_Rider_Follow_Target_Position_2')
+				&& !GetACS_HorseRiderFollowTargetRedania().HasTag('ACS_Horse_Rider_Follow_Target_Position_3')
+				)
+				{
+					GetACS_HorseRiderFollowTargetRedania().Teleport(redania_pos1);
+
+					GetACS_HorseRiderFollowTargetRedania().AddTag('ACS_Horse_Rider_Follow_Target_Position_1');
+				}
+				else if (GetACS_HorseRiderFollowTargetRedania().HasTag('ACS_Horse_Rider_Follow_Target_Position_1')
+				&& !GetACS_HorseRiderFollowTargetRedania().HasTag('ACS_Horse_Rider_Follow_Target_Position_2')
+				&& !GetACS_HorseRiderFollowTargetRedania().HasTag('ACS_Horse_Rider_Follow_Target_Position_3')
+				)
+				{
+					GetACS_HorseRiderFollowTargetRedania().Teleport(redania_pos2);
+
+					GetACS_HorseRiderFollowTargetRedania().AddTag('ACS_Horse_Rider_Follow_Target_Position_2');
+				}
+				else if (GetACS_HorseRiderFollowTargetRedania().HasTag('ACS_Horse_Rider_Follow_Target_Position_1')
+				&& GetACS_HorseRiderFollowTargetRedania().HasTag('ACS_Horse_Rider_Follow_Target_Position_2')
+				&& !GetACS_HorseRiderFollowTargetRedania().HasTag('ACS_Horse_Rider_Follow_Target_Position_3')
+				)
+				{
+					GetACS_HorseRiderFollowTargetRedania().Teleport(redania_pos3);
+
+					GetACS_HorseRiderFollowTargetRedania().AddTag('ACS_Horse_Rider_Follow_Target_Position_3');
+				}
+				else if (GetACS_HorseRiderFollowTargetRedania().HasTag('ACS_Horse_Rider_Follow_Target_Position_1')
+				&& GetACS_HorseRiderFollowTargetRedania().HasTag('ACS_Horse_Rider_Follow_Target_Position_2')
+				&& GetACS_HorseRiderFollowTargetRedania().HasTag('ACS_Horse_Rider_Follow_Target_Position_3')
+				)
+				{
+					GetACS_HorseRiderFollowTargetRedania().Teleport(redania_pos1);
+
+					GetACS_HorseRiderFollowTargetRedania().RemoveTag('ACS_Horse_Rider_Follow_Target_Position_1');
+					GetACS_HorseRiderFollowTargetRedania().RemoveTag('ACS_Horse_Rider_Follow_Target_Position_2');
+					GetACS_HorseRiderFollowTargetRedania().RemoveTag('ACS_Horse_Rider_Follow_Target_Position_3');
+				}
+			}
+		}
+
+		HorseRiderRedaniaBreakAttachment();
+
+		HorseRiderNovigradBreakAttachment();
+
+		HorseRiderNilfgaardBreakAttachment();
+	}
+
+	function HorseRiderRedaniaBreakAttachment()
+	{	
+		var i, j											: int;
+		var ents, horseEnts 								: array<CActor>;
+		var enemyAnimatedComponent 							: CAnimatedComponent;
+		var targetDistanceRider, targetDistanceHorse		: float;
+
+		ents.Clear();
+
+		theGame.GetActorsByTag( 'ACS_Horse_Rider_Redania', ents );	
+
+		if (ents.Size() < 0)
+		{
+			return;
+		}
+		
+		for( i = 0; i < ents.Size(); i += 1 )
+		{
+			enemyAnimatedComponent = (CAnimatedComponent)ents[i].GetComponentByClassName( 'CAnimatedComponent' );	
+
+			targetDistanceRider = VecDistanceSquared2D( thePlayer.GetWorldPosition(), ents[i].GetWorldPosition() );
+
+			if (ents[i].IsInCombat())
+			{
+				if (!ents[i].HasTag('ACS_Horse_Rider_In_Combat'))
+				{
+					enemyAnimatedComponent.UnfreezePose();
+
+					ents[i].EnableCollisions(true);
+					ents[i].EnableCharacterCollisions(true);
+
+					ents[i].BreakAttachment();
+
+					ents[i].AddTag('ACS_Horse_Rider_In_Combat');
+				}
+			}
+
+			if (targetDistanceRider >= 150 * 150
+			)
+			{
+				ents[i].Destroy();
+			}
+		}
+
+		horseEnts.Clear();
+
+		theGame.GetActorsByTag( 'ACS_Horse_Rider_Horse_Redania', horseEnts );	
+
+		if (horseEnts.Size() < 0)
+		{
+			return;
+		}
+		
+		for( j = 0; j < horseEnts.Size(); j += 1 )
+		{
+			targetDistanceHorse = VecDistanceSquared2D( thePlayer.GetWorldPosition(), horseEnts[j].GetWorldPosition() );
+
+			if (targetDistanceHorse >= 150 * 150
+			)
+			{
+				horseEnts[j].Destroy();
+			}
+		}
+	}
+
+	function HorseRiderNovigradBreakAttachment()
+	{	
+		var i, j											: int;
+		var ents, horseEnts 								: array<CActor>;
+		var enemyAnimatedComponent 							: CAnimatedComponent;
+		var targetDistanceRider, targetDistanceHorse		: float;
+
+		ents.Clear();
+
+		theGame.GetActorsByTag( 'ACS_Horse_Rider_Novigrad', ents );	
+
+		if (ents.Size() < 0)
+		{
+			return;
+		}
+		
+		for( i = 0; i < ents.Size(); i += 1 )
+		{
+			enemyAnimatedComponent = (CAnimatedComponent)ents[i].GetComponentByClassName( 'CAnimatedComponent' );	
+
+			targetDistanceRider = VecDistanceSquared2D( thePlayer.GetWorldPosition(), ents[i].GetWorldPosition() );
+
+			if (ents[i].IsInCombat())
+			{
+				if (!ents[i].HasTag('ACS_Horse_Rider_In_Combat'))
+				{
+					enemyAnimatedComponent.UnfreezePose();
+
+					ents[i].EnableCollisions(true);
+					ents[i].EnableCharacterCollisions(true);
+
+					ents[i].BreakAttachment();
+
+					ents[i].AddTag('ACS_Horse_Rider_In_Combat');
+				}
+			}
+
+			if (targetDistanceRider >= 150 * 150
+			)
+			{
+				ents[i].Destroy();
+			}
+		}
+
+
+		horseEnts.Clear();
+
+		theGame.GetActorsByTag( 'ACS_Horse_Rider_Horse_Novigrad', horseEnts );	
+
+		if (horseEnts.Size() < 0)
+		{
+			return;
+		}
+		
+		for( j = 0; j < horseEnts.Size(); j += 1 )
+		{
+			targetDistanceHorse = VecDistanceSquared2D( thePlayer.GetWorldPosition(), horseEnts[j].GetWorldPosition() );
+
+			if (targetDistanceHorse >= 150 * 150
+			)
+			{
+				horseEnts[j].Destroy();
+			}
+		}
+
+	}
+
+	function HorseRiderNilfgaardBreakAttachment()
+	{	
+		var i, j											: int;
+		var ents, horseEnts 								: array<CActor>;
+		var enemyAnimatedComponent 							: CAnimatedComponent;
+		var targetDistanceRider, targetDistanceHorse		: float;
+
+		ents.Clear();
+
+		theGame.GetActorsByTag( 'ACS_Horse_Rider_Nilfgaard', ents );	
+
+		if (ents.Size() < 0)
+		{
+			return;
+		}
+
+		for( i = 0; i < ents.Size(); i += 1 )
+		{
+			enemyAnimatedComponent = (CAnimatedComponent)ents[i].GetComponentByClassName( 'CAnimatedComponent' );	
+
+			targetDistanceRider = VecDistanceSquared2D( thePlayer.GetWorldPosition(), ents[i].GetWorldPosition() );
+
+			if (ents[i].IsInCombat())
+			{
+				if (!ents[i].HasTag('ACS_Horse_Rider_In_Combat'))
+				{
+					enemyAnimatedComponent.UnfreezePose();
+
+					ents[i].EnableCollisions(true);
+					ents[i].EnableCharacterCollisions(true);
+
+					ents[i].BreakAttachment();
+
+					ents[i].AddTag('ACS_Horse_Rider_In_Combat');
+				}
+			}
+
+			if (targetDistanceRider >= 150 * 150
+			)
+			{
+				ents[i].Destroy();
+			}
+		}
+
+
+
+		horseEnts.Clear();
+
+		theGame.GetActorsByTag( 'ACS_Horse_Rider_Horse_Nilfgaard', horseEnts );	
+
+		if (horseEnts.Size() < 0)
+		{
+			return;
+		}
+		
+		for( j = 0; j < horseEnts.Size(); j += 1 )
+		{
+			targetDistanceHorse = VecDistanceSquared2D( thePlayer.GetWorldPosition(), horseEnts[j].GetWorldPosition() );
+
+			if (targetDistanceHorse >= 150 * 150
+			)
+			{
+				horseEnts[j].Destroy();
+			}
+		}
+
+	}
+
 	function THE_EYE()
 	{
 		if (!ACS_Enabled())
@@ -31102,6 +32079,8 @@ statemachine abstract class W3ACSWatcher extends CEntity
 			theGame.EnableUberMovement( true );
 		}
 
+		HorseRiderFollowTargetTeleport();
+
 		ACS_Fog_Generate();
 
 		SetPlayerTargetAcquire();
@@ -31158,8 +32137,6 @@ statemachine abstract class W3ACSWatcher extends CEntity
 
 		ACS_MeditationControl();
 
-		ACS_BuffsDisplay();
-
 		Durability_Always_Max();
 
 		AutoRead();
@@ -31190,7 +32167,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 
 		FUCKING_TUTORIAL_DISABLE();
 
-		MinimapAndQuestModuleAutoHide();
+		HudModulesAutoHide();
 
 		ACS_Give_Medallions();
 
@@ -32219,56 +33196,48 @@ statemachine abstract class W3ACSWatcher extends CEntity
 				thePlayer.PlayEffectSingle('embers_particles_test');
 				thePlayer.StopEffect('embers_particles_test');
 				quen_sword_summon();
-				thePlayer.SoundEvent("fx_fire_sizzle_small");
 			}
 			else if (thePlayer.HasTag('axii_sword_equipped'))
 			{
 				thePlayer.PlayEffectSingle('embers_particles_test');
 				thePlayer.StopEffect('embers_particles_test');
 				axii_sword_summon();
-				thePlayer.SoundEvent("fx_fire_sizzle_small");
 			}
 			else if (thePlayer.HasTag('aard_sword_equipped'))
 			{
 				thePlayer.PlayEffectSingle('embers_particles_test');
 				thePlayer.StopEffect('embers_particles_test');
 				aard_sword_summon();
-				thePlayer.SoundEvent("fx_fire_sizzle_small");
 			}
 			else if (thePlayer.HasTag('yrden_sword_equipped'))
 			{
 				thePlayer.PlayEffectSingle('embers_particles_test');
 				thePlayer.StopEffect('embers_particles_test');
 				yrden_sword_summon();
-				thePlayer.SoundEvent("fx_fire_sizzle_small");
 			}
 			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
 			{
 				thePlayer.PlayEffectSingle('embers_particles_test');
 				thePlayer.StopEffect('embers_particles_test');
 				quen_secondary_sword_summon();
-				thePlayer.SoundEvent("fx_fire_sizzle_small");
 			}
 			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
 			{
 				thePlayer.PlayEffectSingle('embers_particles_test');
 				thePlayer.StopEffect('embers_particles_test');
 				axii_secondary_sword_summon();
-				thePlayer.SoundEvent("fx_fire_sizzle_small");
 			}
 			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
 			{
 				thePlayer.PlayEffectSingle('embers_particles_test');
 				thePlayer.StopEffect('embers_particles_test');
 				aard_secondary_sword_summon();
-				thePlayer.SoundEvent("fx_fire_sizzle_small");
 			}
 			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
 			{
 				thePlayer.PlayEffectSingle('embers_particles_test');
 				thePlayer.StopEffect('embers_particles_test');
 				yrden_secondary_sword_summon();
-				thePlayer.SoundEvent("fx_fire_sizzle_small");
 			}
 			else if (
 			thePlayer.HasTag('igni_secondary_sword_equipped')
@@ -32279,7 +33248,6 @@ statemachine abstract class W3ACSWatcher extends CEntity
 					thePlayer.PlayEffectSingle('embers_particles_test');
 					thePlayer.StopEffect('embers_particles_test');
 					igni_sword_summon();
-					thePlayer.SoundEvent("fx_fire_sizzle_small");
 				}
 
 				if (!thePlayer.HasTag('ACS_HideWeaponOnDodge')
@@ -32299,7 +33267,6 @@ statemachine abstract class W3ACSWatcher extends CEntity
 				thePlayer.PlayEffectSingle('embers_particles_test');
 				thePlayer.StopEffect('embers_particles_test');
 				aard_sword_summon();
-				thePlayer.SoundEvent("fx_fire_sizzle_small");
 			}
 			else if (
 			thePlayer.HasTag('igni_secondary_sword_equipped')
@@ -32353,8 +33320,6 @@ statemachine abstract class W3ACSWatcher extends CEntity
 		ACS_Yrden_Sidearm_3().StopEffect('fast_attack_buff_hit');
 
 		ACS_Yrden_Sidearm_UpdateEnhancements();
-
-		thePlayer.SoundEvent("fx_fire_sizzle_small");
 	}
 
 	function Weapon_Summon_Effect_Delay()
@@ -38306,6 +39271,11 @@ statemachine abstract class W3ACSWatcher extends CEntity
 			DisableTransformationToad_Actual();
 		}
 
+		if (ACS_Transformation_Red_Miasmal_Check())
+		{
+			DisableRedMiasmal_Actual();
+		}
+
 		playerPos = thePlayer.GetWorldPosition();
 
 		playerPos.Z += 2;
@@ -41812,9 +42782,9 @@ statemachine abstract class W3ACSWatcher extends CEntity
 					RemoveTimer('ACS_ResetAnimation');
 					RemoveTimer('ACS_ResetAnimation'); AddTimer('ACS_ResetAnimation', 0.5  , false);
 
-					thePlayer.SetSprintActionPressed( false );
-					thePlayer.SetSprintToggle( false );
-					thePlayer.SetWalkToggle( true );
+					//thePlayer.SetSprintActionPressed( false );
+					//thePlayer.SetSprintToggle( false );
+					//thePlayer.SetWalkToggle( true );
 				}
 			}
 			else
@@ -44784,7 +45754,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 					}
 					else if (combo_counter_geralt_light_attack == 4)
 					{
-						PlayerPlayAnimation( 'geralt_attack_fast_5_rp_ACS');
+						PlayerPlayAnimation( 'geralt_attack_fast_7_rp_ACS');
 
 						combo_counter_damage += 1;
 
@@ -44792,7 +45762,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 					}
 					else if (combo_counter_geralt_light_attack == 5)
 					{
-						PlayerPlayAnimation( 'geralt_attack_fast_5_lp_ACS');
+						PlayerPlayAnimation( 'geralt_attack_fast_7_lp_ACS');
 
 						combo_counter_damage += 1;
 
@@ -44800,13 +45770,29 @@ statemachine abstract class W3ACSWatcher extends CEntity
 					}
 					else if (combo_counter_geralt_light_attack == 6)
 					{
-						PlayerPlayAnimation( 'geralt_attack_fast_6_rp_ACS');
+						PlayerPlayAnimation( 'geralt_attack_fast_5_rp_ACS');
 
 						combo_counter_damage += 1;
 
 						combo_counter_geralt_light_attack += 1;
 					}
 					else if (combo_counter_geralt_light_attack == 7)
+					{
+						PlayerPlayAnimation( 'geralt_attack_fast_5_lp_ACS');
+
+						combo_counter_damage += 1;
+
+						combo_counter_geralt_light_attack += 1;
+					}
+					else if (combo_counter_geralt_light_attack == 8)
+					{
+						PlayerPlayAnimation( 'geralt_attack_fast_6_rp_ACS');
+
+						combo_counter_damage += 1;
+
+						combo_counter_geralt_light_attack += 1;
+					}
+					else if (combo_counter_geralt_light_attack == 9)
 					{
 						if( thePlayer.IsAlive()) {thePlayer.ClearAnimationSpeedMultipliers();}	
 
@@ -44925,10 +45911,18 @@ statemachine abstract class W3ACSWatcher extends CEntity
 			{
 				if( targetDistance <= 3 * 3 ) 
 				{
-					geralt_light_attack_forward_index_1 = RandDifferent(this.previous_geralt_light_attack_forward_index_1 , 7);
+					geralt_light_attack_forward_index_1 = RandDifferent(this.previous_geralt_light_attack_forward_index_1 , 9);
 
 					switch (geralt_light_attack_forward_index_1) 
 					{	
+						case 8:
+						PlayerPlayAnimation( 'geralt_attack_fast_7_lp_ACS');
+						break;
+
+						case 7:
+						PlayerPlayAnimation( 'geralt_attack_fast_7_rp_ACS');
+						break;
+
 						case 6:
 						if( thePlayer.IsAlive()) {thePlayer.ClearAnimationSpeedMultipliers();}	
 
@@ -45192,6 +46186,11 @@ statemachine abstract class W3ACSWatcher extends CEntity
 			thePlayer.PlayEffectSingle( 'fury_ciri' );
 		}
 
+		if (!thePlayer.IsEffectActive('acs_fury_effect', false))
+		{
+			thePlayer.PlayEffectSingle( 'acs_fury_effect' );
+		}
+
 		ACS_ExplorationDelayHack();
 
 		finisherActorTarget = (CActor)( thePlayer.GetTarget() );	
@@ -45259,6 +46258,11 @@ statemachine abstract class W3ACSWatcher extends CEntity
 			thePlayer.PlayEffectSingle( 'fury_ciri' );
 		}
 
+		if (!thePlayer.IsEffectActive('acs_fury_effect', false))
+		{
+			thePlayer.PlayEffectSingle( 'acs_fury_effect' );
+		}
+
 		ACS_ExplorationDelayHack();
 
 		finisherActorTarget = (CActor)( thePlayer.GetTarget() );	
@@ -45324,6 +46328,11 @@ statemachine abstract class W3ACSWatcher extends CEntity
 		if (!thePlayer.IsEffectActive('fury_ciri', false))
 		{
 			thePlayer.PlayEffectSingle( 'fury_ciri' );
+		}
+
+		if (!thePlayer.IsEffectActive('acs_fury_effect', false))
+		{
+			thePlayer.PlayEffectSingle( 'acs_fury_effect' );
 		}
 
 		ACS_ExplorationDelayHack();
@@ -51720,6 +52729,11 @@ statemachine abstract class W3ACSWatcher extends CEntity
 			thePlayer.PlayEffectSingle( 'fury_ciri' );
 		}
 
+		if (!thePlayer.IsEffectActive('acs_fury_effect', false))
+		{
+			thePlayer.PlayEffectSingle( 'acs_fury_effect' );
+		}
+
 		ACS_Vampire_Back_Claw_Teleport();
 
 		thePlayer.StopEffect('dive_shape');
@@ -54251,6 +55265,11 @@ statemachine abstract class W3ACSWatcher extends CEntity
 				if (!thePlayer.IsEffectActive('fury_ciri', false))
 				{
 					thePlayer.PlayEffectSingle( 'fury_ciri' );
+				}
+
+				if (!thePlayer.IsEffectActive('acs_fury_effect', false))
+				{
+					thePlayer.PlayEffectSingle( 'acs_fury_effect' );
 				}
 			}
 		}
@@ -62165,8 +63184,6 @@ statemachine abstract class W3ACSWatcher extends CEntity
 	function jump_attack()
 	{
 		MovementAdjust();
-
-		movementAdjustor.AdjustmentDuration( ticket, 1 );
 		
 		thePlayer.BreakAttachment();
 		
@@ -62205,6 +63222,8 @@ statemachine abstract class W3ACSWatcher extends CEntity
 					}
 					else
 					{
+						movementAdjustor.AdjustmentDuration( ticket, 1 );
+
 						thePlayer.SoundEvent("monster_dettlaff_monster_combat_construct_dash_vfx");
 
 						jump_attack_index_1 = RandDifferent(this.previous_jump_attack_index_1 , 2);
@@ -62260,6 +63279,8 @@ statemachine abstract class W3ACSWatcher extends CEntity
 					}
 					else
 					{
+						movementAdjustor.AdjustmentDuration( ticket, 1 );
+
 						thePlayer.SoundEvent("monster_dettlaff_monster_combat_construct_dash_vfx");
 
 						jump_attack_index_1 = RandDifferent(this.previous_jump_attack_index_1 , 2);
@@ -62316,6 +63337,8 @@ statemachine abstract class W3ACSWatcher extends CEntity
 					}
 					else
 					{
+						movementAdjustor.AdjustmentDuration( ticket, 1 );
+
 						thePlayer.SoundEvent("monster_dettlaff_monster_combat_construct_dash_vfx");
 
 						jump_attack_index_1 = RandDifferent(this.previous_jump_attack_index_1 , 2);
@@ -62356,6 +63379,8 @@ statemachine abstract class W3ACSWatcher extends CEntity
 					}
 					else
 					{
+						movementAdjustor.AdjustmentDuration( ticket, 1 );
+
 						thePlayer.SoundEvent("monster_dettlaff_monster_combat_construct_dash_vfx");
 
 						jump_attack_index_1 = RandDifferent(this.previous_jump_attack_index_1 , 2);
@@ -62399,6 +63424,8 @@ statemachine abstract class W3ACSWatcher extends CEntity
 				}
 				else
 				{
+					movementAdjustor.AdjustmentDuration( ticket, 1 );
+
 					thePlayer.SoundEvent("monster_dettlaff_monster_combat_construct_dash_vfx");
 
 					if( RandF() < 0.5 ) 
@@ -66285,7 +67312,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 				}
 				else if (combo_counter_geralt_light_attack_cat == 4)
 				{
-					PlayerPlayAnimation( 'geralt_attack_fast_5_rp_ACS');
+					PlayerPlayAnimation( 'geralt_attack_fast_7_rp_ACS');
 
 					combo_counter_damage += 1;
 
@@ -66293,7 +67320,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 				}
 				else if (combo_counter_geralt_light_attack_cat == 5)
 				{
-					PlayerPlayAnimation( 'geralt_attack_fast_5_lp_ACS');
+					PlayerPlayAnimation( 'geralt_attack_fast_7_lp_ACS');
 
 					combo_counter_damage += 1;
 
@@ -66301,13 +67328,29 @@ statemachine abstract class W3ACSWatcher extends CEntity
 				}
 				else if (combo_counter_geralt_light_attack_cat == 6)
 				{
-					PlayerPlayAnimation( 'geralt_attack_fast_6_rp_ACS');
+					PlayerPlayAnimation( 'geralt_attack_fast_5_rp_ACS');
 
 					combo_counter_damage += 1;
 
 					combo_counter_geralt_light_attack_cat += 1;
 				}
 				else if (combo_counter_geralt_light_attack_cat == 7)
+				{
+					PlayerPlayAnimation( 'geralt_attack_fast_5_lp_ACS');
+
+					combo_counter_damage += 1;
+
+					combo_counter_geralt_light_attack_cat += 1;
+				}
+				else if (combo_counter_geralt_light_attack_cat == 8)
+				{
+					PlayerPlayAnimation( 'geralt_attack_fast_6_rp_ACS');
+
+					combo_counter_damage += 1;
+
+					combo_counter_geralt_light_attack_cat += 1;
+				}
+				else if (combo_counter_geralt_light_attack_cat == 9)
 				{
 					if( thePlayer.IsAlive()) {thePlayer.ClearAnimationSpeedMultipliers();}	
 
@@ -66324,10 +67367,18 @@ statemachine abstract class W3ACSWatcher extends CEntity
 			}
 			else if (ACS_ComboMode() == 1)
 			{
-				geralt_light_attack_index_1 = RandDifferent(this.previous_geralt_light_attack_index_1 , 8);
+				geralt_light_attack_index_1 = RandDifferent(this.previous_geralt_light_attack_index_1 , 10);
 
 				switch (geralt_light_attack_index_1) 
 				{	
+					case 9:
+					PlayerPlayAnimation( 'geralt_attack_fast_7_lp_ACS');
+					break;
+
+					case 8:
+					PlayerPlayAnimation( 'geralt_attack_fast_7_rp_ACS');
+					break;
+
 					case 7:
 					PlayerPlayAnimation( 'geralt_attack_fast_5_rp_ACS');
 					break;
@@ -66412,7 +67463,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 				}
 				else if (combo_counter_geralt_light_attack_cat == 4)
 				{
-					PlayerPlayAnimation( 'geralt_attack_fast_5_rp_ACS');
+					PlayerPlayAnimation( 'geralt_attack_fast_7_rp_ACS');
 
 					combo_counter_damage += 1;
 
@@ -66420,7 +67471,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 				}
 				else if (combo_counter_geralt_light_attack_cat == 5)
 				{
-					PlayerPlayAnimation( 'geralt_attack_fast_5_lp_ACS');
+					PlayerPlayAnimation( 'geralt_attack_fast_7_lp_ACS');
 
 					combo_counter_damage += 1;
 
@@ -66428,13 +67479,29 @@ statemachine abstract class W3ACSWatcher extends CEntity
 				}
 				else if (combo_counter_geralt_light_attack_cat == 6)
 				{
-					PlayerPlayAnimation( 'geralt_attack_fast_6_rp_ACS');
+					PlayerPlayAnimation( 'geralt_attack_fast_5_rp_ACS');
 
 					combo_counter_damage += 1;
 
 					combo_counter_geralt_light_attack_cat += 1;
 				}
 				else if (combo_counter_geralt_light_attack_cat == 7)
+				{
+					PlayerPlayAnimation( 'geralt_attack_fast_5_lp_ACS');
+
+					combo_counter_damage += 1;
+
+					combo_counter_geralt_light_attack_cat += 1;
+				}
+				else if (combo_counter_geralt_light_attack_cat == 8)
+				{
+					PlayerPlayAnimation( 'geralt_attack_fast_6_rp_ACS');
+
+					combo_counter_damage += 1;
+
+					combo_counter_geralt_light_attack_cat += 1;
+				}
+				else if (combo_counter_geralt_light_attack_cat == 9)
 				{
 					if( thePlayer.IsAlive()) {thePlayer.ClearAnimationSpeedMultipliers();}	
 
@@ -66451,10 +67518,18 @@ statemachine abstract class W3ACSWatcher extends CEntity
 			}
 			else if (ACS_ComboMode() == 1)
 			{
-				geralt_light_attack_index_3 = RandDifferent(this.previous_geralt_light_attack_index_3 , 8);
+				geralt_light_attack_index_3 = RandDifferent(this.previous_geralt_light_attack_index_3 , 10);
 
 				switch (geralt_light_attack_index_3) 
 				{	
+					case 9:
+					PlayerPlayAnimation( 'geralt_attack_fast_7_lp_ACS');
+					break;
+
+					case 8:
+					PlayerPlayAnimation( 'geralt_attack_fast_7_rp_ACS');
+					break;
+
 					case 7:
 					PlayerPlayAnimation( 'geralt_attack_fast_5_rp_ACS');
 					break;
@@ -66559,6 +67634,22 @@ statemachine abstract class W3ACSWatcher extends CEntity
 				}
 				else if (combo_counter_geralt_heavy_attack_cat == 4)
 				{
+					PlayerPlayAnimation( 'geralt_attack_fast_7_rp_ACS');
+
+					combo_counter_damage += 1;
+
+					combo_counter_geralt_heavy_attack_cat += 1;
+				}
+				else if (combo_counter_geralt_heavy_attack_cat == 5)
+				{
+					PlayerPlayAnimation( 'geralt_attack_fast_7_lp_ACS');
+
+					combo_counter_damage += 1;
+
+					combo_counter_geralt_heavy_attack_cat += 1;
+				}
+				else if (combo_counter_geralt_heavy_attack_cat == 6)
+				{
 					PlayerPlayAnimation( 'geralt_attack_strong_5_rp_ACS');
 	
 					combo_counter_damage += 1;
@@ -66566,7 +67657,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 					combo_counter_geralt_heavy_attack_cat += 1;
 				}
 
-				else if (combo_counter_geralt_heavy_attack_cat == 5)
+				else if (combo_counter_geralt_heavy_attack_cat == 7)
 				{
 					PlayerPlayAnimation( 'geralt_attack_strong_3_lp_ACS');
 	
@@ -66575,7 +67666,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 					combo_counter_geralt_heavy_attack_cat += 1;
 				}
 
-				else if (combo_counter_geralt_heavy_attack_cat == 6)
+				else if (combo_counter_geralt_heavy_attack_cat == 8)
 				{
 					PlayerPlayAnimation( 'geralt_attack_strong_4_rp_ACS');
 	
@@ -66584,7 +67675,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 					combo_counter_geralt_heavy_attack_cat += 1;
 				}
 
-				else if (combo_counter_geralt_heavy_attack_cat == 7)
+				else if (combo_counter_geralt_heavy_attack_cat == 9)
 				{
 					PlayerPlayAnimation( 'geralt_attack_strong_2_lp_ACS');
 	
@@ -66595,10 +67686,18 @@ statemachine abstract class W3ACSWatcher extends CEntity
 			}
 			else if (ACS_ComboMode() == 1)
 			{
-				geralt_light_attack_index_1 = RandDifferent(this.previous_geralt_light_attack_index_1 , 8);
+				geralt_light_attack_index_1 = RandDifferent(this.previous_geralt_light_attack_index_1 , 10);
 
 				switch (geralt_light_attack_index_1) 
 				{
+					case 9:
+					PlayerPlayAnimation( 'geralt_attack_fast_7_lp_ACS');
+					break;
+
+					case 8:
+					PlayerPlayAnimation( 'geralt_attack_fast_7_rp_ACS');
+					break;
+
 					case 7:
 					PlayerPlayAnimation( 'geralt_attack_strong_2_lp_ACS');
 					break;
@@ -66677,6 +67776,22 @@ statemachine abstract class W3ACSWatcher extends CEntity
 				}
 				else if (combo_counter_geralt_heavy_attack_cat == 4)
 				{
+					PlayerPlayAnimation( 'geralt_attack_fast_7_rp_ACS');
+
+					combo_counter_damage += 1;
+
+					combo_counter_geralt_heavy_attack_cat += 1;
+				}
+				else if (combo_counter_geralt_heavy_attack_cat == 5)
+				{
+					PlayerPlayAnimation( 'geralt_attack_fast_7_lp_ACS');
+
+					combo_counter_damage += 1;
+
+					combo_counter_geralt_heavy_attack_cat += 1;
+				}
+				else if (combo_counter_geralt_heavy_attack_cat == 6)
+				{
 					PlayerPlayAnimation( 'geralt_attack_strong_5_rp_ACS');
 	
 					combo_counter_damage += 1;
@@ -66684,7 +67799,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 					combo_counter_geralt_heavy_attack_cat += 1;
 				}
 
-				else if (combo_counter_geralt_heavy_attack_cat == 5)
+				else if (combo_counter_geralt_heavy_attack_cat == 7)
 				{
 					PlayerPlayAnimation( 'geralt_attack_strong_3_lp_ACS');
 	
@@ -66693,7 +67808,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 					combo_counter_geralt_heavy_attack_cat += 1;
 				}
 
-				else if (combo_counter_geralt_heavy_attack_cat == 6)
+				else if (combo_counter_geralt_heavy_attack_cat == 8)
 				{
 					PlayerPlayAnimation( 'geralt_attack_strong_4_rp_ACS');
 	
@@ -66702,7 +67817,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 					combo_counter_geralt_heavy_attack_cat += 1;
 				}
 
-				else if (combo_counter_geralt_heavy_attack_cat == 7)
+				else if (combo_counter_geralt_heavy_attack_cat == 9)
 				{
 					PlayerPlayAnimation( 'geralt_attack_strong_2_lp_ACS');
 	
@@ -66713,10 +67828,18 @@ statemachine abstract class W3ACSWatcher extends CEntity
 			}
 			else if (ACS_ComboMode() == 1)
 			{
-				geralt_light_attack_index_3 = RandDifferent(this.previous_geralt_light_attack_index_3 , 8);
+				geralt_light_attack_index_3 = RandDifferent(this.previous_geralt_light_attack_index_3 , 10);
 
 				switch (geralt_light_attack_index_3) 
 				{	
+					case 9:
+					PlayerPlayAnimation( 'geralt_attack_fast_7_lp_ACS');
+					break;
+
+					case 8:
+					PlayerPlayAnimation( 'geralt_attack_fast_7_rp_ACS');
+					break;
+
 					case 7:
 					PlayerPlayAnimation( 'geralt_attack_strong_2_lp_ACS');
 					break;
@@ -66895,7 +68018,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 
 					RemoveTimer('ACS_ResetAnimation'); AddTimer('ACS_ResetAnimation', 0.25  , false);	
 
-					PlayerPlayAnimation( 'geralt_attack_fast_5_rp_ACS');
+					PlayerPlayAnimation( 'geralt_attack_fast_7_rp_ACS');
 
 					combo_counter_damage += 1;
 
@@ -66907,7 +68030,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 
 					RemoveTimer('ACS_ResetAnimation'); AddTimer('ACS_ResetAnimation', 0.25  , false);	
 
-					PlayerPlayAnimation( 'geralt_attack_fast_5_lp_ACS');
+					PlayerPlayAnimation( 'geralt_attack_fast_7_lp_ACS');
 
 					combo_counter_damage += 1;
 
@@ -66919,13 +68042,37 @@ statemachine abstract class W3ACSWatcher extends CEntity
 
 					RemoveTimer('ACS_ResetAnimation'); AddTimer('ACS_ResetAnimation', 0.25  , false);	
 
-					PlayerPlayAnimation( 'geralt_attack_fast_6_rp_ACS');
+					PlayerPlayAnimation( 'geralt_attack_fast_5_rp_ACS');
 
 					combo_counter_damage += 1;
 
 					combo_counter_geralt_light_attack_forward_cat += 1;
 				}
 				else if (combo_counter_geralt_light_attack_forward_cat == 12)
+				{
+					if (thePlayer.IsGuarded()||thePlayer.HasBuff(EET_SlowdownFrost)||thePlayer.HasBuff(EET_Slowdown)||thePlayer.HasBuff(EET_Blizzard)){thePlayer.SetAnimationSpeedMultiplier( 1.5  ); }else{thePlayer.SetAnimationSpeedMultiplier( 1.5 ); }		
+
+					RemoveTimer('ACS_ResetAnimation'); AddTimer('ACS_ResetAnimation', 0.25  , false);	
+
+					PlayerPlayAnimation( 'geralt_attack_fast_5_lp_ACS');
+
+					combo_counter_damage += 1;
+
+					combo_counter_geralt_light_attack_forward_cat += 1;
+				}
+				else if (combo_counter_geralt_light_attack_forward_cat == 13)
+				{
+					if (thePlayer.IsGuarded()||thePlayer.HasBuff(EET_SlowdownFrost)||thePlayer.HasBuff(EET_Slowdown)||thePlayer.HasBuff(EET_Blizzard)){thePlayer.SetAnimationSpeedMultiplier( 1.5  ); }else{thePlayer.SetAnimationSpeedMultiplier( 1.5 ); }		
+
+					RemoveTimer('ACS_ResetAnimation'); AddTimer('ACS_ResetAnimation', 0.25  , false);	
+
+					PlayerPlayAnimation( 'geralt_attack_fast_6_rp_ACS');
+
+					combo_counter_damage += 1;
+
+					combo_counter_geralt_light_attack_forward_cat += 1;
+				}
+				else if (combo_counter_geralt_light_attack_forward_cat == 14)
 				{
 					if (thePlayer.IsGuarded()||thePlayer.HasBuff(EET_SlowdownFrost)||thePlayer.HasBuff(EET_Slowdown)||thePlayer.HasBuff(EET_Blizzard)){thePlayer.SetAnimationSpeedMultiplier( 1.5  ); }else{thePlayer.SetAnimationSpeedMultiplier( 1.5 ); }		
 
@@ -66940,10 +68087,26 @@ statemachine abstract class W3ACSWatcher extends CEntity
 			}
 			else if (ACS_ComboMode() == 1)
 			{
-				geralt_light_attack_forward_index_1 = RandDifferent(this.previous_geralt_light_attack_forward_index_1 , 13);
+				geralt_light_attack_forward_index_1 = RandDifferent(this.previous_geralt_light_attack_forward_index_1 , 15);
 
 				switch (geralt_light_attack_forward_index_1) 
 				{	
+					case 14:
+					if (thePlayer.IsGuarded()||thePlayer.HasBuff(EET_SlowdownFrost)||thePlayer.HasBuff(EET_Slowdown)||thePlayer.HasBuff(EET_Blizzard)){thePlayer.SetAnimationSpeedMultiplier( 1.5  ); }else{thePlayer.SetAnimationSpeedMultiplier( 1.5 ); }		
+
+					RemoveTimer('ACS_ResetAnimation'); AddTimer('ACS_ResetAnimation', 0.25  , false);	
+
+					PlayerPlayAnimation( 'geralt_attack_fast_7_lp_ACS');
+					break;
+
+					case 13:
+					if (thePlayer.IsGuarded()||thePlayer.HasBuff(EET_SlowdownFrost)||thePlayer.HasBuff(EET_Slowdown)||thePlayer.HasBuff(EET_Blizzard)){thePlayer.SetAnimationSpeedMultiplier( 1.5  ); }else{thePlayer.SetAnimationSpeedMultiplier( 1.5 ); }		
+
+					RemoveTimer('ACS_ResetAnimation'); AddTimer('ACS_ResetAnimation', 0.25  , false);	
+
+					PlayerPlayAnimation( 'geralt_attack_fast_7_rp_ACS');
+					break;
+
 					case 12:
 					if (thePlayer.IsGuarded()||thePlayer.HasBuff(EET_SlowdownFrost)||thePlayer.HasBuff(EET_Slowdown)||thePlayer.HasBuff(EET_Blizzard)){thePlayer.SetAnimationSpeedMultiplier( 1.5  ); }else{thePlayer.SetAnimationSpeedMultiplier( 1.5 ); }		
 
@@ -67174,7 +68337,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 
 					RemoveTimer('ACS_ResetAnimation'); AddTimer('ACS_ResetAnimation', 0.25  , false);	
 
-					PlayerPlayAnimation( 'geralt_attack_fast_5_rp_ACS');
+					PlayerPlayAnimation( 'geralt_attack_fast_7_rp_ACS');
 
 					combo_counter_damage += 1;
 
@@ -67186,7 +68349,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 
 					RemoveTimer('ACS_ResetAnimation'); AddTimer('ACS_ResetAnimation', 0.25  , false);	
 
-					PlayerPlayAnimation( 'geralt_attack_fast_5_lp_ACS');
+					PlayerPlayAnimation( 'geralt_attack_fast_7_lp_ACS');
 
 					combo_counter_damage += 1;
 
@@ -67198,13 +68361,37 @@ statemachine abstract class W3ACSWatcher extends CEntity
 
 					RemoveTimer('ACS_ResetAnimation'); AddTimer('ACS_ResetAnimation', 0.25  , false);	
 
-					PlayerPlayAnimation( 'geralt_attack_fast_6_rp_ACS');
+					PlayerPlayAnimation( 'geralt_attack_fast_5_rp_ACS');
 
 					combo_counter_damage += 1;
 
 					combo_counter_geralt_light_attack_forward_cat += 1;
 				}
 				else if (combo_counter_geralt_light_attack_forward_cat == 12)
+				{
+					if (thePlayer.IsGuarded()||thePlayer.HasBuff(EET_SlowdownFrost)||thePlayer.HasBuff(EET_Slowdown)||thePlayer.HasBuff(EET_Blizzard)){thePlayer.SetAnimationSpeedMultiplier( 1.5  ); }else{thePlayer.SetAnimationSpeedMultiplier( 1.5 ); }		
+
+					RemoveTimer('ACS_ResetAnimation'); AddTimer('ACS_ResetAnimation', 0.25  , false);	
+
+					PlayerPlayAnimation( 'geralt_attack_fast_5_lp_ACS');
+
+					combo_counter_damage += 1;
+
+					combo_counter_geralt_light_attack_forward_cat += 1;
+				}
+				else if (combo_counter_geralt_light_attack_forward_cat == 13)
+				{
+					if (thePlayer.IsGuarded()||thePlayer.HasBuff(EET_SlowdownFrost)||thePlayer.HasBuff(EET_Slowdown)||thePlayer.HasBuff(EET_Blizzard)){thePlayer.SetAnimationSpeedMultiplier( 1.5  ); }else{thePlayer.SetAnimationSpeedMultiplier( 1.5 ); }		
+
+					RemoveTimer('ACS_ResetAnimation'); AddTimer('ACS_ResetAnimation', 0.25  , false);	
+
+					PlayerPlayAnimation( 'geralt_attack_fast_6_rp_ACS');
+
+					combo_counter_damage += 1;
+
+					combo_counter_geralt_light_attack_forward_cat += 1;
+				}
+				else if (combo_counter_geralt_light_attack_forward_cat == 14)
 				{
 					if (thePlayer.IsGuarded()||thePlayer.HasBuff(EET_SlowdownFrost)||thePlayer.HasBuff(EET_Slowdown)||thePlayer.HasBuff(EET_Blizzard)){thePlayer.SetAnimationSpeedMultiplier( 1.5  ); }else{thePlayer.SetAnimationSpeedMultiplier( 1.5 ); }		
 
@@ -67219,10 +68406,26 @@ statemachine abstract class W3ACSWatcher extends CEntity
 			}
 			else if (ACS_ComboMode() == 1)
 			{
-				geralt_light_attack_forward_index_1 = RandDifferent(this.previous_geralt_light_attack_forward_index_1 , 13);
+				geralt_light_attack_forward_index_1 = RandDifferent(this.previous_geralt_light_attack_forward_index_1 , 15);
 
 				switch (geralt_light_attack_forward_index_1) 
 				{	
+					case 14:
+					if (thePlayer.IsGuarded()||thePlayer.HasBuff(EET_SlowdownFrost)||thePlayer.HasBuff(EET_Slowdown)||thePlayer.HasBuff(EET_Blizzard)){thePlayer.SetAnimationSpeedMultiplier( 1.5  ); }else{thePlayer.SetAnimationSpeedMultiplier( 1.5 ); }		
+
+					RemoveTimer('ACS_ResetAnimation'); AddTimer('ACS_ResetAnimation', 0.25  , false);	
+
+					PlayerPlayAnimation( 'geralt_attack_fast_7_lp_ACS');
+					break;
+
+					case 13:
+					if (thePlayer.IsGuarded()||thePlayer.HasBuff(EET_SlowdownFrost)||thePlayer.HasBuff(EET_Slowdown)||thePlayer.HasBuff(EET_Blizzard)){thePlayer.SetAnimationSpeedMultiplier( 1.5  ); }else{thePlayer.SetAnimationSpeedMultiplier( 1.5 ); }		
+
+					RemoveTimer('ACS_ResetAnimation'); AddTimer('ACS_ResetAnimation', 0.25  , false);	
+
+					PlayerPlayAnimation( 'geralt_attack_fast_7_rp_ACS');
+					break;
+
 					case 12:
 					if (thePlayer.IsGuarded()||thePlayer.HasBuff(EET_SlowdownFrost)||thePlayer.HasBuff(EET_Slowdown)||thePlayer.HasBuff(EET_Blizzard)){thePlayer.SetAnimationSpeedMultiplier( 1.5  ); }else{thePlayer.SetAnimationSpeedMultiplier( 1.5 ); }		
 
@@ -67792,8 +68995,23 @@ statemachine abstract class W3ACSWatcher extends CEntity
 
 					combo_counter_geralt_light_attack_griffin += 1;
 				}
-
 				else if (combo_counter_geralt_light_attack_griffin == 4)
+				{
+					PlayerPlayAnimation( 'geralt_attack_fast_7_rp_ACS');
+
+					combo_counter_damage += 1;
+
+					combo_counter_geralt_light_attack_griffin += 1;
+				}
+				else if (combo_counter_geralt_light_attack_griffin == 5)
+				{
+					PlayerPlayAnimation( 'geralt_attack_fast_7_lp_ACS');
+
+					combo_counter_damage += 1;
+
+					combo_counter_geralt_light_attack_griffin += 1;
+				}
+				else if (combo_counter_geralt_light_attack_griffin == 6)
 				{
 					
 					PlayerPlayAnimation( 'geralt_attack_fast_5_rp_ACS');
@@ -67803,7 +69021,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 					combo_counter_geralt_light_attack_griffin += 1;
 				}
 
-				else if (combo_counter_geralt_light_attack_griffin == 5)
+				else if (combo_counter_geralt_light_attack_griffin == 7)
 				{
 					
 					PlayerPlayAnimation( 'geralt_attack_fast_5_lp_ACS');
@@ -67813,7 +69031,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 					combo_counter_geralt_light_attack_griffin += 1;
 				}
 
-				else if (combo_counter_geralt_light_attack_griffin == 6)
+				else if (combo_counter_geralt_light_attack_griffin == 8)
 				{
 					
 					PlayerPlayAnimation( 'geralt_attack_fast_6_rp_ACS');
@@ -67823,7 +69041,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 					combo_counter_geralt_light_attack_griffin += 1;
 				}
 
-				else if (combo_counter_geralt_light_attack_griffin == 7)
+				else if (combo_counter_geralt_light_attack_griffin == 9)
 				{
 					if( thePlayer.IsAlive()) {thePlayer.ClearAnimationSpeedMultipliers();}	
 
@@ -67840,10 +69058,18 @@ statemachine abstract class W3ACSWatcher extends CEntity
 			}
 			else if (ACS_ComboMode() == 1)
 			{
-				geralt_light_attack_index_1 = RandDifferent(this.previous_geralt_light_attack_index_1 , 8);
+				geralt_light_attack_index_1 = RandDifferent(this.previous_geralt_light_attack_index_1 , 10);
 
 				switch (geralt_light_attack_index_1) 
 				{
+					case 9:
+					PlayerPlayAnimation( 'geralt_attack_fast_7_lp_ACS');
+					break;
+
+					case 8:
+					PlayerPlayAnimation( 'geralt_attack_fast_7_rp_ACS');
+					break;
+
 					case 7:
 					PlayerPlayAnimation( 'geralt_attack_fast_5_rp_ACS');
 					break;
@@ -67927,8 +69153,23 @@ statemachine abstract class W3ACSWatcher extends CEntity
 
 					combo_counter_geralt_light_attack_griffin += 1;
 				}
-
 				else if (combo_counter_geralt_light_attack_griffin == 4)
+				{
+					PlayerPlayAnimation( 'geralt_attack_fast_7_rp_ACS');
+
+					combo_counter_damage += 1;
+
+					combo_counter_geralt_light_attack_griffin += 1;
+				}
+				else if (combo_counter_geralt_light_attack_griffin == 5)
+				{
+					PlayerPlayAnimation( 'geralt_attack_fast_7_lp_ACS');
+
+					combo_counter_damage += 1;
+
+					combo_counter_geralt_light_attack_griffin += 1;
+				}
+				else if (combo_counter_geralt_light_attack_griffin == 6)
 				{
 					
 					PlayerPlayAnimation( 'geralt_attack_fast_5_rp_ACS');
@@ -67938,7 +69179,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 					combo_counter_geralt_light_attack_griffin += 1;
 				}
 
-				else if (combo_counter_geralt_light_attack_griffin == 5)
+				else if (combo_counter_geralt_light_attack_griffin == 7)
 				{
 					
 					PlayerPlayAnimation( 'geralt_attack_fast_5_lp_ACS');
@@ -67948,7 +69189,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 					combo_counter_geralt_light_attack_griffin += 1;
 				}
 
-				else if (combo_counter_geralt_light_attack_griffin == 6)
+				else if (combo_counter_geralt_light_attack_griffin == 8)
 				{
 					
 					PlayerPlayAnimation( 'geralt_attack_fast_6_rp_ACS');
@@ -67958,7 +69199,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 					combo_counter_geralt_light_attack_griffin += 1;
 				}
 
-				else if (combo_counter_geralt_light_attack_griffin == 7)
+				else if (combo_counter_geralt_light_attack_griffin == 9)
 				{
 					if( thePlayer.IsAlive()) {thePlayer.ClearAnimationSpeedMultipliers();}	
 
@@ -67979,6 +69220,14 @@ statemachine abstract class W3ACSWatcher extends CEntity
 
 				switch (geralt_light_attack_index_3) 
 				{
+					case 9:
+					PlayerPlayAnimation( 'geralt_attack_fast_7_lp_ACS');
+					break;
+
+					case 8:
+					PlayerPlayAnimation( 'geralt_attack_fast_7_rp_ACS');
+					break;
+
 					case 7:
 					PlayerPlayAnimation( 'geralt_attack_fast_5_rp_ACS');
 					break;
@@ -69255,8 +70504,23 @@ statemachine abstract class W3ACSWatcher extends CEntity
 
 					combo_counter_geralt_light_attack_manticore += 1;
 				}
-
 				else if (combo_counter_geralt_light_attack_manticore == 4)
+				{
+					PlayerPlayAnimation( 'geralt_attack_fast_7_rp_ACS');
+
+					combo_counter_damage += 1;
+
+					combo_counter_geralt_light_attack_manticore += 1;
+				}
+				else if (combo_counter_geralt_light_attack_manticore == 5)
+				{
+					PlayerPlayAnimation( 'geralt_attack_fast_7_lp_ACS');
+
+					combo_counter_damage += 1;
+
+					combo_counter_geralt_light_attack_manticore += 1;
+				}
+				else if (combo_counter_geralt_light_attack_manticore == 6)
 				{
 					
 					PlayerPlayAnimation( 'geralt_attack_fast_5_rp_ACS');
@@ -69266,7 +70530,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 					combo_counter_geralt_light_attack_manticore += 1;
 				}
 
-				else if (combo_counter_geralt_light_attack_manticore == 5)
+				else if (combo_counter_geralt_light_attack_manticore == 7)
 				{
 					
 					PlayerPlayAnimation( 'geralt_attack_fast_5_lp_ACS');
@@ -69276,7 +70540,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 					combo_counter_geralt_light_attack_manticore += 1;
 				}
 
-				else if (combo_counter_geralt_light_attack_manticore == 6)
+				else if (combo_counter_geralt_light_attack_manticore == 8)
 				{
 					
 					PlayerPlayAnimation( 'geralt_attack_fast_6_rp_ACS');
@@ -69286,7 +70550,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 					combo_counter_geralt_light_attack_manticore += 1;
 				}
 
-				else if (combo_counter_geralt_light_attack_manticore == 7)
+				else if (combo_counter_geralt_light_attack_manticore == 9)
 				{
 					if( thePlayer.IsAlive()) {thePlayer.ClearAnimationSpeedMultipliers();}	
 
@@ -69390,8 +70654,23 @@ statemachine abstract class W3ACSWatcher extends CEntity
 
 					combo_counter_geralt_light_attack_manticore += 1;
 				}
-
 				else if (combo_counter_geralt_light_attack_manticore == 4)
+				{
+					PlayerPlayAnimation( 'geralt_attack_fast_7_rp_ACS');
+
+					combo_counter_damage += 1;
+
+					combo_counter_geralt_light_attack_manticore += 1;
+				}
+				else if (combo_counter_geralt_light_attack_manticore == 5)
+				{
+					PlayerPlayAnimation( 'geralt_attack_fast_7_lp_ACS');
+
+					combo_counter_damage += 1;
+
+					combo_counter_geralt_light_attack_manticore += 1;
+				}
+				else if (combo_counter_geralt_light_attack_manticore == 6)
 				{
 					
 					PlayerPlayAnimation( 'geralt_attack_fast_5_rp_ACS');
@@ -69401,7 +70680,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 					combo_counter_geralt_light_attack_manticore += 1;
 				}
 
-				else if (combo_counter_geralt_light_attack_manticore == 5)
+				else if (combo_counter_geralt_light_attack_manticore == 7)
 				{
 					
 					PlayerPlayAnimation( 'geralt_attack_fast_5_lp_ACS');
@@ -69411,7 +70690,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 					combo_counter_geralt_light_attack_manticore += 1;
 				}
 
-				else if (combo_counter_geralt_light_attack_manticore == 6)
+				else if (combo_counter_geralt_light_attack_manticore == 8)
 				{
 					
 					PlayerPlayAnimation( 'geralt_attack_fast_6_rp_ACS');
@@ -69421,7 +70700,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 					combo_counter_geralt_light_attack_manticore += 1;
 				}
 
-				else if (combo_counter_geralt_light_attack_manticore == 7)
+				else if (combo_counter_geralt_light_attack_manticore == 9)
 				{
 					if( thePlayer.IsAlive()) {thePlayer.ClearAnimationSpeedMultipliers();}	
 
@@ -69438,10 +70717,18 @@ statemachine abstract class W3ACSWatcher extends CEntity
 			}
 			else if (ACS_ComboMode() == 1)
 			{
-				geralt_light_attack_index_3 = RandDifferent(this.previous_geralt_light_attack_index_3 , 8);
+				geralt_light_attack_index_3 = RandDifferent(this.previous_geralt_light_attack_index_3 , 10);
 
 				switch (geralt_light_attack_index_3) 
 				{	
+					case 9:
+					PlayerPlayAnimation( 'geralt_attack_fast_7_lp_ACS');
+					break;
+
+					case 8:
+					PlayerPlayAnimation( 'geralt_attack_fast_7_rp_ACS');
+					break;
+
 					case 7:
 					PlayerPlayAnimation( 'geralt_attack_fast_5_rp_ACS');
 					break;
@@ -70733,8 +72020,23 @@ statemachine abstract class W3ACSWatcher extends CEntity
 
 					combo_counter_geralt_light_attack += 1;
 				}
-
 				else if (combo_counter_geralt_light_attack == 4)
+				{
+					PlayerPlayAnimation( 'geralt_attack_fast_7_rp_ACS');
+
+					combo_counter_damage += 1;
+
+					combo_counter_geralt_light_attack += 1;
+				}
+				else if (combo_counter_geralt_light_attack == 5)
+				{
+					PlayerPlayAnimation( 'geralt_attack_fast_7_lp_ACS');
+
+					combo_counter_damage += 1;
+
+					combo_counter_geralt_light_attack += 1;
+				}
+				else if (combo_counter_geralt_light_attack == 6)
 				{
 					
 					PlayerPlayAnimation( 'geralt_attack_fast_5_rp_ACS');
@@ -70744,7 +72046,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 					combo_counter_geralt_light_attack += 1;
 				}
 
-				else if (combo_counter_geralt_light_attack == 5)
+				else if (combo_counter_geralt_light_attack == 7)
 				{
 					
 					PlayerPlayAnimation( 'geralt_attack_fast_5_lp_ACS');
@@ -70754,7 +72056,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 					combo_counter_geralt_light_attack += 1;
 				}
 
-				else if (combo_counter_geralt_light_attack == 6)
+				else if (combo_counter_geralt_light_attack == 8)
 				{
 					
 					PlayerPlayAnimation( 'geralt_attack_fast_6_rp_ACS');
@@ -70765,7 +72067,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 				}
 
 
-				else if (combo_counter_geralt_light_attack == 7)
+				else if (combo_counter_geralt_light_attack == 9)
 				{
 					if( thePlayer.IsAlive()) {thePlayer.ClearAnimationSpeedMultipliers();}	
 
@@ -70784,10 +72086,18 @@ statemachine abstract class W3ACSWatcher extends CEntity
 			{
 				if( targetDistance <= 3 * 3 ) 
 				{
-					geralt_light_attack_index_1 = RandDifferent(this.previous_geralt_light_attack_index_1 , 8);
+					geralt_light_attack_index_1 = RandDifferent(this.previous_geralt_light_attack_index_1 , 10);
 
 					switch (geralt_light_attack_index_1) 
 					{
+						case 9:
+						PlayerPlayAnimation( 'geralt_attack_fast_7_lp_ACS');
+						break;
+
+						case 8:
+						PlayerPlayAnimation( 'geralt_attack_fast_7_rp_ACS');
+						break;
+
 						case 7:
 						PlayerPlayAnimation( 'geralt_attack_fast_5_rp_ACS');
 						break;
@@ -70921,8 +72231,23 @@ statemachine abstract class W3ACSWatcher extends CEntity
 
 					combo_counter_geralt_light_attack += 1;
 				}
-
 				else if (combo_counter_geralt_light_attack == 4)
+				{
+					PlayerPlayAnimation( 'geralt_attack_fast_7_rp_ACS');
+
+					combo_counter_damage += 1;
+
+					combo_counter_geralt_light_attack += 1;
+				}
+				else if (combo_counter_geralt_light_attack == 5)
+				{
+					PlayerPlayAnimation( 'geralt_attack_fast_7_lp_ACS');
+
+					combo_counter_damage += 1;
+
+					combo_counter_geralt_light_attack += 1;
+				}
+				else if (combo_counter_geralt_light_attack == 6)
 				{
 					
 					PlayerPlayAnimation( 'geralt_attack_fast_5_rp_ACS');
@@ -70932,7 +72257,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 					combo_counter_geralt_light_attack += 1;
 				}
 
-				else if (combo_counter_geralt_light_attack == 5)
+				else if (combo_counter_geralt_light_attack == 7)
 				{
 					
 					PlayerPlayAnimation( 'geralt_attack_fast_5_lp_ACS');
@@ -70942,7 +72267,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 					combo_counter_geralt_light_attack += 1;
 				}
 
-				else if (combo_counter_geralt_light_attack == 6)
+				else if (combo_counter_geralt_light_attack == 8)
 				{
 					
 					PlayerPlayAnimation( 'geralt_attack_fast_6_rp_ACS');
@@ -70953,7 +72278,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 				}
 
 
-				else if (combo_counter_geralt_light_attack == 7)
+				else if (combo_counter_geralt_light_attack == 9)
 				{
 					if( thePlayer.IsAlive()) {thePlayer.ClearAnimationSpeedMultipliers();}	
 
@@ -70970,10 +72295,18 @@ statemachine abstract class W3ACSWatcher extends CEntity
 			}
 			else if (ACS_ComboMode() == 1)
 			{
-				geralt_light_attack_index_3 = RandDifferent(this.previous_geralt_light_attack_index_3 , 8);
+				geralt_light_attack_index_3 = RandDifferent(this.previous_geralt_light_attack_index_3 , 10);
 
 				switch (geralt_light_attack_index_3) 
 				{	
+					case 9:
+					PlayerPlayAnimation( 'geralt_attack_fast_7_lp_ACS');
+					break;
+
+					case 8:
+					PlayerPlayAnimation( 'geralt_attack_fast_7_rp_ACS');
+					break;
+
 					case 7:
 					PlayerPlayAnimation( 'geralt_attack_fast_5_rp_ACS');
 					break;
@@ -71541,8 +72874,23 @@ statemachine abstract class W3ACSWatcher extends CEntity
 
 						combo_counter_geralt_light_attack += 1;
 					}
-
 					else if (combo_counter_geralt_light_attack == 4)
+					{
+						PlayerPlayAnimation( 'geralt_attack_fast_7_rp_ACS');
+
+						combo_counter_damage += 1;
+
+						combo_counter_geralt_light_attack += 1;
+					}
+					else if (combo_counter_geralt_light_attack == 5)
+					{
+						PlayerPlayAnimation( 'geralt_attack_fast_7_lp_ACS');
+
+						combo_counter_damage += 1;
+
+						combo_counter_geralt_light_attack += 1;
+					}
+					else if (combo_counter_geralt_light_attack == 6)
 					{
 						
 						PlayerPlayAnimation( 'geralt_attack_fast_5_rp_ACS');
@@ -71552,7 +72900,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 						combo_counter_geralt_light_attack += 1;
 					}
 
-					else if (combo_counter_geralt_light_attack == 5)
+					else if (combo_counter_geralt_light_attack == 7)
 					{
 						
 						PlayerPlayAnimation( 'geralt_attack_fast_5_lp_ACS');
@@ -71562,7 +72910,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 						combo_counter_geralt_light_attack += 1;
 					}
 
-					else if (combo_counter_geralt_light_attack == 6)
+					else if (combo_counter_geralt_light_attack == 8)
 					{
 						
 						PlayerPlayAnimation( 'geralt_attack_fast_6_rp_ACS');
@@ -71572,7 +72920,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 						combo_counter_geralt_light_attack += 1;
 					}
 
-					else if (combo_counter_geralt_light_attack == 7)
+					else if (combo_counter_geralt_light_attack == 9)
 					{
 						if( thePlayer.IsAlive()) {thePlayer.ClearAnimationSpeedMultipliers();}	
 
@@ -71685,10 +73033,18 @@ statemachine abstract class W3ACSWatcher extends CEntity
 			{
 				if( targetDistance <= 3 * 3 ) 
 				{
-					geralt_light_attack_forward_index_1 = RandDifferent(this.previous_geralt_light_attack_forward_index_1 , 8);
+					geralt_light_attack_forward_index_1 = RandDifferent(this.previous_geralt_light_attack_forward_index_1 , 10);
 
 					switch (geralt_light_attack_forward_index_1) 
 					{
+						case 9:
+						PlayerPlayAnimation( 'geralt_attack_fast_7_lp_ACS');
+						break;
+
+						case 8:
+						PlayerPlayAnimation( 'geralt_attack_fast_7_rp_ACS');
+						break;
+
 						case 7:
 						PlayerPlayAnimation( 'geralt_attack_fast_5_rp_ACS');
 						break;
@@ -72527,10 +73883,24 @@ statemachine abstract class W3ACSWatcher extends CEntity
 			{
 				if( targetDistance <= 3 * 3 ) 
 				{
-					geralt_light_attack_index_1 = RandDifferent(this.previous_geralt_light_attack_index_1 , 9);
+					geralt_light_attack_index_1 = RandDifferent(this.previous_geralt_light_attack_index_1 , 11);
 
 					switch (geralt_light_attack_index_1) 
 					{
+						case 10:
+						if (thePlayer.IsGuarded()||thePlayer.HasBuff(EET_SlowdownFrost)||thePlayer.HasBuff(EET_Slowdown)||thePlayer.HasBuff(EET_Blizzard)){thePlayer.SetAnimationSpeedMultiplier( 1  ); }else{thePlayer.SetAnimationSpeedMultiplier( 1.5 ); }	
+						RemoveTimer('ACS_ResetAnimation'); AddTimer('ACS_ResetAnimation', 0.5  , false);
+
+						PlayerPlayAnimation( 'geralt_attack_fast_7_lp_ACS');
+						break;
+
+						case 9:
+						if (thePlayer.IsGuarded()||thePlayer.HasBuff(EET_SlowdownFrost)||thePlayer.HasBuff(EET_Slowdown)||thePlayer.HasBuff(EET_Blizzard)){thePlayer.SetAnimationSpeedMultiplier( 1  ); }else{thePlayer.SetAnimationSpeedMultiplier( 1.5 ); }	
+						RemoveTimer('ACS_ResetAnimation'); AddTimer('ACS_ResetAnimation', 0.5  , false);
+
+						PlayerPlayAnimation( 'geralt_attack_fast_7_rp_ACS');
+						break;
+
 						case 8:
 						if (thePlayer.IsGuarded()||thePlayer.HasBuff(EET_SlowdownFrost)||thePlayer.HasBuff(EET_Slowdown)||thePlayer.HasBuff(EET_Blizzard)){thePlayer.SetAnimationSpeedMultiplier( 1  ); }else{thePlayer.SetAnimationSpeedMultiplier( 1.5 ); }	
 						RemoveTimer('ACS_ResetAnimation'); AddTimer('ACS_ResetAnimation', 0.5  , false);
@@ -72736,10 +74106,24 @@ statemachine abstract class W3ACSWatcher extends CEntity
 			}
 			else if (ACS_ComboMode() == 1)
 			{
-				geralt_light_attack_index_3 = RandDifferent(this.previous_geralt_light_attack_index_3 , 9);
+				geralt_light_attack_index_3 = RandDifferent(this.previous_geralt_light_attack_index_3 , 11);
 
 				switch (geralt_light_attack_index_3) 
 				{	
+					case 10:
+					if (thePlayer.IsGuarded()||thePlayer.HasBuff(EET_SlowdownFrost)||thePlayer.HasBuff(EET_Slowdown)||thePlayer.HasBuff(EET_Blizzard)){thePlayer.SetAnimationSpeedMultiplier( 1  ); }else{thePlayer.SetAnimationSpeedMultiplier( 1.5 ); }	
+					RemoveTimer('ACS_ResetAnimation'); AddTimer('ACS_ResetAnimation', 0.5  , false);
+					
+					PlayerPlayAnimation( 'geralt_attack_fast_7_lp_ACS');
+					break;
+
+					case 9:
+					if (thePlayer.IsGuarded()||thePlayer.HasBuff(EET_SlowdownFrost)||thePlayer.HasBuff(EET_Slowdown)||thePlayer.HasBuff(EET_Blizzard)){thePlayer.SetAnimationSpeedMultiplier( 1  ); }else{thePlayer.SetAnimationSpeedMultiplier( 1.5 ); }	
+					RemoveTimer('ACS_ResetAnimation'); AddTimer('ACS_ResetAnimation', 0.5  , false);
+
+					PlayerPlayAnimation( 'geralt_attack_fast_7_rp_ACS');
+					break;
+
 					case 8:
 					if (thePlayer.IsGuarded()||thePlayer.HasBuff(EET_SlowdownFrost)||thePlayer.HasBuff(EET_Slowdown)||thePlayer.HasBuff(EET_Blizzard)){thePlayer.SetAnimationSpeedMultiplier( 1  ); }else{thePlayer.SetAnimationSpeedMultiplier( 1.5 ); }	
 					RemoveTimer('ACS_ResetAnimation'); AddTimer('ACS_ResetAnimation', 0.5  , false);
@@ -73358,10 +74742,24 @@ statemachine abstract class W3ACSWatcher extends CEntity
 			{
 				if( targetDistance <= 3 * 3 ) 
 				{
-					geralt_light_attack_forward_index_1 = RandDifferent(this.previous_geralt_light_attack_forward_index_1 , 9);
+					geralt_light_attack_forward_index_1 = RandDifferent(this.previous_geralt_light_attack_forward_index_1 , 11);
 
 					switch (geralt_light_attack_forward_index_1) 
 					{	
+						case 10:
+						if (thePlayer.IsGuarded()||thePlayer.HasBuff(EET_SlowdownFrost)||thePlayer.HasBuff(EET_Slowdown)||thePlayer.HasBuff(EET_Blizzard)){thePlayer.SetAnimationSpeedMultiplier( 1  ); }else{thePlayer.SetAnimationSpeedMultiplier( 1.5 ); }	
+						RemoveTimer('ACS_ResetAnimation'); AddTimer('ACS_ResetAnimation', 0.5  , false);
+						
+						PlayerPlayAnimation( 'geralt_attack_fast_7_lp_ACS');
+						break;
+
+						case 9:
+						if (thePlayer.IsGuarded()||thePlayer.HasBuff(EET_SlowdownFrost)||thePlayer.HasBuff(EET_Slowdown)||thePlayer.HasBuff(EET_Blizzard)){thePlayer.SetAnimationSpeedMultiplier( 1  ); }else{thePlayer.SetAnimationSpeedMultiplier( 1.5 ); }	
+						RemoveTimer('ACS_ResetAnimation'); AddTimer('ACS_ResetAnimation', 0.5  , false);
+
+						PlayerPlayAnimation( 'geralt_attack_fast_7_rp_ACS');
+						break;
+
 						case 8:
 						if (thePlayer.IsGuarded()||thePlayer.HasBuff(EET_SlowdownFrost)||thePlayer.HasBuff(EET_Slowdown)||thePlayer.HasBuff(EET_Blizzard)){thePlayer.SetAnimationSpeedMultiplier( 1  ); }else{thePlayer.SetAnimationSpeedMultiplier( 1.5 ); }	
 						RemoveTimer('ACS_ResetAnimation'); AddTimer('ACS_ResetAnimation', 0.5  , false);
@@ -74043,8 +75441,23 @@ statemachine abstract class W3ACSWatcher extends CEntity
 
 						combo_counter_geralt_light_attack += 1;
 					}
-
 					else if (combo_counter_geralt_light_attack == 4)
+					{
+						PlayerPlayAnimation( 'geralt_attack_fast_7_rp_ACS');
+
+						combo_counter_damage += 1;
+
+						combo_counter_geralt_light_attack += 1;
+					}
+					else if (combo_counter_geralt_light_attack == 5)
+					{
+						PlayerPlayAnimation( 'geralt_attack_fast_7_lp_ACS');
+
+						combo_counter_damage += 1;
+
+						combo_counter_geralt_light_attack += 1;
+					}
+					else if (combo_counter_geralt_light_attack == 6)
 					{
 						
 						PlayerPlayAnimation( 'geralt_attack_fast_5_rp_ACS');
@@ -74054,7 +75467,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 						combo_counter_geralt_light_attack += 1;
 					}
 
-					else if (combo_counter_geralt_light_attack == 5)
+					else if (combo_counter_geralt_light_attack == 7)
 					{
 						
 						PlayerPlayAnimation( 'geralt_attack_fast_5_lp_ACS');
@@ -74064,7 +75477,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 						combo_counter_geralt_light_attack += 1;
 					}
 
-					else if (combo_counter_geralt_light_attack == 6)
+					else if (combo_counter_geralt_light_attack == 8)
 					{
 						
 						PlayerPlayAnimation( 'geralt_attack_fast_6_rp_ACS');
@@ -74074,7 +75487,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 						combo_counter_geralt_light_attack += 1;
 					}
 
-					else if (combo_counter_geralt_light_attack == 7)
+					else if (combo_counter_geralt_light_attack == 9)
 					{
 						if( thePlayer.IsAlive()) {thePlayer.ClearAnimationSpeedMultipliers();}	
 
@@ -74196,10 +75609,18 @@ statemachine abstract class W3ACSWatcher extends CEntity
 			{
 				if( targetDistance <= 3 * 3 ) 
 				{
-					geralt_light_attack_forward_index_1 = RandDifferent(this.previous_geralt_light_attack_forward_index_1 , 8);
+					geralt_light_attack_forward_index_1 = RandDifferent(this.previous_geralt_light_attack_forward_index_1 , 10);
 
 					switch (geralt_light_attack_forward_index_1) 
 					{
+						case 9:
+						PlayerPlayAnimation( 'geralt_attack_fast_7_lp_ACS');
+						break;
+
+						case 8:
+						PlayerPlayAnimation( 'geralt_attack_fast_7_rp_ACS');
+						break;
+
 						case 7:
 						PlayerPlayAnimation( 'geralt_attack_fast_5_rp_ACS');
 						break;
@@ -100605,6 +102026,15 @@ statemachine abstract class W3ACSWatcher extends CEntity
 		movementAdjustorWerewolfWitcher.RotateTo( ticketWerewolfWitcher, VecHeading( theCamera.GetCameraDirection() ) );
 	}
 
+	function ACSTransformRedMiasmalPlayAnim(animation_name: name, blendIn, blendout : float)
+	{
+		var animatedComponentA			: CAnimatedComponent;
+
+		animatedComponentA = (CAnimatedComponent)((CNewNPC)GetACSTransformationRedMiasmal()).GetComponentByClassName( 'CAnimatedComponent' );	
+
+		animatedComponentA.PlaySlotAnimationAsync ( animation_name, 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(blendIn, blendout) );
+	}
+
 	function ACSTransformWerewolfPlayAnim(animation_name: name, blendIn, blendout : float)
 	{
 		var animatedComponentA			: CAnimatedComponent;
@@ -101588,6 +103018,11 @@ statemachine abstract class W3ACSWatcher extends CEntity
 		}
 	}
 
+	function ACS_Transformation_Create_Savelock()
+	{
+		theGame.CreateNoSaveLock( "ACS_Transformation_Active", ACS_Transformation_Savelock_ID, false, false );
+	}
+
 	public timer function DisableWerewolfStart(deltaTime : float , id : int)
 	{
 		DisableWerewolf_Actual();
@@ -101627,11 +103062,6 @@ statemachine abstract class W3ACSWatcher extends CEntity
 			RemoveTimer('DisableWerewolfStart');
 			AddTimer('DisableWerewolfStart', 0.5, false);
 		}
-	}
-
-	function ACS_Transformation_Create_Savelock()
-	{
-		theGame.CreateNoSaveLock( "ACS_Transformation_Active", ACS_Transformation_Savelock_ID, false, false );
 	}
 
 	function DisableWerewolf_Actual()
@@ -102223,6 +103653,118 @@ statemachine abstract class W3ACSWatcher extends CEntity
 		}
 	}
 
+	public timer function DisableRedMiasmalStart(deltaTime : float , id : int)
+	{
+		DisableRedMiasmal_Actual();
+	}
+
+	function DisableRedMiasmal()
+	{
+		if ( theGame.IsDialogOrCutscenePlaying() 
+		|| thePlayer.IsInNonGameplayCutscene() 
+		|| thePlayer.IsInGameplayScene() 
+		|| theGame.IsCurrentlyPlayingNonGameplayScene()
+		)
+		{
+			DisableRedMiasmal_Actual();
+		}
+		else
+		{
+			ACSTransformRedMiasmalPlayAnim('monster_lessun_despawn', 0.25f, 0.25f);
+
+			GetACSTransformationRedMiasmal().PlayEffectSingle('death');
+			GetACSTransformationRedMiasmal().StopEffect('death');
+
+			GetACSTransformationRedMiasmal().PlayEffectSingle('evil_disappear');
+			GetACSTransformationRedMiasmal().StopEffect('evil_disappear');
+
+			RemoveTimer('DisableRedMiasmalStart');
+
+			AddTimer('DisableRedMiasmalStart', 1.5, false);
+		}
+	}
+
+	function DisableRedMiasmal_Actual()
+	{
+		var playerAnimcomp					 : CAnimatedComponent;
+
+		var playerPos, newPlayerPos			: Vector;
+
+		playerAnimcomp = (CAnimatedComponent)thePlayer.GetComponentByClassName('CAnimatedComponent');
+
+		if (
+		FactsQuerySum("acs_transformation_activated") > 0
+		&& FactsQuerySum("acs_red_miasmal_curse_activated") > 0
+		)
+		{
+			FactsRemove("block_geralts_battlecries");
+
+			ACSTransformationRedMiasmalRemoveMoveTimers();
+
+			GetTransformationCamera().Stop();
+
+			GetTransformationCamera().Destroy();
+
+			theGame.ReleaseNoSaveLock( ACS_Transformation_Savelock_ID );
+
+			thePlayer.BreakAttachment();
+
+			FactsRemove("acs_transformation_activated");
+
+			FactsRemove("acs_red_miasmal_curse_activated");
+			
+			thePlayer.PlayEffectSingle('smoke_explosion');
+			thePlayer.StopEffect('smoke_explosion');
+
+			thePlayer.PlayEffectSingle('teleport');
+			thePlayer.StopEffect('teleport');
+
+			thePlayer.RemoveBuffImmunity_AllNegative('ACS_Transformation_Immunity_Negative'); 
+			thePlayer.RemoveBuffImmunity_AllCritical('ACS_Transformation_Immunity_Critical'); 
+
+			thePlayer.SetVisibility(true);
+
+			thePlayer.EnableCollisions(true);
+
+			thePlayer.SetCanPlayHitAnim(true); 
+
+			thePlayer.EnableCharacterCollisions(true);
+
+			playerAnimcomp.UnfreezePose();
+
+			//thePlayer.SetAnimationSpeedMultiplier( 1  );
+
+			GetACSTransformationRedMiasmal().Teleport(thePlayer.GetWorldPosition() + Vector(0,0,-200));
+
+			GetACSTransformationRedMiasmal().DestroyAfter(0.125);
+
+			FactsRemove("ACS_Transformation_Attached");
+
+			thePlayer.UnblockAction(EIAB_CallHorse,				'ACS_Transformation');
+			thePlayer.UnblockAction(EIAB_DrawWeapon, 			'ACS_Transformation'); 
+			thePlayer.UnblockAction(EIAB_FastTravel, 			'ACS_Transformation');
+			thePlayer.UnblockAction(EIAB_InteractionAction, 	'ACS_Transformation');
+			thePlayer.UnblockAction(EIAB_Crossbow,				'ACS_Transformation');
+			thePlayer.UnblockAction(EIAB_UsableItem,			'ACS_Transformation');
+			thePlayer.UnblockAction(EIAB_ThrowBomb,				'ACS_Transformation');
+			thePlayer.UnblockAction(EIAB_Parry,					'ACS_Transformation');
+			thePlayer.UnblockAction(EIAB_MeditationWaiting,		'ACS_Transformation');
+			thePlayer.UnblockAction(EIAB_OpenMeditation,		'ACS_Transformation');
+			thePlayer.UnblockAction(EIAB_RadialMenu,			'ACS_Transformation');
+			thePlayer.UnblockAction(EIAB_Jump,					'ACS_Transformation');
+			thePlayer.UnblockAction(EIAB_QuickSlots, 			'ACS_Transformation');
+
+			playerPos = ACSPlayerFixZAxis(thePlayer.GetWorldPosition());
+
+			if( !theGame.GetWorld().NavigationFindSafeSpot( playerPos, 0.3, 0.3 , newPlayerPos ) )
+			{
+				theGame.GetWorld().NavigationFindSafeSpot( playerPos, 0.3, 4 , newPlayerPos );
+				playerPos = newPlayerPos;
+			}
+
+			thePlayer.TeleportWithRotation(ACSPlayerFixZAxis(playerPos), thePlayer.GetWorldRotation());
+		}
+	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -107409,6 +108951,27 @@ statemachine abstract class W3ACSWatcher extends CEntity
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	function GetTransformationRedMiasmalClass() : cACS_Spawn_Transformation_Red_Miasmal
+	{
+		var vACS_Spawn_Transformation_Red_Miasmal: cACS_Spawn_Transformation_Red_Miasmal;
+
+		vACS_Spawn_Transformation_Red_Miasmal = new cACS_Spawn_Transformation_Red_Miasmal in this;
+
+		return vACS_Spawn_Transformation_Red_Miasmal;
+	}
+
+	function Spawn_Transformation_Red_Miasmal()
+	{		
+		GetTransformationRedMiasmalClass().Spawn_Transformation_Red_Miasmal_Engage();
+	}
+
+	function ACS_RedMiasmalBehSwitch()
+	{	
+		GetTransformationRedMiasmalClass().ACS_RedMiasmalBehSwitch_Engage();
+	}
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	function GetVampireMonsterClass() : cACS_Transformation_Vampire_Monster
 	{
 		var vACS_Transformation_Vampire_Monster: cACS_Transformation_Vampire_Monster;
@@ -110033,6 +111596,1673 @@ statemachine abstract class W3ACSWatcher extends CEntity
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	public timer function Transformation_Red_Miasmal_Remove_Stationary_Tag ( dt : float, id : int) 
+	{ 
+		GetACSTransformationRedMiasmal().RemoveTag('ACS_Transformation_Red_Miasmal_Stationary_Transition');
+	}
+
+	function TransformationRedMiasmalRestoreRotation()
+	{
+		if (GetACSTransformationRedMiasmal().HasTag('ACS_Transformation_Red_Miasmal_Stopped_Moving'))
+		{
+			RemoveTimer('Transformation_Red_Miasmal_Remove_Stationary_Tag');
+			AddTimer('Transformation_Red_Miasmal_Remove_Stationary_Tag', 1, false);
+
+			GetACSTransformationRedMiasmal().RemoveTag('ACS_Transformation_Red_Miasmal_Stopped_Moving');
+		}
+	}
+
+	function RedMiasmalChangeStance()
+	{
+		if (GetACSTransformationRedMiasmal().HasTag('ACS_Directional_Change_Anim'))
+		{
+			RemoveChangeStanceTimers();
+			AddTimer('Red_Miasmal_Change_Stance_Forward', 0.25f, false);
+
+			GetACSTransformationRedMiasmal().RemoveTag('ACS_Directional_Change_Anim');
+		}
+	}
+
+	function ACSTransformRedMiasmalMovementAdjustForward()
+	{
+		movementAdjustorRedMiasmal = GetACSTransformationRedMiasmal().GetMovingAgentComponent().GetMovementAdjustor();
+
+		ticketRedMiasmal = movementAdjustorRedMiasmal.GetRequest( 'ACS_Transformation_Red_Miasmal_Rotate');
+		movementAdjustorRedMiasmal.CancelByName( 'ACS_Transformation_Red_Miasmal_Rotate' );
+		movementAdjustorRedMiasmal.CancelAll();
+
+		ticketRedMiasmal = movementAdjustorRedMiasmal.CreateNewRequest( 'ACS_Transformation_Red_Miasmal_Rotate' );
+		movementAdjustorRedMiasmal.AdjustmentDuration( ticketRedMiasmal, 0.5 );
+		movementAdjustorRedMiasmal.MaxRotationAdjustmentSpeed( ticketRedMiasmal, 500000 );
+
+		movementAdjustorRedMiasmal.RotateTo( ticketRedMiasmal, VecHeading( theCamera.GetCameraDirection() ) );
+
+		movementAdjustorRedMiasmalWitcher = thePlayer.GetMovingAgentComponent().GetMovementAdjustor();
+
+		ticketRedMiasmalWitcher = movementAdjustorRedMiasmalWitcher.GetRequest( 'ACS_Transformation_Red_Miasmal_Witcher_Rotate');
+		movementAdjustorRedMiasmalWitcher.CancelByName( 'ACS_Transformation_Red_Miasmal_Witcher_Rotate' );
+		movementAdjustorRedMiasmalWitcher.CancelAll();
+
+		ticketRedMiasmalWitcher = movementAdjustorRedMiasmalWitcher.CreateNewRequest( 'ACS_Transformation_Red_Miasmal_Witcher_Rotate' );
+		movementAdjustorRedMiasmalWitcher.AdjustmentDuration( ticketRedMiasmalWitcher, 0.5 );
+		movementAdjustorRedMiasmalWitcher.MaxRotationAdjustmentSpeed( ticketRedMiasmalWitcher, 500000 );
+
+		movementAdjustorRedMiasmalWitcher.RotateTo( ticketRedMiasmalWitcher, VecHeading( theCamera.GetCameraDirection() ) );
+	}
+
+	function ACSTransformRedMiasmalMovementAdjustBackward()
+	{
+		movementAdjustorRedMiasmal = GetACSTransformationRedMiasmal().GetMovingAgentComponent().GetMovementAdjustor();
+
+		ticketRedMiasmal = movementAdjustorRedMiasmal.GetRequest( 'ACS_Transformation_Red_Miasmal_Rotate');
+		movementAdjustorRedMiasmal.CancelByName( 'ACS_Transformation_Red_Miasmal_Rotate' );
+		movementAdjustorRedMiasmal.CancelAll();
+
+		ticketRedMiasmal = movementAdjustorRedMiasmal.CreateNewRequest( 'ACS_Transformation_Red_Miasmal_Rotate' );
+		movementAdjustorRedMiasmal.AdjustmentDuration( ticketRedMiasmal, 0.5 );
+		movementAdjustorRedMiasmal.MaxRotationAdjustmentSpeed( ticketRedMiasmal, 500000 );
+
+		movementAdjustorRedMiasmal.RotateTo( ticketRedMiasmal, VecHeading( theCamera.GetCameraDirection() * -5 ) );
+
+		movementAdjustorRedMiasmalWitcher = thePlayer.GetMovingAgentComponent().GetMovementAdjustor();
+
+		ticketRedMiasmalWitcher = movementAdjustorRedMiasmalWitcher.GetRequest( 'ACS_Transformation_Red_Miasmal_Witcher_Rotate');
+		movementAdjustorRedMiasmalWitcher.CancelByName( 'ACS_Transformation_Red_Miasmal_Witcher_Rotate' );
+		movementAdjustorRedMiasmalWitcher.CancelAll();
+
+		ticketRedMiasmalWitcher = movementAdjustorRedMiasmalWitcher.CreateNewRequest( 'ACS_Transformation_Red_Miasmal_Witcher_Rotate' );
+		movementAdjustorRedMiasmalWitcher.AdjustmentDuration( ticketRedMiasmalWitcher, 0.5 );
+		movementAdjustorRedMiasmalWitcher.MaxRotationAdjustmentSpeed( ticketRedMiasmalWitcher, 500000 );
+
+		movementAdjustorRedMiasmalWitcher.RotateTo( ticketRedMiasmalWitcher, VecHeading( theCamera.GetCameraDirection() * -5 ) );
+	}
+
+	function ACSTransformRedMiasmalMovementAdjustRight()
+	{
+		movementAdjustorRedMiasmal = GetACSTransformationRedMiasmal().GetMovingAgentComponent().GetMovementAdjustor();
+
+		ticketRedMiasmal = movementAdjustorRedMiasmal.GetRequest( 'ACS_Transformation_Red_Miasmal_Rotate');
+		movementAdjustorRedMiasmal.CancelByName( 'ACS_Transformation_Red_Miasmal_Rotate' );
+		movementAdjustorRedMiasmal.CancelAll();
+
+		ticketRedMiasmal = movementAdjustorRedMiasmal.CreateNewRequest( 'ACS_Transformation_Red_Miasmal_Rotate' );
+		movementAdjustorRedMiasmal.AdjustmentDuration( ticketRedMiasmal, 0.5 );
+		movementAdjustorRedMiasmal.MaxRotationAdjustmentSpeed( ticketRedMiasmal, 500000 );
+
+		movementAdjustorRedMiasmal.RotateTo( ticketRedMiasmal, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraRight() * 5 ) );
+
+
+
+
+		movementAdjustorRedMiasmalWitcher = thePlayer.GetMovingAgentComponent().GetMovementAdjustor();
+
+		ticketRedMiasmalWitcher = movementAdjustorRedMiasmalWitcher.GetRequest( 'ACS_Transformation_Red_Miasmal_Witcher_Rotate');
+		movementAdjustorRedMiasmalWitcher.CancelByName( 'ACS_Transformation_Red_Miasmal_Witcher_Rotate' );
+		movementAdjustorRedMiasmalWitcher.CancelAll();
+
+		ticketRedMiasmalWitcher = movementAdjustorRedMiasmalWitcher.CreateNewRequest( 'ACS_Transformation_Red_Miasmal_Witcher_Rotate' );
+		movementAdjustorRedMiasmalWitcher.AdjustmentDuration( ticketRedMiasmalWitcher, 0.5 );
+		movementAdjustorRedMiasmalWitcher.MaxRotationAdjustmentSpeed( ticketRedMiasmalWitcher, 500000 );
+
+		movementAdjustorRedMiasmalWitcher.RotateTo( ticketRedMiasmalWitcher, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraRight() * 5 ) );
+	}
+
+	function ACSTransformRedMiasmalMovementAdjustLeft()
+	{
+		movementAdjustorRedMiasmal = GetACSTransformationRedMiasmal().GetMovingAgentComponent().GetMovementAdjustor();
+
+		ticketRedMiasmal = movementAdjustorRedMiasmal.GetRequest( 'ACS_Transformation_Red_Miasmal_Rotate');
+		movementAdjustorRedMiasmal.CancelByName( 'ACS_Transformation_Red_Miasmal_Rotate' );
+		movementAdjustorRedMiasmal.CancelAll();
+
+		ticketRedMiasmal = movementAdjustorRedMiasmal.CreateNewRequest( 'ACS_Transformation_Red_Miasmal_Rotate' );
+		movementAdjustorRedMiasmal.AdjustmentDuration( ticketRedMiasmal, 0.5 );
+		movementAdjustorRedMiasmal.MaxRotationAdjustmentSpeed( ticketRedMiasmal, 500000 );
+
+		movementAdjustorRedMiasmal.RotateTo( ticketRedMiasmal, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -5 ) );
+
+
+
+		movementAdjustorRedMiasmalWitcher = thePlayer.GetMovingAgentComponent().GetMovementAdjustor();
+
+		ticketRedMiasmalWitcher = movementAdjustorRedMiasmalWitcher.GetRequest( 'ACS_Transformation_Red_Miasmal_Witcher_Rotate');
+		movementAdjustorRedMiasmalWitcher.CancelByName( 'ACS_Transformation_Red_Miasmal_Witcher_Rotate' );
+		movementAdjustorRedMiasmalWitcher.CancelAll();
+
+		ticketRedMiasmalWitcher = movementAdjustorRedMiasmalWitcher.CreateNewRequest( 'ACS_Transformation_Red_Miasmal_Witcher_Rotate' );
+		movementAdjustorRedMiasmalWitcher.AdjustmentDuration( ticketRedMiasmalWitcher, 0.5 );
+		movementAdjustorRedMiasmalWitcher.MaxRotationAdjustmentSpeed( ticketRedMiasmalWitcher, 500000 );
+
+		movementAdjustorRedMiasmalWitcher.RotateTo( ticketRedMiasmalWitcher, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -5 ) );
+	}
+
+	function ACSTransformRedMiasmalMovementAdjustForwardRight()
+	{
+		movementAdjustorRedMiasmal = GetACSTransformationRedMiasmal().GetMovingAgentComponent().GetMovementAdjustor();
+
+		ticketRedMiasmal = movementAdjustorRedMiasmal.GetRequest( 'ACS_Transformation_Red_Miasmal_Rotate');
+		movementAdjustorRedMiasmal.CancelByName( 'ACS_Transformation_Red_Miasmal_Rotate' );
+		movementAdjustorRedMiasmal.CancelAll();
+
+		ticketRedMiasmal = movementAdjustorRedMiasmal.CreateNewRequest( 'ACS_Transformation_Red_Miasmal_Rotate' );
+		movementAdjustorRedMiasmal.AdjustmentDuration( ticketRedMiasmal, 1 );
+		movementAdjustorRedMiasmal.MaxRotationAdjustmentSpeed( ticketRedMiasmal, 500000 );
+
+		//movementAdjustorRedMiasmal.RotateTo( ticketRedMiasmal, VecHeading( (theCamera.GetCameraDirection() * 5)  + (theCamera.GetCameraForward() * 5) + (theCamera.GetCameraRight() * 5) ) );
+
+		movementAdjustorRedMiasmal.RotateTo( ticketRedMiasmal, VecHeading( (theCamera.GetCameraDirection() * 5) + (theCamera.GetCameraRight() * 5) ) );
+
+
+
+		movementAdjustorRedMiasmalWitcher = thePlayer.GetMovingAgentComponent().GetMovementAdjustor();
+
+		ticketRedMiasmalWitcher = movementAdjustorRedMiasmalWitcher.GetRequest( 'ACS_Transformation_Red_Miasmal_Witcher_Rotate');
+		movementAdjustorRedMiasmalWitcher.CancelByName( 'ACS_Transformation_Red_Miasmal_Witcher_Rotate' );
+		movementAdjustorRedMiasmalWitcher.CancelAll();
+
+		ticketRedMiasmalWitcher = movementAdjustorRedMiasmalWitcher.CreateNewRequest( 'ACS_Transformation_Red_Miasmal_Witcher_Rotate' );
+		movementAdjustorRedMiasmalWitcher.AdjustmentDuration( ticketRedMiasmalWitcher, 1 );
+		movementAdjustorRedMiasmalWitcher.MaxRotationAdjustmentSpeed( ticketRedMiasmalWitcher, 500000 );
+
+		//movementAdjustorRedMiasmalWitcher.RotateTo( ticketRedMiasmalWitcher, VecHeading( (theCamera.GetCameraDirection() * 5)  + (theCamera.GetCameraForward() * 5) + (theCamera.GetCameraRight() * 5) ) );
+
+		movementAdjustorRedMiasmalWitcher.RotateTo( ticketRedMiasmalWitcher, VecHeading( (theCamera.GetCameraDirection() * 5)  + (theCamera.GetCameraRight() * 5) ) );
+	}
+
+	function ACSTransformRedMiasmalMovementAdjustForwardLeft()
+	{
+		movementAdjustorRedMiasmal = GetACSTransformationRedMiasmal().GetMovingAgentComponent().GetMovementAdjustor();
+
+		ticketRedMiasmal = movementAdjustorRedMiasmal.GetRequest( 'ACS_Transformation_Red_Miasmal_Rotate');
+		movementAdjustorRedMiasmal.CancelByName( 'ACS_Transformation_Red_Miasmal_Rotate' );
+		movementAdjustorRedMiasmal.CancelAll();
+
+		ticketRedMiasmal = movementAdjustorRedMiasmal.CreateNewRequest( 'ACS_Transformation_Red_Miasmal_Rotate' );
+		movementAdjustorRedMiasmal.AdjustmentDuration( ticketRedMiasmal, 1 );
+		movementAdjustorRedMiasmal.MaxRotationAdjustmentSpeed( ticketRedMiasmal, 500000 );
+
+		//movementAdjustorRedMiasmal.RotateTo( ticketRedMiasmal, VecHeading( (theCamera.GetCameraDirection() * 5)  + (theCamera.GetCameraForward() * 5) + (theCamera.GetCameraRight() * -5) ) );
+
+		movementAdjustorRedMiasmal.RotateTo( ticketRedMiasmal, VecHeading( (theCamera.GetCameraDirection() * 5) + (theCamera.GetCameraRight() * -5) ) );
+
+
+
+		movementAdjustorRedMiasmalWitcher = thePlayer.GetMovingAgentComponent().GetMovementAdjustor();
+
+		ticketRedMiasmalWitcher = movementAdjustorRedMiasmalWitcher.GetRequest( 'ACS_Transformation_Red_Miasmal_Witcher_Rotate');
+		movementAdjustorRedMiasmalWitcher.CancelByName( 'ACS_Transformation_Red_Miasmal_Witcher_Rotate' );
+		movementAdjustorRedMiasmalWitcher.CancelAll();
+
+		ticketRedMiasmalWitcher = movementAdjustorRedMiasmalWitcher.CreateNewRequest( 'ACS_Transformation_Red_Miasmal_Witcher_Rotate' );
+		movementAdjustorRedMiasmalWitcher.AdjustmentDuration( ticketRedMiasmalWitcher, 1 );
+		movementAdjustorRedMiasmalWitcher.MaxRotationAdjustmentSpeed( ticketRedMiasmalWitcher, 500000 );
+
+		//movementAdjustorRedMiasmalWitcher.RotateTo( ticketRedMiasmalWitcher, VecHeading( (theCamera.GetCameraDirection() * 5) + (theCamera.GetCameraForward() * 5) + (theCamera.GetCameraRight() * -5) ) );
+
+		movementAdjustorRedMiasmalWitcher.RotateTo( ticketRedMiasmalWitcher, VecHeading( (theCamera.GetCameraDirection() * 5) + (theCamera.GetCameraRight() * -5) ) );
+	}
+
+	function ACSTransformRedMiasmalMovementAdjustBackwardRight()
+	{
+		movementAdjustorRedMiasmal = GetACSTransformationRedMiasmal().GetMovingAgentComponent().GetMovementAdjustor();
+
+		ticketRedMiasmal = movementAdjustorRedMiasmal.GetRequest( 'ACS_Transformation_Red_Miasmal_Rotate');
+		movementAdjustorRedMiasmal.CancelByName( 'ACS_Transformation_Red_Miasmal_Rotate' );
+		movementAdjustorRedMiasmal.CancelAll();
+
+		ticketRedMiasmal = movementAdjustorRedMiasmal.CreateNewRequest( 'ACS_Transformation_Red_Miasmal_Rotate' );
+		movementAdjustorRedMiasmal.AdjustmentDuration( ticketRedMiasmal, 1 );
+		movementAdjustorRedMiasmal.MaxRotationAdjustmentSpeed( ticketRedMiasmal, 500000 );
+
+		//movementAdjustorRedMiasmal.RotateTo( ticketRedMiasmal, VecHeading( (theCamera.GetCameraDirection() * -5) + (theCamera.GetCameraForward() * -5) + (theCamera.GetCameraRight() * 5) ) );
+
+		movementAdjustorRedMiasmal.RotateTo( ticketRedMiasmal, VecHeading( (theCamera.GetCameraDirection() * -5) + (theCamera.GetCameraRight() * 5) ) );
+
+
+
+		movementAdjustorRedMiasmalWitcher = thePlayer.GetMovingAgentComponent().GetMovementAdjustor();
+
+		ticketRedMiasmalWitcher = movementAdjustorRedMiasmalWitcher.GetRequest( 'ACS_Transformation_Red_Miasmal_Witcher_Rotate');
+		movementAdjustorRedMiasmalWitcher.CancelByName( 'ACS_Transformation_Red_Miasmal_Witcher_Rotate' );
+		movementAdjustorRedMiasmalWitcher.CancelAll();
+
+		ticketRedMiasmalWitcher = movementAdjustorRedMiasmalWitcher.CreateNewRequest( 'ACS_Transformation_Red_Miasmal_Witcher_Rotate' );
+		movementAdjustorRedMiasmalWitcher.AdjustmentDuration( ticketRedMiasmalWitcher, 1 );
+		movementAdjustorRedMiasmalWitcher.MaxRotationAdjustmentSpeed( ticketRedMiasmalWitcher, 500000 );
+
+		//movementAdjustorRedMiasmalWitcher.RotateTo( ticketRedMiasmalWitcher, VecHeading( (theCamera.GetCameraDirection() * -5) + (theCamera.GetCameraForward() * -5) + (theCamera.GetCameraRight() * 5) ) );
+
+		movementAdjustorRedMiasmalWitcher.RotateTo( ticketRedMiasmalWitcher, VecHeading( (theCamera.GetCameraDirection() * -5) + (theCamera.GetCameraRight() * 5) ) );
+	}
+
+	function ACSTransformRedMiasmalMovementAdjustBackwardLeft()
+	{
+		movementAdjustorRedMiasmal = GetACSTransformationRedMiasmal().GetMovingAgentComponent().GetMovementAdjustor();
+
+		ticketRedMiasmal = movementAdjustorRedMiasmal.GetRequest( 'ACS_Transformation_Red_Miasmal_Rotate');
+		movementAdjustorRedMiasmal.CancelByName( 'ACS_Transformation_Red_Miasmal_Rotate' );
+		movementAdjustorRedMiasmal.CancelAll();
+
+		ticketRedMiasmal = movementAdjustorRedMiasmal.CreateNewRequest( 'ACS_Transformation_Red_Miasmal_Rotate' );
+		movementAdjustorRedMiasmal.AdjustmentDuration( ticketRedMiasmal, 1 );
+		movementAdjustorRedMiasmal.MaxRotationAdjustmentSpeed( ticketRedMiasmal, 500000 );
+
+		//movementAdjustorRedMiasmal.RotateTo( ticketRedMiasmal, VecHeading( (theCamera.GetCameraDirection() * -5) + (theCamera.GetCameraForward() * -5) + (theCamera.GetCameraRight() * -5) ) );
+
+		movementAdjustorRedMiasmal.RotateTo( ticketRedMiasmal, VecHeading( (theCamera.GetCameraDirection() * -5) + (theCamera.GetCameraRight() * -5) ) );
+
+
+
+		movementAdjustorRedMiasmalWitcher = thePlayer.GetMovingAgentComponent().GetMovementAdjustor();
+
+		ticketRedMiasmalWitcher = movementAdjustorRedMiasmalWitcher.GetRequest( 'ACS_Transformation_Red_Miasmal_Witcher_Rotate');
+		movementAdjustorRedMiasmalWitcher.CancelByName( 'ACS_Transformation_Red_Miasmal_Witcher_Rotate' );
+		movementAdjustorRedMiasmalWitcher.CancelAll();
+
+		ticketRedMiasmalWitcher = movementAdjustorRedMiasmalWitcher.CreateNewRequest( 'ACS_Transformation_Red_Miasmal_Witcher_Rotate' );
+		movementAdjustorRedMiasmalWitcher.AdjustmentDuration( ticketRedMiasmalWitcher, 1 );
+		movementAdjustorRedMiasmalWitcher.MaxRotationAdjustmentSpeed( ticketRedMiasmalWitcher, 500000 );
+
+		//movementAdjustorRedMiasmalWitcher.RotateTo( ticketRedMiasmalWitcher, VecHeading( theCamera.GetCameraDirection()  + (theCamera.GetCameraForward() * 5) + (theCamera.GetCameraRight() * -5) ) );
+
+		movementAdjustorRedMiasmalWitcher.RotateTo( ticketRedMiasmalWitcher, VecHeading( theCamera.GetCameraDirection() + (theCamera.GetCameraRight() * -5) ) );
+	}
+
+	function ACSTransformRedMiasmalMovementAdjustRotateTowardsEnemy()
+	{
+		movementAdjustorRedMiasmal = GetACSTransformationRedMiasmal().GetMovingAgentComponent().GetMovementAdjustor();
+
+		ticketRedMiasmal = movementAdjustorRedMiasmal.GetRequest( 'ACS_Transformation_Red_Miasmal_Rotate');
+		movementAdjustorRedMiasmal.CancelByName( 'ACS_Transformation_Red_Miasmal_Rotate' );
+		movementAdjustorRedMiasmal.CancelAll();
+
+		ticketRedMiasmal = movementAdjustorRedMiasmal.CreateNewRequest( 'ACS_Transformation_Red_Miasmal_Rotate' );
+		movementAdjustorRedMiasmal.AdjustmentDuration( ticketRedMiasmal, 0.5 );
+		movementAdjustorRedMiasmal.MaxRotationAdjustmentSpeed( ticketRedMiasmal, 500000 );
+
+		if (thePlayer.GetTarget())
+		{
+			movementAdjustorRedMiasmal.RotateTowards( ticketRedMiasmal, thePlayer.GetTarget() );
+		}
+		else
+		{
+			movementAdjustorRedMiasmal.RotateTo( ticketRedMiasmal, VecHeading( theCamera.GetCameraDirection() ) );
+		}
+	}
+
+	function ACS_Transformation_Red_Miasmal_Move_Controls()
+	{
+		if (thePlayer.IsInCombat())
+		{
+			if (thePlayer.GetStat(BCS_Toxicity) < thePlayer.GetStatMax(BCS_Toxicity))
+			{
+				thePlayer.GainStat(BCS_Toxicity, thePlayer.GetStatMax(BCS_Toxicity) * 0.00049);
+			}
+			
+			thePlayer.DrainVitality(thePlayer.GetStat(BCS_Vitality) * 0.0001225);
+		}
+		else
+		{
+			if (thePlayer.GetStat(BCS_Toxicity) < thePlayer.GetStatMax(BCS_Toxicity))
+			{
+				thePlayer.GainStat(BCS_Toxicity, thePlayer.GetStatMax(BCS_Toxicity) * 0.000245);
+			}
+			
+			thePlayer.DrainVitality(thePlayer.GetStat(BCS_Vitality) * 0.00006125);
+		}
+
+		GetACSTransformationRedMiasmal().GetMovingAgentComponent().EnableCombatMode( true );
+
+		GetACSTransformationRedMiasmal().GetMovingAgentComponent().SetVirtualRadius( 'CombatCharacterRadius' );
+
+		((CNewNPC)GetACSTransformationRedMiasmal()).SetBehaviorVariable( 'additiveTauntOn', 1, true );
+
+		if (thePlayer.IsInCombat())
+		{
+			if (thePlayer.GetTarget())
+			{
+				((CNewNPC)GetACSTransformationRedMiasmal()).SetBehaviorVectorVariable( 'lookAtTarget', ((CActor)(thePlayer.GetTarget())).GetWorldPosition() );
+			}
+			else
+			{
+				((CNewNPC)GetACSTransformationRedMiasmal()).SetBehaviorVectorVariable( 'lookAtTarget', GetACSLookatEntity().GetWorldPosition() );
+			}
+
+			((CNewNPC)GetACSTransformationRedMiasmal()).SetBehaviorVariable( 'lookatOn', 1, true );
+		}
+		else
+		{
+			((CNewNPC)GetACSTransformationRedMiasmal()).SetBehaviorVectorVariable( 'lookAtTarget', GetACSLookatEntity().GetWorldPosition() );
+
+			((CNewNPC)GetACSTransformationRedMiasmal()).SetBehaviorVariable( 'lookatOn', 1, true );
+		}
+
+		if (GetACSTransformationRedMiasmal().GetMovingAgentComponent().GetRelativeMoveSpeed() <= 0.1 )
+		{
+			if
+			(
+				theInput.GetLastActivationTime( 'GI_AxisLeftX' ) > 1.25f 
+				|| theInput.GetLastActivationTime( 'GI_AxisLeftY' ) > 1.25f 
+			)	
+			{
+				GetACSTransformationRedMiasmal().RemoveTag('ACS_Transformation_Red_Miasmal_Stationary_Transition');
+			}
+			else
+			{
+				RemoveTimer('Transformation_Red_Miasmal_Remove_Stationary_Tag');
+
+				if (!GetACSTransformationRedMiasmal().HasTag('ACS_Transformation_Red_Miasmal_Stopped_Moving'))
+				{
+					GetACSTransformationRedMiasmal().AddTag('ACS_Transformation_Red_Miasmal_Stationary_Transition');
+
+					GetACSTransformationRedMiasmal().AddTag('ACS_Transformation_Red_Miasmal_Stopped_Moving');
+				}
+			}
+		}
+
+		if (thePlayer.IsDodgeTimerRunning()
+		|| thePlayer.IsCurrentlyDodging() 
+		|| GetACSTransformationRedMiasmal().HasTag('ACS_Transformation_Toad_Is_Attacking')
+		)
+		{
+			GetACSTransformationRedMiasmal().GetMovingAgentComponent().ForceSetRelativeMoveSpeed( 0 );
+			GetACSTransformationRedMiasmal().GetMovingAgentComponent().SetGameplayRelativeMoveSpeed( 0 );
+			return;
+		}
+
+		if (theInput.GetActionValue('GI_AxisLeftX') == 0 && theInput.GetActionValue('GI_AxisLeftY') == 0 )
+		{
+			GetACSTransformationRedMiasmal().GetMovingAgentComponent().ForceSetRelativeMoveSpeed( 0 );
+			GetACSTransformationRedMiasmal().GetMovingAgentComponent().SetGameplayRelativeMoveSpeed( 0 );
+		}
+		else
+		{
+			if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') == 0 )
+			{
+				TransformationRedMiasmalRestoreRotation();
+
+				GetACSTransformationRedMiasmal().GetMovingAgentComponent().SetGameplayMoveDirection(VecHeading(GetACSTransformationToad().GetHeadingVector()));
+
+				if (!GetACSTransformationRedMiasmal().HasTag('ACS_Transformation_Red_Miasmal_Stationary_Transition')
+				)
+				{
+					ACSTransformRedMiasmalMovementAdjustForward();
+				}
+
+				if (
+				theInput.IsActionPressed('Sprint')
+				)
+				{
+					GetACSTransformationRedMiasmal().GetMovingAgentComponent().SetGameplayRelativeMoveSpeed(2); 
+				}
+				else
+				{
+					GetACSTransformationRedMiasmal().GetMovingAgentComponent().SetGameplayRelativeMoveSpeed(1); 
+				}
+			}
+			else if (theInput.GetActionValue('GI_AxisLeftY') < -0.1 && theInput.GetActionValue('GI_AxisLeftX') == 0 )
+			{
+				TransformationRedMiasmalRestoreRotation();
+
+				if (!GetACSTransformationRedMiasmal().HasTag('ACS_Transformation_Red_Miasmal_Stationary_Transition')
+				)
+				{
+					GetACSTransformationRedMiasmal().GetMovingAgentComponent().SetGameplayMoveDirection(VecHeading(GetACSTransformationToad().GetHeadingVector()));
+						
+					ACSTransformRedMiasmalMovementAdjustBackward();
+				}
+
+				RedMiasmalChangeStance();
+
+				GetACSTransformationRedMiasmal().GetMovingAgentComponent().SetGameplayMoveDirection(VecHeading(GetACSTransformationToad().GetHeadingVector()));
+
+				if (
+				theInput.IsActionPressed('Sprint')
+				)
+				{
+					GetACSTransformationRedMiasmal().GetMovingAgentComponent().SetGameplayRelativeMoveSpeed(2); 
+				}
+				else
+				{
+					GetACSTransformationRedMiasmal().GetMovingAgentComponent().SetGameplayRelativeMoveSpeed(1); 
+				}
+			}
+			else if (theInput.GetActionValue('GI_AxisLeftX') > 0.1 && theInput.GetActionValue('GI_AxisLeftY') == 0 )
+			{
+				TransformationRedMiasmalRestoreRotation();
+
+				RedMiasmalChangeStance();
+
+				if (!GetACSTransformationRedMiasmal().HasTag('ACS_Transformation_Red_Miasmal_Stationary_Transition')
+				)
+				{
+					ACSTransformRedMiasmalMovementAdjustRight();
+				}
+
+				GetACSTransformationRedMiasmal().GetMovingAgentComponent().SetGameplayMoveDirection(VecHeading(GetACSTransformationToad().GetHeadingVector()));
+
+				if (
+				theInput.IsActionPressed('Sprint')
+				)
+				{
+					GetACSTransformationRedMiasmal().GetMovingAgentComponent().SetGameplayRelativeMoveSpeed(2); 
+				}
+				else
+				{
+					GetACSTransformationRedMiasmal().GetMovingAgentComponent().SetGameplayRelativeMoveSpeed(1); 
+				}
+			}
+			else if (theInput.GetActionValue('GI_AxisLeftX') < -0.1 && theInput.GetActionValue('GI_AxisLeftY') == 0 )
+			{
+				TransformationRedMiasmalRestoreRotation();
+
+				RedMiasmalChangeStance();
+
+				if (!GetACSTransformationRedMiasmal().HasTag('ACS_Transformation_Red_Miasmal_Stationary_Transition')
+				)
+				{
+					ACSTransformRedMiasmalMovementAdjustLeft();
+				}
+
+				GetACSTransformationRedMiasmal().GetMovingAgentComponent().SetGameplayMoveDirection(VecHeading(GetACSTransformationToad().GetHeadingVector()));
+
+				if (
+				theInput.IsActionPressed('Sprint')
+				)
+				{
+					GetACSTransformationRedMiasmal().GetMovingAgentComponent().SetGameplayRelativeMoveSpeed(2); 
+				}
+				else
+				{
+					GetACSTransformationRedMiasmal().GetMovingAgentComponent().SetGameplayRelativeMoveSpeed(1); 
+				}
+			}
+			else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') > 0.1 )
+			{
+				TransformationRedMiasmalRestoreRotation();
+
+				RedMiasmalChangeStance();
+
+				if (!GetACSTransformationRedMiasmal().HasTag('ACS_Transformation_Red_Miasmal_Stationary_Transition')
+				)
+				{
+					ACSTransformRedMiasmalMovementAdjustForwardRight();
+				}
+
+				GetACSTransformationRedMiasmal().GetMovingAgentComponent().SetGameplayMoveDirection(VecHeading(GetACSTransformationToad().GetHeadingVector()));
+
+				if (
+				theInput.IsActionPressed('Sprint')
+				)
+				{
+					GetACSTransformationRedMiasmal().GetMovingAgentComponent().SetGameplayRelativeMoveSpeed(2); 
+				}
+				else
+				{
+					GetACSTransformationRedMiasmal().GetMovingAgentComponent().SetGameplayRelativeMoveSpeed(1); 
+				}
+			}
+			else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') < -0.1 )
+			{
+				TransformationRedMiasmalRestoreRotation();
+
+				RedMiasmalChangeStance();
+
+				if (!GetACSTransformationRedMiasmal().HasTag('ACS_Transformation_Red_Miasmal_Stationary_Transition')
+				)
+				{
+					ACSTransformRedMiasmalMovementAdjustForwardLeft();
+				}
+
+				GetACSTransformationRedMiasmal().GetMovingAgentComponent().SetGameplayMoveDirection(VecHeading(GetACSTransformationToad().GetHeadingVector()));
+
+				if (
+				theInput.IsActionPressed('Sprint')
+				)
+				{
+					GetACSTransformationRedMiasmal().GetMovingAgentComponent().SetGameplayRelativeMoveSpeed(2); 
+				}
+				else
+				{
+					GetACSTransformationRedMiasmal().GetMovingAgentComponent().SetGameplayRelativeMoveSpeed(1); 
+				}
+			}
+			else if (theInput.GetActionValue('GI_AxisLeftY') < -0.1 && theInput.GetActionValue('GI_AxisLeftX') > 0.1 )
+			{
+				TransformationRedMiasmalRestoreRotation();
+
+				RedMiasmalChangeStance();
+
+				if (!GetACSTransformationRedMiasmal().HasTag('ACS_Transformation_Red_Miasmal_Stationary_Transition')
+				)
+				{
+					ACSTransformRedMiasmalMovementAdjustBackwardRight();
+				}
+
+				GetACSTransformationRedMiasmal().GetMovingAgentComponent().SetGameplayMoveDirection(VecHeading(GetACSTransformationToad().GetHeadingVector()));
+
+				if (
+				theInput.IsActionPressed('Sprint')
+				)
+				{
+					GetACSTransformationRedMiasmal().GetMovingAgentComponent().SetGameplayRelativeMoveSpeed(2); 
+				}
+				else
+				{
+					GetACSTransformationRedMiasmal().GetMovingAgentComponent().SetGameplayRelativeMoveSpeed(1); 
+				}
+			}
+			else if (theInput.GetActionValue('GI_AxisLeftX') < -0.1 && theInput.GetActionValue('GI_AxisLeftY') < -0.1 )
+			{
+				TransformationRedMiasmalRestoreRotation();
+
+				RedMiasmalChangeStance();
+
+				if (!GetACSTransformationRedMiasmal().HasTag('ACS_Transformation_Red_Miasmal_Stationary_Transition')
+				)
+				{
+					ACSTransformRedMiasmalMovementAdjustBackwardLeft();
+				}
+
+				GetACSTransformationRedMiasmal().GetMovingAgentComponent().SetGameplayMoveDirection(VecHeading(GetACSTransformationToad().GetHeadingVector()));
+
+				if (
+				theInput.IsActionPressed('Sprint')
+				)
+				{
+					GetACSTransformationRedMiasmal().GetMovingAgentComponent().SetGameplayRelativeMoveSpeed(2); 
+				}
+				else
+				{
+					GetACSTransformationRedMiasmal().GetMovingAgentComponent().SetGameplayRelativeMoveSpeed(1); 
+				}
+			}
+		}
+	}
+
+	private var red_miasmal_light_attack_index_1																									: int;
+	default red_miasmal_light_attack_index_1 																										= -1;
+
+	private var previous_red_miasmal_light_attack_index_1																							: int;
+	default previous_red_miasmal_light_attack_index_1 																								= -1;
+
+	private var red_miasmal_heavy_attack_index_1																									: int;
+	default red_miasmal_heavy_attack_index_1 																										= -1;
+
+	private var previous_red_miasmal_heavy_attack_index_1																							: int;
+	default previous_red_miasmal_heavy_attack_index_1 																								= -1;
+
+	private var red_miasmal_special_attack_index_1																									: int;
+	default red_miasmal_special_attack_index_1 																										= -1;
+
+	private var previous_red_miasmal_special_attack_index_1																							: int;
+	default previous_red_miasmal_special_attack_index_1 																							= -1;
+
+
+	function ACS_Transformation_Red_Miasmal_Light_Attacks()
+	{
+		if (ACS_can_perform_transformation_light_attack())
+		{
+			ACS_refresh_transformation_light_attack_cooldown();
+
+			ACSTransformationRedMiasmalRemoveMoveTimers();
+
+			if (thePlayer.IsInCombat())
+			{
+				ACSTransformRedMiasmalMovementAdjustRotateTowardsEnemy();
+			}
+
+			red_miasmal_light_attack_index_1 = RandDifferent(this.previous_red_miasmal_light_attack_index_1 , 7);
+
+			switch (red_miasmal_light_attack_index_1) 
+			{	
+				case 6:
+				ACSTransformRedMiasmalPlayAnim( 'giant_combat_attack_f_4', 0.25f, 0.325f);
+
+				AddTimer('RedMiasmalTentacleDelay_L', 0.5, false);
+
+				AddTimer('RedMiasmalTentacleDelay_L_2', 1.25, false);
+
+				AddTimer('RedMiasmalLightAttackDamageWide', 0.875, false);
+
+				AddTimer('RedMiasmalLightAttackDamageWide_2', 1.25, false);
+				break;
+
+
+				case 5:
+				ACSTransformRedMiasmalPlayAnim( 'giant_combat_attack_f_3', 0.25f, 0.325f);
+
+				AddTimer('RedMiasmalTentacleDelay_R', 0.5, false);
+
+				AddTimer('RedMiasmalLightAttackDamageWide', 0.875, false);
+				break;
+
+
+				case 4:
+				ACSTransformRedMiasmalPlayAnim( 'giant_combat_attack_f_2', 0.25f, 0.325f);
+
+				AddTimer('RedMiasmalTentacleDelay_R', 0.5, false);
+
+				AddTimer('RedMiasmalLightAttackDamageWide', 0.875, false);
+				break;
+
+
+				case 3:
+				ACSTransformRedMiasmalPlayAnim( 'giant_combat_attack_f_1', 0.25f, 0.325f);
+
+				AddTimer('RedMiasmalTentacleDelay_L', 0.5, false);
+
+				AddTimer('RedMiasmalLightAttackDamageWide', 0.875, false);
+				break;
+
+
+				case 2:
+				ACSTransformRedMiasmalPlayAnim( 'monster_lessun_attack_right_swing', 0.25f, 0.325f);
+
+				AddTimer('RedMiasmalTentacleDelay_R', 0.5, false);
+
+				AddTimer('RedMiasmalLightAttackDamageWide', 0.875, false);
+				break;
+
+				case 1:
+				ACSTransformRedMiasmalPlayAnim( 'monster_lessun_attack_left_swing', 0.25f, 0.325f);
+
+				AddTimer('RedMiasmalTentacleDelay_L', 0.5, false);
+
+				AddTimer('RedMiasmalLightAttackDamageWide', 0.875, false);
+				break;
+				
+				default:
+				ACSTransformRedMiasmalPlayAnim( 'monster_lessun_attack_center', 0.25f, 0.325f);
+
+				AddTimer('RedMiasmalTentacleDelay_L', 0.5, false);
+
+				AddTimer('RedMiasmalLightAttackDamage', 0.875, false);
+				break;
+			}
+	
+			this.previous_red_miasmal_light_attack_index_1 = red_miasmal_light_attack_index_1;
+			
+			ACS_StaminaDrainForced(5);
+		}
+	}
+
+	function ACS_Transformation_Red_Miasmal_Heavy_Attacks()
+	{
+		if (ACS_can_perform_transformation_heavy_attack())
+		{
+			ACS_refresh_transformation_heavy_attack_cooldown();
+
+			ACSTransformationRedMiasmalRemoveMoveTimers();
+
+			if (thePlayer.IsInCombat())
+			{
+				ACSTransformRedMiasmalMovementAdjustRotateTowardsEnemy();
+			}
+	
+			red_miasmal_heavy_attack_index_1 = RandDifferent(this.previous_red_miasmal_heavy_attack_index_1 , 2);
+
+			switch (red_miasmal_heavy_attack_index_1) 
+			{	
+				case 1:
+				ACSTransformRedMiasmalPlayAnim( 'giant_combat_attack_ground_2', 0.25f, 0.325f);
+				AddTimer('RedMiasmalHeavyAttackDamage360', 2, false);
+				AddTimer('RedMiasmalRootsDelay', 2, false);
+				break;
+
+				default:
+				ACSTransformRedMiasmalPlayAnim( 'giant_combat_attack_ground_1', 0.25f, 0.325f);
+				AddTimer('RedMiasmalHeavyAttackDamage360', 2, false);
+				AddTimer('RedMiasmalRootsDelay', 2, false);
+				break;
+			}
+	
+			this.previous_red_miasmal_heavy_attack_index_1 = red_miasmal_heavy_attack_index_1;
+		
+			ACS_StaminaDrainForced(5);
+		}
+	}
+
+	function ACS_Transformation_Red_Miasmal_Special_Attack_Pressed()
+	{
+		if (ACS_can_perform_transformation_special_attack())
+		{
+			ACS_refresh_transformation_special_attack_cooldown();
+
+			ACSTransformationRedMiasmalRemoveMoveTimers();
+
+			if (thePlayer.IsInCombat())
+			{
+				ACSTransformRedMiasmalMovementAdjustRotateTowardsEnemy();
+			}
+
+			GetACSTransformationRedMiasmal().AddTag('ACS_Transformation_Red_Miasmal_Rooted');
+
+			ACSTransformRedMiasmalPlayAnim( 'monster_lessun_attack_root_start', 0.25f, 0.25f);
+
+			AddTimer('Red_Miasmal_Tentacles_Start', 1.5, false);
+
+			ACS_StaminaDrainForced(5);
+		}
+	}
+
+	function ACS_Transformation_Red_Miasmal_Special_Attack_Released()
+	{
+		RemoveTimer('Red_Miasmal_Tentacles_Start');
+
+		RemoveTimer('Red_Miasmal_Tentacles_Loop');
+
+		GetACSTransformationRedMiasmal().StopEffect('hand_fx');
+
+		GetACSTransformationRedMiasmal().StopEffect('hand_fx_root');
+
+		GetACSTransformationRedMiasmal().StopEffect('hand_fx2_l');
+
+		GetACSTransformationRedMiasmal().StopEffect('hand_fx2_r');
+
+		ACSTransformRedMiasmalPlayAnim( 'monster_lessun_attack_root_end', 0.25f, 0.25f);
+
+		GetACSTransformationRedMiasmal().RemoveTag('ACS_Transformation_Red_Miasmal_Rooted');
+	}
+
+	public timer function Red_Miasmal_Tentacles_Start ( dt : float, id : int) 
+	{ 
+		RedMiasmalTentacles();
+
+		ACSTransformRedMiasmalPlayAnim( 'monster_lessun_attack_root_loop', 0.1f, 0.1f);
+
+		theGame.GetSurfacePostFX().AddSurfacePostFXGroup( TraceFloor( GetACSTransformationRedMiasmal().GetWorldPosition() ),  0.3,  5,  2 ,  1,  1 );
+
+		RemoveTimer('Red_Miasmal_Tentacles_Loop');
+		AddTimer('Red_Miasmal_Tentacles_Loop', 1.5, true);
+	}
+
+	public timer function Red_Miasmal_Tentacles_Loop ( dt : float, id : int) 
+	{ 
+		RedMiasmalTentacles();
+		
+		GetACSTransformationRedMiasmal().StopEffect('hand_fx');
+		GetACSTransformationRedMiasmal().PlayEffectSingle('hand_fx');
+
+		GetACSTransformationRedMiasmal().StopEffect('hand_fx_root');
+		GetACSTransformationRedMiasmal().PlayEffectSingle('hand_fx_root');
+
+		GetACSTransformationRedMiasmal().StopEffect('hand_fx2_l');
+		GetACSTransformationRedMiasmal().PlayEffectSingle('hand_fx2_l');
+
+		GetACSTransformationRedMiasmal().StopEffect('hand_fx2_r');
+		GetACSTransformationRedMiasmal().PlayEffectSingle('hand_fx2_r');
+
+		theGame.GetSurfacePostFX().AddSurfacePostFXGroup( TraceFloor( GetACSTransformationRedMiasmal().GetWorldPosition() ),  0.3,  5,  2 ,  1,  1 );
+
+		ACSTransformRedMiasmalPlayAnim( 'monster_lessun_attack_root_loop', 0.1f, 0.1f);
+	}
+
+	function RedMiasmalTentacles()
+	{
+		var actor							: CActor; 
+		var actors		    				: array<CActor>;
+		var i								: int;
+		var npc								: CNewNPC;
+
+		actors.Clear();
+
+		actors = thePlayer.GetNPCsAndPlayersInRange( 25, 2, , FLAG_Attitude_Hostile + FLAG_ExcludePlayer + FLAG_OnlyAliveActors);
+
+		if( actors.Size() > 0 )
+		{
+			for( i = 0; i < actors.Size(); i += 1 )
+			{
+				npc = (CNewNPC)actors[i];
+
+				actor = actors[i];
+
+				ACS_Red_Miasmal_Ability_Spawn_Big(actor.PredictWorldPosition(0.7));
+			}
+		}
+	}
+
+	public timer function ACS_Transformation_Red_Miasmal_Reset_Animation_Speed ( dt : float, id : int) 
+	{ 
+		GetACSTransformationRedMiasmal().ClearAnimationSpeedMultipliers();
+	}
+
+	function RedMiasmalLightAttackDamageActual()
+	{
+		var attackRange, attackAngle 	: float;
+		var tmpBool 					: bool;
+		var mc 							: EMonsterCategory;
+		var tmpName 					: name;
+
+		attackRange = 4;
+
+		attackAngle = 60;
+
+		actors.Clear();
+
+		actors = GetACSTransformationRedMiasmal().GetNPCsAndPlayersInCone(attackRange, VecHeading(GetACSTransformationRedMiasmal().GetHeadingVector()), attackAngle, 20, , FLAG_ExcludePlayer + FLAG_OnlyAliveActors );
+
+		if( actors.Size() > 0 )
+		{
+			for( i = 0; i < actors.Size(); i += 1 )
+			{
+				actortarget = (CActor)actors[i];
+
+				if (actortarget == GetACSTransformationRedMiasmal()
+				|| actortarget.HasTag('acs_snow_entity')
+				|| actortarget.HasTag('smokeman') 
+				|| actortarget.HasTag('ACS_Tentacle_1') 
+				|| actortarget.HasTag('ACS_Tentacle_2') 
+				|| actortarget.HasTag('ACS_Tentacle_3') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_1') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_2') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_3') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_6')
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_5')
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_4')
+				|| actortarget.HasTag('ACS_Vampire_Monster_Boss_Bar') 
+				|| actortarget.HasTag('ACS_Chaos_Cloud')
+				)
+				continue;
+
+				actortarget.IsAttacked();
+
+				actortarget.SignalGameplayEventParamInt('Time2Dodge', (int)EDT_Attack_Light );
+
+				movementAdjustorNPC = actortarget.GetMovingAgentComponent().GetMovementAdjustor();
+
+				ticketNPC = movementAdjustorNPC.GetRequest( 'ACS_NPC_Red_Miasmal_Attacked_Rotate');
+				movementAdjustorNPC.CancelByName( 'ACS_NPC_Red_Miasmal_Attacked_Rotate' );
+				movementAdjustorNPC.CancelAll();
+
+				ticketNPC = movementAdjustorNPC.CreateNewRequest( 'ACS_NPC_Red_Miasmal_Attacked_Rotate' );
+				movementAdjustorNPC.AdjustmentDuration( ticketNPC, 0.5 );
+				movementAdjustorNPC.MaxRotationAdjustmentSpeed( ticketNPC, 50000 );
+
+				dmg = new W3DamageAction in theGame.damageMgr;
+				
+				dmg.Initialize(thePlayer, actortarget, NULL, thePlayer.GetName(), EHRT_Heavy, CPS_Undefined, false, false, true, false);
+				
+				dmg.SetProcessBuffsIfNoDamage(true);
+				
+				dmg.SetIgnoreImmortalityMode(false);
+
+				dmg.SetHitAnimationPlayType(EAHA_ForceYes);
+
+				if (actortarget.UsesVitality()) 
+				{ 
+					maxTargetVitality = actortarget.GetStatMax( BCS_Vitality );
+
+					damageMax = maxTargetVitality * 0.25; 
+
+					damageMin = maxTargetVitality * 0.125; 
+				} 
+				else if (actortarget.UsesEssence()) 
+				{ 
+					maxTargetEssence = actortarget.GetStatMax( BCS_Essence );
+
+					if (((CMovingPhysicalAgentComponent)(actortarget.GetMovingAgentComponent())).GetCapsuleHeight() >= 2
+					|| actortarget.GetRadius() >= 0.7
+					)
+					{
+						damageMax = maxTargetEssence * 0.125; 
+					
+						damageMin = maxTargetEssence * 0.25; 
+					}
+					else
+					{
+						damageMax = maxTargetEssence * 0.25; 
+					
+						damageMin = maxTargetEssence * 0.125; 
+					}
+				}
+
+				dmg.SetHitReactionType( EHRT_Heavy, true);
+
+				if (actortarget.HasTag('ACS_Swapped_To_Shield')
+				|| ((CNewNPC)actortarget).IsShielded( NULL ) )
+				{
+					movementAdjustorNPC.RotateTowards( ticketNPC, thePlayer );
+				}
+
+				thePlayer.GainStat( BCS_Focus, thePlayer.GetStatMax( BCS_Focus) * 0.15 );
+
+				thePlayer.SoundEvent("cmb_play_dismemberment_gore");
+
+				thePlayer.SoundEvent("monster_dettlaff_monster_vein_hit_blood");
+
+				actortarget.PlayEffectSingle('blood');
+				actortarget.StopEffect('blood');
+
+				actortarget.PlayEffectSingle('death_blood');
+				actortarget.StopEffect('death_blood');
+
+				actortarget.PlayEffectSingle('heavy_hit');
+				actortarget.StopEffect('heavy_hit');
+
+				actortarget.PlayEffectSingle('light_hit');
+				actortarget.StopEffect('light_hit');
+
+				actortarget.PlayEffectSingle('blood_spill');
+				actortarget.StopEffect('blood_spill');		
+
+				dmg.AddDamage( theGame.params.DAMAGE_NAME_PHYSICAL, RandRangeF(100 + damageMax,100 + damageMin) );
+
+				dmg.AddDamage( theGame.params.DAMAGE_NAME_SILVER, RandRangeF(100 + damageMax,100 + damageMin) );
+
+				dmg.AddEffectInfo( EET_Poison, 3 );
+
+				dmg.AddEffectInfo( EET_Bleeding, 3 );
+
+				dmg.SetForceExplosionDismemberment();
+					
+				theGame.damageMgr.ProcessAction( dmg );
+					
+				delete dmg;	
+			}
+		}
+	}
+
+	public timer function RedMiasmalLightAttackDamage(deltaTime : float , id : int)
+	{
+		RedMiasmalLightAttackDamageActual();
+	}
+
+	function RedMiasmalLightAttackDamageWideActual()
+	{
+		var attackRange, attackAngle 	: float;
+		var tmpBool 					: bool;
+		var mc 							: EMonsterCategory;
+		var tmpName 					: name;
+
+		attackRange = 4;
+
+		attackAngle = 180;
+
+		actors.Clear();
+
+		actors = GetACSTransformationRedMiasmal().GetNPCsAndPlayersInCone(attackRange, VecHeading(GetACSTransformationRedMiasmal().GetHeadingVector()), attackAngle, 20, , FLAG_ExcludePlayer + FLAG_OnlyAliveActors );
+
+		if( actors.Size() > 0 )
+		{
+			for( i = 0; i < actors.Size(); i += 1 )
+			{
+				actortarget = (CActor)actors[i];
+
+				if (actortarget == GetACSTransformationRedMiasmal()
+				|| actortarget.HasTag('acs_snow_entity')
+				|| actortarget.HasTag('smokeman') 
+				|| actortarget.HasTag('ACS_Tentacle_1') 
+				|| actortarget.HasTag('ACS_Tentacle_2') 
+				|| actortarget.HasTag('ACS_Tentacle_3') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_1') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_2') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_3') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_6')
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_5')
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_4')
+				|| actortarget.HasTag('ACS_Vampire_Monster_Boss_Bar') 
+				|| actortarget.HasTag('ACS_Chaos_Cloud')
+				)
+				continue;
+
+				actortarget.IsAttacked();
+
+				actortarget.SignalGameplayEventParamInt('Time2Dodge', (int)EDT_Attack_Light );
+
+				movementAdjustorNPC = actortarget.GetMovingAgentComponent().GetMovementAdjustor();
+
+				ticketNPC = movementAdjustorNPC.GetRequest( 'ACS_NPC_Red_Miasmal_Attacked_Rotate');
+				movementAdjustorNPC.CancelByName( 'ACS_NPC_Red_Miasmal_Attacked_Rotate' );
+				movementAdjustorNPC.CancelAll();
+
+				ticketNPC = movementAdjustorNPC.CreateNewRequest( 'ACS_NPC_Red_Miasmal_Attacked_Rotate' );
+				movementAdjustorNPC.AdjustmentDuration( ticketNPC, 0.5 );
+				movementAdjustorNPC.MaxRotationAdjustmentSpeed( ticketNPC, 50000 );
+
+				dmg = new W3DamageAction in theGame.damageMgr;
+				
+				dmg.Initialize(thePlayer, actortarget, NULL, thePlayer.GetName(), EHRT_Heavy, CPS_Undefined, false, false, true, false);
+				
+				dmg.SetProcessBuffsIfNoDamage(true);
+				
+				dmg.SetIgnoreImmortalityMode(false);
+
+				dmg.SetHitAnimationPlayType(EAHA_ForceYes);
+
+				if (actortarget.UsesVitality()) 
+				{ 
+					maxTargetVitality = actortarget.GetStatMax( BCS_Vitality );
+
+					damageMax = maxTargetVitality * 0.25; 
+
+					damageMin = maxTargetVitality * 0.125; 
+				} 
+				else if (actortarget.UsesEssence()) 
+				{ 
+					maxTargetEssence = actortarget.GetStatMax( BCS_Essence );
+
+					if (((CMovingPhysicalAgentComponent)(actortarget.GetMovingAgentComponent())).GetCapsuleHeight() >= 2
+					|| actortarget.GetRadius() >= 0.7
+					)
+					{
+						damageMax = maxTargetEssence * 0.125; 
+					
+						damageMin = maxTargetEssence * 0.25; 
+					}
+					else
+					{
+						damageMax = maxTargetEssence * 0.25; 
+					
+						damageMin = maxTargetEssence * 0.125; 
+					}
+				}
+
+				dmg.SetHitReactionType( EHRT_Heavy, true);
+
+				if (actortarget.HasTag('ACS_Swapped_To_Shield')
+				|| ((CNewNPC)actortarget).IsShielded( NULL ) )
+				{
+					movementAdjustorNPC.RotateTowards( ticketNPC, thePlayer );
+				}
+
+				thePlayer.GainStat( BCS_Focus, thePlayer.GetStatMax( BCS_Focus) * 0.15 );
+
+				thePlayer.SoundEvent("cmb_play_dismemberment_gore");
+
+				thePlayer.SoundEvent("monster_dettlaff_monster_vein_hit_blood");
+
+				actortarget.PlayEffectSingle('blood');
+				actortarget.StopEffect('blood');
+
+				actortarget.PlayEffectSingle('death_blood');
+				actortarget.StopEffect('death_blood');
+
+				actortarget.PlayEffectSingle('heavy_hit');
+				actortarget.StopEffect('heavy_hit');
+
+				actortarget.PlayEffectSingle('light_hit');
+				actortarget.StopEffect('light_hit');
+
+				actortarget.PlayEffectSingle('blood_spill');
+				actortarget.StopEffect('blood_spill');		
+
+				dmg.AddDamage( theGame.params.DAMAGE_NAME_PHYSICAL, RandRangeF(100 + damageMax,100 + damageMin) );
+
+				dmg.AddDamage( theGame.params.DAMAGE_NAME_SILVER, RandRangeF(100 + damageMax,100 + damageMin) );
+
+				dmg.AddEffectInfo( EET_Poison, 3 );
+
+				dmg.AddEffectInfo( EET_Bleeding, 3 );
+
+				dmg.SetForceExplosionDismemberment();
+					
+				theGame.damageMgr.ProcessAction( dmg );
+					
+				delete dmg;	
+			}
+		}
+	}
+
+	public timer function RedMiasmalLightAttackDamageWide(deltaTime : float , id : int)
+	{
+		RedMiasmalLightAttackDamageWideActual();
+	}
+
+	public timer function RedMiasmalLightAttackDamageWide_2(deltaTime : float , id : int)
+	{
+		RedMiasmalLightAttackDamageWideActual();
+	}
+
+	function RedMiasmalLightAttackDamage360Actual()
+	{
+		var attackRange, attackAngle 	: float;
+		var tmpBool 					: bool;
+		var mc 							: EMonsterCategory;
+		var tmpName 					: name;
+
+		attackRange = 3.5;
+
+		attackAngle = 360;
+
+		actors.Clear();
+
+		actors = GetACSTransformationRedMiasmal().GetNPCsAndPlayersInCone(attackRange, VecHeading(GetACSTransformationRedMiasmal().GetHeadingVector()), attackAngle, 20, , FLAG_ExcludePlayer + FLAG_OnlyAliveActors );
+
+		if( actors.Size() > 0 )
+		{
+			for( i = 0; i < actors.Size(); i += 1 )
+			{
+				actortarget = (CActor)actors[i];
+
+				if (actortarget == GetACSTransformationRedMiasmal()
+				|| actortarget.HasTag('acs_snow_entity')
+				|| actortarget.HasTag('smokeman') 
+				|| actortarget.HasTag('ACS_Tentacle_1') 
+				|| actortarget.HasTag('ACS_Tentacle_2') 
+				|| actortarget.HasTag('ACS_Tentacle_3') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_1') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_2') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_3') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_6')
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_5')
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_4')
+				|| actortarget.HasTag('ACS_Vampire_Monster_Boss_Bar') 
+				|| actortarget.HasTag('ACS_Chaos_Cloud')
+				)
+				continue;
+
+				actortarget.IsAttacked();
+
+				actortarget.SignalGameplayEventParamInt('Time2Dodge', (int)EDT_Attack_Light );
+
+				movementAdjustorNPC = actortarget.GetMovingAgentComponent().GetMovementAdjustor();
+
+				ticketNPC = movementAdjustorNPC.GetRequest( 'ACS_NPC_Red_Miasmal_Attacked_Rotate');
+				movementAdjustorNPC.CancelByName( 'ACS_NPC_Red_Miasmal_Attacked_Rotate' );
+				movementAdjustorNPC.CancelAll();
+
+				ticketNPC = movementAdjustorNPC.CreateNewRequest( 'ACS_NPC_Red_Miasmal_Attacked_Rotate' );
+				movementAdjustorNPC.AdjustmentDuration( ticketNPC, 0.5 );
+				movementAdjustorNPC.MaxRotationAdjustmentSpeed( ticketNPC, 50000 );
+
+				dmg = new W3DamageAction in theGame.damageMgr;
+				
+				dmg.Initialize(thePlayer, actortarget, NULL, thePlayer.GetName(), EHRT_Heavy, CPS_Undefined, false, false, true, false);
+				
+				dmg.SetProcessBuffsIfNoDamage(true);
+				
+				dmg.SetIgnoreImmortalityMode(false);
+
+				dmg.SetHitAnimationPlayType(EAHA_ForceYes);
+
+				if (actortarget.UsesVitality()) 
+				{ 
+					maxTargetVitality = actortarget.GetStatMax( BCS_Vitality );
+
+					damageMax = maxTargetVitality * 0.25; 
+
+					damageMin = maxTargetVitality * 0.125; 
+				} 
+				else if (actortarget.UsesEssence()) 
+				{ 
+					maxTargetEssence = actortarget.GetStatMax( BCS_Essence );
+
+					if (((CMovingPhysicalAgentComponent)(actortarget.GetMovingAgentComponent())).GetCapsuleHeight() >= 2
+					|| actortarget.GetRadius() >= 0.7
+					)
+					{
+						damageMax = maxTargetEssence * 0.125; 
+					
+						damageMin = maxTargetEssence * 0.25; 
+					}
+					else
+					{
+						damageMax = maxTargetEssence * 0.25; 
+					
+						damageMin = maxTargetEssence * 0.125; 
+					}
+				}
+
+				dmg.SetHitReactionType( EHRT_Heavy, true);
+
+				if (actortarget.HasTag('ACS_Swapped_To_Shield')
+				|| ((CNewNPC)actortarget).IsShielded( NULL ) )
+				{
+					movementAdjustorNPC.RotateTowards( ticketNPC, thePlayer );
+				}
+
+				thePlayer.GainStat( BCS_Focus, thePlayer.GetStatMax( BCS_Focus) * 0.15 );
+
+				thePlayer.SoundEvent("cmb_play_dismemberment_gore");
+
+				thePlayer.SoundEvent("monster_dettlaff_monster_vein_hit_blood");
+
+				actortarget.PlayEffectSingle('blood');
+				actortarget.StopEffect('blood');
+
+				actortarget.PlayEffectSingle('death_blood');
+				actortarget.StopEffect('death_blood');
+
+				actortarget.PlayEffectSingle('heavy_hit');
+				actortarget.StopEffect('heavy_hit');
+
+				actortarget.PlayEffectSingle('light_hit');
+				actortarget.StopEffect('light_hit');
+
+				actortarget.PlayEffectSingle('blood_spill');
+				actortarget.StopEffect('blood_spill');		
+
+				dmg.AddDamage( theGame.params.DAMAGE_NAME_PHYSICAL, RandRangeF(100 + damageMax,100 + damageMin) );
+
+				dmg.AddDamage( theGame.params.DAMAGE_NAME_SILVER, RandRangeF(100 + damageMax,100 + damageMin) );
+
+				dmg.AddEffectInfo( EET_Poison, 3 );
+
+				dmg.AddEffectInfo( EET_Bleeding, 3 );
+
+				dmg.SetForceExplosionDismemberment();
+					
+				theGame.damageMgr.ProcessAction( dmg );
+					
+				delete dmg;	
+			}
+		}
+	}
+
+	public timer function RedMiasmalLightAttackDamage360(deltaTime : float , id : int)
+	{
+		RedMiasmalLightAttackDamage360Actual();
+	}
+
+	function RedMiasmalHeavyAttackDamage360Actual()
+	{
+		var attackRange, attackAngle 	: float;
+		var tmpBool 					: bool;
+		var mc 							: EMonsterCategory;
+		var tmpName 					: name;
+
+		attackRange = 5;
+
+		attackAngle = 360;
+
+		actors.Clear();
+
+		actors = GetACSTransformationRedMiasmal().GetNPCsAndPlayersInCone(attackRange, VecHeading(GetACSTransformationRedMiasmal().GetHeadingVector()), attackAngle, 20, , FLAG_ExcludePlayer + FLAG_OnlyAliveActors );
+
+		if( actors.Size() > 0 )
+		{
+			for( i = 0; i < actors.Size(); i += 1 )
+			{
+				actortarget = (CActor)actors[i];
+
+				if (actortarget == GetACSTransformationRedMiasmal()
+				|| actortarget.HasTag('acs_snow_entity')
+				|| actortarget.HasTag('smokeman') 
+				|| actortarget.HasTag('ACS_Tentacle_1') 
+				|| actortarget.HasTag('ACS_Tentacle_2') 
+				|| actortarget.HasTag('ACS_Tentacle_3') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_1') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_2') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_3') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_6')
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_5')
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_4')
+				|| actortarget.HasTag('ACS_Vampire_Monster_Boss_Bar') 
+				|| actortarget.HasTag('ACS_Chaos_Cloud')
+				)
+				continue;
+
+				actortarget.IsAttacked();
+
+				actortarget.SignalGameplayEventParamInt('Time2Dodge', (int)EDT_Attack_Light );
+
+				movementAdjustorNPC = actortarget.GetMovingAgentComponent().GetMovementAdjustor();
+
+				ticketNPC = movementAdjustorNPC.GetRequest( 'ACS_NPC_Red_Miasmal_Attacked_Rotate');
+				movementAdjustorNPC.CancelByName( 'ACS_NPC_Red_Miasmal_Attacked_Rotate' );
+				movementAdjustorNPC.CancelAll();
+
+				ticketNPC = movementAdjustorNPC.CreateNewRequest( 'ACS_NPC_Red_Miasmal_Attacked_Rotate' );
+				movementAdjustorNPC.AdjustmentDuration( ticketNPC, 0.5 );
+				movementAdjustorNPC.MaxRotationAdjustmentSpeed( ticketNPC, 50000 );
+
+				dmg = new W3DamageAction in theGame.damageMgr;
+				
+				dmg.Initialize(thePlayer, actortarget, NULL, thePlayer.GetName(), EHRT_Heavy, CPS_Undefined, false, false, true, false);
+				
+				dmg.SetProcessBuffsIfNoDamage(true);
+				
+				dmg.SetIgnoreImmortalityMode(false);
+
+				dmg.SetHitAnimationPlayType(EAHA_ForceYes);
+
+				if (actortarget.UsesVitality()) 
+				{ 
+					maxTargetVitality = actortarget.GetStatMax( BCS_Vitality );
+
+					damageMax = maxTargetVitality * 0.25; 
+
+					damageMin = maxTargetVitality * 0.125; 
+				} 
+				else if (actortarget.UsesEssence()) 
+				{ 
+					maxTargetEssence = actortarget.GetStatMax( BCS_Essence );
+
+					if (((CMovingPhysicalAgentComponent)(actortarget.GetMovingAgentComponent())).GetCapsuleHeight() >= 2
+					|| actortarget.GetRadius() >= 0.7
+					)
+					{
+						damageMax = maxTargetEssence * 0.125; 
+					
+						damageMin = maxTargetEssence * 0.25; 
+					}
+					else
+					{
+						damageMax = maxTargetEssence * 0.25; 
+					
+						damageMin = maxTargetEssence * 0.125; 
+					}
+				}
+
+				dmg.SetHitReactionType( EHRT_Heavy, true);
+
+				if (actortarget.HasTag('ACS_Swapped_To_Shield')
+				|| ((CNewNPC)actortarget).IsShielded( NULL ) )
+				{
+					movementAdjustorNPC.RotateTowards( ticketNPC, thePlayer );
+				}
+
+				thePlayer.GainStat( BCS_Focus, thePlayer.GetStatMax( BCS_Focus) * 0.15 );
+
+				thePlayer.SoundEvent("cmb_play_dismemberment_gore");
+
+				thePlayer.SoundEvent("monster_dettlaff_monster_vein_hit_blood");
+
+				actortarget.PlayEffectSingle('blood');
+				actortarget.StopEffect('blood');
+
+				actortarget.PlayEffectSingle('death_blood');
+				actortarget.StopEffect('death_blood');
+
+				actortarget.PlayEffectSingle('heavy_hit');
+				actortarget.StopEffect('heavy_hit');
+
+				actortarget.PlayEffectSingle('light_hit');
+				actortarget.StopEffect('light_hit');
+
+				actortarget.PlayEffectSingle('blood_spill');
+				actortarget.StopEffect('blood_spill');		
+
+				dmg.AddDamage( theGame.params.DAMAGE_NAME_PHYSICAL, RandRangeF(100 + damageMax,100 + damageMin) );
+
+				dmg.AddDamage( theGame.params.DAMAGE_NAME_SILVER, RandRangeF(100 + damageMax,100 + damageMin) );
+
+				dmg.AddEffectInfo( EET_Poison, 3 );
+
+				dmg.AddEffectInfo( EET_Bleeding, 3 );
+
+				dmg.SetForceExplosionDismemberment();
+					
+				theGame.damageMgr.ProcessAction( dmg );
+					
+				delete dmg;	
+			}
+		}
+	}
+
+	public timer function RedMiasmalHeavyAttackDamage360(deltaTime : float , id : int)
+	{
+		RedMiasmalHeavyAttackDamage360Actual();
+	}
+
+	public timer function RedMiasmalTentacleDelay_L(deltaTime : float , id : int)
+	{
+		GetACSTransformationRedMiasmal().StopEffect('hand_fx2_l');
+		GetACSTransformationRedMiasmal().PlayEffectSingle('hand_fx2_l');
+	}
+
+	public timer function RedMiasmalTentacleDelay_L_2(deltaTime : float , id : int)
+	{
+		GetACSTransformationRedMiasmal().StopEffect('hand_fx2_l');
+		GetACSTransformationRedMiasmal().PlayEffectSingle('hand_fx2_l');
+	}
+
+	public timer function RedMiasmalTentacleDelay_R(deltaTime : float , id : int)
+	{
+		GetACSTransformationRedMiasmal().StopEffect('hand_fx2_r');
+		GetACSTransformationRedMiasmal().PlayEffectSingle('hand_fx2_r');
+	}
+
+	public timer function RedMiasmalTentacleDelay_R_2(deltaTime : float , id : int)
+	{
+		GetACSTransformationRedMiasmal().StopEffect('hand_fx2_r');
+		GetACSTransformationRedMiasmal().PlayEffectSingle('hand_fx2_r');
+	}
+
+	public timer function RedMiasmalRootsDelay(deltaTime : float , id : int)
+	{
+		GetACSTransformationRedMiasmal().StopEffect('teleport_roots_1');
+		GetACSTransformationRedMiasmal().PlayEffectSingle('teleport_roots_1');
+
+		GetACSTransformationRedMiasmal().StopEffect('hand_fx2_r');
+		GetACSTransformationRedMiasmal().PlayEffectSingle('hand_fx2_r');
+
+		GetACSTransformationRedMiasmal().StopEffect('hand_fx2_l');
+		GetACSTransformationRedMiasmal().PlayEffectSingle('hand_fx2_l');
+	}
+
+	function ACS_Transformation_Red_Miasmal_Dodge()
+	{
+		if (ACS_can_transformation_dodge() && thePlayer.GetStat(BCS_Stamina) >= thePlayer.GetStatMax( BCS_Stamina) * 0.05)
+		{
+			ACS_refresh_transformation_dodge_cooldown();
+
+			ACSTransformationRedMiasmalRemoveMoveTimers();
+
+			red_miasmal_dodge_timer_actual();
+
+			if (thePlayer.IsInCombat())
+			{
+				ACSTransformRedMiasmalMovementAdjustRotateTowardsEnemy();
+			}
+
+			GetACSTransformationRedMiasmal().DestroyEffect('evil_appear' );
+			GetACSTransformationRedMiasmal().DestroyEffect('evil_disappear' );
+
+			GetACSTransformationRedMiasmal().DestroyEffect('disappear' );
+			GetACSTransformationRedMiasmal().DestroyEffect('spawn_disappear' );
+
+			GetACSTransformationRedMiasmal().DestroyEffect('him_smoke_disappear' );
+			GetACSTransformationRedMiasmal().DestroyEffect('him_smoke_disappear_red' );
+
+			GetACSTransformationRedMiasmal().StopEffect('teleport_roots_1');
+			GetACSTransformationRedMiasmal().PlayEffectSingle('teleport_roots_1');
+
+			ACSTransformRedMiasmalPlayAnim('monster_lessun_despawn', 0.25f, 0.325f);
+
+			RemoveTimer('Transformation_Red_Miasmal_Teleport');
+
+			AddTimer('Transformation_Red_Miasmal_Teleport', 1.5, false);
+
+			ACS_StaminaDrainForced(5);
+		}
+		else
+		{
+			thePlayer.SoundEvent("gui_no_stamina");
+		}
+	}
+
+	function Transformation_Red_Miasmal_Teleport_Actual()
+	{
+		var evadeTargetPos, victimPos 	: Vector;
+		var dist 						: float;
+		var evadeTarget					: CActor;
+
+		if ( thePlayer.IsHardLockEnabled() )
+		{
+			evadeTarget = (CActor)( thePlayer.GetDisplayTarget() );
+		}
+		else
+		{
+			evadeTarget = thePlayer.moveTarget;		
+		}
+
+		dist = (((CMovingPhysicalAgentComponent)actor.GetMovingAgentComponent()).GetCapsuleRadius() 
+		+ ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent()).GetCapsuleRadius()) * 1.25;
+
+		evadeTargetPos = evadeTarget.GetWorldPosition();
+
+		movementAdjustorRedMiasmal = GetACSTransformationRedMiasmal().GetMovingAgentComponent().GetMovementAdjustor();
+
+		ticketRedMiasmal = movementAdjustorRedMiasmal.GetRequest( 'ACS_Transformation_Vampiress_Rotate');
+		movementAdjustorRedMiasmal.CancelByName( 'ACS_Transformation_Vampiress_Rotate' );
+		movementAdjustorRedMiasmal.CancelAll();
+
+		ticketRedMiasmal = movementAdjustorRedMiasmal.CreateNewRequest( 'ACS_Transformation_Vampiress_Rotate' );
+		movementAdjustorRedMiasmal.MaxRotationAdjustmentSpeed( ticketRedMiasmal, 500000 );
+		movementAdjustorRedMiasmal.AdjustLocationVertically( ticketRedMiasmal, true );
+		movementAdjustorRedMiasmal.ScaleAnimationLocationVertically( ticketRedMiasmal, true );
+
+		victimPos = evadeTargetPos + VecFromHeading( AngleNormalize180( thePlayer.GetHeading() - dist ) ) * 7;
+
+		if( !theGame.GetWorld().NavigationFindSafeSpot( victimPos, 0.3, 0.3 , newVictimPos) )
+		{
+			theGame.GetWorld().NavigationFindSafeSpot( victimPos, 0.3, 10 , newVictimPos );
+
+			victimPos = newVictimPos;
+		}
+
+		movementAdjustorRedMiasmal.AdjustmentDuration( ticket, 0.06125 );
+			
+		movementAdjustorRedMiasmal.RotateTowards( ticketRedMiasmal, evadeTarget );
+
+		victimPos.Z += 10;
+
+		movementAdjustorRedMiasmal.SlideTo( ticketRedMiasmal, victimPos );
+
+		RemoveTimer('Red_Miasmal_Teleport_Position_Adjust');
+		AddTimer('Red_Miasmal_Teleport_Position_Adjust', 0.125, false);
+
+		RemoveTimer('Red_Miasmal_Visibility_Restore');
+		AddTimer('Red_Miasmal_Visibility_Restore', 0.5, false);
+	}
+
+	public timer function Red_Miasmal_Teleport_Position_Adjust ( dt : float, id : int) 
+	{
+		ACSTransformRedMiasmalMovementAdjustSlideToGround();
+	}
+
+	function ACSTransformRedMiasmalMovementAdjustSlideToGround()
+	{
+		var targetactor 									: CActor;
+
+		movementAdjustorRedMiasmal = GetACSTransformationVampiress().GetMovingAgentComponent().GetMovementAdjustor();
+
+		ticketRedMiasmal = movementAdjustorRedMiasmal.GetRequest( 'ACS_Transformation_Red_Miasmal_Rotate');
+		movementAdjustorRedMiasmal.CancelByName( 'ACS_Transformation_Red_Miasmal_Rotate' );
+		movementAdjustorRedMiasmal.CancelAll();
+
+		ticketRedMiasmal = movementAdjustorVampiress.CreateNewRequest( 'ACS_Transformation_Vampiress_Rotate' );
+		movementAdjustorRedMiasmal.AdjustmentDuration( ticketRedMiasmal, 0.00001 );
+		movementAdjustorRedMiasmal.MaxRotationAdjustmentSpeed( ticketRedMiasmal, 500000 );
+
+		if ( thePlayer.IsHardLockEnabled() && thePlayer.GetTarget() )
+		{
+			targetactor = (CActor)( thePlayer.GetDisplayTarget() );	
+		}
+		else
+		{
+			thePlayer.FindMoveTarget();
+			targetactor = (CActor)( thePlayer.moveTarget );		
+		}
+
+		if (targetactor)
+		{
+			movementAdjustorRedMiasmal.RotateTowards( ticketRedMiasmal, targetactor );
+		}
+		else
+		{
+			movementAdjustorRedMiasmal.RotateTo( ticketRedMiasmal, VecHeading( theCamera.GetCameraDirection() ) );
+		}
+
+		movementAdjustorRedMiasmal.SlideTo( ticketRedMiasmal, ( ACSPlayerFixZAxis(GetACSTransformationRedMiasmal().GetWorldPosition() + GetACSTransformationRedMiasmal().GetWorldForward()) ));
+	}
+
+	public timer function Red_Miasmal_Visibility_Restore ( dt : float, id : int) 
+	{ 
+		ACSTransformRedMiasmalPlayAnim('monster_lessun_Spawn', 0.25f, 0.325f);
+
+		GetACSTransformationRedMiasmal().DestroyEffect('evil_appear' );
+		GetACSTransformationRedMiasmal().DestroyEffect('evil_disappear' );
+
+		GetACSTransformationRedMiasmal().DestroyEffect('disappear' );
+		GetACSTransformationRedMiasmal().DestroyEffect('spawn_disappear' );
+
+		GetACSTransformationRedMiasmal().DestroyEffect('him_smoke_disappear' );
+		GetACSTransformationRedMiasmal().DestroyEffect('him_smoke_disappear_red' );
+
+		GetACSTransformationRedMiasmal().PlayEffectSingle('him_smoke_red' );
+
+		GetACSTransformationRedMiasmal().PlayEffectSingle('evil_appear' );
+
+		GetACSTransformationRedMiasmal().StopEffect('teleport_roots_2');
+		GetACSTransformationRedMiasmal().PlayEffectSingle('teleport_roots_2');
+
+		RedMiasmalLightAttackDamage360Actual();
+
+		ACSTransformRedMiasmalPlayAnim('monster_lessun_Spawn', 0.25f, 0.325f);
+	} 
+
+	public timer function Transformation_Red_Miasmal_Teleport ( dt : float, id : int) 
+	{ 
+		Transformation_Red_Miasmal_Teleport_Actual();
+	} 
+
+	function red_miasmal_dodge_timer_actual() 
+	{
+		RemoveTimer('ACS_red_miasmal_dodge_timer_end');
+
+		thePlayer.SetImmortalityMode( AIM_Invulnerable, AIC_Combat ); 
+
+		thePlayer.SetIsCurrentlyDodging(true);
+	
+		AddTimer('ACS_red_miasmal_dodge_timer_end', 0.875  , false);
+	}
+	
+	function red_miasmal_dodge_timer_end_actual() 
+	{ 
+		thePlayer.SetImmortalityMode( AIM_None, AIC_Combat ); 
+
+		thePlayer.SetIsCurrentlyDodging(false);
+	}
+
+	public timer function ACS_red_miasmal_dodge_timer_end ( dt : float, id : int) 
+	{ 
+		red_miasmal_dodge_timer_end_actual();
+	} 
+	
+	function ACSTransformationRedMiasmalRemoveMoveTimers()
+	{
+		GetACSTransformationRedMiasmal().EnableCharacterCollisions(true);
+
+		GetACSTransformationRedMiasmal().ClearAnimationSpeedMultipliers();
+
+		RemoveTimer('Red_Miasmal_Tentacles_Start');
+
+		RemoveTimer('Red_Miasmal_Tentacles_Loop');
+
+		RemoveTimer('RedMiasmalLightAttackDamage');
+
+		RemoveTimer('RedMiasmalLightAttackDamageWide');
+
+		RemoveTimer('RedMiasmalLightAttackDamageWide_2');
+
+		RemoveTimer('RedMiasmalLightAttackDamage360');
+
+		RemoveTimer('RedMiasmalTentacleDelay_L');
+
+		RemoveTimer('RedMiasmalTentacleDelay_R');
+
+		RemoveTimer('RedMiasmalTentacleDelay_L_2');
+
+		RemoveTimer('RedMiasmalTentacleDelay_R_2');
+
+		RemoveTimer('RedMiasmalRootsDelay');
+
+		RemoveTimer('RedMiasmalHeavyAttackDamage360');
+
+		GetACSTransformationRedMiasmal().StopEffect('hand_fx');
+
+		GetACSTransformationRedMiasmal().StopEffect('hand_fx_root');
+
+		GetACSTransformationRedMiasmal().StopEffect('hand_fx2_r');
+
+		GetACSTransformationRedMiasmal().StopEffect('hand_fx2_l');
+
+		GetACSTransformationRedMiasmal().RemoveTag('ACS_Transformation_Red_Miasmal_Rooted');
+
+	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -110674,6 +113904,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 	
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 }
 
 state ACS_BARADDUR in W3ACSWatcher 
@@ -110836,6 +114067,11 @@ state ACS_BARADDUR in W3ACSWatcher
 		{
 			FactsAdd("wild_hunt_hounds_bestiary_toggle");
 		}
+
+		if (ACSVampiresLifestealBestiaryEnabled() && FactsQuerySum("vampires_lifesteal_bestiary_toggle") <= 0 )
+		{
+			FactsAdd("vampires_lifesteal_bestiary_toggle");
+		}
 	
 		if (ACSWerewolvesBestiaryEnabled() && FactsQuerySum("werewolves_bestiary_toggle") <= 0 )
 		{
@@ -110977,6 +114213,55 @@ state ACS_BARADDUR in W3ACSWatcher
 			FactsAdd("demonic_construct_bestiary_toggle");
 		}
 
+		if (ACSViyBestiaryEnabled() && FactsQuerySum("viy_of_maribor_bestiary_toggle") <= 0 )
+		{
+			FactsAdd("viy_of_maribor_bestiary_toggle");
+		}
+
+		if (ACSPhoocaBestiaryEnabled() && FactsQuerySum("phooca_bestiary_toggle") <= 0 )
+		{
+			FactsAdd("phooca_bestiary_toggle");
+		}
+
+		if (ACSPlumardBestiaryEnabled() && FactsQuerySum("plumard_bestiary_toggle") <= 0 )
+		{
+			FactsAdd("plumard_bestiary_toggle");
+		}
+
+		if (ACSElementalTitansBestiaryEnabled() && FactsQuerySum("elemental_titans_bestiary_toggle") <= 0 )
+		{
+			FactsAdd("elemental_titans_bestiary_toggle");
+		}
+
+		if (ACSGiantTrollsBestiaryEnabled() && FactsQuerySum("giant_trolls_bestiary_toggle") <= 0 )
+		{
+			FactsAdd("giant_trolls_bestiary_toggle");
+		}
+
+		if (ACSTheBeastBestiaryEnabled() && FactsQuerySum("the_beast_bestiary_toggle") <= 0 )
+		{
+			FactsAdd("the_beast_bestiary_toggle");
+		}
+
+		if (ACSDarkKnightBestiaryEnabled() && FactsQuerySum("dark_knight_bestiary_toggle") <= 0 )
+		{
+			FactsAdd("dark_knight_bestiary_toggle");
+		}
+
+		if (ACSVorefBestiaryEnabled() && FactsQuerySum("voref_bestiary_toggle") <= 0 )
+		{
+			FactsAdd("voref_bestiary_toggle");
+		}
+
+		if (ACSMaerolornBestiaryEnabled() && FactsQuerySum("maerolorn_bestiary_toggle") <= 0 )
+		{
+			FactsAdd("maerolorn_bestiary_toggle");
+		}
+
+		if (ACSIfritBestiaryEnabled() && FactsQuerySum("ifrit_bestiary_toggle") <= 0 )
+		{
+			FactsAdd("ifrit_bestiary_toggle");
+		}
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -111141,6 +114426,13 @@ state ACS_BARADDUR in W3ACSWatcher
 			ACS_WildHuntHounds_Bestiary();
 			theGame.GetInGameConfigWrapper().SetVarValue('EHmodEnhancedEnemiesBestiary', 'EHmodWildHuntHoundsBestiaryEnabled', "false");
 			FactsRemove("wild_hunt_hounds_bestiary_toggle");
+		}
+
+		if ( FactsQuerySum("vampires_lifesteal_bestiary_toggle") > 0 )
+		{
+			ACS_VampiresLifesteal_Bestiary();
+			theGame.GetInGameConfigWrapper().SetVarValue('EHmodEnhancedEnemiesBestiary', 'EHmodVampiresLifestealBestiaryEnabled', "false");
+			FactsRemove("vampires_lifesteal_bestiary_toggle");
 		}
 	
 		if ( FactsQuerySum("wild_hunt_warriors_bestiary_toggle") > 0 )
@@ -111332,6 +114624,75 @@ state ACS_BARADDUR in W3ACSWatcher
 			FactsRemove("demonic_construct_bestiary_toggle");
 		}
 
+		if ( FactsQuerySum("viy_of_maribor_bestiary_toggle") > 0 )
+		{
+			ACS_Viy_Bestiary();
+			theGame.GetInGameConfigWrapper().SetVarValue('EHmodAdditionalWorldEncountersBestiary', 'EHmodViyBestiaryEnabled', "false");
+			FactsRemove("viy_of_maribor_bestiary_toggle");
+		}
+
+		if ( FactsQuerySum("phooca_bestiary_toggle") > 0 )
+		{
+			ACS_Phooca_Bestiary();
+			theGame.GetInGameConfigWrapper().SetVarValue('EHmodAdditionalWorldEncountersBestiary', 'EHmodPhoocaBestiaryEnabled', "false");
+			FactsRemove("phooca_bestiary_toggle");
+		}
+
+		if ( FactsQuerySum("plumard_bestiary_toggle") > 0 )
+		{
+			ACS_Plumard_Bestiary();
+			theGame.GetInGameConfigWrapper().SetVarValue('EHmodAdditionalWorldEncountersBestiary', 'EHmodPlumardBestiaryEnabled', "false");
+			FactsRemove("plumard_bestiary_toggle");
+		}
+
+		if ( FactsQuerySum("elemental_titans_bestiary_toggle") > 0 )
+		{
+			ACS_ElementalTitans_Bestiary();
+			theGame.GetInGameConfigWrapper().SetVarValue('EHmodAdditionalWorldEncountersBestiary', 'EHmodElementalTitansBestiaryEnabled', "false");
+			FactsRemove("elemental_titans_bestiary_toggle");
+		}
+
+		if ( FactsQuerySum("giant_trolls_bestiary_toggle") > 0 )
+		{
+			ACS_GiantTrolls_Bestiary();
+			theGame.GetInGameConfigWrapper().SetVarValue('EHmodAdditionalWorldEncountersBestiary', 'EHmodGiantTrollsBestiaryEnabled', "false");
+			FactsRemove("giant_trolls_bestiary_toggle");
+		}
+
+		if ( FactsQuerySum("the_beast_bestiary_toggle") > 0 )
+		{
+			ACS_TheBeast_Bestiary();
+			theGame.GetInGameConfigWrapper().SetVarValue('EHmodAdditionalWorldEncountersBestiary', 'EHmodTheBeastBestiaryEnabled', "false");
+			FactsRemove("the_beast_bestiary_toggle");
+		}
+
+		if ( FactsQuerySum("dark_knight_bestiary_toggle") > 0 )
+		{
+			ACS_DarkKnight_Bestiary();
+			theGame.GetInGameConfigWrapper().SetVarValue('EHmodAdditionalWorldEncountersBestiary', 'EHmodDarkKnightBestiaryEnabled', "false");
+			FactsRemove("dark_knight_bestiary_toggle");
+		}
+
+		if ( FactsQuerySum("voref_bestiary_toggle") > 0 )
+		{
+			ACS_Voref_Bestiary();
+			theGame.GetInGameConfigWrapper().SetVarValue('EHmodAdditionalWorldEncountersBestiary', 'EHmodVorefBestiaryEnabled', "false");
+			FactsRemove("voref_bestiary_toggle");
+		}
+
+		if ( FactsQuerySum("maerolorn_bestiary_toggle") > 0 )
+		{
+			ACS_Maerolorn_Bestiary();
+			theGame.GetInGameConfigWrapper().SetVarValue('EHmodAdditionalWorldEncountersBestiary', 'EHmodMaerolornBestiaryEnabled', "false");
+			FactsRemove("maerolorn_bestiary_toggle");
+		}
+
+		if ( FactsQuerySum("ifrit_bestiary_toggle") > 0 )
+		{
+			ACS_Ifrit_Bestiary();
+			theGame.GetInGameConfigWrapper().SetVarValue('EHmodAdditionalWorldEncountersBestiary', 'EHmodIfritBestiaryEnabled', "false");
+			FactsRemove("ifrit_bestiary_toggle");
+		}
 
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -111615,6 +114976,16 @@ state ACS_BARADDUR in W3ACSWatcher
 		if (ACSHoldToRollTutorialEnabled() && FactsQuerySum("acs_hold_to_roll_tutorial_toggle") <= 0 )
 		{
 			FactsAdd("acs_hold_to_roll_tutorial_toggle");
+		}
+
+		if (ACSRedMiasmalFragmentTutorialEnabled() && FactsQuerySum("acs_red_miasmal_fragment_tutorial_toggle") <= 0 )
+		{
+			FactsAdd("acs_red_miasmal_fragment_tutorial_toggle");
+		}
+
+		if (ACSNightVisionTutorialEnabled() && FactsQuerySum("acs_night_vision_tutorial_toggle") <= 0 )
+		{
+			FactsAdd("acs_night_vision_tutorial_toggle");
 		}
 	}
 
@@ -111954,6 +115325,20 @@ state ACS_BARADDUR in W3ACSWatcher
 			ACS_Hold_To_Roll_Tutorial_Menu();
 			theGame.GetInGameConfigWrapper().SetVarValue('EHmodMovementTutorials', 'EHmodHoldToRollTutorialEnabled', "false");
 			FactsRemove("acs_hold_to_roll_tutorial_toggle");
+		}
+
+		if ( FactsQuerySum("acs_red_miasmal_fragment_tutorial_toggle") > 0 )
+		{
+			ACS_Red_Miasmal_Fragment_Tutorial_Menu();
+			theGame.GetInGameConfigWrapper().SetVarValue('EHmodItemTutorials', 'EHmodRedMiasmalFragmentTutorialEnabled', "false");
+			FactsRemove("acs_red_miasmal_fragment_tutorial_toggle");
+		}
+
+		if ( FactsQuerySum("acs_night_vision_tutorial_toggle") > 0 )
+		{
+			ACS_Night_Vision_Tutorial_Menu();
+			theGame.GetInGameConfigWrapper().SetVarValue('EHmodAdditionalFeaturesTutorials', 'EHmodNightVisionTutorialEnabled', "false");
+			FactsRemove("acs_night_vision_tutorial_toggle");
 		}
 	}
 

@@ -3377,6 +3377,11 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 			GetWitcherPlayer().PlayEffectSingle( 'fury_ciri' );
 		}
 
+		if (!GetWitcherPlayer().IsEffectActive('acs_fury_ciri', false))
+		{
+			GetWitcherPlayer().PlayEffectSingle( 'acs_fury_ciri' );
+		}
+
 		if (theInput.GetActionValue('GI_AxisLeftY') < -0.5 )
 		{
 			if (ACS_BruxaDodgeSlideBack_Enabled()

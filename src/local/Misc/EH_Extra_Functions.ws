@@ -44,7 +44,7 @@ function ACS_Custom_Attack_Range( data : CPreAttackEventData ) : array< CGamepla
 			)
 			{
 				dist = 1.5;
-				ang =	45;
+				ang =	55;
 
 				if(  thePlayer.IsDoingSpecialAttack( false ) )
 				{
@@ -68,7 +68,7 @@ function ACS_Custom_Attack_Range( data : CPreAttackEventData ) : array< CGamepla
 			)
 			{
 				dist = 1.5;
-				ang =	45;
+				ang =	55;
 
 				if(  thePlayer.IsDoingSpecialAttack( false ) )
 				{
@@ -90,7 +90,7 @@ function ACS_Custom_Attack_Range( data : CPreAttackEventData ) : array< CGamepla
 			else if ( thePlayer.HasTag('axii_sword_equipped') )
 			{
 				dist = 1.6;
-				ang =	45;	
+				ang =	55;	
 
 				if (thePlayer.HasTag('ACS_Sparagmos_Active'))
 				{
@@ -107,12 +107,12 @@ function ACS_Custom_Attack_Range( data : CPreAttackEventData ) : array< CGamepla
 				)
 				{
 					dist = 2.25;
-					ang =	45;
+					ang =	55;
 				}
 				else if ( ACS_GetWeaponMode() == 3 )
 				{ 
 					dist = 1.75;
-					ang =	45;
+					ang =	55;
 				}
 			}
 			else if ( thePlayer.HasTag('aard_sword_equipped') )
@@ -180,7 +180,7 @@ function ACS_Custom_Attack_Range( data : CPreAttackEventData ) : array< CGamepla
 			else if ( thePlayer.HasTag('quen_sword_equipped') )
 			{
 				dist = 1.6;
-				ang =	45;
+				ang =	55;
 
 				if (thePlayer.HasTag('ACS_Shadow_Dash_Empowered'))
 				{
@@ -197,7 +197,7 @@ function ACS_Custom_Attack_Range( data : CPreAttackEventData ) : array< CGamepla
 				else
 				{
 					dist = 2.25;
-					ang =	45;
+					ang =	55;
 				}
 			}
 			else 
@@ -2047,6 +2047,22 @@ function ACS_Quest_Marker_Despawn_Delay(): float
 	else return configValue;
 }
 
+function ACS_Untracked_Quest_Marker_Despawn_Delay(): float
+{
+	var configValue :float;
+	var configValueString : string;
+	
+	configValueString = ACSHudSettingsGetConfigValue('EHmodUntrackedQuestMarkerDespawnDelay');
+	configValue =(float) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return 7;
+	}
+	
+	else return configValue;
+}
+
 function ACS_POI_Marker_Despawn_Delay(): float
 {
 	var configValue :float;
@@ -2074,6 +2090,55 @@ function ACS_User_Pin_Marker_Despawn_Delay(): float
 	if(configValueString=="" || configValue<0)
 	{
 		return 7;
+	}
+	
+	else return configValue;
+}
+
+
+function ACS_Quest_Marker_Distance_To_Display(): float
+{
+	var configValue :float;
+	var configValueString : string;
+	
+	configValueString = ACSHudSettingsGetConfigValue('EHmodQuestMarkerDistanceToDisplay');
+	configValue =(float) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return 5000;
+	}
+	
+	else return configValue;
+}
+
+function ACS_Untracked_Quest_Marker_Distance_To_Display(): float
+{
+	var configValue :float;
+	var configValueString : string;
+	
+	configValueString = ACSHudSettingsGetConfigValue('EHmodUntrackedQuestMarkerDistanceToDisplay');
+	configValue =(float) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return 500;
+	}
+	
+	else return configValue;
+}
+
+function ACS_POI_Quest_Marker_Distance_To_Display(): float
+{
+	var configValue :float;
+	var configValueString : string;
+	
+	configValueString = ACSHudSettingsGetConfigValue('EHmodPOIMarkerDistanceToDisplay');
+	configValue =(float) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return 5000;
 	}
 	
 	else return configValue;
@@ -2242,6 +2307,22 @@ function ACS_VampireSoundEffects_Enabled(): bool
 	else return (bool)configValueString;
 }
 
+function ACS_HideVampireClaws_Enabled(): bool 
+{
+	var configValue :int;
+	var configValueString : string;
+	
+	configValueString = ACSMiscSettingsGetConfigValue('EHmodHideVampireClaws');
+	configValue =(int) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return false;
+	}
+	
+	else return (bool)configValueString;
+}
+
 function ACS_MutePlayer_Enabled(): bool 
 {
 	var configValue :int;
@@ -2379,6 +2460,22 @@ function ACS_FogSpawn_Enabled(): bool
 	if(configValueString=="" || configValue<0)
 	{
 		return false;
+	}
+	
+	else return (bool)configValueString;
+}
+
+function ACS_HorseRiders_Enabled(): bool 
+{
+	var configValue :int;
+	var configValueString : string;
+	
+	configValueString = ACSVisualSettingsGetConfigValue('EHmodHorseRidersEnabled');
+	configValue =(int) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return true;
 	}
 	
 	else return (bool)configValueString;
@@ -3801,6 +3898,38 @@ function ACS_Crossbow_Monster_Min_Damage(): float
 	else return configValue;
 }
 
+function ACS_Player_Damage_Multiplier(): float
+{
+	var configValue :float;
+	var configValueString : string;
+	
+	configValueString = ACSDamageSettingsGetConfigValue('EHmodPlayerDamageMultiplier');
+	configValue =(float) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return 1;
+	}
+	
+	else return configValue;
+}
+
+function ACS_Player_DamageTaken_Multiplier(): float
+{
+	var configValue :float;
+	var configValueString : string;
+	
+	configValueString = ACSDamageSettingsGetConfigValue('EHmodPlayerDamageTakenMultiplier');
+	configValue =(float) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return 1;
+	}
+	
+	else return configValue;
+}
+
 // Stamina Settings
 
 function ACSStaminaSettingsGetConfigValue(nam : name) : string
@@ -4693,12 +4822,172 @@ function ACS_Shadow_Pixies_Enabled(): bool
 	else return (bool)configValueString;
 }
 
+function ACS_Maerolorn_Enabled(): bool 
+{
+	var configValue :int;
+	var configValueString : string;
+	
+	configValueString = ACSEncountersSettingsGetConfigValue('EHmodMaerolornEnabled');
+	configValue =(int) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return true;
+	}
+
+	else return (bool)configValueString;
+}
+
 function ACS_Demonic_Construct_Enabled(): bool 
 {
 	var configValue :int;
 	var configValueString : string;
 	
 	configValueString = ACSEncountersSettingsGetConfigValue('EHmodDemonicConstructEnabled');
+	configValue =(int) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return true;
+	}
+
+	else return (bool)configValueString;
+}
+
+function ACS_Dark_Knight_Enabled(): bool 
+{
+	var configValue :int;
+	var configValueString : string;
+	
+	configValueString = ACSEncountersSettingsGetConfigValue('EHmodDarkKnightEnabled');
+	configValue =(int) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return true;
+	}
+
+	else return (bool)configValueString;
+}
+
+function ACS_Voref_Enabled(): bool 
+{
+	var configValue :int;
+	var configValueString : string;
+	
+	configValueString = ACSEncountersSettingsGetConfigValue('EHmodVorefEnabled');
+	configValue =(int) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return true;
+	}
+
+	else return (bool)configValueString;
+}
+
+function ACS_Ifrit_Enabled(): bool 
+{
+	var configValue :int;
+	var configValueString : string;
+	
+	configValueString = ACSEncountersSettingsGetConfigValue('EHmodIfritEnabled');
+	configValue =(int) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return true;
+	}
+
+	else return (bool)configValueString;
+}
+
+function ACS_Viy_Enabled(): bool 
+{
+	var configValue :int;
+	var configValueString : string;
+	
+	configValueString = ACSEncountersSettingsGetConfigValue('EHmodViyEnabled');
+	configValue =(int) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return true;
+	}
+
+	else return (bool)configValueString;
+}
+
+function ACS_Phooca_Enabled(): bool 
+{
+	var configValue :int;
+	var configValueString : string;
+	
+	configValueString = ACSEncountersSettingsGetConfigValue('EHmodPhoocaEnabled');
+	configValue =(int) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return true;
+	}
+
+	else return (bool)configValueString;
+}
+
+function ACS_Plumard_Enabled(): bool 
+{
+	var configValue :int;
+	var configValueString : string;
+	
+	configValueString = ACSEncountersSettingsGetConfigValue('EHmodPlumardEnabled');
+	configValue =(int) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return true;
+	}
+
+	else return (bool)configValueString;
+}
+
+function ACS_The_Beast_Enabled(): bool 
+{
+	var configValue :int;
+	var configValueString : string;
+	
+	configValueString = ACSEncountersSettingsGetConfigValue('EHmodTheBeastEnabled');
+	configValue =(int) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return true;
+	}
+
+	else return (bool)configValueString;
+}
+
+function ACS_Giant_Trolls_Enabled(): bool 
+{
+	var configValue :int;
+	var configValueString : string;
+	
+	configValueString = ACSEncountersSettingsGetConfigValue('EHmodGiantTrollsEnabled');
+	configValue =(int) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return true;
+	}
+
+	else return (bool)configValueString;
+}
+
+function ACS_Elemental_Titans_Enabled(): bool 
+{
+	var configValue :int;
+	var configValueString : string;
+	
+	configValueString = ACSEncountersSettingsGetConfigValue('EHmodElementalTitansEnabled');
 	configValue =(int) configValueString;
 
 	if(configValueString=="" || configValue<0)
@@ -9107,7 +9396,7 @@ state Setup_Combat_Action_CastSign_Engage in cACS_Setup_Combat_Action_CastSign
 			thePlayer.GetRootAnimatedComponent().PlaySlotAnimationAsync( '', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0, 0) );
 		}
 
-		Sleep(0.03125);
+		Sleep(0.0625);
 
 		thePlayer.SetupCombatAction( EBAT_CastSign, BS_Pressed );
 	}
@@ -9505,6 +9794,42 @@ exec function acsspawn( optional entTag: name )
 	ent.AddTag('ACS_MonsterSpawner_Spawn_In_Frame');
 }
 
+exec function acsspawncaranthir()
+{
+	GetACSWatcher().ACS_Spawn_Dark_Portal();
+}
+
+exec function acsspawneredin()
+{
+	GetACSWatcher().ACS_Spawn_Eredin();
+}
+
+exec function acsspawnnighthunter()
+{
+	GetACSWatcher().ACS_SpawnNightStalker();
+}
+
+exec function acsspawnunseenblade()
+{
+	ACS_Blade_Of_The_Unseen().Destroy();
+
+	GetACSStorage().Number_Of_Bruxae_Slain_Reset();
+
+	GetACSWatcher().RemoveTimer('unseen_blade_spawn_delay');
+	GetACSWatcher().RemoveTimer('unseen_blade_hunt_delay');
+
+	ACS_Unseen_Blade_Summon_Start();
+}
+
+exec function acsspawnunseenmonster()
+{
+	ACS_Blade_Of_The_Unseen().Destroy();
+
+	GetACSStorage().Unseen_Blade_Death_Count_Reset();
+		
+	ACS_Unseen_Monster_Summon_Start();
+}
+
 function GetACSNaglfar() : CEntity
 {
 	var entity 			 : CEntity;
@@ -9858,6 +10183,16 @@ function ACS_Transformation_Vampire_Monster_Check() : bool
 function ACS_Transformation_Toad_Check() : bool
 {
 	if (FactsQuerySum("acs_toad_transformation_activated") > 0)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+function ACS_Transformation_Red_Miasmal_Check() : bool
+{
+	if (FactsQuerySum("acs_red_miasmal_curse_activated") > 0)
 	{
 		return true;
 	}
@@ -11497,22 +11832,44 @@ function ACS_SpawnDeathCollision(actor : CNewNPC, pos : Vector)
 
 	if ( ((CNewNPC)actor).GetNPCType() == ENGT_Guard )
 	{
-		actor.DestroyAfter(30);
+		//actor.DestroyAfter(30);
 	}
 	else
 	{
-		actor.DestroyAfter(999);
+		//actor.DestroyAfter(999);
 	}
+
+	actor.SetBehaviorMimicVariable( 'gameplayMimicsMode', (float)(int)GMM_Tpose );
+
 
 	if (actor.HasAbility('mon_siren_base'))
 	{
 		actor.TurnOnRagdoll();
 		actor.SetBehaviorVariable( 'Ragdoll_Weight', 0.f );
 	}
+	else
+	{
+		actor.EnableCharacterCollisions(true);
 
-	actor.EnableCharacterCollisions(true);
+		actor.SetInteractionPriority( IP_Prio_0 );
+	}
+}
 
-	actor.SetInteractionPriority( IP_Prio_0 );
+function ACS_RagdollOrNot(actor : CNewNPC)
+{
+	if (actor.HasAbility('mon_siren_base')
+	|| actor.IsFlying()
+	)
+	{
+		actor.TurnOnRagdoll();
+		actor.SetBehaviorVariable( 'Ragdoll_Weight', 0.f );
+	}
+	else
+	{
+		actor.EnableCharacterCollisions(true);
+
+		actor.SetInteractionPriority( IP_Prio_0 );
+	}
 }
 
 function ACS_Rain_Check() : bool
@@ -11624,5 +11981,143 @@ function ACSYrdenCircle1DestroyAll()
 	for( i = 0; i < actors.Size(); i += 1 )
 	{
 		actors[i].Destroy();
+	}
+}
+
+statemachine class W3ACSGuidingLightMarkerEntity extends CActor
+{
+	event OnSpawned( spawnData : SEntitySpawnData )
+	{
+	}
+
+	event OnTakeDamage( action : W3DamageAction )
+	{
+	}
+
+	event OnDeath( damageData : W3DamageAction )
+	{
+	}
+}
+
+function ACS_IsVanillaTargetCloseEnough( target : CEntity ) : bool
+{
+	var VISIBILITY_DISTANCE : float;	
+	
+	VISIBILITY_DISTANCE = 45; 
+
+	return VecDistanceSquared( target.GetWorldPosition(), thePlayer.GetWorldPosition() ) < VISIBILITY_DISTANCE * VISIBILITY_DISTANCE;
+}
+
+function ACS_IsQuestMarkerTrackedCloseEnough( target : CEntity ) : bool
+{
+	var VISIBILITY_DISTANCE : float;	
+	
+	VISIBILITY_DISTANCE = ACS_Quest_Marker_Distance_To_Display(); 
+
+	return VecDistanceSquared( target.GetWorldPosition(), thePlayer.GetWorldPosition() ) < VISIBILITY_DISTANCE * VISIBILITY_DISTANCE;
+}
+
+function ACS_IsQuestMarkerUntrackedCloseEnough( target : CEntity ) : bool
+{
+	var VISIBILITY_DISTANCE : float;	
+	
+	VISIBILITY_DISTANCE = ACS_Untracked_Quest_Marker_Distance_To_Display(); 
+
+	return VecDistanceSquared( target.GetWorldPosition(), thePlayer.GetWorldPosition() ) < VISIBILITY_DISTANCE * VISIBILITY_DISTANCE;
+}
+
+function ACS_IsPOIMarkerCloseEnough( target : CEntity ) : bool
+{
+	var VISIBILITY_DISTANCE : float;	
+	
+	VISIBILITY_DISTANCE = ACS_POI_Quest_Marker_Distance_To_Display(); 
+
+	return VecDistanceSquared( target.GetWorldPosition(), thePlayer.GetWorldPosition() ) < VISIBILITY_DISTANCE * VISIBILITY_DISTANCE;
+}
+
+function ACS_HUD_Marker_Manager( target : CEntity, mcOneliner : CScriptedFlashSprite)
+{
+	var screenPos			: Vector;
+
+	if ( target.HasTag('ACS_Guiding_Light_Marker'))
+	{
+		if ( target && ACS_IsQuestMarkerTrackedCloseEnough(target))
+		{
+			if ( GetBaseScreenPosition( screenPos, target, NULL, 0, true ) )
+			{
+				screenPos.Y -= 45;
+				mcOneliner.SetPosition( screenPos.X, screenPos.Y );
+				mcOneliner.SetVisible( true );
+			}
+			else
+			{
+				mcOneliner.SetVisible( false );
+			}
+		}
+		else
+		{
+			mcOneliner.SetVisible( false );
+		}
+	}
+	else if ( target.HasTag('ACS_All_Tracked_Quest_Entity')
+	|| target.HasTag('ACS_Guiding_Light_Available_Quest_Marker'))
+	{
+		if ( target && ACS_IsQuestMarkerUntrackedCloseEnough(target))
+		{
+			if ( GetBaseScreenPosition( screenPos, target, NULL, 0, true ) )
+			{
+				screenPos.Y -= 45;
+				mcOneliner.SetPosition( screenPos.X, screenPos.Y );
+				mcOneliner.SetVisible( true );
+			}
+			else
+			{
+				mcOneliner.SetVisible( false );
+			}
+		}
+		else
+		{
+			mcOneliner.SetVisible( false );
+		}
+	}
+	else if ( target.HasTag('ACS_Guiding_Light_POI_Marker'))
+	{
+		if ( target && ACS_IsPOIMarkerCloseEnough(target))
+		{
+			if ( GetBaseScreenPosition( screenPos, target, NULL, 0, true ) )
+			{
+				screenPos.Y -= 45;
+				mcOneliner.SetPosition( screenPos.X, screenPos.Y );
+				mcOneliner.SetVisible( true );
+			}
+			else
+			{
+				mcOneliner.SetVisible( false );
+			}
+		}
+		else
+		{
+			mcOneliner.SetVisible( false );
+		}
+	}
+	else
+	{
+		if ( target )
+		{
+			if ( GetBaseScreenPosition( screenPos, target, NULL, 0, true ) )
+			{
+				screenPos.Y -= 45;
+				mcOneliner.SetPosition( screenPos.X, screenPos.Y );
+				mcOneliner.SetVisible( true );
+			}
+			else
+			{
+				mcOneliner.SetVisible( false );
+			}
+		}
+		else
+		{
+			mcOneliner.SetVisible( false );
+		}
 	}
 }

@@ -16,6 +16,9 @@ function ACS_RandomWeaponEquipInit()
 
 			GetWitcherPlayer().StopEffect('fury_403_ciri');
 			GetWitcherPlayer().PlayEffectSingle('fury_403_ciri');
+			
+			GetWitcherPlayer().StopEffect('acs_fury_ciri');
+			GetWitcherPlayer().PlayEffectSingle( 'acs_fury_ciri' );
 
 			ACS_Sword_Trail_2().StopEffect('fury_sword_fx');
 			ACS_Sword_Trail_2().PlayEffectSingle('fury_sword_fx');

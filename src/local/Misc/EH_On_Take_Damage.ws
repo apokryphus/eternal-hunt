@@ -42,6 +42,10 @@ function ACS_OnTakeDamage(action: W3DamageAction)
 
 	ACS_Nekker_Guardian_On_Take_Damage(action);
 
+	ACS_Phooca_On_Take_Damage(action);
+
+	ACS_Plumard_On_Take_Damage(action);
+
 	ACS_Harpy_Queen_On_Take_Damage(action);
 
 	ACS_Harpy_Praetorian_On_Take_Damage(action);
@@ -124,6 +128,8 @@ function ACS_OnTakeDamage(action: W3DamageAction)
 
 	ACS_Cursed_Werewolf_On_Take_Damage(action);
 
+	ACS_Red_Miasmal_Boss_On_Take_Damage(action);
+
 	ACS_Forest_God_Shadow_On_Take_Damage(action);
 
 	ACS_Nimean_Panther_On_Take_Damage(action);
@@ -165,6 +171,22 @@ function ACS_OnTakeDamage(action: W3DamageAction)
 	ACS_Necrofiend_On_Take_Damage(action);
 
 	ACS_Bumbakvetch_On_Take_Damage(action);
+
+	ACS_Viy_On_Take_Damage(action);
+
+	ACS_VampireMonsterBossbar_On_Take_Damage(action);
+
+	ACS_Giant_Troll_On_Take_Damage(action);
+
+	ACS_Elemental_Titan_On_Take_Damage(action);
+
+	ACS_Hellhound_On_Take_Damage(action);
+
+	ACS_Dark_Knight_On_Take_Damage(action);
+
+	ACS_Dark_Knight_Calidus_On_Take_Damage(action);
+
+	ACS_Carduin_On_Take_Damage(action);
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -209,6 +231,8 @@ function ACS_OnTakeDamage(action: W3DamageAction)
 
 	ACS_XenoArmoredWorker_Attack(action);
 
+	ACS_Unseen_Monster_Attack(action);
+
 	ACS_Big_Lizard_Attack(action);
 
 	ACS_Lynx_Witcher_Attack(action);
@@ -245,7 +269,17 @@ function ACS_OnTakeDamage(action: W3DamageAction)
 
 	ACS_Bumbakvetch_Attack(action);
 
+	ACS_Viy_Attack(action);
+
+	ACS_Plumard_Attack(action);
+
 	ACS_Shades_Rogue_Attack(action);
+
+	ACS_Dark_Knight_Calidus_Attack(action);
+
+	ACS_Vanilla_Vampires_Attack(action);
+
+	ACS_Carduin_Attack(action);
 
 	//ACS_Infected_Prime_Attack(action);
 
@@ -300,6 +334,11 @@ function ACS_OnTakeDamage(action: W3DamageAction)
 				if (ACS_Transformation_Toad_Check())
 				{
 					GetACSWatcher().DisableTransformationToad();
+				}
+
+				if (ACS_Transformation_Red_Miasmal_Check())
+				{
+					GetACSWatcher().DisableRedMiasmal_Actual();
 				}
 
 				ACS_Guards_Tutorial();
@@ -461,6 +500,11 @@ function ACS_OnTakeDamage(action: W3DamageAction)
 						GetACSWatcher().DisableTransformationToad_Actual();
 					}
 
+					if (ACS_Transformation_Red_Miasmal_Check())
+					{
+						GetACSWatcher().DisableRedMiasmal_Actual();
+					}
+
 					GetWitcherPlayer().EnableCharacterCollisions(true); 
 
 					GetWitcherPlayer().EnableCollisions(true);
@@ -620,6 +664,11 @@ function ACS_Player_Fall_Negate(action: W3DamageAction)
 					if (ACS_Transformation_Toad_Check())
 					{
 						GetACSWatcher().DisableTransformationToad_Actual();
+					}
+
+					if (ACS_Transformation_Red_Miasmal_Check())
+					{
+						GetACSWatcher().DisableRedMiasmal_Actual();
 					}
 
 					if (GetWitcherPlayer().GetStat( BCS_Focus ) != 0)
@@ -1126,6 +1175,35 @@ function ACS_AllBlack_Ability_Spawn( pos : Vector )
 	proj_1.DestroyAfter(10);	
 }
 
+function ACS_Red_Miasmal_Ability_Spawn_Big( pos : Vector )
+{
+	var proj_1																												: W3ACSBloodTentacles;
+
+	
+	proj_1 = (W3ACSBloodTentacles)theGame.CreateEntity( 
+	(CEntityTemplate)LoadResource( "dlc\dlc_acs\data\entities\projectiles\transformation_red_miasmal_tentacles.w2ent", true ), pos );
+
+	proj_1.AddTag('ACS_Transformation_Red_Miasmal_Ability');
+
+	proj_1.DestroyAfter(10);	
+}
+
+function ACS_Red_Miasmal_Ability_Spawn( pos : Vector )
+{
+	var proj_1																												: W3ACSBloodTentacles;
+
+	
+	proj_1 = (W3ACSBloodTentacles)theGame.CreateEntity( 
+	(CEntityTemplate)LoadResource( "dlc\dlc_acs\data\entities\projectiles\transformation_red_miasmal_tentacles_small.w2ent", true ), pos );
+
+	proj_1.AddTag('ACS_Transformation_Red_Miasmal_Ability_Small');
+
+	proj_1.DestroyAfter(10);	
+}
+
+
+
+
 function ACS_Enemy_On_Take_Damage_General(action: W3DamageAction)
 {
     var playerAttacker, playerVictim																								: CPlayer;
@@ -1142,7 +1220,34 @@ function ACS_Enemy_On_Take_Damage_General(action: W3DamageAction)
 	if 
 	(playerAttacker && npc)
 	{
+		if (ACS_Player_Damage_Multiplier() != 1)
+		{
+			if (npc.UsesVitality())
+			{
+				action.processedDmg.vitalityDamage *= ACS_Player_Damage_Multiplier();
+			}
+			else if (npc.UsesEssence())
+			{
+				action.processedDmg.essenceDamage *= ACS_Player_Damage_Multiplier();
+			}
+		}
+
 		ACS_Record_Kill(action);
+
+		if ((npc.UsesVitality() && npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.01)
+		||
+		(npc.UsesEssence() && npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= 0.01))
+		{
+			if (ACS_Transformation_Red_Miasmal_Check())
+			{
+				if (!npc.HasTag('ACS_Red_Miasmal_Ability_Spawn_From_Player'))
+				{
+					ACS_Red_Miasmal_Ability_Spawn(npc.GetWorldPosition());
+
+					npc.AddTag('ACS_Red_Miasmal_Ability_Spawn_From_Player');
+				}
+			}
+		}
 
 		if ( !action.IsDoTDamage() 
 		&& !action.IsActionMelee()
@@ -1246,60 +1351,111 @@ function ACS_Enemy_On_Take_Damage_General(action: W3DamageAction)
 		&& thePlayer.IsCastingSign()
 		)
 		{
-			if (ACS_Forgotten_Wolf_Check_For_Item() || ACS_Armor_Equipped_Check())
+			if (npc.IsHuman() && !((CNewNPC)npc).IsShielded( GetWitcherPlayer() ))
 			{
-				if (npc.UsesVitality())
+				npc.GainStat( BCS_Morale, npc.GetStatMax( BCS_Morale ) );  
+
+				npc.GainStat( BCS_Focus, npc.GetStatMax( BCS_Focus ) );  
+
+				if (
+				npc.GetStat(BCS_Stamina) != npc.GetStatMax( BCS_Stamina ) 
+				&& npc.GetBehaviorGraphInstanceName() != 'Shield'
+				)	
 				{
-					action.processedDmg.vitalityDamage += npc.GetCurrentHealth() * RandRangeF(0.25, 0.125);
-				}
-				else if (npc.UsesEssence())
-				{
-					if (((CMovingPhysicalAgentComponent)(npc.GetMovingAgentComponent())).GetCapsuleHeight() >= 2
-					|| npc.GetRadius() >= 0.7
+					if (
+					(ACS_W3EE_Installed() && ACS_W3EE_Enabled() )
+					||
+					(ACS_W3EE_Redux_Installed() && ACS_W3EE_Redux_Enabled() )
 					)
 					{
-						action.processedDmg.essenceDamage += npc.GetMaxHealth() * RandRangeF(0.125, 0.06125);
+						npc.GainStat( BCS_Stamina, npc.GetStat( BCS_Stamina ) * 0.05 );
 					}
 					else
 					{
-						action.processedDmg.essenceDamage += npc.GetMaxHealth() * RandRangeF(0.25, 0.125);
+						npc.GainStat( BCS_Stamina, npc.GetStat( BCS_Stamina ) * 0.25 );
 					}
-				}
+				}	
+			}
 
-				if (npc.IsHuman() && !((CNewNPC)npc).IsShielded( GetWitcherPlayer() ))
-				{
-					npc.GainStat( BCS_Morale, npc.GetStatMax( BCS_Morale ) );  
-
-					npc.GainStat( BCS_Focus, npc.GetStatMax( BCS_Focus ) );  
-
-					if (
-					npc.GetStat(BCS_Stamina) != npc.GetStatMax( BCS_Stamina ) 
-					&& npc.GetBehaviorGraphInstanceName() != 'Shield'
-					)	
-					{
-						if (
-						(ACS_W3EE_Installed() && ACS_W3EE_Enabled() )
-						||
-						(ACS_W3EE_Redux_Installed() && ACS_W3EE_Redux_Enabled() )
-						)
-						{
-							npc.GainStat( BCS_Stamina, npc.GetStat( BCS_Stamina ) * 0.05 );
-						}
-						else
-						{
-							npc.GainStat( BCS_Stamina, npc.GetStat( BCS_Stamina ) * 0.25 );
-						}
-					}	
-				}
-
+			if (ACS_Forgotten_Wolf_Check_For_Item() || ACS_Armor_Equipped_Check())
+			{
 				if ( GetWitcherPlayer().GetEquippedSign() == ST_Igni )
 				{
-					action.AddEffectInfo(EET_Burning, 1);
+					if ( 
+					(theGame.GetWorld().GetDepotPath() == "levels\skellige\skellige.w2w")
+					)
+					{
+						if (npc.UsesVitality())
+						{
+							action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.25;
+						}
+						else if (npc.UsesEssence())
+						{
+							action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.25;
+						}
+					}
+					else
+					{
+						action.AddEffectInfo(EET_Burning, 1);
+
+						if (npc.UsesVitality())
+						{
+							action.processedDmg.vitalityDamage += npc.GetCurrentHealth() * RandRangeF(0.25, 0.125);
+						}
+						else if (npc.UsesEssence())
+						{
+							if (((CMovingPhysicalAgentComponent)(npc.GetMovingAgentComponent())).GetCapsuleHeight() >= 2
+							|| npc.GetRadius() >= 0.7
+							)
+							{
+								action.processedDmg.essenceDamage += npc.GetMaxHealth() * RandRangeF(0.125, 0.06125);
+							}
+							else
+							{
+								action.processedDmg.essenceDamage += npc.GetMaxHealth() * RandRangeF(0.25, 0.125);
+							}
+						}
+					}
 				}
 				else if ( GetWitcherPlayer().GetEquippedSign() == ST_Aard )
 				{
 					action.AddEffectInfo(EET_Knockdown, 1);
 					action.AddEffectInfo(EET_Stagger, 1);
+
+					if (npc.UsesVitality())
+					{
+						action.processedDmg.vitalityDamage += npc.GetCurrentHealth() * RandRangeF(0.125, 0.06125);
+					}
+					else if (npc.UsesEssence())
+					{
+						if (((CMovingPhysicalAgentComponent)(npc.GetMovingAgentComponent())).GetCapsuleHeight() >= 2
+						|| npc.GetRadius() >= 0.7
+						)
+						{
+							action.processedDmg.essenceDamage += npc.GetMaxHealth() * 0.06125;
+						}
+						else
+						{
+							action.processedDmg.essenceDamage += npc.GetMaxHealth() * RandRangeF(0.125, 0.06125);
+						}
+					}
+				}
+			}
+			else
+			{
+				if ( 
+				GetWitcherPlayer().GetEquippedSign() == ST_Igni 
+				&& (theGame.GetWorld().GetDepotPath() == "levels\skellige\skellige.w2w")
+				)
+				{
+					if (npc.UsesVitality())
+					{
+						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.5;
+					}
+					else if (npc.UsesEssence())
+					{
+						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.5;
+					}
 				}
 			}
 
@@ -2098,6 +2254,180 @@ function ACS_Nekker_Guardian_On_Take_Damage(action: W3DamageAction)
 					animatedComponentA.FreezePoseFadeIn(5);
 
 					npc.AddTag('ACS_Nekker_Guardian_End_Stage');
+				}
+			}
+		}
+		else
+		{
+			if (npc.UsesVitality())
+			{
+				action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
+			}
+			else if (npc.UsesEssence())
+			{
+				action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage;
+			}
+		}
+	}
+}
+
+function ACS_Phooca_On_Take_Damage(action: W3DamageAction)
+{
+    var playerAttacker, playerVictim																								: CPlayer;
+	var npc, npcAttacker 																											: CActor;
+	var animatedComponentA 																											: CAnimatedComponent;
+	var movementAdjustor, movementAdjustorNPC																						: CMovementAdjustor;
+	var ticket 																														: SMovementAdjustmentRequestTicket;
+
+    npc = (CActor)action.victim;
+	
+	npcAttacker = (CActor)action.attacker;
+	
+	playerAttacker = (CPlayer)action.attacker;
+	
+	playerVictim = (CPlayer)action.victim;
+
+	animatedComponentA = (CAnimatedComponent)npc.GetComponentByClassName( 'CAnimatedComponent' );
+
+	movementAdjustor = GetWitcherPlayer().GetMovingAgentComponent().GetMovementAdjustor();
+
+	movementAdjustorNPC = npc.GetMovingAgentComponent().GetMovementAdjustor();
+
+	if 
+	(npc && npc.HasTag('ACS_Phooca'))
+	{
+		if (playerAttacker)
+		{
+			if ( !action.IsDoTDamage() 
+			&& !action.WasDodged() 
+			//&& action.IsActionMelee()
+			&& !(((W3Action_Attack)action).IsParried())
+			)
+			{
+				if (npc.UsesVitality())
+				{
+					if( thePlayer.IsDoingSpecialAttack(false))
+					{
+						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.5;
+					}
+					else
+					{
+						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.25;
+					}
+				}
+				else if (npc.UsesEssence())
+				{
+					if( thePlayer.IsDoingSpecialAttack(false))
+					{
+						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.5;
+					}
+					else
+					{
+						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.25;
+					}
+				}
+
+				ticket = movementAdjustorNPC.GetRequest( 'ACS_NPC_Attacked_Rotate');
+				movementAdjustorNPC.CancelByName( 'ACS_NPC_Attacked_Rotate' );
+				movementAdjustorNPC.CancelAll();
+
+				ticket = movementAdjustorNPC.CreateNewRequest( 'ACS_NPC_Attacked_Rotate' );
+				movementAdjustorNPC.AdjustmentDuration( ticket, 0.5 );
+				movementAdjustorNPC.MaxRotationAdjustmentSpeed( ticket, 125 );
+
+				movementAdjustorNPC.RotateTowards( ticket, GetWitcherPlayer() );
+			}
+
+			if (npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= 0.1)
+			{
+				if (!npc.HasTag('ACS_Phooca_End_Stage'))
+				{
+					ACS_Ghoul_Explode(npc, npc.GetWorldPosition());
+
+					animatedComponentA.FreezePoseFadeIn(5);
+
+					npc.AddTag('ACS_Phooca_End_Stage');
+				}
+			}
+			else if (npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.1)
+			{
+				if (!npc.HasTag('ACS_Phooca_End_Stage'))
+				{
+					ACS_Ghoul_Explode(npc, npc.GetWorldPosition());
+
+					animatedComponentA.FreezePoseFadeIn(5);
+
+					npc.AddTag('ACS_Phooca_End_Stage');
+				}
+			}
+		}
+		else
+		{
+			if (npc.UsesVitality())
+			{
+				action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
+			}
+			else if (npc.UsesEssence())
+			{
+				action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage;
+			}
+		}
+	}
+}
+
+function ACS_Plumard_On_Take_Damage(action: W3DamageAction)
+{
+    var playerAttacker, playerVictim																								: CPlayer;
+	var npc, npcAttacker 																											: CActor;
+	var animatedComponentA 																											: CAnimatedComponent;
+	
+    npc = (CActor)action.victim;
+	
+	npcAttacker = (CActor)action.attacker;
+	
+	playerAttacker = (CPlayer)action.attacker;
+	
+	playerVictim = (CPlayer)action.victim;
+
+	animatedComponentA = (CAnimatedComponent)npc.GetComponentByClassName( 'CAnimatedComponent' );
+
+	if 
+	(npc && npc.HasTag('ACS_Plumard'))
+	{
+		if (playerAttacker)
+		{
+			if ( !action.IsDoTDamage() 
+			&& !action.WasDodged() 
+			//&& action.IsActionMelee()
+			&& !(((W3Action_Attack)action).IsParried())
+			)
+			{
+				if (ACS_IsNight())
+				{
+					if (npc.UsesVitality())
+					{
+						action.processedDmg.vitalityDamage += npc.GetMaxHealth() * 0.2;
+					}
+					else if (npc.UsesEssence())
+					{
+						action.processedDmg.essenceDamage += npc.GetMaxHealth() * 0.2;
+					}
+
+					if (!npc.HasAbility('Flashstep'))
+					{
+						npc.AddAbility('Flashstep');
+					}
+				}
+				else
+				{
+					if (npc.UsesVitality())
+					{
+						action.processedDmg.vitalityDamage += npc.GetMaxHealth() * 0.25;
+					}
+					else if (npc.UsesEssence())
+					{
+						action.processedDmg.essenceDamage += npc.GetMaxHealth() * 0.25;
+					}
 				}
 			}
 		}
@@ -4357,6 +4687,37 @@ function ACS_Cursed_Werewolf_On_Take_Damage(action: W3DamageAction)
 
 					npc.AddTag('ACS_Morkvarg_Death');
 				}
+			}
+		}
+	}
+}
+
+function ACS_Red_Miasmal_Boss_On_Take_Damage(action: W3DamageAction)
+{
+    var playerAttacker, playerVictim																								: CPlayer;
+	var npc, npcAttacker 																											: CActor;
+
+    npc = (CActor)action.victim;
+	
+	npcAttacker = (CActor)action.attacker;
+	
+	playerAttacker = (CPlayer)action.attacker;
+	
+	playerVictim = (CPlayer)action.victim;
+
+	if 
+	(npc && StrContains( npc.GetReadableName(), "mq1060_evil_spirit" ))
+	{
+		if (playerAttacker)
+		{
+			if ( !npc.HasTag('ACS_Red_Miasmal_Boss_On_Hit'))
+			{
+				if (!thePlayer.inv.HasItem('acs_red_miasmal_fragment'))
+				{
+					thePlayer.inv.AddAnItem('acs_red_miasmal_fragment', 1);
+				}
+
+				npc.AddTag('ACS_Red_Miasmal_Boss_On_Hit');
 			}
 		}
 	}
@@ -7122,6 +7483,559 @@ function ACS_Bumbakvetch_On_Take_Damage(action: W3DamageAction)
 	}
 }
 
+function ACS_Viy_On_Take_Damage(action: W3DamageAction)
+{
+    var playerAttacker, playerVictim																								: CPlayer;
+	var npc, npcAttacker 																											: CActor;
+
+    npc = (CActor)action.victim;
+	
+	npcAttacker = (CActor)action.attacker;
+	
+	playerAttacker = (CPlayer)action.attacker;
+	
+	playerVictim = (CPlayer)action.victim;
+
+	if 
+	(npc && npc.HasTag('ACS_Viy_Of_Maribor'))
+	{
+		if ( playerAttacker )
+		{
+			npc.SetCanPlayHitAnim(false);
+
+			if ( !action.IsDoTDamage() 
+			&& !action.WasDodged() 
+			//&& action.IsActionMelee()
+			&& !(((W3Action_Attack)action).IsParried())
+			)
+			{
+				if (npc.UsesVitality())
+				{
+					if( thePlayer.IsDoingSpecialAttack(false))
+					{
+						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.5;
+					}
+					else
+					{
+						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.25;
+					}
+				}
+				else if (npc.UsesEssence())
+				{
+					if( thePlayer.IsDoingSpecialAttack(false))
+					{
+						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.5;
+					}
+					else
+					{
+						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.25;
+					}
+				}
+			}
+
+			if ((npc.UsesVitality() && npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.01)
+			||
+			(npc.UsesEssence() && npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= 0.01))
+			{
+				if ( !npc.HasTag('ACS_Viy_Death'))
+				{
+					npc.StopAllEffects();
+
+					npc.AddTag('ACS_Viy_Death');
+				}
+			}
+		}
+		else
+		{
+			if (npc.UsesVitality())
+			{
+				action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
+			}
+			else if (npc.UsesEssence())
+			{
+				action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage;
+			}
+		}
+	}
+}
+
+function ACS_VampireMonsterBossbar_On_Take_Damage(action: W3DamageAction)
+{
+    var playerAttacker, playerVictim																								: CPlayer;
+	var npc, npcAttacker 																											: CActor;
+
+    npc = (CActor)action.victim;
+	
+	npcAttacker = (CActor)action.attacker;
+	
+	playerAttacker = (CPlayer)action.attacker;
+	
+	playerVictim = (CPlayer)action.victim;
+
+	if 
+	(npc && npc.HasTag('ACS_Vampire_Monster_Boss_Bar'))
+	{
+		if (npc.UsesVitality())
+		{
+			action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
+		}
+		else if (npc.UsesEssence())
+		{
+			action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage;
+		}
+	}
+}
+
+function ACS_Giant_Troll_On_Take_Damage(action: W3DamageAction)
+{
+    var playerAttacker, playerVictim																								: CPlayer;
+	var npc, npcAttacker 																											: CActor;
+
+    npc = (CActor)action.victim;
+	
+	npcAttacker = (CActor)action.attacker;
+	
+	playerAttacker = (CPlayer)action.attacker;
+	
+	playerVictim = (CPlayer)action.victim;
+
+	if 
+	(npc && npc.HasTag('ACS_Giant_Troll'))
+	{
+		if ( playerAttacker )
+		{
+			npc.SetCanPlayHitAnim(false);
+
+			((CNewNPC)npc).SetUnstoppable( true );
+
+			if ( !action.IsDoTDamage() 
+			&& !action.WasDodged() 
+			//&& action.IsActionMelee()
+			&& !(((W3Action_Attack)action).IsParried())
+			)
+			{
+				if (npc.UsesVitality())
+				{
+					if( thePlayer.IsDoingSpecialAttack(false))
+					{
+						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.5;
+					}
+					else
+					{
+						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.25;
+					}
+				}
+				else if (npc.UsesEssence())
+				{
+					if( thePlayer.IsDoingSpecialAttack(false))
+					{
+						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.5;
+					}
+					else
+					{
+						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.25;
+					}
+				}
+			}
+
+		}
+		else
+		{
+			if (npc.UsesVitality())
+			{
+				action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
+			}
+			else if (npc.UsesEssence())
+			{
+				action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage;
+			}
+		}
+	}
+}
+
+function ACS_Elemental_Titan_On_Take_Damage(action: W3DamageAction)
+{
+    var playerAttacker, playerVictim																								: CPlayer;
+	var npc, npcAttacker 																											: CActor;
+
+    npc = (CActor)action.victim;
+	
+	npcAttacker = (CActor)action.attacker;
+	
+	playerAttacker = (CPlayer)action.attacker;
+	
+	playerVictim = (CPlayer)action.victim;
+
+	if 
+	(npc && npc.HasTag('ACS_Elemental_Titan'))
+	{
+		if ( playerAttacker )
+		{
+			npc.SetCanPlayHitAnim(false);
+
+			((CNewNPC)npc).SetUnstoppable( true );
+
+			if ( !action.IsDoTDamage() 
+			&& !action.WasDodged() 
+			//&& action.IsActionMelee()
+			&& !(((W3Action_Attack)action).IsParried())
+			)
+			{
+				if (npc.UsesVitality())
+				{
+					if( thePlayer.IsDoingSpecialAttack(false))
+					{
+						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.5;
+					}
+					else
+					{
+						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.25;
+					}
+				}
+				else if (npc.UsesEssence())
+				{
+					if( thePlayer.IsDoingSpecialAttack(false))
+					{
+						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.5;
+					}
+					else
+					{
+						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.25;
+					}
+				}
+			}
+		}
+		else
+		{
+			if (npc.UsesVitality())
+			{
+				action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
+			}
+			else if (npc.UsesEssence())
+			{
+				action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage;
+			}
+		}
+	}
+}
+
+function ACS_Hellhound_On_Take_Damage(action: W3DamageAction)
+{
+    var playerAttacker, playerVictim																								: CPlayer;
+	var npc, npcAttacker 																											: CActor;
+
+    npc = (CActor)action.victim;
+	
+	npcAttacker = (CActor)action.attacker;
+	
+	playerAttacker = (CPlayer)action.attacker;
+	
+	playerVictim = (CPlayer)action.victim;
+
+	if 
+	(npc && npc.HasTag('ACS_Hellhound'))
+	{
+		if ( playerAttacker )
+		{
+			if ( !action.IsDoTDamage() 
+			&& !action.WasDodged() 
+			//&& action.IsActionMelee()
+			&& !(((W3Action_Attack)action).IsParried())
+			)
+			{
+				if (npc.UsesVitality())
+				{
+					if( thePlayer.IsDoingSpecialAttack(false))
+					{
+						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.25;
+					}
+					else
+					{
+						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.125;
+					}
+				}
+				else if (npc.UsesEssence())
+				{
+					if( thePlayer.IsDoingSpecialAttack(false))
+					{
+						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.25;
+					}
+					else
+					{
+						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.125;
+					}
+				}
+			}
+		}
+		else
+		{
+			if (npc.UsesVitality())
+			{
+				action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
+			}
+			else if (npc.UsesEssence())
+			{
+				action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage;
+			}
+		}
+	}
+}
+
+function ACS_Dark_Knight_On_Take_Damage(action: W3DamageAction)
+{
+    var playerAttacker, playerVictim																								: CPlayer;
+	var npc, npcAttacker 																											: CActor;
+
+    npc = (CActor)action.victim;
+	
+	npcAttacker = (CActor)action.attacker;
+	
+	playerAttacker = (CPlayer)action.attacker;
+	
+	playerVictim = (CPlayer)action.victim;
+
+	if 
+	(npc 
+	&& 
+	(
+		npc.HasTag('ACS_Dark_Knight')
+	)
+	)
+	{
+		if ( playerAttacker )
+		{
+			if ( !action.IsDoTDamage() 
+			&& !action.WasDodged() 
+			//&& action.IsActionMelee()
+			&& !(((W3Action_Attack)action).IsParried())
+			)
+			{
+				
+			}
+
+			if ((npc.UsesVitality() && npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.01)
+			||
+			(npc.UsesEssence() && npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= 0.01))
+			{
+				if ( !npc.HasTag('ACS_Dark_Knight_Death'))
+				{
+					npc.DestroyEffect('ghost');
+					npc.DestroyEffect('him_smoke_red');
+					npc.DestroyEffect('shadow_form');
+					npc.DestroyEffect('smoke_effect_1');
+					npc.DestroyEffect('smoke_effect_2');
+
+					npc.PlayEffect('death_vision');
+
+					((CNewNPC)npc).SetVisibility(false);
+
+					npc.AddTag('ACS_Dark_Knight_Death');
+				}
+			}
+		}
+		else
+		{
+			if (npc.UsesVitality())
+			{
+				action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
+			}
+			else if (npc.UsesEssence())
+			{
+				action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage;
+			}
+		}
+	}
+}
+
+function ACS_Dark_Knight_Calidus_On_Take_Damage(action: W3DamageAction)
+{
+    var playerAttacker, playerVictim																								: CPlayer;
+	var npc, npcAttacker 																											: CActor;
+
+    npc = (CActor)action.victim;
+	
+	npcAttacker = (CActor)action.attacker;
+	
+	playerAttacker = (CPlayer)action.attacker;
+	
+	playerVictim = (CPlayer)action.victim;
+
+	if 
+	(npc 
+	&& 
+	(
+		npc.HasTag('ACS_Dark_Knight_Calidus')
+	)
+	)
+	{
+		((CNewNPC)npc).SetUnstoppable( true );
+
+		if ( playerAttacker )
+		{
+			if ( !action.IsDoTDamage() 
+			&& !action.WasDodged() 
+			//&& action.IsActionMelee()
+			&& !(((W3Action_Attack)action).IsParried())
+			)
+			{
+				if (npc.UsesVitality())
+				{
+					if( thePlayer.IsDoingSpecialAttack(false))
+					{
+						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.5;
+					}
+					else
+					{
+						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.25;
+					}
+				}
+				else if (npc.UsesEssence())
+				{
+					if( thePlayer.IsDoingSpecialAttack(false))
+					{
+						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.5;
+					}
+					else
+					{
+						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.25;
+					}
+				}
+			}
+
+			if ((npc.UsesVitality() && npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.01)
+			||
+			(npc.UsesEssence() && npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= 0.01))
+			{
+				if ( !npc.HasTag('ACS_Dark_Knight_Calidus_Death'))
+				{
+					npc.DestroyEffect('lugos_vision_burning_mat');
+					npc.DestroyEffect('burning_body');
+					npc.DestroyEffect('him_smoke_red');
+					npc.DestroyEffect('shadow_form');
+					npc.DestroyEffect('lugos_vision_burning');
+					npc.DestroyEffect('smoke_effect_1');
+					npc.DestroyEffect('smoke_effect_2');
+
+					npc.PlayEffect('death_vision');
+
+					((CNewNPC)npc).SetVisibility(false);
+
+					npc.AddTag('ACS_Dark_Knight_Calidus_Death');
+				}
+			}
+		}
+		else
+		{
+			if (npc.UsesVitality())
+			{
+				action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
+			}
+			else if (npc.UsesEssence())
+			{
+				action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage;
+			}
+		}
+	}
+}
+
+function ACS_Carduin_On_Take_Damage(action: W3DamageAction)
+{
+    var playerAttacker, playerVictim																								: CPlayer;
+	var npc, npcAttacker 																											: CActor;
+
+    npc = (CActor)action.victim;
+	
+	npcAttacker = (CActor)action.attacker;
+	
+	playerAttacker = (CPlayer)action.attacker;
+	
+	playerVictim = (CPlayer)action.victim;
+
+	if 
+	(npc 
+	&& 
+	(
+		npc.HasTag('ACS_Carduin')
+	)
+	)
+	{
+		if ( playerAttacker )
+		{
+			if ( !action.IsDoTDamage() 
+			&& !action.WasDodged() 
+			//&& action.IsActionMelee()
+			&& !(((W3Action_Attack)action).IsParried())
+			)
+			{
+				if (npc.UsesVitality())
+				{
+					if( thePlayer.IsDoingSpecialAttack(false))
+					{
+						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.75;
+					}
+					else
+					{
+						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.5;
+					}
+				}
+				else if (npc.UsesEssence())
+				{
+					if( thePlayer.IsDoingSpecialAttack(false))
+					{
+						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.75;
+					}
+					else
+					{
+						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.5;
+					}
+				}
+			}
+
+			if ((npc.UsesVitality() && npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.01)
+			||
+			(npc.UsesEssence() && npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= 0.01))
+			{
+				if ( !npc.HasTag('ACS_Carduin_Death'))
+				{
+					ACS_Carduin_Spawn_Ifrit(npc.GetWorldPosition());
+
+					FactsAdd("ACS_Carduin_Killed", 1, -1);
+
+					npc.AddTag('ACS_Carduin_Death');
+				}
+			}
+		}
+		else
+		{
+			if (npc.UsesVitality())
+			{
+				action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
+			}
+			else if (npc.UsesEssence())
+			{
+				action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage;
+			}
+		}
+	}
+}
+
+function ACS_Carduin_Spawn_Ifrit( pos : Vector )
+{
+	var ent	: CACSMonsterSpawner;
+
+	ent = (CACSMonsterSpawner)theGame.CreateEntity( 
+
+	(CEntityTemplate)LoadResource( "dlc\dlc_acs\data\entities\other\acs_monster_spawner.w2ent", true ), 
+	
+	pos, 
+
+	thePlayer.GetWorldRotation() );
+
+	ent.AddTag('ACS_MonsterSpawner_Ifrit');
+
+	ent.AddTag('ACS_MonsterSpawner_Spawn_In_Frame');
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -8654,13 +9568,13 @@ function ACS_Create_Red_Quen_Hit_Effect()
 
 function ACS_Take_Damage(action: W3DamageAction)
 {
-    var playerAttacker, playerVictim																								: CPlayer;
-	var npc, npcAttacker 																											: CActor;
-	var movementAdjustor, movementAdjustorWerewolf, movementAdjustorVampiress, movementAdjustorTransformationVampireMonster			: CMovementAdjustor;
-	var ticket, ticketWerewolf, ticketVampiress, ticketTransformationVampireMonster 												: SMovementAdjustmentRequestTicket;
-	var item																														: SItemUniqueId;
-	var dmg																															: W3DamageAction;
-	var damageMax, damageMin																										: float;
+    var playerAttacker, playerVictim																																	: CPlayer;
+	var npc, npcAttacker 																																				: CActor;
+	var movementAdjustor, movementAdjustorWerewolf, movementAdjustorVampiress, movementAdjustorTransformationVampireMonster, movementAdjustorRedMiasmal					: CMovementAdjustor;
+	var ticket, ticketWerewolf, ticketVampiress, ticketTransformationVampireMonster, ticketRedMiasmal 																	: SMovementAdjustmentRequestTicket;
+	var item																																							: SItemUniqueId;
+	var dmg																																								: W3DamageAction;
+	var damageMax, damageMin																																			: float;
 
     npc = (CActor)action.victim;
 	
@@ -8677,6 +9591,16 @@ function ACS_Take_Damage(action: W3DamageAction)
 	movementAdjustorVampiress = GetACSTransformationVampiress().GetMovingAgentComponent().GetMovementAdjustor();
 
 	movementAdjustorTransformationVampireMonster = GetACSTransformationVampireMonster().GetMovingAgentComponent().GetMovementAdjustor();
+
+	movementAdjustorRedMiasmal = GetACSTransformationRedMiasmal().GetMovingAgentComponent().GetMovementAdjustor();
+
+	if (playerVictim && npcAttacker)
+	{
+		if (ACS_Player_DamageTaken_Multiplier() != 1)
+		{
+			action.processedDmg.vitalityDamage *= ACS_Player_DamageTaken_Multiplier();
+		}
+	}
 
     if ( playerVictim
 	&& action.GetBuffSourceName() != "FallingDamage"
@@ -8897,6 +9821,47 @@ function ACS_Take_Damage(action: W3DamageAction)
 				if (ACS_Transformation_Toad_Check())
 				{
 					action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.9;
+				}
+
+				if (ACS_Transformation_Red_Miasmal_Check())
+				{
+					if (GetACSTransformationRedMiasmal().HasTag('ACS_Transformation_Red_Miasmal_Rooted'))
+					{
+						GetACSTransformationRedMiasmal().StopEffect('teleport_roots_1');
+						GetACSTransformationRedMiasmal().PlayEffectSingle('teleport_roots_1');
+
+						GetACSWatcher().RedMiasmalLightAttackDamage360Actual();
+
+						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.95;
+					}
+					else
+					{
+						if (RandF() < 0.06125)
+						{
+							ticketRedMiasmal = movementAdjustorRedMiasmal.GetRequest( 'ACS_Transformation_Red_Miasmal_Hit_Rotate');
+							movementAdjustorRedMiasmal.CancelByName( 'ACS_Transformation_Red_Miasmal_Hit_Rotate' );
+							movementAdjustorRedMiasmal.CancelAll();
+
+							ticketRedMiasmal = movementAdjustorRedMiasmal.CreateNewRequest( 'ACS_Transformation_Red_Miasmal_Hit_Rotate' );
+							movementAdjustorRedMiasmal.AdjustmentDuration( ticketRedMiasmal, 0.25 );
+							movementAdjustorRedMiasmal.MaxRotationAdjustmentSpeed( ticketRedMiasmal, 500000 );
+
+							action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.75;
+
+							movementAdjustorRedMiasmal.RotateTowards( ticketRedMiasmal, npcAttacker);
+
+							ACS_Transformation_Red_Miasmal_Hit_Animations();
+						}
+						else
+						{
+							GetACSTransformationRedMiasmal().StopEffect('teleport_roots_1');
+							GetACSTransformationRedMiasmal().PlayEffectSingle('teleport_roots_1');
+
+							GetACSWatcher().RedMiasmalLightAttackDamage360Actual();
+
+							action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.95;
+						}
+					}
 				}
 
 				return;
@@ -9672,6 +10637,10 @@ function ACS_Hit_Animations(action: W3DamageAction)
 
 function ACS_Transformation_Werewolf_Hit_Animations()
 {
+	var hit_anim_names	: array<name>;
+
+	hit_anim_names.Clear();
+
 	GetACSTransformationWerewolf().DestroyEffect('light_hit');
 	GetACSTransformationWerewolf().DestroyEffect('heavy_hit');
 	GetACSTransformationWerewolf().DestroyEffect('light_hit_back');
@@ -9691,42 +10660,14 @@ function ACS_Transformation_Werewolf_Hit_Animations()
 
 	GetACSWatcher().ACSWerewolfRemoveAttackTimers();
 
-	if ( RandF() < 0.5 )
-	{
-		if ( RandF() < 0.5 )
-		{
-			GetACSWatcher().ACSTransformWerewolfPlayAnim( 'monster_werewolf_hit_light_front_down', 0.25f, 0.875f);
-		}
-		else
-		{
-			GetACSWatcher().ACSTransformWerewolfPlayAnim( 'monster_werewolf_hit_heavy_front_down', 0.25f, 0.875f);
-		}
-	}
-	else
-	{
-		if ( RandF() < 0.5 )
-		{
-			if ( RandF() < 0.5 )
-			{
-				GetACSWatcher().ACSTransformWerewolfPlayAnim( 'monster_werewolf_hit_heavy_front_right', 0.25f, 0.875f);
-			}
-			else
-			{
-				GetACSWatcher().ACSTransformWerewolfPlayAnim( 'monster_werewolf_hit_light_front_left', 0.25f, 0.875f);
-			}
-		}
-		else
-		{
-			if ( RandF() < 0.5 )
-			{
-				GetACSWatcher().ACSTransformWerewolfPlayAnim( 'monster_werewolf_hit_light_front_right', 0.25f, 0.875f);
-			}
-			else
-			{
-				GetACSWatcher().ACSTransformWerewolfPlayAnim( 'monster_werewolf_hit_heavy_front_left', 0.25f, 0.875f);
-			}
-		}
-	}
+	hit_anim_names.PushBack('monster_werewolf_hit_light_front_down');
+	hit_anim_names.PushBack('monster_werewolf_hit_heavy_front_down');
+	hit_anim_names.PushBack('monster_werewolf_hit_heavy_front_right');
+	hit_anim_names.PushBack('monster_werewolf_hit_light_front_left');
+	hit_anim_names.PushBack('monster_werewolf_hit_light_front_right');
+	hit_anim_names.PushBack('monster_werewolf_hit_heavy_front_left');
+
+	GetACSWatcher().ACSTransformWerewolfPlayAnim(hit_anim_names[RandRange(hit_anim_names.Size())], 0.25f, 0.5f);
 }
 
 function ACS_Transformation_Vampiress_Hit_Animations()
@@ -9836,6 +10777,37 @@ function ACS_Transformation_Vampire_Monster_Hit_Animations()
 			GetACSWatcher().ACSTransformVampireMonsterPlayAnim(vampire_monster_hit_anim_names[RandRange(vampire_monster_hit_anim_names.Size())], 0.25f, 0.25f);
 		}
 	}
+}
+
+function ACS_Transformation_Red_Miasmal_Hit_Animations()
+{
+	var hit_anim_names	: array<name>;
+
+	hit_anim_names.Clear();
+
+	GetACSTransformationRedMiasmal().DestroyEffect('light_hit');
+	GetACSTransformationRedMiasmal().DestroyEffect('heavy_hit');
+	GetACSTransformationRedMiasmal().DestroyEffect('light_hit_back');
+	GetACSTransformationRedMiasmal().DestroyEffect('heavy_hit_back');
+	GetACSTransformationRedMiasmal().DestroyEffect('blood_spill');
+
+	GetACSTransformationRedMiasmal().PlayEffectSingle('light_hit');
+	GetACSTransformationRedMiasmal().PlayEffectSingle('heavy_hit');
+	GetACSTransformationRedMiasmal().PlayEffectSingle('light_hit_back');
+	GetACSTransformationRedMiasmal().PlayEffectSingle('heavy_hit_back');
+	GetACSTransformationRedMiasmal().PlayEffectSingle('blood_spill');
+
+	hit_anim_names.PushBack('monster_lessun_hit_light_f');
+	hit_anim_names.PushBack('monster_lessun_hit_light_left');
+	hit_anim_names.PushBack('monster_lessun_hit_light_right');
+	hit_anim_names.PushBack('monster_lessun_hit_strong_f');
+	hit_anim_names.PushBack('monster_lessun_hit_strong_left');
+	hit_anim_names.PushBack('monster_lessun_hit_strong_right');
+
+	GetACSWatcher().ACSTransformationRedMiasmalRemoveMoveTimers();
+
+	GetACSWatcher().ACSTransformRedMiasmalPlayAnim(hit_anim_names[RandRange(hit_anim_names.Size())], 0.25f, 0.25f);
+	
 }
 
 function ACS_Forest_God_Attack(action: W3DamageAction)
@@ -11726,10 +12698,72 @@ function ACS_Bumbakvetch_Attack(action: W3DamageAction)
 
 			action.processedDmg.vitalityDamage += GetWitcherPlayer().GetStatMax(BCS_Vitality) * 0.25f;
 
-			thePlayer.AddEffectDefault( EET_Knockdown, thePlayer, "ACS_Bumbakvetch" );
+			thePlayer.AddEffectDefault( EET_Knockdown, thePlayer, 'ACS_Bumbakvetch' );
 		}
 	}
 }
+
+function ACS_Viy_Attack(action: W3DamageAction)
+{
+    var playerAttacker, playerVictim						: CPlayer;
+	var npc, npcAttacker 									: CActor;
+
+    npc = (CActor)action.victim;
+	
+	npcAttacker = (CActor)action.attacker;
+	
+	playerAttacker = (CPlayer)action.attacker;
+	
+	playerVictim = (CPlayer)action.victim;
+
+    if ( npcAttacker
+	&& npcAttacker.HasTag('ACS_Viy_Of_Maribor')
+	&& !action.IsDoTDamage()
+	&& playerVictim
+	)
+	{	
+		if (!action.WasDodged() && !GetWitcherPlayer().IsCurrentlyDodging())
+		{
+			GetWitcherPlayer().SoundEvent("cmb_play_dismemberment_gore");
+
+			action.processedDmg.vitalityDamage += GetWitcherPlayer().GetStat(BCS_Vitality) * 0.125f;
+
+			thePlayer.AddEffectDefault( EET_Poison, ACSViyOfMaribor(), 'ACS_Viy_Of_Maribor' );
+
+			thePlayer.AddEffectDefault( EET_HeavyKnockdown, ACSViyOfMaribor(), 'ACS_Viy_Of_Maribor' );
+		}
+	}
+}
+
+function ACS_Plumard_Attack(action: W3DamageAction)
+{
+    var playerAttacker, playerVictim						: CPlayer;
+	var npc, npcAttacker 									: CActor;
+
+    npc = (CActor)action.victim;
+	
+	npcAttacker = (CActor)action.attacker;
+	
+	playerAttacker = (CPlayer)action.attacker;
+	
+	playerVictim = (CPlayer)action.victim;
+
+    if ( npcAttacker
+	&& npcAttacker.HasTag('ACS_Plumard')
+	&& !action.IsDoTDamage()
+	&& playerVictim
+	)
+	{	
+		if (!action.WasDodged() && !GetWitcherPlayer().IsCurrentlyDodging())
+		{
+			if (!playerVictim.HasBuff(EET_Bleeding))
+			{
+				playerVictim.AddEffectDefault( EET_Bleeding, npcAttacker, 'ACS_Plumard' );
+			}
+		}
+	}
+}
+
 
 function ACS_Shades_Rogue_Attack(action: W3DamageAction)
 {
@@ -11753,6 +12787,119 @@ function ACS_Shades_Rogue_Attack(action: W3DamageAction)
 		if (!action.WasDodged() && !GetWitcherPlayer().IsCurrentlyDodging())
 		{
 			action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.75;
+		}
+	}
+}
+
+function ACS_Dark_Knight_Calidus_Attack(action: W3DamageAction)
+{
+    var playerAttacker, playerVictim						: CPlayer;
+	var npc, npcAttacker 									: CActor;
+
+    npc = (CActor)action.victim;
+	
+	npcAttacker = (CActor)action.attacker;
+	
+	playerAttacker = (CPlayer)action.attacker;
+	
+	playerVictim = (CPlayer)action.victim;
+
+    if ( npcAttacker
+	&& npcAttacker.HasTag('ACS_Dark_Knight_Calidus')
+	&& !action.IsDoTDamage()
+	&& playerVictim
+	)
+	{	
+		if (!action.WasDodged() && !GetWitcherPlayer().IsCurrentlyDodging())
+		{
+			if (!playerVictim.HasBuff(EET_Burning))
+			{
+				playerVictim.AddEffectDefault( EET_Burning, npcAttacker, 'ACS_Dark_Knight_Calidus' );
+			}
+		}
+	}
+}
+
+function ACS_Vanilla_Vampires_Attack(action: W3DamageAction)
+{
+    var playerAttacker, playerVictim						: CPlayer;
+	var npc, npcAttacker 									: CActor;
+
+    npc = (CActor)action.victim;
+	
+	npcAttacker = (CActor)action.attacker;
+	
+	playerAttacker = (CPlayer)action.attacker;
+	
+	playerVictim = (CPlayer)action.victim;
+
+    if ( npcAttacker
+	&& 
+	(npcAttacker.GetSfxTag() == 'sfx_katakan'
+	|| npcAttacker.HasAbility('mon_ekimma')
+	|| npcAttacker.HasAbility('mon_garkain')
+	|| npcAttacker.HasAbility('mon_bruxa')
+	|| npcAttacker.HasAbility('mon_fleder')
+	|| npcAttacker.HasAbility('q704_mon_protofleder')
+	|| npcAttacker.HasAbility('mon_alp')
+	|| npcAttacker.HasTag('dettlaff_vampire'))
+	&& !action.IsDoTDamage()
+	&& npc
+	)
+	{	
+		if (!action.WasDodged() && !npc.IsCurrentlyDodging())
+		{
+			if (npc.HasBuff(EET_BlackBlood))
+			{
+				if (npcAttacker.UsesEssence())
+				{
+					npcAttacker.GainStat( BCS_Essence, ( npcAttacker.GetStatMax(BCS_Essence) - npcAttacker.GetStat( BCS_Essence ) ) * 0.025 );
+				}
+				else if (npcAttacker.UsesVitality())
+				{
+					npcAttacker.GainStat( BCS_Vitality, ( npcAttacker.GetStatMax(BCS_Vitality) - npcAttacker.GetStat( BCS_Vitality ) ) * 0.025 );
+				}
+			}
+			else
+			{
+				if (npcAttacker.UsesEssence())
+				{
+					npcAttacker.GainStat( BCS_Essence, ( npcAttacker.GetStatMax(BCS_Essence) - npcAttacker.GetStat( BCS_Essence ) ) * 0.075 );
+				}
+				else if (npcAttacker.UsesVitality())
+				{
+					npcAttacker.GainStat( BCS_Vitality, ( npcAttacker.GetStatMax(BCS_Vitality) - npcAttacker.GetStat( BCS_Vitality ) ) * 0.075 );
+				}
+			}
+		}
+	}
+}
+
+function ACS_Carduin_Attack(action: W3DamageAction)
+{
+    var playerAttacker, playerVictim						: CPlayer;
+	var npc, npcAttacker 									: CActor;
+
+    npc = (CActor)action.victim;
+	
+	npcAttacker = (CActor)action.attacker;
+	
+	playerAttacker = (CPlayer)action.attacker;
+	
+	playerVictim = (CPlayer)action.victim;
+
+    if ( npcAttacker
+	&& npcAttacker.HasTag('ACS_Carduin')
+	&& !action.IsDoTDamage()
+	&& playerVictim
+	)
+	{	
+		if (!action.WasDodged() && !GetWitcherPlayer().IsCurrentlyDodging())
+		{
+			if (!playerVictim.HasBuff(EET_Burning))
+			{
+				playerVictim.AddEffectDefault( EET_Burning, npcAttacker, 'ACS_Carduin' );
+			}
 		}
 	}
 }

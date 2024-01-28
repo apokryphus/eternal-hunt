@@ -4832,6 +4832,7 @@ state ACS_Beam_Attack_Engage in cACS_Beam_Attack
 						|| actors[i].HasTag('smokeman') 
 						|| ((CNewNPC)(actors[i])).IsHorse() 
 						|| actors[i].HasTag('ACS_Rat_Mage_Rat')
+						|| actors[i].HasTag('ACS_Plumard')
 						|| actors[i].HasTag('ACS_Tentacle_1') 
 						|| actors[i].HasTag('ACS_Tentacle_2') 
 						|| actors[i].HasTag('ACS_Tentacle_3') 
@@ -5015,7 +5016,7 @@ state ACS_Detonation_Weapon_Effects_Switch_Engage in cACS_Detonation_Weapon_Effe
 				)
 				{
 					dist = 1.5;
-					ang =	45;
+					ang =	55;
 
 					if(  thePlayer.IsDoingSpecialAttack( false ) )
 					{
@@ -5039,7 +5040,7 @@ state ACS_Detonation_Weapon_Effects_Switch_Engage in cACS_Detonation_Weapon_Effe
 				)
 				{
 					dist = 1.5;
-					ang =	45;
+					ang =	55;
 
 					if(  thePlayer.IsDoingSpecialAttack( false ) )
 					{
@@ -5061,7 +5062,7 @@ state ACS_Detonation_Weapon_Effects_Switch_Engage in cACS_Detonation_Weapon_Effe
 				else if ( thePlayer.HasTag('axii_sword_equipped') )
 				{
 					dist = 1.6;
-					ang =	45;	
+					ang =	55;	
 
 					if (thePlayer.HasTag('ACS_Sparagmos_Active'))
 					{
@@ -5078,12 +5079,12 @@ state ACS_Detonation_Weapon_Effects_Switch_Engage in cACS_Detonation_Weapon_Effe
 					)
 					{
 						dist = 2.25;
-						ang =	45;
+						ang =	55;
 					}
 					else if ( ACS_GetWeaponMode() == 3 )
 					{ 
 						dist = 1.75;
-						ang =	45;
+						ang =	55;
 					}
 				}
 				else if ( thePlayer.HasTag('aard_sword_equipped') )
@@ -5151,7 +5152,7 @@ state ACS_Detonation_Weapon_Effects_Switch_Engage in cACS_Detonation_Weapon_Effe
 				else if ( thePlayer.HasTag('quen_sword_equipped') )
 				{
 					dist = 1.6;
-					ang =	45;
+					ang =	55;
 
 					if (thePlayer.HasTag('ACS_Shadow_Dash_Empowered'))
 					{
@@ -5168,7 +5169,7 @@ state ACS_Detonation_Weapon_Effects_Switch_Engage in cACS_Detonation_Weapon_Effe
 					else
 					{
 						dist = 2.25;
-						ang =	45;
+						ang =	55;
 					}
 				}
 				else 
@@ -5295,6 +5296,7 @@ state ACS_Detonation_Weapon_Effects_Switch_Engage in cACS_Detonation_Weapon_Effe
 			|| npc.HasTag('smokeman') 
 			|| npc.IsHorse() 
 			|| npc.HasTag('ACS_Rat_Mage_Rat')
+			|| npc.HasTag('ACS_Plumard')
 			|| npc.HasTag('ACS_Tentacle_1') 
 			|| npc.HasTag('ACS_Tentacle_2') 
 			|| npc.HasTag('ACS_Tentacle_3') 
@@ -5458,7 +5460,7 @@ state ACS_Passive_Weapon_Effects_Switch_Engage in cACS_Passive_Weapon_Effects_Sw
 				)
 				{
 					dist = 1.5;
-					ang =	45;
+					ang =	55;
 
 					if(  thePlayer.IsDoingSpecialAttack( false ) )
 					{
@@ -5482,7 +5484,7 @@ state ACS_Passive_Weapon_Effects_Switch_Engage in cACS_Passive_Weapon_Effects_Sw
 				)
 				{
 					dist = 1.5;
-					ang =	45;
+					ang =	55;
 
 					if(  thePlayer.IsDoingSpecialAttack( false ) )
 					{
@@ -5504,7 +5506,7 @@ state ACS_Passive_Weapon_Effects_Switch_Engage in cACS_Passive_Weapon_Effects_Sw
 				else if ( thePlayer.HasTag('axii_sword_equipped') )
 				{
 					dist = 1.6;
-					ang =	45;	
+					ang =	55;	
 
 					if (thePlayer.HasTag('ACS_Sparagmos_Active'))
 					{
@@ -5521,12 +5523,12 @@ state ACS_Passive_Weapon_Effects_Switch_Engage in cACS_Passive_Weapon_Effects_Sw
 					)
 					{
 						dist = 2.25;
-						ang =	45;
+						ang =	55;
 					}
 					else if ( ACS_GetWeaponMode() == 3 )
 					{ 
 						dist = 1.75;
-						ang =	45;
+						ang =	55;
 					}
 				}
 				else if ( thePlayer.HasTag('aard_sword_equipped') )
@@ -5594,7 +5596,7 @@ state ACS_Passive_Weapon_Effects_Switch_Engage in cACS_Passive_Weapon_Effects_Sw
 				else if ( thePlayer.HasTag('quen_sword_equipped') )
 				{
 					dist = 1.6;
-					ang =	45;
+					ang =	55;
 
 					if (thePlayer.HasTag('ACS_Shadow_Dash_Empowered'))
 					{
@@ -5611,7 +5613,7 @@ state ACS_Passive_Weapon_Effects_Switch_Engage in cACS_Passive_Weapon_Effects_Sw
 					else
 					{
 						dist = 2.25;
-						ang =	45;
+						ang =	55;
 					}
 				}
 				else 
@@ -5737,6 +5739,7 @@ state ACS_Passive_Weapon_Effects_Switch_Engage in cACS_Passive_Weapon_Effects_Sw
 			|| npc.HasTag('smokeman') 
 			|| npc.IsHorse() 
 			|| npc.HasTag('ACS_Rat_Mage_Rat')
+			|| npc.HasTag('ACS_Plumard')
 			|| npc.HasTag('ACS_Tentacle_1') 
 			|| npc.HasTag('ACS_Tentacle_2') 
 			|| npc.HasTag('ACS_Tentacle_3') 
@@ -6989,7 +6992,7 @@ state ACS_Blood_Spatter_Switch_Engage in cACS_Blood_Spatter_Switch
 				)
 				{
 					dist = 1.5;
-					ang =	45;
+					ang =	55;
 
 					if( thePlayer.HasAbility('Runeword 2 _Stats', true) )
 					{
@@ -7009,7 +7012,7 @@ state ACS_Blood_Spatter_Switch_Engage in cACS_Blood_Spatter_Switch
 				)
 				{
 					dist = 1.5;
-					ang =	45;
+					ang =	55;
 
 					if( thePlayer.HasAbility('Runeword 2 _Stats', true) )
 					{
@@ -7027,7 +7030,7 @@ state ACS_Blood_Spatter_Switch_Engage in cACS_Blood_Spatter_Switch
 				else if ( thePlayer.HasTag('axii_sword_equipped') )
 				{
 					dist = 1.6;
-					ang =	45;	
+					ang =	55;	
 
 					if (thePlayer.HasTag('ACS_Sparagmos_Active'))
 					{
@@ -7044,12 +7047,12 @@ state ACS_Blood_Spatter_Switch_Engage in cACS_Blood_Spatter_Switch
 					)
 					{
 						dist = 2.25;
-						ang =	45;
+						ang =	55;
 					}
 					else if ( ACS_GetWeaponMode() == 3 )
 					{ 
 						dist = 1.75;
-						ang =	45;
+						ang =	55;
 					}
 				}
 				else if ( thePlayer.HasTag('aard_sword_equipped') )
@@ -7117,7 +7120,7 @@ state ACS_Blood_Spatter_Switch_Engage in cACS_Blood_Spatter_Switch
 				else if ( thePlayer.HasTag('quen_sword_equipped') )
 				{
 					dist = 1.6;
-					ang =	45;
+					ang =	55;
 
 					if (thePlayer.HasTag('ACS_Shadow_Dash_Empowered'))
 					{
@@ -7134,7 +7137,7 @@ state ACS_Blood_Spatter_Switch_Engage in cACS_Blood_Spatter_Switch
 					else
 					{
 						dist = 2.25;
-						ang =	45;
+						ang =	55;
 					}
 				}
 				else 
@@ -7262,6 +7265,7 @@ state ACS_Blood_Spatter_Switch_Engage in cACS_Blood_Spatter_Switch
 			|| npc.HasTag('smokeman') 
 			|| npc.IsHorse() 
 			|| npc.HasTag('ACS_Rat_Mage_Rat')
+			|| npc.HasTag('ACS_Plumard')
 			|| npc.HasTag('ACS_Tentacle_1') 
 			|| npc.HasTag('ACS_Tentacle_2') 
 			|| npc.HasTag('ACS_Tentacle_3') 
@@ -7461,6 +7465,7 @@ state ACS_Blood_Spatter_Switch_Full_Engage in cACS_Blood_Spatter_Switch
 			|| npc.HasTag('smokeman') 
 			|| npc.IsHorse() 
 			|| npc.HasTag('ACS_Rat_Mage_Rat')
+			|| npc.HasTag('ACS_Plumard')
 			|| npc.HasTag('ACS_Tentacle_1') 
 			|| npc.HasTag('ACS_Tentacle_2') 
 			|| npc.HasTag('ACS_Tentacle_3') 
@@ -7690,6 +7695,7 @@ state ACS_Caretaker_Drain_Energy_Engage in cACS_Caretaker_Drain_Energy
 			|| npc.HasTag('smokeman') 
 			|| npc.IsHorse() 
 			|| npc.HasTag('ACS_Rat_Mage_Rat')
+			|| npc.HasTag('ACS_Plumard')
 			|| npc.HasTag('ACS_Tentacle_1') 
 			|| npc.HasTag('ACS_Tentacle_2') 
 			|| npc.HasTag('ACS_Tentacle_3') 
@@ -7803,6 +7809,7 @@ state ACS_Drain_Energy_Engage in cACS_Drain_Energy
 			|| npc.HasTag('smokeman') 
 			|| npc.IsHorse() 
 			|| npc.HasTag('ACS_Rat_Mage_Rat')
+			|| npc.HasTag('ACS_Plumard')
 			|| npc.HasTag('ACS_Tentacle_1') 
 			|| npc.HasTag('ACS_Tentacle_2') 
 			|| npc.HasTag('ACS_Tentacle_3') 
@@ -7909,7 +7916,7 @@ state ACS_Marker_Switch_Engage in cACS_Marker_Switch
 				)
 				{
 					dist = 1.5;
-					ang =	45;
+					ang =	55;
 
 					if( thePlayer.HasAbility('Runeword 2 _Stats', true) )
 					{
@@ -7929,7 +7936,7 @@ state ACS_Marker_Switch_Engage in cACS_Marker_Switch
 				)
 				{
 					dist = 1.5;
-					ang =	45;
+					ang =	55;
 
 					if( thePlayer.HasAbility('Runeword 2 _Stats', true) )
 					{
@@ -7947,7 +7954,7 @@ state ACS_Marker_Switch_Engage in cACS_Marker_Switch
 				else if ( thePlayer.HasTag('axii_sword_equipped') )
 				{
 					dist = 1.6;
-					ang =	45;	
+					ang =	55;	
 
 					if (thePlayer.HasTag('ACS_Sparagmos_Active'))
 					{
@@ -7964,12 +7971,12 @@ state ACS_Marker_Switch_Engage in cACS_Marker_Switch
 					)
 					{
 						dist = 2.25;
-						ang =	45;
+						ang =	55;
 					}
 					else if ( ACS_GetWeaponMode() == 3 )
 					{ 
 						dist = 1.75;
-						ang =	45;
+						ang =	55;
 					}
 				}
 				else if ( thePlayer.HasTag('aard_sword_equipped') )
@@ -8037,7 +8044,7 @@ state ACS_Marker_Switch_Engage in cACS_Marker_Switch
 				else if ( thePlayer.HasTag('quen_sword_equipped') )
 				{
 					dist = 1.6;
-					ang =	45;
+					ang =	55;
 
 					if (thePlayer.HasTag('ACS_Shadow_Dash_Empowered'))
 					{
@@ -8054,7 +8061,7 @@ state ACS_Marker_Switch_Engage in cACS_Marker_Switch
 					else
 					{
 						dist = 2.25;
-						ang =	45;
+						ang =	55;
 					}
 				}
 				else 
@@ -8192,6 +8199,7 @@ state ACS_Marker_Switch_Engage in cACS_Marker_Switch
 				&& !npc.HasTag('ACS_Vampire_Monster_Boss_Bar') 
 				&& !npc.HasTag('acs_snow_entity') 
 				&& !npc.HasTag('ACS_Rat_Mage_Rat') 
+				&& !npc.HasTag('ACS_Plumard')
 				&& !npc.HasTag('ACS_Svalblod_Bossbar') 
 				&& !npc.HasTag('ACS_Melusine_Bossbar') 
 				&& npc.IsAlive()
@@ -9162,6 +9170,7 @@ function ACS_Bat_Damage()
 		|| actortarget.HasTag('smokeman') 
 		|| ((CNewNPC)(actortarget)).IsHorse() 
 		|| actortarget.HasTag('ACS_Rat_Mage_Rat')
+		|| actortarget.HasTag('ACS_Plumard')
 		|| actortarget.HasTag('ACS_Tentacle_1') 
 		|| actortarget.HasTag('ACS_Tentacle_2') 
 		|| actortarget.HasTag('ACS_Tentacle_3') 
@@ -9242,6 +9251,7 @@ state ACS_Bats_Summon_Engage in cACS_Bats_Summon
 			|| actortarget.HasTag('ACS_Transformation_Vampire_Monster_Camera_Dummy') 
 			|| ((CNewNPC)(actortarget)).IsHorse() 
 			|| actortarget.HasTag('ACS_Rat_Mage_Rat')
+			|| actortarget.HasTag('ACS_Plumard')
 			|| actortarget.HasTag('ACS_Tentacle_1') 
 			|| actortarget.HasTag('ACS_Tentacle_2') 
 			|| actortarget.HasTag('ACS_Tentacle_3') 
@@ -14878,7 +14888,9 @@ class ACSHumanDeathCrawlController extends CEntity
 					&& !actor.UsesEssence()
 					)
 					{
-						actor.SetBehaviorMimicVariable( 'gameplayMimicsMode', (float)(int)GMM_Death );
+						actor.SetBehaviorMimicVariable( 'gameplayMimicsMode', (float)(int)GMM_Tpose );
+
+						actor.SetAnimationSpeedMultiplier(1);
 
 						animatedComponentA = (CAnimatedComponent)actor.GetComponentByClassName( 'CAnimatedComponent' );
 
@@ -15267,6 +15279,10 @@ class ACSHumanDeathCrawlController extends CEntity
 					actor.StopEffect('blood_spill');
 					actor.PlayEffectSingle('blood_spill');  
 
+					actor.SetAnimationSpeedMultiplier(1);
+
+					actor.SetBehaviorMimicVariable( 'gameplayMimicsMode', (float)(int)GMM_Tpose );
+
 					dismembermentComp = (CDismembermentComponent)(actor.GetComponentByClassName( 'CDismembermentComponent' ));
 
 					if( StrContains( NameToString(dismembermentComp.GetVisibleWoundName()), "head" ) 
@@ -15414,6 +15430,10 @@ class ACSHumanDeathCrawlController extends CEntity
 				)
 				{
 					actor.TurnOnRagdoll();
+
+					//actor.SetAnimationSpeedMultiplier(0);
+
+					actor.SetBehaviorMimicVariable( 'gameplayMimicsMode', (float)(int)GMM_Tpose );
 
 					this.DestroyAfter(10);
 				}
@@ -16632,6 +16652,160 @@ function GetACSTransformationWerewolf() : CActor
 	var entity 			 : CActor;
 	
 	entity = (CActor)theGame.GetEntityByTag( 'ACS_Transformation_Werewolf' );
+	return entity;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+statemachine class cACS_Spawn_Transformation_Red_Miasmal
+{
+    function Spawn_Transformation_Red_Miasmal_Engage()
+	{
+		this.PushState('Spawn_Transformation_Red_Miasmal_Engage');
+	}
+
+	function ACS_RedMiasmalBehSwitch_Engage()
+	{
+		this.PushState('ACS_RedMiasmalBehSwitch_Engage');
+	}
+}
+
+state Spawn_Transformation_Red_Miasmal_Engage in cACS_Spawn_Transformation_Red_Miasmal
+{
+	private var actor															: CActor;
+	private var ent																: CEntity;
+	private var temp															: CEntityTemplate;
+	private var meshcomp														: CComponent;
+	private var animcomp 														: CAnimatedComponent;
+	private var h 																: float;
+	private var p_comp															: CComponent;
+	private var apptemp															: CEntityTemplate;
+
+	var cameraTemplate															: CEntityTemplate;
+	var cameraEnt																: CEntity;
+
+	event OnEnterState(prevStateName : name)
+	{
+		super.OnEnterState(prevStateName);
+		GetACSTransformationRedMiasmal().Destroy();
+		Spawn_Transformation_Red_Miasmal_Entry();
+	}
+	
+	entry function Spawn_Transformation_Red_Miasmal_Entry()
+	{
+		Spawn_Transformation_Red_Miasmal_Latent();
+	}
+	
+	latent function Spawn_Transformation_Red_Miasmal_Latent()
+	{
+		temp = (CEntityTemplate)LoadResource( 
+
+		"dlc\dlc_acs\data\entities\transformation_entities\acs_red_miasmal.w2ent"
+			
+		, true );
+
+		ent = theGame.CreateEntity( temp, GetWitcherPlayer().GetWorldPosition(), GetWitcherPlayer().GetWorldRotation() );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 0.875;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+
+		((CNewNPC)ent).SetLevel(GetWitcherPlayer().GetLevel());
+
+		((CActor)ent).SetTemporaryAttitudeGroup( 'q104_avallach_friendly_to_all', AGP_Default );
+		((CNewNPC)ent).SetTemporaryAttitudeGroup( 'q104_avallach_friendly_to_all', AGP_Default );
+
+		((CNewNPC)ent).SetCanPlayHitAnim(false);
+
+		((CActor)ent).SetImmortalityMode( AIM_Invulnerable, AIC_Default, true );
+
+		((CActor)ent).AddBuffImmunity_AllNegative('ACS_Transformation_Red_Miasmal_Immunity_Negative', true); 
+		((CActor)ent).AddBuffImmunity_AllCritical('ACS_Transformation_Red_Miasmal_Immunity_Critical', true); 
+
+		ent.AddTag('ACS_Transformation_Red_Miasmal');
+
+		GetACSTransformationRedMiasmal().PlayEffectSingle('evil_appear');
+		GetACSTransformationRedMiasmal().StopEffect('evil_appear');
+
+		GetACSTransformationRedMiasmal().PlayEffectSingle('appear');
+		GetACSTransformationRedMiasmal().StopEffect('appear');
+
+		GetACSWatcher().CamerasDestroy();
+
+		cameraTemplate = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\entities\other\transformation_camera.w2ent", true);
+
+		cameraEnt = (CStaticCamera)theGame.CreateEntity(cameraTemplate, theCamera.GetCameraPosition(), theCamera.GetCameraRotation());	
+
+		cameraEnt.AddTag('ACS_Transformation_Custom_Camera');
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+state ACS_RedMiasmalBehSwitch_Engage in cACS_Spawn_Transformation_Red_Miasmal
+{
+	var p_actor 					: CActor;
+	var p_comp						: CComponent;
+	var temp						: CEntityTemplate;
+	var vampRot, adjustedRot 		: EulerAngles;
+	
+	event OnEnterState(prevStateName : name)
+	{
+		super.OnEnterState(prevStateName);
+		Beh_Switch_Entry();
+	}
+	
+	entry function Beh_Switch_Entry()
+	{	
+		LockEntryFunction(true);
+	
+		Beh_Switch_Latent();
+		
+		LockEntryFunction(false);
+	}
+	
+	latent function Beh_Switch_Latent()
+	{
+		p_actor = GetACSTransformationRedMiasmal();
+
+		p_comp = p_actor.GetComponentByClassName( 'CAppearanceComponent' );
+
+		if (!GetACSTransformationRedMiasmal().HasTag('ACS_Red_Miasmal_Giant_Mode'))
+		{
+			if ( GetACSTransformationRedMiasmal().GetBehaviorGraphInstanceName() != 'Combat_Giant' )
+			{
+				GetACSTransformationRedMiasmal().ActivateAndSyncBehavior( 'Combat_Giant' );
+			}
+
+			GetACSTransformationRedMiasmal().AddTag('ACS_Red_Miasmal_Giant_Mode');
+		}
+		else
+		{
+			if ( GetACSTransformationRedMiasmal().GetBehaviorGraphInstanceName() != 'Exploration' )
+			{
+				GetACSTransformationRedMiasmal().ActivateAndSyncBehavior( 'Exploration' );
+			}
+
+			GetACSTransformationRedMiasmal().RemoveTag('ACS_Red_Miasmal_Giant_Mode');
+		}
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+function GetACSTransformationRedMiasmal() : CActor
+{
+	var entity 			 : CActor;
+	
+	entity = (CActor)theGame.GetEntityByTag( 'ACS_Transformation_Red_Miasmal' );
 	return entity;
 }
 
@@ -21524,7 +21698,7 @@ state EtherSword_Spawner_Engage in cACS_EtherSword_Summon
 
 			//sword_trail_1.PlayEffectSingle('arrow_trail_fire_2');
 
-			thePlayer.SoundEvent("magic_sorceress_vfx_lightning_fx_loop_start");
+			//thePlayer.SoundEvent("magic_sorceress_vfx_lightning_fx_loop_start");
 		}
 
 		//sword_trail_1.DestroyAfter(10);
@@ -23234,6 +23408,7 @@ function ACS_FriendlyWolves()
 			&& !actor.UsesEssence()
 			&& !npc.IsInInterior()
 			&& !thePlayer.IsInInterior()
+			&& ((CNewNPC)npc).GetNPCType() != ENGT_Quest
 			)
 			{
 				if (targetDistance < 2 * 2)
@@ -23285,6 +23460,19 @@ function ACS_FriendlyWolves()
 
 function ACS_Sneaking()
 {
+	if (thePlayer.HasTag('ACS_Is_Sneaking')
+	)
+	{
+		ACS_Sneaking_For_Hostile();
+	}
+	else
+	{
+		ACS_Sneaking_Revert();
+	}
+}
+
+function ACS_Sneaking_For_Hostile()
+{
 	var actor, actortarget								: CActor; 
 	var actors, targets		    						: array<CActor>;
 	var i, j											: int;
@@ -23295,7 +23483,7 @@ function ACS_Sneaking()
 	
 	actors.Clear();
 
-	actors = thePlayer.GetNPCsAndPlayersInRange( 50, 20, , FLAG_OnlyAliveActors + FLAG_ExcludePlayer);
+	actors = thePlayer.GetNPCsAndPlayersInRange( 50, 20, , FLAG_OnlyAliveActors + FLAG_ExcludePlayer + FLAG_Attitude_Hostile);
 
 	if( actors.Size() <= 0 )
 	{
@@ -23312,102 +23500,136 @@ function ACS_Sneaking()
 
 			targetDistance = VecDistanceSquared2D( ((CActor)actors[i]).GetWorldPosition(), GetWitcherPlayer().GetWorldPosition() );
 
-			if (!actor.HasAbility('mon_wolf_base'))
+			if (!actor.HasAbility('mon_wolf_base')
+			&& ((CNewNPC)actor).GetNPCType() != ENGT_Quest
+			&& !actor.IsAnimal()
+			)
 			{
-				if (thePlayer.HasTag('ACS_Is_Sneaking')
-				)
+				if (targetDistance < 15 * 15)
 				{
-					if (targetDistance < 15 * 15)
+					if( GetRainStrength() > 0 ) 
 					{
-						if( GetRainStrength() > 0 ) 
+						if (npc.IsMonster())
 						{
-							if (npc.IsMonster())
-							{
-								actorSightCone = 225;
+							actorSightCone = 225;
 
-								actorSightRange = 15;
-							}
-							else
-							{
-								actorSightCone = 135;
-
-								actorSightRange = 12;
-							}
+							actorSightRange = 15;
 						}
 						else
 						{
-							if (npc.IsMonster())
-							{
-								actorSightCone = 270;
+							actorSightCone = 135;
 
-								actorSightRange = 17;
-							}
-							else
-							{
-								actorSightCone = 180;
-
-								actorSightRange = 15;
-							}
+							actorSightRange = 12;
 						}
-
-						targets.Clear();
-
-						targets = actor.GetNPCsAndPlayersInCone(15, VecHeading(actor.GetHeadingVector()), actorSightCone, 50, , FLAG_OnlyAliveActors );
-
-						if( targets.Size() > 0 )
+					}
+					else
+					{
+						if (npc.IsMonster())
 						{
-							for( j = 0; j < targets.Size(); j += 1 )
+							actorSightCone = 270;
+
+							actorSightRange = 17;
+						}
+						else
+						{
+							actorSightCone = 180;
+
+							actorSightRange = 15;
+						}
+					}
+
+					targets.Clear();
+
+					targets = actor.GetNPCsAndPlayersInCone(15, VecHeading(actor.GetHeadingVector()), actorSightCone, 50, , FLAG_OnlyAliveActors );
+
+					if( targets.Size() > 0 )
+					{
+						for( j = 0; j < targets.Size(); j += 1 )
+						{
+							targetPlayer = (CPlayer)targets[j];
+
+							if (targetPlayer)
 							{
-								targetPlayer = (CPlayer)targets[j];
-
-								if (targetPlayer)
+								if (!actor.HasTag('ACS_Sneaking_Hostile') 
+								&& actor.GetAttitude( thePlayer ) != AIA_Hostile
+								&& ((CNewNPC)actor).GetNPCType() != ENGT_Quest
+								)
 								{
-									if (!actor.HasTag('ACS_Sneaking_Hostile') && actor.GetAttitude( thePlayer ) != AIA_Hostile)
-									{
-										((CNewNPC)actor).ResetAttitude(thePlayer);
+									((CNewNPC)actor).ResetAttitude(thePlayer);
 
-										((CNewNPC)actor).ResetBaseAttitudeGroup();
+									((CNewNPC)actor).ResetBaseAttitudeGroup();
 
-										((CNewNPC)actor).SetAttitude(thePlayer, AIA_Hostile);
+									((CNewNPC)actor).SetAttitude(thePlayer, AIA_Hostile);
 
-										actor.AddTag('ACS_Sneaking_Hostile');
-									}
+									actor.AddTag('ACS_Sneaking_Hostile');
 								}
 							}
 						}
-						else
-						{
-							break;
-						}
-					}
-					else if (targetDistance >= 15 * 15)
-					{
-						if (!actor.HasTag('ACS_Sneaking_Neutral') && actor.GetAttitude( thePlayer ) == AIA_Hostile)
-						{
-							((CNewNPC)actor).SetAttitude(thePlayer, AIA_Neutral);
-							
-							//((CNewNPC)actor).SetTemporaryAttitudeGroup( 'friendly_to_player', AGP_Default );	
-
-							((CNewNPC)actor).ForgetActor(thePlayer);
-
-							actor.AddTag('ACS_Sneaking_Neutral');
-						}
 					}
 				}
-				else
+				else if (targetDistance >= 15 * 15)
 				{
-					if (actor.HasTag('ACS_Sneaking_Neutral') && actor.GetAttitude( thePlayer ) != AIA_Hostile)
+					if (!actor.HasTag('ACS_Sneaking_Neutral') && actor.GetAttitude( thePlayer ) == AIA_Hostile)
 					{
-						((CNewNPC)actor).ResetAttitude(thePlayer);
+						((CNewNPC)actor).SetAttitude(thePlayer, AIA_Neutral);
+						
+						//((CNewNPC)actor).SetTemporaryAttitudeGroup( 'friendly_to_player', AGP_Default );	
 
-						((CNewNPC)actor).ResetBaseAttitudeGroup();
+						((CNewNPC)actor).ForgetActor(thePlayer);
 
-						((CNewNPC)actor).SetAttitude(thePlayer, AIA_Hostile);
-
-						actor.RemoveTag('ACS_Sneaking_Hostile');
-
-						actor.RemoveTag('ACS_Sneaking_Neutral');
+						actor.AddTag('ACS_Sneaking_Neutral');
 					}
+				}
+			}
+		}
+	}
+}
+
+function ACS_Sneaking_Revert()
+{
+	var actor, actortarget								: CActor; 
+	var actors, targets		    						: array<CActor>;
+	var i, j											: int;
+	var npc												: CNewNPC;
+	var targetDistance									: float;
+	var targetPlayer									: CPlayer;
+	var actorSightCone, actorSightRange					: float;
+	
+	actors.Clear();
+
+	theGame.GetActorsByTag( 'ACS_Sneaking_Neutral', actors );	
+
+	if( actors.Size() <= 0 )
+	{
+		return;
+	}
+
+	if( actors.Size() > 0 )
+	{
+		for( i = 0; i < actors.Size(); i += 1 )
+		{
+			npc = (CNewNPC)actors[i];
+
+			actor = actors[i];
+
+			targetDistance = VecDistanceSquared2D( ((CActor)actors[i]).GetWorldPosition(), GetWitcherPlayer().GetWorldPosition() );
+
+			if (!actor.HasAbility('mon_wolf_base')
+			&& ((CNewNPC)actor).GetNPCType() != ENGT_Quest
+			&& !actor.IsAnimal()
+			)
+			{
+				if (actor.HasTag('ACS_Sneaking_Neutral'))
+				{
+					((CNewNPC)actor).ResetAttitude(thePlayer);
+
+					((CNewNPC)actor).ResetBaseAttitudeGroup();
+
+					((CNewNPC)actor).SetAttitude(thePlayer, AIA_Hostile);
+
+					actor.RemoveTag('ACS_Sneaking_Hostile');
+
+					actor.RemoveTag('ACS_Sneaking_Neutral');
 				}
 			}
 		}

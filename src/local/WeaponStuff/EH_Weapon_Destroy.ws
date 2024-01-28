@@ -61,7 +61,7 @@ function ACS_WeaponDestroyInit()
 	{
 		GetACSArmorEtherSword().Destroy();
 
-		thePlayer.SoundEvent("magic_sorceress_vfx_lightning_fx_loop_stop");
+		//thePlayer.SoundEvent("magic_sorceress_vfx_lightning_fx_loop_stop");
 	}
 }
 
@@ -128,7 +128,7 @@ function ACS_WeaponDestroyIMMEDIATEInit()
 	{
 		GetACSArmorEtherSword().Destroy();
 
-		thePlayer.SoundEvent("magic_sorceress_vfx_lightning_fx_loop_stop");
+		//thePlayer.SoundEvent("magic_sorceress_vfx_lightning_fx_loop_stop");
 	}
 }
 
@@ -179,7 +179,7 @@ function ACS_WeaponDestroyInit_WITHOUT_HIDESWORD()
 	{
 		GetACSArmorEtherSword().Destroy();
 
-		thePlayer.SoundEvent("magic_sorceress_vfx_lightning_fx_loop_stop");
+		//thePlayer.SoundEvent("magic_sorceress_vfx_lightning_fx_loop_stop");
 	}
 }
 
@@ -230,7 +230,7 @@ function ACS_WeaponDestroyInit_WITHOUT_HIDESWORD_IMMEDIATE()
 	{
 		GetACSArmorEtherSword().Destroy();
 
-		thePlayer.SoundEvent("magic_sorceress_vfx_lightning_fx_loop_stop");
+		//thePlayer.SoundEvent("magic_sorceress_vfx_lightning_fx_loop_stop");
 	}
 }
 
@@ -316,7 +316,7 @@ function ACS_Weapon_Invisible()
 	{
 		GetACSArmorEtherSword().Destroy();
 
-		thePlayer.SoundEvent("magic_sorceress_vfx_lightning_fx_loop_stop");
+		//thePlayer.SoundEvent("magic_sorceress_vfx_lightning_fx_loop_stop");
 	}
 	
 	ACS_Sword_Trail_1().StopAllEffects();
@@ -569,9 +569,12 @@ state ClawEquip_OnDodge_Engage in cACS_ClawEquip_OnDodge
 
 				((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(claw_temp);
 
-				claw_temp = (CEntityTemplate)LoadResource(	"dlc\dlc_acs\data\entities\swords\vamp_claws.w2ent", true);	
+				if (!ACS_HideVampireClaws_Enabled())
+				{
+					claw_temp = (CEntityTemplate)LoadResource(	"dlc\dlc_acs\data\entities\swords\vamp_claws.w2ent", true);	
 
-				((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(claw_temp);
+					((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(claw_temp);
+				}
 			}
 		}
 	}
@@ -637,9 +640,12 @@ state ClawDestroy_NOTAG_Engage in cClawDestroy_NOTAG
 
 			((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(claw_temp);
 
-			claw_temp = (CEntityTemplate)LoadResource(	"dlc\dlc_acs\data\entities\swords\vamp_claws.w2ent", true);	
+			if (!ACS_HideVampireClaws_Enabled())
+			{
+				claw_temp = (CEntityTemplate)LoadResource(	"dlc\dlc_acs\data\entities\swords\vamp_claws.w2ent", true);	
 
-			((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(claw_temp);
+				((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(claw_temp);
+			}
 
 			//GetWitcherPlayer().PlayEffectSingle('claws_effect');
 			//GetWitcherPlayer().StopEffect('claws_effect');

@@ -15768,6 +15768,10 @@ function ACS_PirateZombieController()
 			GetACSPirateZombie().StopEffect('special_attack_only_black_fx');
 		}
 	}
+	else
+	{
+		return;
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -17399,6 +17403,159 @@ function GetACSShadowPixieIdleAction()
 	}
 }
 
+function GetACSPlumardIdleAction()
+{	
+	var actors, actors2 								: array<CActor>;
+	var i												: int;
+	var actor											: CActor; 
+	var j												: int;
+	var npc												: CNewNPC;
+
+	actors.Clear();
+
+	theGame.GetActorsByTag( 'ACS_Plumard', actors );	
+
+	if (actors.Size() <= 0)
+	{
+		return;
+	}
+	
+	for( i = 0; i < actors.Size(); i += 1 )
+	{
+		((CNewNPC)actors[i]).SetAttitude(thePlayer, AIA_Hostile);
+
+		actors2.Clear();
+
+		actors2 = actors[i].GetNPCsAndPlayersInRange( 50, 20, , FLAG_OnlyAliveActors + FLAG_ExcludePlayer  );
+		{
+			if( actors2.Size() > 0 )
+			{
+				for( j = 0; j < actors2.Size(); j += 1 )
+				{
+					npc = (CNewNPC)actors2[j];
+
+					actor = actors2[j];
+
+					if (npc.HasTag('ACS_Plumard'))
+					{
+						((CNewNPC)actors[i]).SetAttitude(npc, AIA_Friendly);
+
+						npc.SetAttitude(((CNewNPC)actors[i]), AIA_Friendly);
+					}
+					else
+					{
+						((CNewNPC)actors[i]).SetAttitude(npc, AIA_Hostile);
+
+						npc.SetAttitude(((CNewNPC)actors[i]), AIA_Hostile);
+					}
+				}
+			}
+		}
+	}
+}
+
+function GetACSMaerolornIdleAction()
+{	
+	var actors, actors2 								: array<CActor>;
+	var i												: int;
+	var actor											: CActor; 
+	var j												: int;
+	var npc												: CNewNPC;
+
+	actors.Clear();
+
+	theGame.GetActorsByTag( 'ACS_Maerolorn', actors );	
+
+	if (actors.Size() <= 0)
+	{
+		return;
+	}
+	
+	for( i = 0; i < actors.Size(); i += 1 )
+	{
+		((CNewNPC)actors[i]).SetAttitude(thePlayer, AIA_Hostile);
+
+		actors2.Clear();
+
+		actors2 = actors[i].GetNPCsAndPlayersInRange( 50, 20, , FLAG_OnlyAliveActors + FLAG_ExcludePlayer  );
+		{
+			if( actors2.Size() > 0 )
+			{
+				for( j = 0; j < actors2.Size(); j += 1 )
+				{
+					npc = (CNewNPC)actors2[j];
+
+					actor = actors2[j];
+
+					if (npc.HasTag('ACS_Maerolorn'))
+					{
+						((CNewNPC)actors[i]).SetAttitude(npc, AIA_Friendly);
+
+						npc.SetAttitude(((CNewNPC)actors[i]), AIA_Friendly);
+					}
+					else
+					{
+						((CNewNPC)actors[i]).SetAttitude(npc, AIA_Hostile);
+
+						npc.SetAttitude(((CNewNPC)actors[i]), AIA_Hostile);
+					}
+				}
+			}
+		}
+	}
+}
+
+function GetACSHellhoundIdleAction()
+{	
+	var actors, actors2 								: array<CActor>;
+	var i												: int;
+	var actor											: CActor; 
+	var j												: int;
+	var npc												: CNewNPC;
+
+	actors.Clear();
+
+	theGame.GetActorsByTag( 'ACS_Hellhound_Pack', actors );	
+
+	if (actors.Size() <= 0)
+	{
+		return;
+	}
+	
+	for( i = 0; i < actors.Size(); i += 1 )
+	{
+		((CNewNPC)actors[i]).SetAttitude(thePlayer, AIA_Hostile);
+
+		actors2.Clear();
+
+		actors2 = actors[i].GetNPCsAndPlayersInRange( 50, 20, , FLAG_OnlyAliveActors + FLAG_ExcludePlayer  );
+		{
+			if( actors2.Size() > 0 )
+			{
+				for( j = 0; j < actors2.Size(); j += 1 )
+				{
+					npc = (CNewNPC)actors2[j];
+
+					actor = actors2[j];
+
+					if (npc.HasTag('ACS_Hellhound_Pack'))
+					{
+						((CNewNPC)actors[i]).SetAttitude(npc, AIA_Friendly);
+
+						npc.SetAttitude(((CNewNPC)actors[i]), AIA_Friendly);
+					}
+					else
+					{
+						((CNewNPC)actors[i]).SetAttitude(npc, AIA_Hostile);
+
+						npc.SetAttitude(((CNewNPC)actors[i]), AIA_Hostile);
+					}
+				}
+			}
+		}
+	}
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 statemachine class cACS_Draug_Spawner
@@ -18137,6 +18294,12 @@ function ACS_Spawn_Big_Hym( npc : CActor, pos : Vector )
 
 		((CActor)ent).AddBuffImmunity(EET_Swarm , 'ACS_Big_Hym_Buff', true);
 
+		((CActor)ent).AddBuffImmunity(EET_Knockdown , 'ACS_Big_Hym_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_HeavyKnockdown , 'ACS_Big_Hym_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_KnockdownTypeApplicator , 'ACS_Big_Hym_Buff', true);
+
 		((CActor)ent).AddTag( 'ContractTarget' );
 
 		((CActor)ent).AddTag('IsBoss');
@@ -18332,59 +18495,19 @@ state ACS_Elderblood_Assassin_Engage in cACS_Elderblood_Assassin
 			((CNewNPC)ent).SetAttitude(thePlayer, AIA_Hostile);
 			((CActor)ent).SetAnimationSpeedMultiplier(1);
 
-			((CActor)ent).SetCanPlayHitAnim(false);
-
-			((CActor)ent).AddBuffImmunity(EET_Poison, 'ACS_Enemy_Buff', true);
-
-			((CActor)ent).AddBuffImmunity(EET_PoisonCritical , 'ACS_Enemy_Buff', true);
-
-			((CActor)ent).AddBuffImmunity(EET_Bleeding , 'ACS_Enemy_Buff', true);
-
-			((CActor)ent).AddBuffImmunity(EET_Weaken , 'ACS_Enemy_Buff', true);
-
-			((CActor)ent).AddBuffImmunity(EET_WeakeningAura , 'ACS_Enemy_Buff', true);
-
-			((CActor)ent).AddBuffImmunity(EET_Confusion , 'ACS_Enemy_Buff', true);
-
-			((CActor)ent).AddBuffImmunity(EET_Hypnotized , 'ACS_Enemy_Buff', true);
-
-			((CActor)ent).AddBuffImmunity(EET_AxiiGuardMe , 'ACS_Enemy_Buff', true);
-
-			((CActor)ent).AddBuffImmunity(EET_Immobilized , 'ACS_Enemy_Buff', true);
-
-			((CActor)ent).AddBuffImmunity(EET_Paralyzed , 'ACS_Enemy_Buff', true);
-
-			((CActor)ent).AddBuffImmunity(EET_Blindness , 'ACS_Enemy_Buff', true);
-
-			((CActor)ent).AddBuffImmunity(EET_Choking , 'ACS_Enemy_Buff', true);
-
-			((CActor)ent).AddBuffImmunity(EET_Swarm , 'ACS_Enemy_Buff', true);
-
-			((CActor)ent).AddBuffImmunity(EET_Knockdown , 'ACS_Enemy_Buff', true);
-
-			((CActor)ent).AddBuffImmunity(EET_HeavyKnockdown , 'ACS_Enemy_Buff', true);
+			//((CActor)ent).SetCanPlayHitAnim(false);
 
 			((CActor)ent).AddTag( 'ContractTarget' );
 
 			((CActor)ent).AddTag('IsBoss');
 
-			//((CActor)ent).AddTag('ACS_Legolas');
-
-			//((CActor)ent).AddTag('ACS_Big_Boi');
-
 			((CActor)ent).AddAbility('Boss');
 
 			((CActor)ent).AddAbility('BounceBoltsWildhunt');
 
-			//((CActor)ent).RemoveAbility('Venom');
-
 			ent.AddTag('NoBestiaryEntry');
 
 			ent.PlayEffect('demonic_possession');
-
-			//ent.PlayEffect('default_fx');
-
-			//ent.PlayEffect('him_smoke_red');
 
 			ent.AddTag( 'ACS_Elderblood_Assassin' );
 
@@ -18448,7 +18571,7 @@ function ACS_ElderbloodAssassinSmokeScreen( npc : CActor, pos : Vector )
 
 	playerRot = npc.GetWorldRotation();
 	
-	count = 2;
+	count = RandRange(4,2);
 		
 	for( i = 0; i < count; i += 1 )
 	{
@@ -18472,59 +18595,17 @@ function ACS_ElderbloodAssassinSmokeScreen( npc : CActor, pos : Vector )
 		((CNewNPC)ent).SetAttitude(thePlayer, AIA_Hostile);
 		((CActor)ent).SetAnimationSpeedMultiplier(1);
 
-		((CActor)ent).SetCanPlayHitAnim(false);
-
-		((CActor)ent).AddBuffImmunity(EET_Poison, 'ACS_Enemy_Buff', true);
-
-		((CActor)ent).AddBuffImmunity(EET_PoisonCritical , 'ACS_Enemy_Buff', true);
-
-		((CActor)ent).AddBuffImmunity(EET_Bleeding , 'ACS_Enemy_Buff', true);
-
-		((CActor)ent).AddBuffImmunity(EET_Weaken , 'ACS_Enemy_Buff', true);
-
-		((CActor)ent).AddBuffImmunity(EET_WeakeningAura , 'ACS_Enemy_Buff', true);
-
-		((CActor)ent).AddBuffImmunity(EET_Confusion , 'ACS_Enemy_Buff', true);
-
-		((CActor)ent).AddBuffImmunity(EET_Hypnotized , 'ACS_Enemy_Buff', true);
-
-		((CActor)ent).AddBuffImmunity(EET_AxiiGuardMe , 'ACS_Enemy_Buff', true);
-
-		((CActor)ent).AddBuffImmunity(EET_Immobilized , 'ACS_Enemy_Buff', true);
-
-		((CActor)ent).AddBuffImmunity(EET_Paralyzed , 'ACS_Enemy_Buff', true);
-
-		((CActor)ent).AddBuffImmunity(EET_Blindness , 'ACS_Enemy_Buff', true);
-
-		((CActor)ent).AddBuffImmunity(EET_Choking , 'ACS_Enemy_Buff', true);
-
-		((CActor)ent).AddBuffImmunity(EET_Swarm , 'ACS_Enemy_Buff', true);
-
-		((CActor)ent).AddBuffImmunity(EET_Knockdown , 'ACS_Enemy_Buff', true);
-
-		((CActor)ent).AddBuffImmunity(EET_HeavyKnockdown , 'ACS_Enemy_Buff', true);
-
 		((CActor)ent).AddTag( 'ContractTarget' );
 
 		((CActor)ent).AddTag('IsBoss');
-
-		//((CActor)ent).AddTag('ACS_Legolas');
-
-		//((CActor)ent).AddTag('ACS_Big_Boi');
 
 		((CActor)ent).AddAbility('Boss');
 
 		((CActor)ent).AddAbility('BounceBoltsWildhunt');
 
-		//((CActor)ent).RemoveAbility('Venom');
-
 		ent.AddTag('NoBestiaryEntry');
 
 		ent.PlayEffect('demonic_possession');
-
-		//ent.PlayEffect('default_fx');
-
-		//ent.PlayEffect('him_smoke_red');
 
 		ent.AddTag( 'ACS_Elderblood_Assassin_Clone' );
 
@@ -18533,6 +18614,15 @@ function ACS_ElderbloodAssassinSmokeScreen( npc : CActor, pos : Vector )
 		ent.PlayEffect('appear');
 
 		ent.PlayEffect('appear_cutscene');
+
+		if (((CActor)ent).UsesVitality())
+		{
+			((CActor)ent).DrainVitality(((CActor)ent).GetStat(BCS_Vitality) * 0.5);
+		}
+		else if (((CActor)ent).UsesEssence())
+		{
+			((CActor)ent).DrainEssence(((CActor)ent).GetStat(BCS_Essence) * 0.5);
+		}
 	}
 }
 
@@ -18961,6 +19051,12 @@ statemachine class CACSHeartMiniboss extends CNewNPC
 
 						((CActor)ent).AddBuffImmunity(EET_Swarm , 'ACS_Enemy_Buff', true);
 
+						((CActor)ent).AddBuffImmunity(EET_Knockdown , 'ACS_Enemy_Buff', true);
+
+						((CActor)ent).AddBuffImmunity(EET_HeavyKnockdown , 'ACS_Enemy_Buff', true);
+
+						((CActor)ent).AddBuffImmunity(EET_KnockdownTypeApplicator , 'ACS_Enemy_Buff', true);
+
 						((CActor)ent).AddTag( 'ContractTarget' );
 
 						((CActor)ent).AddTag('IsBoss');
@@ -19049,6 +19145,12 @@ statemachine class CACSHeartMiniboss extends CNewNPC
 					((CActor)ent).AddBuffImmunity(EET_Choking , 'ACS_Enemy_Buff', true);
 
 					((CActor)ent).AddBuffImmunity(EET_Swarm , 'ACS_Enemy_Buff', true);
+
+					((CActor)ent).AddBuffImmunity(EET_Knockdown , 'ACS_Enemy_Buff', true);
+
+					((CActor)ent).AddBuffImmunity(EET_HeavyKnockdown , 'ACS_Enemy_Buff', true);
+
+					((CActor)ent).AddBuffImmunity(EET_KnockdownTypeApplicator , 'ACS_Enemy_Buff', true);
 
 					((CActor)ent).AddTag( 'ContractTarget' );
 
@@ -19151,6 +19253,12 @@ statemachine class CACSHeartMiniboss extends CNewNPC
 						((CActor)ent).AddBuffImmunity(EET_Choking , 'ACS_Enemy_Buff', true);
 
 						((CActor)ent).AddBuffImmunity(EET_Swarm , 'ACS_Enemy_Buff', true);
+
+						((CActor)ent).AddBuffImmunity(EET_Knockdown , 'ACS_Enemy_Buff', true);
+
+						((CActor)ent).AddBuffImmunity(EET_HeavyKnockdown , 'ACS_Enemy_Buff', true);
+
+						((CActor)ent).AddBuffImmunity(EET_KnockdownTypeApplicator , 'ACS_Enemy_Buff', true);
 
 						((CActor)ent).AddTag( 'ContractTarget' );
 
@@ -19363,6 +19471,12 @@ statemachine class CACSHeartMiniboss extends CNewNPC
 
 					((CActor)ent).AddBuffImmunity(EET_Swarm , 'ACS_Enemy_Buff', true);
 
+					((CActor)ent).AddBuffImmunity(EET_Knockdown , 'ACS_Enemy_Buff', true);
+
+					((CActor)ent).AddBuffImmunity(EET_HeavyKnockdown , 'ACS_Enemy_Buff', true);
+
+					((CActor)ent).AddBuffImmunity(EET_KnockdownTypeApplicator , 'ACS_Enemy_Buff', true);
+
 					((CActor)ent).AddTag( 'ContractTarget' );
 
 					((CActor)ent).AddTag('IsBoss');
@@ -19452,6 +19566,12 @@ statemachine class CACSHeartMiniboss extends CNewNPC
 					((CActor)ent).AddBuffImmunity(EET_Choking , 'ACS_Enemy_Buff', true);
 
 					((CActor)ent).AddBuffImmunity(EET_Swarm , 'ACS_Enemy_Buff', true);
+
+					((CActor)ent).AddBuffImmunity(EET_Knockdown , 'ACS_Enemy_Buff', true);
+
+					((CActor)ent).AddBuffImmunity(EET_HeavyKnockdown , 'ACS_Enemy_Buff', true);
+
+					((CActor)ent).AddBuffImmunity(EET_KnockdownTypeApplicator , 'ACS_Enemy_Buff', true);
 
 					((CActor)ent).AddTag( 'ContractTarget' );
 
@@ -20242,9 +20362,21 @@ statemachine class CACSMonsterSpawner extends CEntity
 
 	timer function PlayerDistanceCheck ( dt : float, id : int )
 	{
+		if (this.HasTag('ACS_MonsterSpawner_HorseRidersNovigrad')
+		|| this.HasTag('ACS_MonsterSpawner_HorseRidersRedania')
+		|| this.HasTag('ACS_MonsterSpawner_HorseRidersNilfgaard')
+		)
+		{
+			if ( this.HasTag('ACS_MonsterSpawner_POI_Point'))
+			{
+				this.RemoveTag('ACS_MonsterSpawner_POI_Point');
+			}
+		}
+
 		targetDistance = VecDistanceSquared2D( thePlayer.GetWorldPosition(), pos );
 
-		if (targetDistance <= (GetDistance() * GetDistance()) 
+		if (
+		( targetDistance > 5 * 5 && targetDistance <= (GetDistance() * GetDistance()) )
 		&& IsEntityOutsideOfCameraFrame()
 		&& thePlayer.IsOnGround()
 		&& !thePlayer.IsInInterior()
@@ -20252,6 +20384,10 @@ statemachine class CACSMonsterSpawner extends CEntity
 		&& !thePlayer.IsInNonGameplayCutscene() 
 		&& !thePlayer.IsInGameplayScene()
 		&& !thePlayer.IsCiri()
+		&& !theGame.IsCurrentlyPlayingNonGameplayScene()
+		&& !theGame.IsFading()
+		&& !theGame.IsBlackscreen()
+		&& !theGame.IsPaused() 
 		)
 		{
 			if (!this.HasTag('ACS_MonsterSpawner_Activated'))
@@ -20563,7 +20699,142 @@ statemachine class CACSMonsterSpawner extends CEntity
 					RemoveSpawner();
 					return;
 				}
+				
+				if (this.HasTag('ACS_MonsterSpawner_ViyOfMaribor'))
+				{
+					this.PushState('ACS_MonsterSpawner_ViyOfMaribor');
+					RemoveSpawner();
+					return;
+				}
 
+				if (this.HasTag('ACS_MonsterSpawner_Phooca'))
+				{
+					this.PushState('ACS_MonsterSpawner_Phooca');
+					RemoveSpawner();
+					return;
+				}
+
+				if (this.HasTag('ACS_MonsterSpawner_Plumard'))
+				{
+					this.PushState('ACS_MonsterSpawner_Plumard');
+					RemoveSpawner();
+					return;
+				}
+
+				if (this.HasTag('ACS_MonsterSpawner_GiantRockTroll'))
+				{
+					this.PushState('ACS_MonsterSpawner_GiantRockTroll');
+					RemoveSpawner();
+					return;
+				}
+
+				if (this.HasTag('ACS_MonsterSpawner_GiantIceTroll'))
+				{
+					this.PushState('ACS_MonsterSpawner_GiantIceTroll');
+					RemoveSpawner();
+					return;
+				}
+
+				if (this.HasTag('ACS_MonsterSpawner_GiantMagmaTroll'))
+				{
+					this.PushState('ACS_MonsterSpawner_GiantMagmaTroll');
+					RemoveSpawner();
+					return;
+				}
+
+				if (this.HasTag('ACS_MonsterSpawner_TheBeast'))
+				{
+					this.PushState('ACS_MonsterSpawner_TheBeast');
+					RemoveSpawner();
+					return;
+				}
+
+				if (this.HasTag('ACS_MonsterSpawner_ElementalTitanOfFire'))
+				{
+					this.PushState('ACS_MonsterSpawner_ElementalTitanOfFire');
+					RemoveSpawner();
+					return;
+				}
+
+				if (this.HasTag('ACS_MonsterSpawner_ElementalTitanOfTerra'))
+				{
+					this.PushState('ACS_MonsterSpawner_ElementalTitanOfTerra');
+					RemoveSpawner();
+					return;
+				}
+
+				if (this.HasTag('ACS_MonsterSpawner_ElementalTitanOfIce'))
+				{
+					this.PushState('ACS_MonsterSpawner_ElementalTitanOfIce');
+					RemoveSpawner();
+					return;
+				}
+
+				if (this.HasTag('ACS_MonsterSpawner_DarkKnight'))
+				{
+					this.PushState('ACS_MonsterSpawner_DarkKnight');
+					RemoveSpawner();
+					return;
+				}
+
+				if (this.HasTag('ACS_MonsterSpawner_DarkKnightCalidus'))
+				{
+					this.PushState('ACS_MonsterSpawner_DarkKnightCalidus');
+					RemoveSpawner();
+					return;
+				}
+
+				if (this.HasTag('ACS_MonsterSpawner_Voref'))
+				{
+					this.PushState('ACS_MonsterSpawner_Voref');
+					RemoveSpawner();
+					return;
+				}
+
+				if (this.HasTag('ACS_MonsterSpawner_Maerolorn'))
+				{
+					this.PushState('ACS_MonsterSpawner_Maerolorn');
+					RemoveSpawner();
+					return;
+				}
+
+				if (this.HasTag('ACS_MonsterSpawner_Ifrit'))
+				{
+					this.PushState('ACS_MonsterSpawner_Ifrit');
+					RemoveSpawner();
+					return;
+				}
+
+				if (this.HasTag('ACS_MonsterSpawner_Carduin'))
+				{
+					this.PushState('ACS_MonsterSpawner_Carduin');
+					RemoveSpawner();
+					return;
+				}
+
+
+				/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+				if (this.HasTag('ACS_MonsterSpawner_HorseRidersNovigrad'))
+				{
+					this.PushState('ACS_MonsterSpawner_HorseRidersNovigrad');
+					RemoveSpawner();
+					return;
+				}
+
+				if (this.HasTag('ACS_MonsterSpawner_HorseRidersRedania'))
+				{
+					this.PushState('ACS_MonsterSpawner_HorseRidersRedania');
+					RemoveSpawner();
+					return;
+				}
+
+				if (this.HasTag('ACS_MonsterSpawner_HorseRidersNilfgaard'))
+				{
+					this.PushState('ACS_MonsterSpawner_HorseRidersNilfgaard');
+					RemoveSpawner();
+					return;
+				}
 
 				
 				this.PushState('ACS_MonsterSpawner_Default');
@@ -20626,11 +20897,17 @@ state ACS_MonsterSpawner_Default in CACSMonsterSpawner
 
 		temp = (CEntityTemplate)LoadResourceAsync( 
 
-		"dlc\bob\data\quests\main_quests\quest_files\q704b_fairy_tale\entities\q704_wolpertinger.w2ent"
+		//"dlc\bob\data\quests\main_quests\quest_files\q704b_fairy_tale\entities\q704_wolpertinger.w2ent"
 
-		//"dlc\bob\data\quests\main_quests\quest_files\q704b_fairy_tale\entities\imps\q704_ft_pixie_01.w2ent"
+		//"dlc\dlc_acs_test\data\entities\monsters\kikimore_queen.w2ent"
 
-		//"dlc\ep1\data\quests\quest_files\q604_mansion\characters\q604_caretaker.w2ent"
+		//"dlc\dlc_acs_test\data\entities\monsters\voref.w2ent"
+
+		//"dlc\ep1\data\quests\quest_files\q605_finale\characters\q605_shadow_fogling.w2ent"
+
+		//"dlc\dlc_acs_test\data\entities\monsters\hare_aggressive.w2ent"
+
+		"dlc\dlc_acs\data\entities\mages\carduin_of_lan_exeter.w2ent"
 			
 		, true );
 
@@ -20664,7 +20941,7 @@ state ACS_MonsterSpawner_Default in CACSMonsterSpawner
 			((CNewNPC)ent).SetAttitude(thePlayer, AIA_Hostile);
 			((CActor)ent).SetAnimationSpeedMultiplier(1);
 
-			((CActor)ent).SetCanPlayHitAnim(false);
+			((CActor)ent).SetCanPlayHitAnim(true);
 
 			((CActor)ent).AddBuffImmunity(EET_Poison, 'ACS_Enemy_Buff', true);
 
@@ -20696,33 +20973,47 @@ state ACS_MonsterSpawner_Default in CACSMonsterSpawner
 
 			((CActor)ent).AddBuffImmunity(EET_HeavyKnockdown , 'ACS_Enemy_Buff', true);
 
-			((CActor)ent).AddTag( 'ContractTarget' );
+			//((CActor)ent).AddTag( 'ContractTarget' );
 
 			((CActor)ent).AddTag('IsBoss');
-
-			//((CActor)ent).AddTag('ACS_Legolas');
 
 			//((CActor)ent).AddTag('ACS_Big_Boi');
 
 			((CActor)ent).AddAbility('Boss');
 
-			//((CActor)ent).AddAbility('BounceBoltsWildhunt');
+			//((CActor)ent).AddAbility('AcidSpit');
 
-			//((CActor)ent).AddAbility( 'FairytaleWitchDelay', false );
+			((CActor)ent).AddAbility('InstantKillImmune');
+
+			((CActor)ent).AddAbility('ablIgnoreSigns');
+
+			((CActor)ent).AddAbility('DisableFinishers');
+
+			((CActor)ent).AddAbility('MonsterMHBoss');
+
+			((CActor)ent).AddAbility('ForceCriticalEffects');
+
+			((CActor)ent).AddAbility('BounceBoltsWildhunt');
 
 			//((CActor)ent).RemoveAbility('Venom');
 
-			ent.AddTag('NoBestiaryEntry');
+			//ent.AddTag('NoBestiaryEntry');
 
-			ent.PlayEffect('demonic_possession');
+			//ent.PlayEffect('shadow_form');
+			
+			//ent.PlayEffect('shadow_form_head');
 
-			//ent.PlayEffect('default_fx');
+			//ent.PlayEffect('demonic_eye_r');
 
-			//ent.PlayEffect('him_smoke_red');
+			//ent.PlayEffect('demonic_eye_l');
+
+			//((CActor)ent).RemoveBuff(EET_FireAura, true, 'acs_ifrit_fire_aura');
+
+			//((CActor)ent).AddEffectDefault( EET_FireAura, ((CActor)ent), 'acs_ifrit_fire_aura' );
 
 			ent.AddTag( 'ACS_enemy' );
 
-			ent.AddTag( 'ACS_Hostile_To_All' );
+			//ent.AddTag( 'ACS_Hostile_To_All' );
 		}
 	}
 	
@@ -23960,6 +24251,12 @@ state ACS_MonsterSpawner_Mula in CACSMonsterSpawner
 
 		((CActor)ent).AddBuffImmunity(EET_Swarm , 'ACS_Mula_Buff', true);
 
+		((CActor)ent).AddBuffImmunity(EET_Knockdown , 'ACS_Mula_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_HeavyKnockdown , 'ACS_Mula_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_KnockdownTypeApplicator , 'ACS_Mula_Buff', true);
+
 		((CActor)ent).AddTag( 'ContractTarget' );
 
 		((CActor)ent).AddTag('IsBoss');
@@ -24042,6 +24339,12 @@ state ACS_MonsterSpawner_BloodHym in CACSMonsterSpawner
 		((CActor)ent).AddBuffImmunity(EET_Choking , 'ACS_Mini_Hym_Buff', true);
 
 		((CActor)ent).AddBuffImmunity(EET_Swarm , 'ACS_Mini_Hym_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_Knockdown , 'ACS_Mini_Hym_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_HeavyKnockdown , 'ACS_Mini_Hym_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_KnockdownTypeApplicator , 'ACS_Mini_Hym_Buff', true);
 
 		((CActor)ent).AddTag( 'ContractTarget' );
 
@@ -24789,7 +25092,2043 @@ state ACS_MonsterSpawner_DemonicConstruct in CACSMonsterSpawner
 	}
 }
 
+state ACS_MonsterSpawner_DarkKnight in CACSMonsterSpawner
+{
+	private var temp															: CEntityTemplate;
+	private var ent																: CEntity;
+	private var playerPos														: Vector;
+	private var meshcomp														: CComponent;
+	private var animcomp 														: CAnimatedComponent;
+	private var h 																: float;
+	private var playerRot														: EulerAngles;
+		
+	event OnEnterState(prevStateName : name)
+	{
+		Spawn_DarkKnight_Entry();
+	}
+	
+	entry function Spawn_DarkKnight_Entry()
+	{	
+		Spawn_DarkKnight_Latent();
+	}
 
+	latent function Spawn_DarkKnight_Latent()
+	{
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\dlc_acs\data\entities\monsters\dark_knight.w2ent"
+			
+		, true );
+
+		playerPos = parent.pos;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += 180;
+		
+		ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+
+		((CNewNPC)ent).SetLevel(thePlayer.GetLevel());
+
+		((CNewNPC)ent).SetAttitude(thePlayer, AIA_Hostile);
+		((CActor)ent).SetAnimationSpeedMultiplier(1);
+
+		((CActor)ent).SetCanPlayHitAnim(true);
+
+		((CActor)ent).AddTag( 'ContractTarget' );
+
+		((CActor)ent).AddTag('IsBoss');
+
+		((CActor)ent).AddAbility('Boss');
+
+		((CActor)ent).AddAbility('InstantKillImmune');
+
+		((CActor)ent).AddAbility('ablIgnoreSigns');
+
+		((CActor)ent).AddAbility('DisableFinishers');
+
+		((CActor)ent).AddAbility('MonsterMHBoss');
+
+		((CActor)ent).AddAbility('ForceCriticalEffects');
+
+		((CActor)ent).AddAbility('BounceBoltsWildhunt');
+
+		ent.AddTag('NoBestiaryEntry');
+
+		ent.PlayEffect('ghost');
+
+		ent.PlayEffect('him_smoke_red');
+
+		ent.PlayEffect('shadow_form');
+
+		ent.PlayEffect('smoke_effect_1');
+
+		ent.PlayEffect('smoke_effect_2');
+
+		ent.AddTag( 'ACS_Dark_Knight' );
+
+		ent.AddTag( 'ACS_Hostile_To_All' );
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+state ACS_MonsterSpawner_DarkKnightCalidus in CACSMonsterSpawner
+{
+	private var temp															: CEntityTemplate;
+	private var ent																: CEntity;
+	private var playerPos														: Vector;
+	private var meshcomp														: CComponent;
+	private var animcomp 														: CAnimatedComponent;
+	private var h 																: float;
+	private var playerRot														: EulerAngles;
+		
+	event OnEnterState(prevStateName : name)
+	{
+		Spawn_DarkKnightCalidus_Entry();
+	}
+	
+	entry function Spawn_DarkKnightCalidus_Entry()
+	{	
+		Spawn_DarkKnightCalidus_Latent();
+	}
+
+	latent function Spawn_DarkKnightCalidus_Latent()
+	{
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\dlc_acs\data\entities\monsters\dark_knight_calidus.w2ent"
+			
+		, true );
+
+		playerPos = parent.pos;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += 180;
+		
+		ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+
+		((CNewNPC)ent).SetLevel(thePlayer.GetLevel());
+
+		((CNewNPC)ent).SetAttitude(thePlayer, AIA_Hostile);
+		((CActor)ent).SetAnimationSpeedMultiplier(1);
+
+		((CActor)ent).SetCanPlayHitAnim(true);
+
+		((CActor)ent).AddTag( 'ContractTarget' );
+
+		((CActor)ent).AddTag('IsBoss');
+
+		((CActor)ent).AddAbility('Boss');
+
+		((CActor)ent).AddAbility('InstantKillImmune');
+
+		((CActor)ent).AddAbility('ablIgnoreSigns');
+
+		((CActor)ent).AddAbility('DisableFinishers');
+
+		((CActor)ent).AddAbility('MonsterMHBoss');
+
+		((CActor)ent).AddAbility('ForceCriticalEffects');
+
+		((CActor)ent).AddAbility('BounceBoltsWildhunt');
+
+		ent.AddTag('NoBestiaryEntry');
+
+		ent.PlayEffect('lugos_vision_burning_mat');
+
+		//ent.PlayEffect('burning_body');
+
+		ent.PlayEffect('him_smoke_red');
+
+		ent.PlayEffect('shadow_form');
+
+		ent.PlayEffect('lugos_vision_burning');
+
+		ent.PlayEffect('smoke_effect_1');
+
+		ent.PlayEffect('smoke_effect_2');
+
+		ent.AddTag( 'ACS_Dark_Knight_Calidus' );
+
+		ent.AddTag( 'ACS_Hostile_To_All' );
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+state ACS_MonsterSpawner_Voref in CACSMonsterSpawner
+{
+	private var temp															: CEntityTemplate;
+	private var ent																: CEntity;
+	private var playerPos														: Vector;
+	private var meshcomp														: CComponent;
+	private var animcomp 														: CAnimatedComponent;
+	private var h 																: float;
+	private var playerRot														: EulerAngles;
+		
+	event OnEnterState(prevStateName : name)
+	{
+		Spawn_Voref_Entry();
+	}
+	
+	entry function Spawn_Voref_Entry()
+	{	
+		Spawn_Voref_Latent();
+	}
+
+	latent function Spawn_Voref_Latent()
+	{
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\dlc_acs\data\entities\monsters\voref.w2ent"
+			
+		, true );
+
+		playerPos = parent.pos;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += 180;
+		
+		ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1.5;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+
+		((CNewNPC)ent).SetLevel(thePlayer.GetLevel());
+
+		((CNewNPC)ent).SetAttitude(thePlayer, AIA_Hostile);
+		((CActor)ent).SetAnimationSpeedMultiplier(1.125);
+
+		((CActor)ent).SetCanPlayHitAnim(true);
+
+		((CActor)ent).AddTag( 'ContractTarget' );
+
+		((CActor)ent).AddTag('IsBoss');
+
+		((CActor)ent).AddAbility('Boss');
+
+		((CActor)ent).AddAbility('InstantKillImmune');
+
+		((CActor)ent).AddAbility('ablIgnoreSigns');
+
+		((CActor)ent).AddAbility('DisableFinishers');
+
+		((CActor)ent).AddAbility('MonsterMHBoss');
+
+		((CActor)ent).AddAbility('ForceCriticalEffects');
+
+		((CActor)ent).AddAbility('BounceBoltsWildhunt');
+
+		ent.AddTag('NoBestiaryEntry');
+
+		ent.AddTag( 'ACS_Voref' );
+
+		ent.AddTag( 'ACS_Hostile_To_All' );
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+state ACS_MonsterSpawner_Maerolorn in CACSMonsterSpawner
+{
+	private var temp															: CEntityTemplate;
+	private var ent																: CEntity;
+	private var i, count														: int;
+	private var pos, spawnPos													: Vector;
+	private var randAngle, randRange											: float;
+	private var rot, playerRot, adjustedRot										: EulerAngles;
+	private var num, num_2														: int;
+
+	event OnEnterState(prevStateName : name)
+	{
+		Spawn_Maerolorn_Entry();
+	}
+	
+	entry function Spawn_Maerolorn_Entry()
+	{	
+		Spawn_Maerolorn_Latent();
+	}
+
+	latent function Spawn_Maerolorn_Latent()
+	{
+		pos = parent.pos;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += 180;
+
+		adjustedRot = EulerAngles(0,0,0);
+
+		adjustedRot.Yaw = playerRot.Yaw;
+
+		count = 3;
+		
+		for( i = 0; i < count; i += 1 )
+		{
+			randRange = 5 + 5 * RandF();
+			randAngle = 5 * Pi() * RandF();
+			
+			spawnPos.X = randRange * CosF( randAngle ) + pos.X;
+			spawnPos.Y = randRange * SinF( randAngle ) + pos.Y;
+			spawnPos.Z = pos.Z;
+
+			temp = (CEntityTemplate)LoadResourceAsync( 
+
+			"dlc\dlc_acs\data\entities\monsters\maerolorn.w2ent"
+				
+			, true );
+
+			ent = theGame.CreateEntity(temp, ACSPlayerFixZAxis(spawnPos), adjustedRot);
+
+			((CNewNPC)ent).SetLevel(thePlayer.GetLevel());
+
+			((CNewNPC)ent).SetAttitude(thePlayer, AIA_Hostile);
+
+			((CActor)ent).SetAnimationSpeedMultiplier(1);
+
+			//ent.AddTag('NoBestiaryEntry');
+
+			((CActor)ent).AddAbility('InstantKillImmune');
+
+			((CActor)ent).AddAbility('DisableFinishers');
+
+			((CActor)ent).AddAbility('BounceBoltsWildhunt');
+
+			ent.PlayEffect('shadow_form');
+			
+			ent.PlayEffect('shadow_form_head');
+
+			ent.PlayEffect('demonic_eye_r');
+
+			ent.PlayEffect('demonic_eye_l');
+
+			ent.PlayEffect('shadow_smoke');
+
+			ent.AddTag('NoBestiaryEntry');
+
+			ent.AddTag( 'ACS_Maerolorn' );
+		}
+	}
+}
+
+state ACS_MonsterSpawner_Ifrit in CACSMonsterSpawner
+{
+	private var temp															: CEntityTemplate;
+	private var ent																: CEntity;
+	private var playerPos														: Vector;
+	private var meshcomp														: CComponent;
+	private var animcomp 														: CAnimatedComponent;
+	private var h 																: float;
+	private var pos																: Vector;
+	private var playerRot														: EulerAngles;
+		
+	event OnEnterState(prevStateName : name)
+	{
+		Spawn_Ifrit_Entry();
+	}
+	
+	entry function Spawn_Ifrit_Entry()
+	{	
+		Spawn_Ifrit_Latent();
+	}
+
+	latent function Spawn_Ifrit_Latent()
+	{
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\dlc_acs\data\entities\monsters\ifrit.w2ent"
+			
+		, true );
+
+		playerPos = parent.pos;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += 180;
+		
+		ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1.5;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+
+		((CNewNPC)ent).SetLevel(thePlayer.GetLevel());
+
+		((CNewNPC)ent).SetAttitude(thePlayer, AIA_Hostile);
+		((CActor)ent).SetAnimationSpeedMultiplier(1);
+
+		((CActor)ent).AddTag( 'ContractTarget' );
+
+		((CActor)ent).AddTag('IsBoss');
+
+		((CActor)ent).AddAbility('Boss');
+
+		((CActor)ent).AddAbility('InstantKillImmune');
+
+		((CActor)ent).AddAbility('ablIgnoreSigns');
+
+		((CActor)ent).AddAbility('DisableFinishers');
+
+		((CActor)ent).AddAbility('MonsterMHBoss');
+
+		((CActor)ent).AddAbility('ForceCriticalEffects');
+
+		((CActor)ent).AddAbility('BounceBoltsWildhunt');
+
+		((CActor)ent).RemoveBuff(EET_FireAura, true, 'acs_ifrit_fire_aura');
+
+		((CActor)ent).AddEffectDefault( EET_FireAura, ((CActor)ent), 'acs_ifrit_fire_aura' );
+
+		ent.PlayEffectSingle('fire');
+
+		ent.AddTag( 'ACS_Ifrit' );
+
+		ent.AddTag( 'ACS_Hostile_To_All' );
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+state ACS_MonsterSpawner_Carduin in CACSMonsterSpawner
+{
+	private var temp															: CEntityTemplate;
+	private var ent																: CEntity;
+	private var playerPos														: Vector;
+	private var meshcomp														: CComponent;
+	private var animcomp 														: CAnimatedComponent;
+	private var h 																: float;
+	private var pos																: Vector;
+	private var playerRot														: EulerAngles;
+		
+	event OnEnterState(prevStateName : name)
+	{
+		Spawn_Carduin_Entry();
+	}
+	
+	entry function Spawn_Carduin_Entry()
+	{	
+		Spawn_Carduin_Latent();
+	}
+
+	latent function Spawn_Carduin_Latent()
+	{
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\dlc_acs\data\entities\mages\carduin_of_lan_exeter.w2ent"
+			
+		, true );
+
+		playerPos = parent.pos;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += 180;
+		
+		ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+
+		((CNewNPC)ent).SetLevel(thePlayer.GetLevel());
+
+		((CNewNPC)ent).SetAttitude(thePlayer, AIA_Hostile);
+		((CActor)ent).SetAnimationSpeedMultiplier(1);
+
+		((CActor)ent).AddTag( 'ContractTarget' );
+
+		((CActor)ent).AddTag('IsBoss');
+
+		((CActor)ent).AddAbility('Boss');
+
+		((CActor)ent).AddAbility('InstantKillImmune');
+
+		((CActor)ent).AddAbility('ablIgnoreSigns');
+
+		((CActor)ent).AddAbility('DisableFinishers');
+
+		((CActor)ent).AddAbility('MonsterMHBoss');
+
+		((CActor)ent).AddAbility('ForceCriticalEffects');
+
+		((CActor)ent).AddAbility('BounceBoltsWildhunt');
+
+		ent.AddTag( 'ACS_Carduin' );
+
+		ent.AddTag( 'ACS_Hostile_To_All' );
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+state ACS_MonsterSpawner_ViyOfMaribor in CACSMonsterSpawner
+{
+	private var temp															: CEntityTemplate;
+	private var ent																: CEntity;
+	private var playerPos														: Vector;
+	private var meshcomp														: CComponent;
+	private var animcomp 														: CAnimatedComponent;
+	private var h 																: float;
+	private var playerRot														: EulerAngles;
+
+	event OnEnterState(prevStateName : name)
+	{
+		Spawn_Viy_Entry();
+	}
+	
+	entry function Spawn_Viy_Entry()
+	{	
+		Spawn_Viy_Latent();
+	}
+
+	latent function Spawn_Viy_Latent()
+	{
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\dlc_acs\data\entities\monsters\viy_of_maribor.w2ent"
+			
+		, true );
+
+		playerPos = parent.pos;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += 180;
+
+		ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 10;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+
+		((CNewNPC)ent).SetLevel(thePlayer.GetLevel());
+
+		((CNewNPC)ent).SetAttitude(thePlayer, AIA_Hostile);
+		((CActor)ent).SetAnimationSpeedMultiplier(0.875);
+
+		((CActor)ent).SetCanPlayHitAnim(false);
+
+		((CActor)ent).AddBuffImmunity(EET_Poison, 'ACS_Viy_Of_Maribor_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_PoisonCritical , 'ACS_Viy_Of_Maribor_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_Bleeding , 'ACS_Viy_Of_Maribor_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_Weaken , 'ACS_Viy_Of_Maribor_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_WeakeningAura , 'ACS_Viy_Of_Maribor_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_Confusion , 'ACS_Viy_Of_Maribor_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_Hypnotized , 'ACS_Viy_Of_Maribor_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_AxiiGuardMe , 'ACS_Viy_Of_Maribor_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_Immobilized , 'ACS_Viy_Of_Maribor_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_Paralyzed , 'ACS_Viy_Of_Maribor_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_Blindness , 'ACS_Viy_Of_Maribor_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_Choking , 'ACS_Viy_Of_Maribor_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_Swarm , 'ACS_Viy_Of_Maribor_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_Knockdown , 'ACS_Viy_Of_Maribor_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_HeavyKnockdown , 'ACS_Viy_Of_Maribor_Buff', true);
+
+		((CActor)ent).AddTag( 'ContractTarget' );
+
+		((CActor)ent).AddTag('IsBoss');
+
+		((CActor)ent).AddTag('ACS_Big_Boi');
+
+		((CActor)ent).AddAbility('Boss');
+
+		((CActor)ent).AddAbility('AcidSpit');
+
+		((CActor)ent).AddAbility('InstantKillImmune');
+
+		((CActor)ent).AddAbility('ablIgnoreSigns');
+
+		((CActor)ent).AddAbility('DisableFinishers');
+
+		((CActor)ent).AddAbility('MonsterMHBoss');
+
+		((CActor)ent).AddAbility('ForceCriticalEffects');
+
+		((CActor)ent).AddAbility('BounceBoltsWildhunt');
+
+		ent.AddTag('NoBestiaryEntry');
+
+		ent.PlayEffect('glow1');
+		ent.PlayEffect('glow2');
+		ent.PlayEffect('glow3');
+
+		ent.AddTag( 'ACS_Viy_Of_Maribor' );
+
+		ent.AddTag( 'ACS_Hostile_To_All' );
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+function ACSViyOfMaribor() : CActor
+{
+	var entity 			 : CActor;
+	
+	entity = (CActor)theGame.GetEntityByTag( 'ACS_Viy_Of_Maribor' );
+	return entity;
+}
+
+statemachine class CACSViyBaseEffect extends CGameplayEntity
+{
+	var pos : Vector;
+	var rot : EulerAngles;
+
+	event OnSpawned( spawnData : SEntitySpawnData )
+	{
+		pos = this.GetWorldPosition();
+		rot = this.GetWorldRotation();
+
+		AddTimer('CreateFireLine', 1.5, false);
+
+		theGame.GetSurfacePostFX().AddSurfacePostFXGroup( TraceFloor( pos ), 1.f, 10, 1.f, 60.f, 1);
+
+		GCameraShake(1.0, true, this.GetWorldPosition(), 60.0f, false);
+	}
+
+	timer function CreateFireLine ( dt : float, id : int )
+	{
+		var meteorEntityTemplate 		: CEntityTemplate;
+		var meteorEntity 				: W3ACSViyBaseEffectFireLine;
+
+		if ( !theSound.SoundIsBankLoaded("monster_golem_ifryt.bnk") )
+		{
+			theSound.SoundLoadBank( "monster_golem_ifryt.bnk", false );
+		}
+
+		meteorEntityTemplate = (CEntityTemplate)LoadResource(
+
+		"dlc\dlc_acs\data\entities\projectiles\scolopendromorph_base_effect_fire_line.w2ent"
+		
+		, true );
+
+		meteorEntity = (W3ACSViyBaseEffectFireLine)theGame.CreateEntity(meteorEntityTemplate, ACSPlayerFixZAxis(pos), rot);
+		meteorEntity.Init(ACSViyOfMaribor());
+
+		meteorEntity.PlayEffectSingle('fire_line_old');
+		meteorEntity.ShootProjectileAtPosition( 0, 10, pos, 500 );
+
+		meteorEntity.StopAllEffectsAfter(1.5);
+
+		meteorEntity.DestroyAfter(10);
+
+		GCameraShake(1.0, true, this.GetWorldPosition(), 60.0f, false);
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+state ACS_MonsterSpawner_Phooca in CACSMonsterSpawner
+{
+	private var temp															: CEntityTemplate;
+	private var ent																: CEntity;
+	private var playerPos														: Vector;
+	private var meshcomp														: CComponent;
+	private var animcomp 														: CAnimatedComponent;
+	private var h 																: float;
+	private var playerRot														: EulerAngles;
+	
+	event OnEnterState(prevStateName : name)
+	{
+		Spawn_Phooca_Entry();
+	}
+	
+	entry function Spawn_Phooca_Entry()
+	{	
+		Spawn_Phooca_Latent();
+	}
+
+	latent function Spawn_Phooca_Latent()
+	{
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\dlc_acs\data\entities\monsters\phooca.w2ent"
+			
+		, true );
+
+		playerPos = parent.pos;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += 180;
+
+		ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1.375;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+
+		((CNewNPC)ent).SetLevel(thePlayer.GetLevel());
+
+		((CNewNPC)ent).SetAttitude(thePlayer, AIA_Hostile);
+		((CActor)ent).SetAnimationSpeedMultiplier(1.125);
+
+		((CActor)ent).SetCanPlayHitAnim(false);
+
+		((CActor)ent).AddBuffImmunity(EET_Poison, 'ACS_Enemy_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_PoisonCritical , 'ACS_Enemy_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_Bleeding , 'ACS_Enemy_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_Weaken , 'ACS_Enemy_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_WeakeningAura , 'ACS_Enemy_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_Confusion , 'ACS_Enemy_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_Hypnotized , 'ACS_Enemy_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_AxiiGuardMe , 'ACS_Enemy_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_Immobilized , 'ACS_Enemy_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_Paralyzed , 'ACS_Enemy_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_Blindness , 'ACS_Enemy_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_Choking , 'ACS_Enemy_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_Swarm , 'ACS_Enemy_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_Knockdown , 'ACS_Enemy_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_HeavyKnockdown , 'ACS_Enemy_Buff', true);
+
+		((CActor)ent).AddTag( 'ContractTarget' );
+
+		((CActor)ent).AddTag('IsBoss');
+
+		//((CActor)ent).AddTag('ACS_Legolas');
+
+		//((CActor)ent).AddTag('ACS_Big_Boi');
+
+		((CActor)ent).AddAbility('Boss');
+
+		((CActor)ent).AddAbility('AcidSpit');
+
+		((CActor)ent).AddAbility('InstantKillImmune');
+
+		((CActor)ent).AddAbility('ablIgnoreSigns');
+
+		((CActor)ent).AddAbility('DisableFinishers');
+
+		((CActor)ent).AddAbility('MonsterMHBoss');
+
+		((CActor)ent).AddAbility('ForceCriticalEffects');
+
+		ent.AddTag('NoBestiaryEntry');
+
+		ent.AddTag( 'ACS_Phooca' );
+
+		ent.AddTag( 'ACS_Hostile_To_All' );
+		
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+state ACS_MonsterSpawner_Plumard in CACSMonsterSpawner
+{
+	private var temp															: CEntityTemplate;
+	private var ent																: CEntity;
+	private var i, count														: int;
+	private var playerPos, spawnPos												: Vector;
+	private var randAngle, randRange											: float;
+	private var meshcomp														: CComponent;
+	private var animcomp 														: CAnimatedComponent;
+	private var h 																: float;
+	private var playerRot														: EulerAngles;
+	
+	event OnEnterState(prevStateName : name)
+	{
+		Spawn_Plumard_Entry();
+	}
+	
+	entry function Spawn_Plumard_Entry()
+	{	
+		Spawn_Plumard_Latent();
+	}
+
+	latent function Spawn_Plumard_Latent()
+	{
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\dlc_acs\data\entities\monsters\plumard.w2ent"
+			
+		, true );
+
+		playerPos = parent.pos;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += 180;
+		
+		count = RandRange(9,5);
+			
+		for( i = 0; i < count; i += 1 )
+		{
+			randRange = 5 + 5 * RandF();
+			randAngle = 2 * Pi() * RandF();
+			
+			spawnPos.X = randRange * CosF( randAngle ) + playerPos.X;
+			spawnPos.Y = randRange * SinF( randAngle ) + playerPos.Y;
+			spawnPos.Z = playerPos.Z;
+
+			ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(spawnPos), playerRot );
+
+			animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+			meshcomp = ent.GetComponentByClassName('CMeshComponent');
+			h = 1;
+			animcomp.SetScale(Vector(h,h,h,1));
+			meshcomp.SetScale(Vector(h,h,h,1));	
+
+			((CNewNPC)ent).SetLevel(thePlayer.GetLevel()/2);
+
+			((CNewNPC)ent).SetAttitude(thePlayer, AIA_Hostile);
+			((CActor)ent).SetAnimationSpeedMultiplier(1);
+
+			((CActor)ent).SetCanPlayHitAnim(true);
+
+			ent.AddTag('NoBestiaryEntry');
+
+			ent.AddTag( 'ACS_Plumard' );
+		}
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+state ACS_MonsterSpawner_GiantRockTroll in CACSMonsterSpawner
+{
+	private var temp															: CEntityTemplate;
+	private var ent																: CEntity;
+	private var playerPos														: Vector;
+	private var meshcomp														: CComponent;
+	private var animcomp 														: CAnimatedComponent;
+	private var h 																: float;
+	private var playerRot														: EulerAngles;
+
+	event OnEnterState(prevStateName : name)
+	{
+		Spawn_GiantRockTroll_Entry();
+	}
+	
+	entry function Spawn_GiantRockTroll_Entry()
+	{	
+		Spawn_GiantRockTroll_Latent();
+	}
+
+	latent function Spawn_GiantRockTroll_Latent()
+	{
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\dlc_acs\data\entities\monsters\giant_rock_troll.w2ent"
+			
+		, true );
+
+		playerPos = parent.pos;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += 180;
+
+		ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 2;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+
+		((CNewNPC)ent).SetLevel(thePlayer.GetLevel());
+
+		((CNewNPC)ent).SetAttitude(thePlayer, AIA_Hostile);
+		((CActor)ent).SetAnimationSpeedMultiplier(0.9);
+
+		((CActor)ent).SetCanPlayHitAnim(false);
+
+		((CActor)ent).AddTag( 'ContractTarget' );
+
+		((CActor)ent).AddTag('IsBoss');
+
+		((CActor)ent).AddTag('ACS_Big_Boi');
+
+		((CActor)ent).AddAbility('Boss');
+
+		((CActor)ent).AddAbility('InstantKillImmune');
+
+		((CActor)ent).AddAbility('ablIgnoreSigns');
+
+		((CActor)ent).AddAbility('DisableFinishers');
+
+		((CActor)ent).AddAbility('MonsterMHBoss');
+
+		((CActor)ent).AddAbility('ForceCriticalEffects');
+
+		((CActor)ent).AddAbility('BounceBoltsWildhunt');
+
+		ent.AddTag('NoBestiaryEntry');
+
+		ent.AddTag( 'ACS_Giant_Troll' );
+
+		ent.AddTag( 'ACS_Hostile_To_All' );
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+state ACS_MonsterSpawner_GiantIceTroll in CACSMonsterSpawner
+{
+	private var temp															: CEntityTemplate;
+	private var ent																: CEntity;
+	private var playerPos														: Vector;
+	private var meshcomp														: CComponent;
+	private var animcomp 														: CAnimatedComponent;
+	private var h 																: float;
+	private var playerRot														: EulerAngles;
+
+	event OnEnterState(prevStateName : name)
+	{
+		Spawn_GiantIceTroll_Entry();
+	}
+	
+	entry function Spawn_GiantIceTroll_Entry()
+	{	
+		Spawn_GiantIceTroll_Latent();
+	}
+
+	latent function Spawn_GiantIceTroll_Latent()
+	{
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\dlc_acs\data\entities\monsters\giant_ice_troll.w2ent"
+			
+		, true );
+
+		playerPos = parent.pos;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += 180;
+
+		ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 2;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+
+		((CNewNPC)ent).SetLevel(thePlayer.GetLevel());
+
+		((CNewNPC)ent).SetAttitude(thePlayer, AIA_Hostile);
+		((CActor)ent).SetAnimationSpeedMultiplier(0.9);
+
+		((CActor)ent).SetCanPlayHitAnim(false);
+
+		((CActor)ent).AddTag( 'ContractTarget' );
+
+		((CActor)ent).AddTag('IsBoss');
+
+		((CActor)ent).AddTag('ACS_Big_Boi');
+
+		((CActor)ent).AddAbility('Boss');
+
+		((CActor)ent).AddAbility('InstantKillImmune');
+
+		((CActor)ent).AddAbility('ablIgnoreSigns');
+
+		((CActor)ent).AddAbility('DisableFinishers');
+
+		((CActor)ent).AddAbility('MonsterMHBoss');
+
+		((CActor)ent).AddAbility('ForceCriticalEffects');
+
+		((CActor)ent).AddAbility('BounceBoltsWildhunt');
+
+		ent.AddTag('NoBestiaryEntry');
+
+		ent.AddTag( 'ACS_Giant_Troll' );
+
+		ent.AddTag( 'ACS_Hostile_To_All' );
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+state ACS_MonsterSpawner_GiantMagmaTroll in CACSMonsterSpawner
+{
+	private var temp															: CEntityTemplate;
+	private var ent																: CEntity;
+	private var playerPos														: Vector;
+	private var meshcomp														: CComponent;
+	private var animcomp 														: CAnimatedComponent;
+	private var h 																: float;
+	private var playerRot														: EulerAngles;
+
+	event OnEnterState(prevStateName : name)
+	{
+		Spawn_GiantMagmaTroll_Entry();
+	}
+	
+	entry function Spawn_GiantMagmaTroll_Entry()
+	{	
+		Spawn_GiantMagmaTroll_Latent();
+	}
+
+	latent function Spawn_GiantMagmaTroll_Latent()
+	{
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\dlc_acs\data\entities\monsters\giant_magma_troll.w2ent"
+			
+		, true );
+
+		playerPos = parent.pos;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += 180;
+
+		ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 2;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+
+		((CNewNPC)ent).SetLevel(thePlayer.GetLevel());
+
+		((CNewNPC)ent).SetAttitude(thePlayer, AIA_Hostile);
+		((CActor)ent).SetAnimationSpeedMultiplier(0.9);
+
+		((CActor)ent).SetCanPlayHitAnim(false);
+
+		((CActor)ent).AddTag( 'ContractTarget' );
+
+		((CActor)ent).AddTag('IsBoss');
+
+		((CActor)ent).AddTag('ACS_Big_Boi');
+
+		((CActor)ent).AddAbility('Boss');
+
+		((CActor)ent).AddAbility('InstantKillImmune');
+
+		((CActor)ent).AddAbility('ablIgnoreSigns');
+
+		((CActor)ent).AddAbility('DisableFinishers');
+
+		((CActor)ent).AddAbility('MonsterMHBoss');
+
+		((CActor)ent).AddAbility('ForceCriticalEffects');
+
+		((CActor)ent).AddAbility('BounceBoltsWildhunt');
+
+		ent.AddTag('NoBestiaryEntry');
+
+		ent.AddTag( 'ACS_Giant_Troll' );
+
+		ent.AddTag( 'ACS_Hostile_To_All' );
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+state ACS_MonsterSpawner_TheBeast in CACSMonsterSpawner
+{
+	private var temp															: CEntityTemplate;
+	private var ent																: CEntity;
+	private var i, count														: int;
+	private var playerPos, spawnPos												: Vector;
+	private var randAngle, randRange											: float;
+	private var meshcomp														: CComponent;
+	private var animcomp 														: CAnimatedComponent;
+	private var h 																: float;
+	private var playerRot														: EulerAngles;
+	
+	event OnEnterState(prevStateName : name)
+	{
+		Spawn_TheBeast_Entry();
+	}
+	
+	entry function Spawn_TheBeast_Entry()
+	{	
+		Spawn_TheBeast_Latent();
+
+		Spawn_TheBeastMinions_Latent();
+	}
+
+	latent function Spawn_TheBeast_Latent()
+	{
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\dlc_acs\data\entities\monsters\the_beast.w2ent"
+			
+		, true );
+
+		playerPos = parent.pos;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += 180;
+
+		ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1.5;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+
+		((CNewNPC)ent).SetLevel(thePlayer.GetLevel());
+
+		((CNewNPC)ent).SetAttitude(thePlayer, AIA_Hostile);
+		((CActor)ent).SetAnimationSpeedMultiplier(1);
+
+		//((CActor)ent).SetCanPlayHitAnim(false);
+
+		((CActor)ent).AddTag( 'ContractTarget' );
+
+		((CActor)ent).AddTag('IsBoss');
+
+		((CActor)ent).AddAbility('Boss');
+
+		((CActor)ent).AddAbility('InstantKillImmune');
+
+		((CActor)ent).AddAbility('ablIgnoreSigns');
+
+		((CActor)ent).AddAbility('DisableFinishers');
+
+		((CActor)ent).AddAbility('ForceCriticalEffects');
+
+		((CActor)ent).AddAbility('BounceBoltsWildhunt');
+
+		ent.AddTag('NoBestiaryEntry');
+
+		ent.AddTag( 'ACS_Hellhound' );
+
+		ent.AddTag( 'ACS_Hellhound_Pack' );
+	}
+
+	latent function Spawn_TheBeastMinions_Latent()
+	{
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\dlc_acs\data\entities\monsters\the_beast_minion.w2ent"
+			
+		, true );
+
+		playerPos = parent.pos;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += 180;
+		
+		count = RandRange(4,2);
+			
+		for( i = 0; i < count; i += 1 )
+		{
+			randRange = 5 + 5 * RandF();
+			randAngle = 2 * Pi() * RandF();
+			
+			spawnPos.X = randRange * CosF( randAngle ) + playerPos.X;
+			spawnPos.Y = randRange * SinF( randAngle ) + playerPos.Y;
+			spawnPos.Z = playerPos.Z;
+
+			ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(spawnPos), playerRot );
+
+			animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+			meshcomp = ent.GetComponentByClassName('CMeshComponent');
+			h = 1;
+			animcomp.SetScale(Vector(h,h,h,1));
+			meshcomp.SetScale(Vector(h,h,h,1));	
+
+			((CNewNPC)ent).SetLevel(thePlayer.GetLevel()/2);
+
+			((CNewNPC)ent).SetAttitude(thePlayer, AIA_Hostile);
+			((CActor)ent).SetAnimationSpeedMultiplier(1);
+
+			((CActor)ent).SetCanPlayHitAnim(true);
+
+			ent.AddTag( 'ACS_Hellhound_Minion' );
+
+			ent.AddTag( 'ACS_Hellhound_Pack' );
+		}
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+state ACS_MonsterSpawner_ElementalTitanOfFire in CACSMonsterSpawner
+{
+	private var temp															: CEntityTemplate;
+	private var ent																: CEntity;
+	private var playerPos														: Vector;
+	private var meshcomp														: CComponent;
+	private var animcomp 														: CAnimatedComponent;
+	private var h 																: float;
+	private var playerRot														: EulerAngles;
+
+	event OnEnterState(prevStateName : name)
+	{
+		Spawn_ElementalTitanOfFire_Entry();
+	}
+	
+	entry function Spawn_ElementalTitanOfFire_Entry()
+	{	
+		Spawn_ElementalTitanOfFire_Latent();
+	}
+
+	latent function Spawn_ElementalTitanOfFire_Latent()
+	{
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\dlc_acs\data\entities\monsters\giant_fire_elemental.w2ent"
+			
+		, true );
+
+		playerPos = parent.pos;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += 180;
+
+		ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 2.5;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+
+		((CNewNPC)ent).SetLevel(thePlayer.GetLevel());
+
+		((CNewNPC)ent).SetAttitude(thePlayer, AIA_Hostile);
+		((CActor)ent).SetAnimationSpeedMultiplier(0.9);
+
+		((CActor)ent).SetCanPlayHitAnim(false);
+
+		((CActor)ent).AddBuffImmunity(EET_Stagger , 'ACS_Elemental_Titan_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_HeavyKnockdown , 'ACS_Elemental_Titan_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_Knockdown , 'ACS_Elemental_Titan_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_KnockdownTypeApplicator , 'ACS_Elemental_Titan_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_LongStagger , 'ACS_Elemental_Titan_Buff', true);
+
+		((CActor)ent).AddTag( 'ContractTarget' );
+
+		((CActor)ent).AddTag('IsBoss');
+
+		((CActor)ent).AddTag('ACS_Big_Boi');
+
+		((CActor)ent).AddAbility('Boss');
+
+		((CActor)ent).AddAbility('InstantKillImmune');
+
+		((CActor)ent).AddAbility('ablIgnoreSigns');
+
+		((CActor)ent).AddAbility('DisableFinishers');
+
+		((CActor)ent).AddAbility('MonsterMHBoss');
+
+		((CActor)ent).AddAbility('ForceCriticalEffects');
+
+		((CActor)ent).AddAbility('BounceBoltsWildhunt');
+
+		((CNewNPC)ent).SetUnstoppable( true );
+
+		ent.AddTag('NoBestiaryEntry');
+
+		ent.AddTag( 'ACS_Elemental_Titan' );
+
+		ent.AddTag( 'ACS_Hostile_To_All' );
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+state ACS_MonsterSpawner_ElementalTitanOfTerra in CACSMonsterSpawner
+{
+	private var temp															: CEntityTemplate;
+	private var ent																: CEntity;
+	private var playerPos														: Vector;
+	private var meshcomp														: CComponent;
+	private var animcomp 														: CAnimatedComponent;
+	private var h 																: float;
+	private var playerRot														: EulerAngles;
+
+	event OnEnterState(prevStateName : name)
+	{
+		Spawn_ElementalTitanOfTerra_Entry();
+	}
+	
+	entry function Spawn_ElementalTitanOfTerra_Entry()
+	{	
+		Spawn_ElementalTitanOfTerra_Latent();
+	}
+
+	latent function Spawn_ElementalTitanOfTerra_Latent()
+	{
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\dlc_acs\data\entities\monsters\giant_rock_elemental.w2ent"
+			
+		, true );
+
+		playerPos = parent.pos;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += 180;
+
+		ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 2.5;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+
+		((CNewNPC)ent).SetLevel(thePlayer.GetLevel());
+
+		((CNewNPC)ent).SetAttitude(thePlayer, AIA_Hostile);
+		((CActor)ent).SetAnimationSpeedMultiplier(0.9);
+
+		((CActor)ent).SetCanPlayHitAnim(false);
+
+		((CActor)ent).AddBuffImmunity(EET_Stagger , 'ACS_Elemental_Titan_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_HeavyKnockdown , 'ACS_Elemental_Titan_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_Knockdown , 'ACS_Elemental_Titan_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_KnockdownTypeApplicator , 'ACS_Elemental_Titan_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_LongStagger , 'ACS_Elemental_Titan_Buff', true);
+
+		((CActor)ent).AddTag( 'ContractTarget' );
+
+		((CActor)ent).AddTag('IsBoss');
+
+		((CActor)ent).AddTag('ACS_Big_Boi');
+
+		((CActor)ent).AddAbility('Boss');
+
+		((CActor)ent).AddAbility('InstantKillImmune');
+
+		((CActor)ent).AddAbility('ablIgnoreSigns');
+
+		((CActor)ent).AddAbility('DisableFinishers');
+
+		((CActor)ent).AddAbility('MonsterMHBoss');
+
+		((CActor)ent).AddAbility('ForceCriticalEffects');
+
+		((CActor)ent).AddAbility('BounceBoltsWildhunt');
+
+		((CNewNPC)ent).SetUnstoppable( true );
+
+		//((CActor)ent).RemoveAbility('ThrowStone');
+
+		//((CActor)ent).AddAbility('ThrowFire');
+
+		ent.AddTag('NoBestiaryEntry');
+
+		ent.AddTag( 'ACS_Elemental_Titan' );
+
+		ent.AddTag( 'ACS_Hostile_To_All' );
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+state ACS_MonsterSpawner_ElementalTitanOfIce in CACSMonsterSpawner
+{
+	private var temp															: CEntityTemplate;
+	private var ent																: CEntity;
+	private var playerPos														: Vector;
+	private var meshcomp														: CComponent;
+	private var animcomp 														: CAnimatedComponent;
+	private var h 																: float;
+	private var playerRot														: EulerAngles;
+
+	event OnEnterState(prevStateName : name)
+	{
+		Spawn_ElementalTitanOfIce_Entry();
+	}
+	
+	entry function Spawn_ElementalTitanOfIce_Entry()
+	{	
+		Spawn_ElementalTitanOfIce_Latent();
+	}
+
+	latent function Spawn_ElementalTitanOfIce_Latent()
+	{
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\dlc_acs\data\entities\monsters\giant_ice_elemental.w2ent"
+			
+		, true );
+
+		playerPos = parent.pos;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += 180;
+
+		ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 2.5;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+
+		((CNewNPC)ent).SetLevel(thePlayer.GetLevel());
+
+		((CNewNPC)ent).SetAttitude(thePlayer, AIA_Hostile);
+		((CActor)ent).SetAnimationSpeedMultiplier(0.9);
+
+		((CActor)ent).SetCanPlayHitAnim(false);
+
+		((CActor)ent).AddBuffImmunity(EET_Stagger , 'ACS_Elemental_Titan_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_HeavyKnockdown , 'ACS_Elemental_Titan_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_Knockdown , 'ACS_Elemental_Titan_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_KnockdownTypeApplicator , 'ACS_Elemental_Titan_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_LongStagger , 'ACS_Elemental_Titan_Buff', true);
+
+		((CActor)ent).AddTag( 'ContractTarget' );
+
+		((CActor)ent).AddTag('IsBoss');
+
+		((CActor)ent).AddTag('ACS_Big_Boi');
+
+		((CActor)ent).AddAbility('Boss');
+
+		((CActor)ent).AddAbility('InstantKillImmune');
+
+		((CActor)ent).AddAbility('ablIgnoreSigns');
+
+		((CActor)ent).AddAbility('DisableFinishers');
+
+		((CActor)ent).AddAbility('MonsterMHBoss');
+
+		((CActor)ent).AddAbility('ForceCriticalEffects');
+
+		((CActor)ent).AddAbility('BounceBoltsWildhunt');
+
+		((CNewNPC)ent).SetUnstoppable( true );
+
+		ent.AddTag('NoBestiaryEntry');
+
+		ent.AddTag( 'ACS_Elemental_Titan' );
+
+		ent.AddTag( 'ACS_Hostile_To_All' );
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+state ACS_MonsterSpawner_HorseRidersNovigrad in CACSMonsterSpawner
+{
+	private var temp, temp_2, temp_3											: CEntityTemplate;
+	private var ent, ent_2, ent_3												: CEntity;
+	private var i, count														: int;
+	private var playerPos, spawnPos, newSpawnPos								: Vector;
+	private var randAngle, randRange											: float;
+	private var meshcomp														: CComponent;
+	private var animcomp 														: CAnimatedComponent;
+	private var h 																: float;
+	private var bone_vec, pos, attach_vec										: Vector;
+	private var bone_rot, rot, attach_rot, playerRot, adjustedRot				: EulerAngles;
+	private var steelsword, silversword, scabbard_steel, scabbard_silver		: CDrawableComponent;	
+	private var l_aiTree														: CAIHorseDoNothingAction;			
+	private var horseTag 														: array<name>;	
+	private var movementAdjustor												: CMovementAdjustor;
+	private var ticket 															: SMovementAdjustmentRequestTicket;
+	private var l_aiTreeFollow													: CAIFollowSideBySideAction;	
+	var actor							: CActor; 
+	var enemyAnimatedComponent 			: CAnimatedComponent;
+
+	var actors		    				: array<CActor>;
+	var npc								: CNewNPC;
+
+	event OnEnterState(prevStateName : name)
+	{
+		Spawn_HorseRiderNovigrad_Entry();
+	}
+	
+	entry function Spawn_HorseRiderNovigrad_Entry()
+	{	
+		Spawn_HorseRiderNovigrad_Latent();
+
+		if (!GetACS_HorseRiderFollowTargetNovigrad())
+		{
+			Spawn_HorseRiderTargetNovigrad_Latent();
+		}
+	}
+
+	latent function Spawn_HorseRiderNovigrad_Latent()
+	{
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\dlc_acs\data\entities\enemy_riders\enemy_rider_novigrad_soldier.w2ent"
+			
+		, true );
+
+		temp_2 = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\dlc_acs\data\entities\enemy_riders\horse_vehicle_novigrad.w2ent"
+			
+		, true );
+
+		playerPos = parent.pos;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += 180;
+
+		adjustedRot = EulerAngles(0,0,0);
+
+		adjustedRot.Yaw = playerRot.Yaw;
+
+		if( !theGame.GetWorld().NavigationFindSafeSpot( playerPos, 0.3, 0.3 , newSpawnPos ) )
+		{
+			theGame.GetWorld().NavigationFindSafeSpot( playerPos, 0.3, 10 , newSpawnPos );
+			playerPos = newSpawnPos;
+		}
+
+		ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(playerPos), adjustedRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+
+		((CNewNPC)ent).SetLevel(thePlayer.GetLevel());
+
+		((CNewNPC)ent).SetAttitude(thePlayer, AIA_Neutral);
+
+		((CActor)ent).SetAnimationSpeedMultiplier(1);
+
+		ent.AddTag('NoBestiaryEntry');
+
+		horseTag.Clear();
+		
+		horseTag.PushBack('enemy_horse');
+
+		ent_2 = theGame.CreateEntity(temp_2, ACSPlayerFixZAxis(playerPos), playerRot,true,false,false,PM_DontPersist,horseTag);
+
+		((CNewNPC)ent_2).SetAttitude(thePlayer, AIA_Neutral);
+
+		ent.AddTag( 'ACS_Horse_Rider_Novigrad' );
+
+		ent_2.AddTag( 'ACS_Horse_Rider_Horse_Novigrad' );
+
+		((CNewNPC)ent_2).SetAttitude(thePlayer, AIA_Neutral);
+
+		((CActor)ent).CreateAttachment(((CActor)ent_2),,Vector( 0, 0 , 0.01f ));
+		
+		actor = ((CActor)ent);
+		
+		enemyAnimatedComponent = (CAnimatedComponent)actor.GetComponentByClassName( 'CAnimatedComponent' );	
+		
+		enemyAnimatedComponent.PlaySlotAnimationAsync( 'horse_walk', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
+
+		enemyAnimatedComponent.FreezePoseFadeIn(1.f);
+
+		((CActor)ent).EnableCollisions(false);
+		((CActor)ent).EnableCharacterCollisions(false);
+
+		((CNewNPC)ent).SetTemporaryAttitudeGroup( 'q104_avallach_friendly_to_all', AGP_Default );	
+	}
+
+	latent function Spawn_HorseRiderTargetNovigrad_Latent()
+	{
+		var ent           										: CEntity;
+
+		ent = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\dlc_acs\data\entities\enemy_riders\horse_follow_target_novigrad.w2ent"
+
+		, true ), thePlayer.GetWorldPosition(), thePlayer.GetWorldRotation() );
+
+		((CActor)ent).EnableCollisions(false);
+		((CActor)ent).EnableCharacterCollisions(false);
+
+		((CActor)ent).AddBuffImmunity_AllNegative('ACS_Horse_Rider_Target_Novigrad_Entity', true);
+
+		((CActor)ent).AddBuffImmunity_AllCritical('ACS_Horse_Rider_Target_Novigrad_Entity', true);
+
+		((CActor)ent).SetImmortalityMode( AIM_Invulnerable, AIC_Combat ); 
+
+		((CActor)ent).SetVisibility( false );
+
+		((CActor)ent).AddTag('IsBoss');
+
+		((CActor)ent).AddAbility('Boss');
+
+		((CActor)ent).AddAbility('InstantKillImmune');
+
+		((CActor)ent).AddAbility('ablIgnoreSigns');
+
+		((CActor)ent).AddAbility('DisableFinishers');
+
+		((CActor)ent).AddAbility('MonsterMHBoss');
+
+		((CActor)ent).AddAbility('BounceBoltsWildhunt');
+
+		ent.AddTag('ACS_Horse_Rider_Follow_Target_Novigrad_Tag');
+
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+state ACS_MonsterSpawner_HorseRidersNilfgaard in CACSMonsterSpawner
+{
+	private var temp, temp_2, temp_3											: CEntityTemplate;
+	private var ent, ent_2, ent_3												: CEntity;
+	private var i, count														: int;
+	private var playerPos, spawnPos, newSpawnPos								: Vector;
+	private var randAngle, randRange											: float;
+	private var meshcomp														: CComponent;
+	private var animcomp 														: CAnimatedComponent;
+	private var h 																: float;
+	private var bone_vec, pos, attach_vec										: Vector;
+	private var bone_rot, rot, attach_rot, playerRot, adjustedRot				: EulerAngles;
+	private var steelsword, silversword, scabbard_steel, scabbard_silver		: CDrawableComponent;	
+	private var l_aiTree														: CAIHorseDoNothingAction;			
+	private var horseTag 														: array<name>;	
+	private var movementAdjustor												: CMovementAdjustor;
+	private var ticket 															: SMovementAdjustmentRequestTicket;
+	private var l_aiTreeFollow													: CAIFollowSideBySideAction;	
+	var actor							: CActor; 
+	var enemyAnimatedComponent 			: CAnimatedComponent;
+
+	var actors		    				: array<CActor>;
+	var npc								: CNewNPC;
+
+	event OnEnterState(prevStateName : name)
+	{
+		Spawn_HorseRiderNilfgaard_Entry();
+	}
+	
+	entry function Spawn_HorseRiderNilfgaard_Entry()
+	{	
+		Spawn_HorseRiderNilfgaard_Latent();
+
+		if (!GetACS_HorseRiderFollowTargetNilfgaard())
+		{
+			Spawn_HorseRiderTargetNilfgaardLatent();
+		}
+	}
+
+	latent function Spawn_HorseRiderNilfgaard_Latent()
+	{
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\dlc_acs\data\entities\enemy_riders\enemy_rider_nilfgaard_soldier.w2ent"
+			
+		, true );
+
+		temp_2 = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\dlc_acs\data\entities\enemy_riders\horse_vehicle_nilfgaard.w2ent"
+			
+		, true );
+
+		playerPos = parent.pos;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += 180;
+
+		adjustedRot = EulerAngles(0,0,0);
+
+		adjustedRot.Yaw = playerRot.Yaw;
+
+		if( !theGame.GetWorld().NavigationFindSafeSpot( playerPos, 0.3, 0.3 , newSpawnPos ) )
+		{
+			theGame.GetWorld().NavigationFindSafeSpot( playerPos, 0.3, 10 , newSpawnPos );
+			playerPos = newSpawnPos;
+		}
+
+		ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(playerPos), adjustedRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+
+		((CNewNPC)ent).SetLevel(thePlayer.GetLevel());
+
+		((CNewNPC)ent).SetAttitude(thePlayer, AIA_Neutral);
+
+		((CActor)ent).SetAnimationSpeedMultiplier(1);
+
+		ent.AddTag('NoBestiaryEntry');
+
+		horseTag.Clear();
+		
+		horseTag.PushBack('enemy_horse');
+
+		ent_2 = theGame.CreateEntity(temp_2, ACSPlayerFixZAxis(playerPos), playerRot,true,false,false,PM_DontPersist,horseTag);
+
+		((CNewNPC)ent_2).SetAttitude(thePlayer, AIA_Neutral);
+
+		ent.AddTag( 'ACS_Horse_Rider_Nilfgaard' );
+
+		ent_2.AddTag( 'ACS_Horse_Rider_Horse_Nilfgaard' );
+
+		((CNewNPC)ent_2).SetAttitude(thePlayer, AIA_Neutral);
+
+		((CActor)ent).CreateAttachment(((CActor)ent_2),,Vector( 0, 0 , 0.01f ));
+		
+		actor = ((CActor)ent);
+		
+		enemyAnimatedComponent = (CAnimatedComponent)actor.GetComponentByClassName( 'CAnimatedComponent' );	
+		
+		enemyAnimatedComponent.PlaySlotAnimationAsync( 'horse_walk', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
+
+		enemyAnimatedComponent.FreezePoseFadeIn(1.f);
+
+		((CActor)ent).EnableCollisions(false);
+		((CActor)ent).EnableCharacterCollisions(false);
+
+		((CNewNPC)ent).SetTemporaryAttitudeGroup( 'q104_avallach_friendly_to_all', AGP_Default );	
+	}
+
+	latent function Spawn_HorseRiderTargetNilfgaardLatent()
+	{
+		var ent           										: CEntity;
+
+		ent = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\dlc_acs\data\entities\enemy_riders\horse_follow_target_nilfgaard.w2ent"
+
+		, true ), thePlayer.GetWorldPosition(), thePlayer.GetWorldRotation() );
+
+		((CActor)ent).EnableCollisions(false);
+		((CActor)ent).EnableCharacterCollisions(false);
+
+		((CActor)ent).AddBuffImmunity_AllNegative('ACS_Horse_Rider_Target_Nilfgaard_Entity', true);
+
+		((CActor)ent).AddBuffImmunity_AllCritical('ACS_Horse_Rider_Target_Nilfgaard_Entity', true);
+
+		((CActor)ent).SetImmortalityMode( AIM_Invulnerable, AIC_Combat ); 
+
+		((CActor)ent).SetVisibility( false );
+
+		((CActor)ent).AddTag('IsBoss');
+
+		((CActor)ent).AddAbility('Boss');
+
+		((CActor)ent).AddAbility('InstantKillImmune');
+
+		((CActor)ent).AddAbility('ablIgnoreSigns');
+
+		((CActor)ent).AddAbility('DisableFinishers');
+
+		((CActor)ent).AddAbility('MonsterMHBoss');
+
+		((CActor)ent).AddAbility('BounceBoltsWildhunt');
+
+		ent.AddTag('ACS_Horse_Rider_Follow_Target_Nilfgaard_Tag');
+
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+state ACS_MonsterSpawner_HorseRidersRedania in CACSMonsterSpawner
+{
+	private var temp, temp_2, temp_3											: CEntityTemplate;
+	private var ent, ent_2, ent_3												: CEntity;
+	private var i, count														: int;
+	private var playerPos, spawnPos, newSpawnPos								: Vector;
+	private var randAngle, randRange											: float;
+	private var meshcomp														: CComponent;
+	private var animcomp 														: CAnimatedComponent;
+	private var h 																: float;
+	private var bone_vec, pos, attach_vec										: Vector;
+	private var bone_rot, rot, attach_rot, playerRot, adjustedRot				: EulerAngles;
+	private var steelsword, silversword, scabbard_steel, scabbard_silver		: CDrawableComponent;	
+	private var l_aiTree														: CAIHorseDoNothingAction;			
+	private var horseTag 														: array<name>;	
+	private var movementAdjustor												: CMovementAdjustor;
+	private var ticket 															: SMovementAdjustmentRequestTicket;
+	private var l_aiTreeFollow													: CAIFollowSideBySideAction;	
+	var actor							: CActor; 
+	var enemyAnimatedComponent 			: CAnimatedComponent;
+
+	var actors		    				: array<CActor>;
+	var npc								: CNewNPC;
+
+	event OnEnterState(prevStateName : name)
+	{
+		Spawn_HorseRiderRedania_Entry();
+	}
+	
+	entry function Spawn_HorseRiderRedania_Entry()
+	{	
+		Spawn_HorseRiderRedania_Latent();
+
+		if (!GetACS_HorseRiderFollowTargetRedania())
+		{
+			Spawn_HorseRiderTargetRedaniaLatent();
+		}
+	}
+
+	latent function Spawn_HorseRiderRedania_Latent()
+	{
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\dlc_acs\data\entities\enemy_riders\enemy_rider_redanian_soldier.w2ent"
+			
+		, true );
+
+		temp_2 = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\dlc_acs\data\entities\enemy_riders\horse_vehicle_redania.w2ent"
+			
+		, true );
+
+		playerPos = parent.pos;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += 180;
+
+		adjustedRot = EulerAngles(0,0,0);
+
+		adjustedRot.Yaw = playerRot.Yaw;
+
+		if( !theGame.GetWorld().NavigationFindSafeSpot( playerPos, 0.3, 0.3 , newSpawnPos ) )
+		{
+			theGame.GetWorld().NavigationFindSafeSpot( playerPos, 0.3, 10 , newSpawnPos );
+			playerPos = newSpawnPos;
+		}
+
+		ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(playerPos), adjustedRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+
+		((CNewNPC)ent).SetLevel(thePlayer.GetLevel());
+
+		((CNewNPC)ent).SetAttitude(thePlayer, AIA_Neutral);
+
+		((CActor)ent).SetAnimationSpeedMultiplier(1);
+
+		ent.AddTag('NoBestiaryEntry');
+
+		horseTag.Clear();
+		
+		horseTag.PushBack('enemy_horse');
+
+		ent_2 = theGame.CreateEntity(temp_2, ACSPlayerFixZAxis(playerPos), playerRot,true,false,false,PM_DontPersist,horseTag);
+
+		((CNewNPC)ent_2).SetAttitude(thePlayer, AIA_Neutral);
+
+		ent.AddTag( 'ACS_Horse_Rider_Redania' );
+
+		ent_2.AddTag( 'ACS_Horse_Rider_Horse_Redania' );
+
+		((CNewNPC)ent_2).SetAttitude(thePlayer, AIA_Neutral);
+
+		((CActor)ent).CreateAttachment(((CActor)ent_2),,Vector( 0, 0 , 0.01f ));
+		
+		actor = ((CActor)ent);
+		
+		enemyAnimatedComponent = (CAnimatedComponent)actor.GetComponentByClassName( 'CAnimatedComponent' );	
+		
+		enemyAnimatedComponent.PlaySlotAnimationAsync( 'horse_walk', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
+
+		enemyAnimatedComponent.FreezePoseFadeIn(1.f);
+
+		((CActor)ent).EnableCollisions(false);
+		((CActor)ent).EnableCharacterCollisions(false);
+
+		((CNewNPC)ent).SetTemporaryAttitudeGroup( 'q104_avallach_friendly_to_all', AGP_Default );	
+	}
+
+	latent function Spawn_HorseRiderTargetRedaniaLatent()
+	{
+		var ent           										: CEntity;
+
+		ent = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\dlc_acs\data\entities\enemy_riders\horse_follow_target_redania.w2ent"
+
+		, true ), thePlayer.GetWorldPosition(), thePlayer.GetWorldRotation() );
+
+		((CActor)ent).EnableCollisions(false);
+		((CActor)ent).EnableCharacterCollisions(false);
+
+		((CActor)ent).AddBuffImmunity_AllNegative('ACS_Horse_Rider_Target_Redania_Entity', true);
+
+		((CActor)ent).AddBuffImmunity_AllCritical('ACS_Horse_Rider_Target_Redania_Entity', true);
+
+		((CActor)ent).SetImmortalityMode( AIM_Invulnerable, AIC_Combat ); 
+
+		((CActor)ent).SetVisibility( false );
+
+		((CActor)ent).AddTag('IsBoss');
+
+		((CActor)ent).AddAbility('Boss');
+
+		((CActor)ent).AddAbility('InstantKillImmune');
+
+		((CActor)ent).AddAbility('ablIgnoreSigns');
+
+		((CActor)ent).AddAbility('DisableFinishers');
+
+		((CActor)ent).AddAbility('MonsterMHBoss');
+
+		((CActor)ent).AddAbility('BounceBoltsWildhunt');
+
+		ent.AddTag('ACS_Horse_Rider_Follow_Target_Redania_Tag');
+
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+function GetACS_HorseRiderFollowTargetNovigrad() : CActor
+{
+	var entity 			 : CActor;
+	
+	entity = (CActor)theGame.GetEntityByTag( 'ACS_Horse_Rider_Follow_Target_Novigrad_Tag' );
+	return entity;
+}
+
+function GetACS_HorseRiderFollowTargetNilfgaard() : CActor
+{
+	var entity 			 : CActor;
+	
+	entity = (CActor)theGame.GetEntityByTag( 'ACS_Horse_Rider_Follow_Target_Nilfgaard_Tag' );
+	return entity;
+}
+
+function GetACS_HorseRiderFollowTargetRedania() : CActor
+{
+	var entity 			 : CActor;
+	
+	entity = (CActor)theGame.GetEntityByTag( 'ACS_Horse_Rider_Follow_Target_Redania_Tag' );
+	return entity;
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -25800,6 +28139,9 @@ state ACS_MonsterSpawner_ShadesShowdown in CACSMonsterSpawner
 	}
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 state ACS_MonsterSpawner_ShadesDancerWaning in CACSMonsterSpawner
 {
 	private var temp															: CEntityTemplate;
@@ -26002,6 +28344,9 @@ function GetACS_ShadesDancerWaning_L_Anchor() : CEntity
 	entity = (CEntity)theGame.GetEntityByTag( 'ACS_ShadesDancerWaning_L_Anchor' );
 	return entity;
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 state ACS_MonsterSpawner_ShadesDancerWaxing in CACSMonsterSpawner
 {
@@ -26206,6 +28551,9 @@ function GetACS_ShadesDancerWaxing_L_Anchor() : CEntity
 	return entity;
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 state ACS_MonsterSpawner_ShadesKara in CACSMonsterSpawner
 {
 	private var temp															: CEntityTemplate;
@@ -26286,6 +28634,12 @@ state ACS_MonsterSpawner_ShadesKara in CACSMonsterSpawner
 		((CActor)ent).AddBuffImmunity(EET_Swarm , 'ACS_Kara_Buff', true);
 
 		((CActor)ent).AddBuffImmunity(EET_Burning , 'ACS_Kara_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_Knockdown , 'ACS_Kara_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_HeavyKnockdown , 'ACS_Kara_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_KnockdownTypeApplicator , 'ACS_Kara_Buff', true);
 
 		((CActor)ent).AddTag( 'ContractTarget' );
 
@@ -26477,15 +28831,9 @@ state ACS_ShadesKara_Spawn_Adds_Engage in cACS_ShadesKara_Spawn_Adds
 
 								((CNewNPC)ent_1).SetAttitude(((CActor)(npc.GetTarget())), AIA_Hostile);
 
+								ent_1.AddTag('NoBestiaryEntry');
+
 								ent_1.AddTag('ACS_Shades_Kara_Shadow_Werewolf');
-
-								((CActor)npc).SetVisibility( false );
-
-								animatedComponentA = (CAnimatedComponent)npc.GetComponentByClassName( 'CAnimatedComponent' );
-
-								animatedComponentA.FreezePoseFadeIn(1);
-
-								GetACSWatcher().AddTimer('ACS_Shades_Kara_Resume_Fight', 30, false);
 							}
 						}
 					}
@@ -26515,6 +28863,9 @@ function GetACS_ShadesKaraShadowWerewolf() : CActor
 	entity = (CActor)theGame.GetEntityByTag( 'ACS_Shades_Kara_Shadow_Werewolf' );
 	return entity;
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 state ACS_MonsterSpawner_ShadesNightmareIncarnate in CACSMonsterSpawner
 {
@@ -26633,6 +28984,11 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 	
 	entry function Monster_Static_Spawner_Entry()
 	{	
+		if (thePlayer.IsCiri())
+		{
+			return;
+		}
+
 		ForestGod_Static_Spawn_Latent();
 
 		IceTitan_Static_Spawn_Latent();
@@ -26703,8 +29059,45 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 
 		DemonicConstruct_Static_Spawn_Latent();
 
+		Viy_Static_Spawn_Latent();
 
+		Phooca_Static_Spawn_Latent();
+		
+		Plumard_Static_Spawn_Latent();
 
+		The_Beast_Static_Spawn_Latent();
+
+		GiantRockTroll_Static_Spawn_Latent();
+
+		GiantIceTroll_Static_Spawn_Latent();
+
+		GiantMagmaTroll_Static_Spawn_Latent();
+
+		GiantRockElemental_Static_Spawn_Latent();
+
+		GiantIceElemental_Static_Spawn_Latent();
+
+		GiantFireElemental_Static_Spawn_Latent();
+
+		DarkKnight_Static_Spawn_Latent();
+
+		DarkKnightCalidus_Static_Spawn_Latent();
+
+		Voref_Static_Spawn_Latent();
+
+		Maerolorn_Static_Spawn_Latent();
+
+		Ifrit_Static_Spawn_Latent();
+
+		Carduin_Static_Spawn_Latent();
+
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		
+		Horse_Riders_Novigrad_Static_Spawn_Latent();
+
+		Horse_Riders_Nilfgaard_Static_Spawn_Latent();
+
+		Horse_Riders_Redania_Static_Spawn_Latent();
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -27055,6 +29448,10 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 			locationArray.PushBack(Vector(-665.973572, -125.281822, 9.988349, 1));
 			locationArray.PushBack(Vector(-582.600159, -347.738068, 6.804880, 1));
 			locationArray.PushBack(Vector(-620.631470, -610.329773, 14.780170, 1));
+			locationArray.PushBack(Vector(731.618530, 732.352722, 7.271194, 1));
+			locationArray.PushBack(Vector(741.291382, 623.972839, 26.438852, 1));
+			locationArray.PushBack(Vector(812.667542, 542.385559, 19.872581, 1));
+			locationArray.PushBack(Vector(520.018860, 450.320496, 12.395922, 1));
 		}
 		else
 		{
@@ -27154,6 +29551,12 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 			locationArray.PushBack(Vector(405.802002,1068.651611,0.608021,1));
 			locationArray.PushBack(Vector(521.863770,1081.006836,1.518828,1));
 			locationArray.PushBack(Vector(381.410614,1027.466553,-0.259066,1));
+			locationArray.PushBack(Vector(1461.869141, 1121.341797, 0.007444, 1));
+			locationArray.PushBack(Vector(917.797424, 915.553467, 11.310884, 1));
+			locationArray.PushBack(Vector(899.050049, 993.041687, 0.236208, 1));
+			locationArray.PushBack(Vector(814.379395, 759.632629, 16.101336, 1));
+			locationArray.PushBack(Vector(1567.507568, 1266.352539, 0.209946, 1));
+			locationArray.PushBack(Vector(1507.250366, 1212.312256, -0.029652, 1));
 		}
 		else
 		{
@@ -27329,6 +29732,12 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 			locationArray.PushBack(Vector(-318.583130, -288.942657, 37.038479, 1));
 			locationArray.PushBack(Vector(445.866913, -482.297333, 15.613439, 1));
 			locationArray.PushBack(Vector(111.097275, -689.275269, 89.946808, 1));
+			locationArray.PushBack(Vector(-436.023285, -945.449341, 2.724056, 1));
+			locationArray.PushBack(Vector(-325.336884, -985.246399, 9.480059, 1));
+			locationArray.PushBack(Vector(-213.434402, -1180.457642, 2.318056, 1));
+			locationArray.PushBack(Vector(185.917999, -1317.859009, 4.039735, 1));
+			locationArray.PushBack(Vector(543.599548, -1451.897705, 3.470709, 1));
+
 		}
 		else
 		{
@@ -27932,6 +30341,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 			locationArray.PushBack(Vector(1961.057617, 183.068954, -0.167544, 1));
 			locationArray.PushBack(Vector(1539.826416, -116.563423, 30.740000, 1));
 			locationArray.PushBack(Vector(1455.942871, -608.051086, -0.023946, 1));
+			locationArray.PushBack(Vector(772.609863, 817.236694, 8.522795, 1));
 		}
 		else if ((theGame.GetWorld().GetDepotPath() == "dlc\bob\data\levels\bob\bob.w2w"))
 		{
@@ -28018,7 +30428,9 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (FactsQuerySum("ACS_Orianna_Killed") > 0)
+		if (FactsQuerySum("ACS_Orianna_Killed") > 0
+		|| FactsQuerySum("q704_orianas_part_done") <= 0 
+		)
 		{
 			return;
 		}
@@ -28260,6 +30672,42 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 			locationArray.PushBack(Vector(508.310608, -671.548889, 1.998710, 1));
 			locationArray.PushBack(Vector(532.568420, -515.193542, 3.633354, 1));
 			locationArray.PushBack(Vector(394.641602, -273.185089, 2.823583, 1));
+		}
+		else
+		{
+			locationArray.Clear();
+		}
+
+		sizeArray = locationArray.Size();
+
+		if (sizeArray <= 0)
+		{
+			return;
+		}
+
+		for(idx = 0; idx < sizeArray; idx += 1)
+		{
+			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+			
+			ent.AddTag( 'ACS_MonsterSpawner_ShadowPixies' );
+		}
+	}
+
+	latent function Maerolorn_Static_Spawn_Latent()
+	{
+		var locationArray 													: array<Vector>;
+		var sizeArray , idx 												: int;
+		var ent																: CEntity;
+
+		if (!ACS_Maerolorn_Enabled())
+		{
+			return;
+		}
+
+		locationArray.Clear();
+
+		if ((theGame.GetWorld().GetDepotPath() == "levels\novigrad\novigrad.w2w"))
+		{
 			locationArray.PushBack(Vector(201.009018, -89.774681, 6.168664, 1));
 			locationArray.PushBack(Vector(596.421265, 87.885803, 14.969600, 1));
 			locationArray.PushBack(Vector(1049.233643, 428.017303, 5.511171, 1));
@@ -28288,11 +30736,32 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		}
 		else if ((theGame.GetWorld().GetDepotPath() == "levels\skellige\skellige.w2w"))
 		{
-			
+			locationArray.PushBack(Vector(-250.648987, -225.613937, 50.329533, 1));
+			locationArray.PushBack(Vector(-281.433411, -315.749115, 48.481895, 1));
+			locationArray.PushBack(Vector(-478.772614, -325.816406, 40.550762, 1));
+			locationArray.PushBack(Vector(-557.016968, -239.274811, 29.269978, 1));
+			locationArray.PushBack(Vector(-662.958740, -368.075073, 36.580730, 1));
+			locationArray.PushBack(Vector(-629.118713, -454.444824, 24.667442, 1));
+			locationArray.PushBack(Vector(-362.263702, -773.948547, 48.340256, 1));
+			locationArray.PushBack(Vector(343.466217, -1034.842041, 7.201228, 1));
+			locationArray.PushBack(Vector(-393.795563, -218.860306, 44.933662, 1));
+			locationArray.PushBack(Vector(-519.567017, -116.759766, 14.104027, 1));
+			locationArray.PushBack(Vector(-356.946930, -138.365829, 43.513229, 1));
+
 		}
 		else if ((theGame.GetWorld().GetDepotPath() == "dlc\bob\data\levels\bob\bob.w2w"))
 		{
-			
+			locationArray.PushBack(Vector(-65.393364, 229.019211, 9.804246, 1));
+			locationArray.PushBack(Vector(129.678940, 321.257416, 8.369221, 1));
+			locationArray.PushBack(Vector(-221.635056, 802.966064, 9.048968, 1));
+			locationArray.PushBack(Vector(-347.041260, 874.186096, 5.744734, 1));
+			locationArray.PushBack(Vector(-289.218597, 1008.576599, 18.032904, 1));
+			locationArray.PushBack(Vector(82.924866, -675.782593, 16.568867, 1));
+			locationArray.PushBack(Vector(437.431305, -675.855835, 13.835930, 1));
+			locationArray.PushBack(Vector(1002.411743, -647.667297, 57.719486, 1));
+			locationArray.PushBack(Vector(1200.223267, -730.116089, 59.851807, 1));
+			locationArray.PushBack(Vector(1293.875244, -579.901123, 47.885342, 1));
+			locationArray.PushBack(Vector(1549.631348, -588.727051, 27.637899, 1));
 		}
 		else
 		{
@@ -28309,8 +30778,8 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		for(idx = 0; idx < sizeArray; idx += 1)
 		{
 			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
-
-			ent.AddTag( 'ACS_MonsterSpawner_ShadowPixies' );
+			
+			ent.AddTag( 'ACS_MonsterSpawner_Maerolorn' );
 		}
 	}
 
@@ -28337,14 +30806,18 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 			locationArray.PushBack(Vector(2000.905762, 1134.007080, 7.018495, 1));
 			locationArray.PushBack(Vector(1125.795166, 1756.960449, -0.321325, 1));
 			locationArray.PushBack(Vector(609.381897, 2441.609863, 14.510590, 1));
-		}
-		else if ((theGame.GetWorld().GetDepotPath() == "levels\skellige\skellige.w2w"))
-		{
-			
+			locationArray.PushBack(Vector(1180.151978, 928.981018, 1.267978, 1));
 		}
 		else if ((theGame.GetWorld().GetDepotPath() == "dlc\bob\data\levels\bob\bob.w2w"))
 		{
-			
+			locationArray.PushBack(Vector(786.033875, -346.937103, 33.184544, 1));
+			locationArray.PushBack(Vector(925.891541, -249.306229, 40.366764, 1));
+			locationArray.PushBack(Vector(1085.731689, -276.682037, 39.590401, 1));
+			locationArray.PushBack(Vector(1131.786255, -483.291107, 61.852448, 1));
+			locationArray.PushBack(Vector(786.369751, -151.175552, 8.624273, 1));
+			locationArray.PushBack(Vector(153.237411, -689.852112, 3.570430, 1));
+			locationArray.PushBack(Vector(390.102875, -1059.416504, 15.472711, 1));
+			locationArray.PushBack(Vector(233.615845, -1561.855835, 28.989651, 1));
 		}
 		else
 		{
@@ -28363,6 +30836,1104 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
 
 			ent.AddTag( 'ACS_MonsterSpawner_DemonicConstruct' );
+		}
+	}
+
+	latent function Viy_Static_Spawn_Latent()
+	{
+		var locationArray 													: array<Vector>;
+		var sizeArray , idx 												: int;
+		var ent																: CEntity;
+
+		if (!ACS_Viy_Enabled())
+		{
+			return;
+		}
+
+		locationArray.Clear();
+
+		if ((theGame.GetWorld().GetDepotPath() == "levels\novigrad\novigrad.w2w"))
+		{
+			locationArray.PushBack(Vector(1512.937134, 2767.984375, 22.905933, 1));
+		}
+		else if ((theGame.GetWorld().GetDepotPath() == "dlc\bob\data\levels\bob\bob.w2w"))
+		{
+			locationArray.PushBack(Vector(-434.079163, 137.873047, 0.264920, 1));
+		}
+		else
+		{
+			locationArray.Clear();
+		}
+
+		sizeArray = locationArray.Size();
+
+		if (sizeArray <= 0)
+		{
+			return;
+		}
+
+		for(idx = 0; idx < sizeArray; idx += 1)
+		{
+			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+
+			ent.AddTag( 'ACS_MonsterSpawner_ViyOfMaribor' );
+		}
+	}
+
+	latent function Phooca_Static_Spawn_Latent()
+	{
+		var locationArray 													: array<Vector>;
+		var sizeArray , idx 												: int;
+		var ent																: CEntity;
+
+		if (!ACS_Phooca_Enabled())
+		{
+			return;
+		}
+
+		locationArray.Clear();
+
+		if ((theGame.GetWorld().GetDepotPath() == "levels\novigrad\novigrad.w2w"))
+		{
+			locationArray.PushBack(Vector(-309.806213, -12.130629, 6.355621, 1));
+			locationArray.PushBack(Vector(-217.993256, -201.438065, -0.007215, 1));
+			locationArray.PushBack(Vector(-310.222260, -556.260315, 12.819904, 1));
+			locationArray.PushBack(Vector(-326.428589, -994.577209, 9.115502, 1));
+			locationArray.PushBack(Vector(-58.793747, -1088.911255, 15.187658, 1));
+			locationArray.PushBack(Vector(-221.109116, -1334.758179, 2.988543, 1));
+			locationArray.PushBack(Vector(-413.678253, -965.686707, 18.881584, 1));
+			locationArray.PushBack(Vector(-478.313019, -576.372437, 0.989693, 1));
+			locationArray.PushBack(Vector(-471.687408, -304.360718, 6.090889, 1));
+			locationArray.PushBack(Vector(-466.381348, -70.429337, 13.885661, 1));
+			locationArray.PushBack(Vector(-108.438202, -364.045288, 21.700657, 1));
+			locationArray.PushBack(Vector(403.627533, 21.946386, 14.263351, 1));
+			locationArray.PushBack(Vector(527.674377, 437.758820, 11.075422, 1));
+			locationArray.PushBack(Vector(352.311310, 621.796631, 11.316551, 1));
+			locationArray.PushBack(Vector(425.906219, 778.331238, 0.498355, 1));
+			locationArray.PushBack(Vector(622.418762, 767.745117, 9.982017, 1));
+			locationArray.PushBack(Vector(1083.745117, 997.666992, 0.237540, 1));
+			locationArray.PushBack(Vector(1296.631714, 1228.667480, 3.763229, 1));
+			locationArray.PushBack(Vector(1634.657837, 1336.022217, 4.576551, 1));
+			locationArray.PushBack(Vector(1463.239258, 1426.611450, 0.406934, 1));
+			locationArray.PushBack(Vector(1244.548584, 905.599121, 8.224167, 1));
+			locationArray.PushBack(Vector(1344.185547, 962.923645, 4.485644, 1));
+			locationArray.PushBack(Vector(1303.751099, 1004.022400, 6.708428, 1));
+			locationArray.PushBack(Vector(1301.843140, 1178.571045, -0.127025, 1));
+			locationArray.PushBack(Vector(2337.958252, 1433.572144, 56.266186, 1));
+			locationArray.PushBack(Vector(2402.581299, 1800.875488, 25.891737, 1));
+		}
+		if ((theGame.GetWorld().GetDepotPath() == "dlc\bob\data\levels\bob\bob.w2w"))
+		{
+			locationArray.PushBack(Vector(-186.363312, -1893.770996, 48.059792, 1));
+			locationArray.PushBack(Vector(-344.072906, -2093.879883, 79.584808, 1));
+			locationArray.PushBack(Vector(-503.066711, -1940.372559, 86.045418, 1));
+			locationArray.PushBack(Vector(-903.430603, -1717.940552, 105.720253, 1));
+			locationArray.PushBack(Vector(-1016.057617, -1407.408691, 123.840996, 1));
+			locationArray.PushBack(Vector(-1119.396362, -1342.514160, 141.596375, 1));
+			locationArray.PushBack(Vector(-993.063721, -1176.904663, 152.789749, 1));
+			locationArray.PushBack(Vector(-1034.244141, -1003.966370, 133.748672, 1));
+			locationArray.PushBack(Vector(-840.275574, -774.929443, 59.384888, 1));
+			locationArray.PushBack(Vector(-856.001953, -603.389221, 46.191223, 1));
+			locationArray.PushBack(Vector(0.726310, -607.658508, 24.529608, 1));
+			locationArray.PushBack(Vector(407.886566, -557.544189, 22.235830, 1));
+			locationArray.PushBack(Vector(708.602478, -402.620605, 17.965200, 1));
+			locationArray.PushBack(Vector(805.953796, -570.503845, 49.959652, 1));
+			locationArray.PushBack(Vector(1068.740112, -742.722656, 48.708954, 1));
+			locationArray.PushBack(Vector(1330.748779, -706.607605, 49.725273, 1));
+			locationArray.PushBack(Vector(1245.156616, -1002.181152, 34.783703, 1));
+			locationArray.PushBack(Vector(1195.632935, -1236.864746, 3.214235, 1));
+			locationArray.PushBack(Vector(855.881470, -1037.284546, 3.171189, 1));
+			locationArray.PushBack(Vector(859.237305, -792.381958, 18.118769, 1));
+			locationArray.PushBack(Vector(644.261047, -679.302246, 30.725731, 1));
+		}
+		else
+		{
+			locationArray.Clear();
+		}
+
+		sizeArray = locationArray.Size();
+
+		if (sizeArray <= 0)
+		{
+			return;
+		}
+
+		for(idx = 0; idx < sizeArray; idx += 1)
+		{
+			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+
+			ent.AddTag( 'ACS_MonsterSpawner_Phooca' );
+		}
+	}
+
+	latent function Plumard_Static_Spawn_Latent()
+	{
+		var locationArray 													: array<Vector>;
+		var sizeArray , idx 												: int;
+		var ent																: CEntity;
+
+		if (!ACS_Plumard_Enabled())
+		{
+			return;
+		}
+
+		locationArray.Clear();
+
+		if ((theGame.GetWorld().GetDepotPath() == "levels\novigrad\novigrad.w2w"))
+		{
+			locationArray.PushBack(Vector(-113.550011, -293.514191, 15.165395, 1));
+			locationArray.PushBack(Vector(98.915962, -390.873230, 7.779979, 1));
+			locationArray.PushBack(Vector(-495.109802, -665.237122, 16.498842, 1));
+			locationArray.PushBack(Vector(-669.183044, -163.483078, 14.383647, 1));
+			locationArray.PushBack(Vector(-372.574402, 112.467865, 3.057209, 1));
+			locationArray.PushBack(Vector(-322.405365, 663.856262, 7.021557, 1));
+			locationArray.PushBack(Vector(-33.923191, 776.514465, 1.268860, 1));
+			locationArray.PushBack(Vector(369.754761, 829.642395, 0.058789, 1));
+			locationArray.PushBack(Vector(758.484680, 633.648926, 26.403652, 1));
+			locationArray.PushBack(Vector(829.530029, 397.860077, 6.489234, 1));
+			locationArray.PushBack(Vector(908.231995, -257.649109, 2.601311, 1));
+			locationArray.PushBack(Vector(1037.110718, -429.625122, 1.717417, 1));
+			locationArray.PushBack(Vector(1309.664429, -189.607056, 59.493999, 1));
+			locationArray.PushBack(Vector(1556.100830, 48.231869, 15.460027, 1));
+			locationArray.PushBack(Vector(1942.644287, -84.989563, 67.931824, 1));
+			locationArray.PushBack(Vector(2244.792725, 399.043579, 9.307269, 1));
+			locationArray.PushBack(Vector(2143.829590, 993.916321, 9.623662, 1));
+			locationArray.PushBack(Vector(1921.153198, 1677.497192, 53.787735, 1));
+			locationArray.PushBack(Vector(1798.041382, 2245.388672, 25.049421, 1));
+			locationArray.PushBack(Vector(1371.197632, 2669.423340, 22.356218, 1));
+			locationArray.PushBack(Vector(2079.475586, -470.123962, 6.851670, 1));
+			locationArray.PushBack(Vector(73.458557, -316.602020, 3.533530, 1));
+			locationArray.PushBack(Vector(16.252119, -468.912170, 12.709140, 1));
+			locationArray.PushBack(Vector(349.460144, -423.570984, 0.829480, 1));
+			locationArray.PushBack(Vector(539.309387, -127.748688, 5.721369, 1));
+			locationArray.PushBack(Vector(469.873840, 207.302292, 15.570441, 1));
+			locationArray.PushBack(Vector(381.270203, 103.280365, 13.728671, 1));
+			locationArray.PushBack(Vector(71.422661, 189.642700, 12.144307, 1));
+			locationArray.PushBack(Vector(372.044373, 294.698669, 12.074133, 1));
+			locationArray.PushBack(Vector(426.272186, 492.548401, 4.412453, 1));
+			locationArray.PushBack(Vector(637.340271, 726.201416, 10.877499, 1));
+			locationArray.PushBack(Vector(970.197205, 554.683899, 24.736645, 1));
+			locationArray.PushBack(Vector(1005.125549, 669.880615, 46.845470, 1));
+			locationArray.PushBack(Vector(1048.338135, 879.819702, 25.295919, 1));
+			locationArray.PushBack(Vector(1237.814453, 1042.234497, 5.863652, 1));
+			locationArray.PushBack(Vector(1424.071777, 797.444641, 12.719515, 1));
+			locationArray.PushBack(Vector(1521.724365, 665.587952, 14.807588, 1));
+			locationArray.PushBack(Vector(1546.617798, 742.251343, 7.241004, 1));
+			locationArray.PushBack(Vector(1592.058716, 500.552856, 0.884511, 1));
+			locationArray.PushBack(Vector(945.443542, 909.594849, 14.161572, 1));
+			locationArray.PushBack(Vector(804.166748, 891.754211, 5.302580, 1));
+			locationArray.PushBack(Vector(-308.923248, 441.003937, 8.911276, 1));
+			locationArray.PushBack(Vector(1654.742798, 1393.394287, 4.738217, 1));
+			locationArray.PushBack(Vector(2216.801758, 1514.659912, 63.202801, 1));
+			locationArray.PushBack(Vector(2062.631104, 1393.094727, 40.999130, 1));
+			locationArray.PushBack(Vector(2274.527344, 1856.616699, 31.518398, 1));
+			locationArray.PushBack(Vector(2395.979492, 1936.375854, 24.093918, 1));
+			locationArray.PushBack(Vector(2418.147949, 2128.505615, 13.727621, 1));
+		}
+		else
+		{
+			locationArray.Clear();
+		}
+
+		sizeArray = locationArray.Size();
+
+		if (sizeArray <= 0)
+		{
+			return;
+		}
+
+		for(idx = 0; idx < sizeArray; idx += 1)
+		{
+			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+
+			ent.AddTag( 'ACS_MonsterSpawner_Plumard' );
+		}
+	}
+
+	latent function The_Beast_Static_Spawn_Latent()
+	{
+		var locationArray 													: array<Vector>;
+		var sizeArray , idx 												: int;
+		var ent																: CEntity;
+
+		if (!ACS_The_Beast_Enabled())
+		{
+			return;
+		}
+
+		locationArray.Clear();
+
+		if ((theGame.GetWorld().GetDepotPath() == "levels\novigrad\novigrad.w2w"))
+		{
+			locationArray.PushBack(Vector(-340.750336, 499.078217, 5.579980, 1));
+			locationArray.PushBack(Vector(-240.779892, 744.179504, 23.957359, 1));
+			locationArray.PushBack(Vector(435.992065, 1326.085693, 21.042843, 1));
+			locationArray.PushBack(Vector(665.411133, 1472.419312, 6.838765, 1));
+			locationArray.PushBack(Vector(959.845520, 1569.980713, 3.392555, 1));
+			locationArray.PushBack(Vector(1388.463135, 1610.053833, 1.860427, 1));
+			locationArray.PushBack(Vector(1530.992554, 1965.764160, 5.588093, 1));
+			locationArray.PushBack(Vector(1387.307739, 1480.788574, 2.095412, 1));
+			locationArray.PushBack(Vector(1570.825928, 1297.688599, -0.123172, 1));
+			locationArray.PushBack(Vector(1470.294434, 1187.032715, 2.240878, 1));
+			locationArray.PushBack(Vector(1783.669678, 1172.022217, 4.548589, 1));
+			locationArray.PushBack(Vector(1960.101196, 1147.488647, 8.013702, 1));
+			locationArray.PushBack(Vector(2074.075928, 1089.023926, 4.917964, 1));
+			locationArray.PushBack(Vector(1953.877441, 927.431519, 1.269838, 1));
+			locationArray.PushBack(Vector(2100.793457, 1303.387939, 24.075527, 1));
+			locationArray.PushBack(Vector(2312.710938, 960.193970, 30.624783, 1));
+			locationArray.PushBack(Vector(2140.385986, -392.130829, 7.141558, 1));
+			locationArray.PushBack(Vector(699.186707, 460.728790, 13.150536, 1));
+			locationArray.PushBack(Vector(942.565308, 825.476440, 19.566553, 1));
+			locationArray.PushBack(Vector(942.565308, 825.476440, 19.566553, 1));
+			locationArray.PushBack(Vector(917.797424, 915.553467, 11.310884, 1));
+			locationArray.PushBack(Vector(899.050049, 993.041687, 0.236208, 1));
+			locationArray.PushBack(Vector(1110.524536, 916.439270, 12.815605, 1));
+			locationArray.PushBack(Vector(1168.049438, 959.228699, 2.232119, 1));
+			locationArray.PushBack(Vector(1243.095825, 1396.839966, 0.038495, 1));
+
+		}
+		else if ((theGame.GetWorld().GetDepotPath() == "dlc\bob\data\levels\bob\bob.w2w"))
+		{
+			locationArray.PushBack(Vector(-727.400085, -484.026886, 29.109505, 1));
+			locationArray.PushBack(Vector(-674.402771, -353.762695, 20.994011, 1));
+			locationArray.PushBack(Vector(-776.804626, -189.315796, 3.700600, 1));
+			locationArray.PushBack(Vector(-845.259521, 33.708336, 6.991922, 1));
+			locationArray.PushBack(Vector(-935.302856, 169.652054, 26.963079, 1));
+			locationArray.PushBack(Vector(-924.858337, 398.163055, 37.801090, 1));
+			locationArray.PushBack(Vector(-963.745667, 531.646790, 64.991776, 1));
+			locationArray.PushBack(Vector(-890.756592, 686.291809, 19.700903, 1));
+			locationArray.PushBack(Vector(-461.354553, 615.971375, 2.315744, 1));
+			locationArray.PushBack(Vector(-248.619080, 721.939392, -0.175762, 1));
+			locationArray.PushBack(Vector(-72.771103, 630.751465, 15.047138, 1));
+			locationArray.PushBack(Vector(103.121086, 457.775452, 13.096078, 1));
+			locationArray.PushBack(Vector(163.520279, 543.093323, 18.353504, 1));
+			locationArray.PushBack(Vector(108.897484, 706.738892, 44.768902, 1));
+			locationArray.PushBack(Vector(-30.010857, 803.107300, 26.647226, 1));
+			locationArray.PushBack(Vector(500.922668, -164.858215, 9.097790, 1));
+			locationArray.PushBack(Vector(799.975159, -78.755714, 12.026348, 1));
+			locationArray.PushBack(Vector(750.720093, -236.485458, 17.653166, 1));
+			locationArray.PushBack(Vector(461.852081, -349.161407, 38.958031, 1));
+			locationArray.PushBack(Vector(392.519257, -601.149536, 19.787714, 1));
+			locationArray.PushBack(Vector(339.226318, -820.844788, 25.294600, 1));
+			locationArray.PushBack(Vector(177.564240, -949.896973, 11.095909, 1));
+		}
+		else
+		{
+			locationArray.Clear();
+		}
+
+		sizeArray = locationArray.Size();
+
+		if (sizeArray <= 0)
+		{
+			return;
+		}
+
+		for(idx = 0; idx < sizeArray; idx += 1)
+		{
+			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+
+			ent.AddTag( 'ACS_MonsterSpawner_TheBeast' );
+		}
+	}
+
+	latent function GiantRockTroll_Static_Spawn_Latent()
+	{
+		var locationArray 													: array<Vector>;
+		var sizeArray , idx 												: int;
+		var ent																: CEntity;
+
+		if (!ACS_Giant_Trolls_Enabled())
+		{
+			return;
+		}
+
+		locationArray.Clear();
+
+		if ((theGame.GetWorld().GetDepotPath() == "levels\novigrad\novigrad.w2w"))
+		{
+			locationArray.PushBack(Vector(-83.652283, 825.619385, 6.814040, 1));
+			locationArray.PushBack(Vector(439.038361, 297.068268, 2.413083, 1));
+			locationArray.PushBack(Vector(432.175995, 1189.342407, 10.317221, 1));
+			locationArray.PushBack(Vector(296.638794, 1417.689453, 26.598749, 1));
+			locationArray.PushBack(Vector(135.326385, 1564.283813, 4.147139, 1));
+			locationArray.PushBack(Vector(378.451141, 1547.816040, 7.426154, 1));
+			locationArray.PushBack(Vector(1057.539307, 2124.237061, 6.799896, 1));
+			locationArray.PushBack(Vector(954.551636, 2237.672607, 4.126230, 1));
+			locationArray.PushBack(Vector(1007.959045, 2382.247070, 3.155971, 1));
+			locationArray.PushBack(Vector(904.387024, 2478.490479, 20.083954, 1));
+			locationArray.PushBack(Vector(685.963379, 2660.965576, 42.131599, 1));
+			locationArray.PushBack(Vector(1203.423218, -1336.628662, 13.647555, 1));
+			locationArray.PushBack(Vector(1365.308960, -1411.254028, 25.590517, 1));
+			locationArray.PushBack(Vector(1568.900513, -1441.859497, 24.755070, 1));
+			locationArray.PushBack(Vector(556.318054, -161.332397, 0.982558, 1));
+			locationArray.PushBack(Vector(695.733459, -103.891937, 3.385972, 1));
+			locationArray.PushBack(Vector(820.482666, -27.432623, 9.354900, 1));
+			locationArray.PushBack(Vector(1362.515381, 97.368980, 15.285660, 1));
+			locationArray.PushBack(Vector(1944.443970, -28.135277, 67.442513, 1));
+			locationArray.PushBack(Vector(2126.497559, -629.321228, 7.145461, 1));
+			locationArray.PushBack(Vector(2133.784912, -346.064240, 0.765507, 1));
+			locationArray.PushBack(Vector(39.825802, -57.843487, 2.932896, 1));
+			locationArray.PushBack(Vector(814.379395, 759.632629, 16.101336, 1));
+			locationArray.PushBack(Vector(895.817932, 783.947632, 25.214117, 1));
+			locationArray.PushBack(Vector(895.817932, 783.947632, 25.214117, 1));
+			locationArray.PushBack(Vector(1030.896606, 986.082764, 0.090311, 1));
+			locationArray.PushBack(Vector(1087.558960, 973.826416, 0.063283, 1));
+			locationArray.PushBack(Vector(210.700470, 720.616943, 2.240232, 1));
+			locationArray.PushBack(Vector(2360.036377, 1480.215942, 44.723820, 1));
+			locationArray.PushBack(Vector(396.246948, 469.986145, 0.662693, 1));
+		}
+		else
+		{
+			locationArray.Clear();
+		}
+
+		sizeArray = locationArray.Size();
+
+		if (sizeArray <= 0)
+		{
+			return;
+		}
+
+		for(idx = 0; idx < sizeArray; idx += 1)
+		{
+			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+
+			ent.AddTag( 'ACS_MonsterSpawner_GiantRockTroll' );
+		}
+	}
+
+	latent function GiantIceTroll_Static_Spawn_Latent()
+	{
+		var locationArray 													: array<Vector>;
+		var sizeArray , idx 												: int;
+		var ent																: CEntity;
+
+		if (!ACS_Giant_Trolls_Enabled())
+		{
+			return;
+		}
+
+		locationArray.Clear();
+
+		if ((theGame.GetWorld().GetDepotPath() == "levels\skellige\skellige.w2w"))
+		{
+			locationArray.PushBack(Vector(4.445589, -333.085541, 71.284271, 1));
+			locationArray.PushBack(Vector(5.287621, -580.129456, 62.766724, 1));
+			locationArray.PushBack(Vector(310.019714, -747.174500, 16.894848, 1));
+			locationArray.PushBack(Vector(493.789459, -693.541748, 29.782984, 1));
+			locationArray.PushBack(Vector(671.784180, -531.278015, 72.428757, 1));
+			locationArray.PushBack(Vector(843.949829, -436.526093, 66.400955, 1));
+			locationArray.PushBack(Vector(899.529968, -248.567078, 22.200169, 1));
+			locationArray.PushBack(Vector(1003.532410, -331.773621, 12.782719, 1));
+			locationArray.PushBack(Vector(1099.866333, 499.817047, 2.947420, 1));
+			locationArray.PushBack(Vector(1043.034180, 659.841064, 1.871318, 1));
+			locationArray.PushBack(Vector(370.272583, 970.457214, 0.645516, 1));
+			locationArray.PushBack(Vector(-114.917969, 398.548798, 36.592354, 1));
+			locationArray.PushBack(Vector(-102.911087, 229.688812, 2.486377, 1));
+			locationArray.PushBack(Vector(-227.657761, -111.409737, 40.609638, 1));
+			locationArray.PushBack(Vector(-503.814514, -225.105331, 38.784515, 1));
+			locationArray.PushBack(Vector(-694.657593, -235.945084, 14.500160, 1));
+			locationArray.PushBack(Vector(-1494.397583, -589.593445, 24.010265, 1));
+			locationArray.PushBack(Vector(-2091.409180, -693.341980, 21.748358, 1));
+			locationArray.PushBack(Vector(-2407.948975, -982.762390, 0.496828, 1));
+			locationArray.PushBack(Vector(-1798.451172, -1978.912720, 6.662552, 1));
+			locationArray.PushBack(Vector(-723.084167, -1895.524658, 1.139682, 1));
+			locationArray.PushBack(Vector(-44.313530, -1245.620361, 3.188847, 1));
+			locationArray.PushBack(Vector(349.847565, -1409.451660, 4.052605, 1));
+			locationArray.PushBack(Vector(408.525635, -1230.413940, 8.973654, 1));
+			locationArray.PushBack(Vector(485.187592, -831.525208, 1.485389, 1));
+			locationArray.PushBack(Vector(645.458984, -635.424561, 57.471813, 1));
+			locationArray.PushBack(Vector(832.278015, -440.492004, 66.671371, 1));
+			locationArray.PushBack(Vector(1096.462769, -189.441208, 2.649631, 1));
+			locationArray.PushBack(Vector(-631.686157, -560.699890, 6.997999, 1));
+			locationArray.PushBack(Vector(-669.275574, -629.244019, 1.302735, 1));
+			locationArray.PushBack(Vector(-528.461853, -688.140320, 4.295346, 1));
+			locationArray.PushBack(Vector(-456.681580, -796.733887, 16.357405, 1));
+			locationArray.PushBack(Vector(446.876892, -1287.261597, 5.703918, 1));
+			locationArray.PushBack(Vector(-316.006287, -443.072784, 52.868565, 1));
+		}
+		else
+		{
+			locationArray.Clear();
+		}
+
+		sizeArray = locationArray.Size();
+
+		if (sizeArray <= 0)
+		{
+			return;
+		}
+
+		for(idx = 0; idx < sizeArray; idx += 1)
+		{
+			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+
+			ent.AddTag( 'ACS_MonsterSpawner_GiantIceTroll' );
+		}
+	}
+
+	latent function GiantMagmaTroll_Static_Spawn_Latent()
+	{
+		var locationArray 													: array<Vector>;
+		var sizeArray , idx 												: int;
+		var ent																: CEntity;
+
+		if (!ACS_Giant_Trolls_Enabled())
+		{
+			return;
+		}
+
+		locationArray.Clear();
+
+		if ((theGame.GetWorld().GetDepotPath() == "dlc\bob\data\levels\bob\bob.w2w"))
+		{
+			locationArray.PushBack(Vector(59.739307, 37.811275, 8.193762, 1));
+			locationArray.PushBack(Vector(-221.911743, -198.083328, 17.216597, 1));
+			locationArray.PushBack(Vector(-206.392944, -484.391296, 6.202147, 1));
+			locationArray.PushBack(Vector(389.383667, -481.389313, 36.636112, 1));
+			locationArray.PushBack(Vector(412.723297, -277.240631, 28.178568, 1));
+			locationArray.PushBack(Vector(239.237747, -186.436615, 39.053719, 1));
+			locationArray.PushBack(Vector(53.277809, -372.931610, 12.303003, 1));
+			locationArray.PushBack(Vector(-239.807907, -158.113632, 19.732639, 1));
+			locationArray.PushBack(Vector(-700.918396, -599.062073, 28.272722, 1));
+			locationArray.PushBack(Vector(-894.362000, -435.819611, 48.287174, 1));
+			locationArray.PushBack(Vector(-1462.350708, -1118.758423, 132.064682, 1));
+			locationArray.PushBack(Vector(-1491.314697, -1425.742065, 207.128387, 1));
+			locationArray.PushBack(Vector(-1156.875732, -1708.053955, 152.096863, 1));
+			locationArray.PushBack(Vector(-819.692200, -2121.879150, 185.318588, 1));
+			locationArray.PushBack(Vector(-413.944336, -2237.573242, 102.716560, 1));
+			locationArray.PushBack(Vector(-124.331795, -2299.412842, 99.222824, 1));
+			locationArray.PushBack(Vector(162.306305, -2284.646729, 99.687889, 1));
+			locationArray.PushBack(Vector(440.774536, -2363.433350, 75.127831, 1));
+			locationArray.PushBack(Vector(649.908264, -2487.118652, 4.996531, 1));
+			locationArray.PushBack(Vector(557.734192, -2064.443604, 32.717133, 1));
+			locationArray.PushBack(Vector(533.501648, -1498.732544, 6.590299, 1));
+			locationArray.PushBack(Vector(432.482147, -1360.970093, 1.059601, 1));
+			locationArray.PushBack(Vector(183.312088, -1502.213989, 9.366125, 1));
+			locationArray.PushBack(Vector(528.933594, -1018.452271, 7.716246, 1));
+			locationArray.PushBack(Vector(136.884506, -540.972046, 27.618055, 1));
+		}
+		else
+		{
+			locationArray.Clear();
+		}
+
+		sizeArray = locationArray.Size();
+
+		if (sizeArray <= 0)
+		{
+			return;
+		}
+
+		for(idx = 0; idx < sizeArray; idx += 1)
+		{
+			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+
+			ent.AddTag( 'ACS_MonsterSpawner_GiantMagmaTroll' );
+		}
+	}
+
+	latent function GiantRockElemental_Static_Spawn_Latent()
+	{
+		var locationArray 													: array<Vector>;
+		var sizeArray , idx 												: int;
+		var ent																: CEntity;
+
+		if (!ACS_Elemental_Titans_Enabled())
+		{
+			return;
+		}
+
+		locationArray.Clear();
+
+		if ((theGame.GetWorld().GetDepotPath() == "levels\novigrad\novigrad.w2w"))
+		{
+			locationArray.PushBack(Vector(1060.282471, -76.535538, 19.190325, 1));
+			locationArray.PushBack(Vector(1687.603149, 198.648117, 6.743061, 1));
+			locationArray.PushBack(Vector(2048.343506, -517.623840, 12.872213, 1));
+			locationArray.PushBack(Vector(2032.016235, -1036.760376, 3.535477, 1));
+			locationArray.PushBack(Vector(2297.008057, -798.962219, 9.000401, 1));
+
+		}
+		else
+		{
+			locationArray.Clear();
+		}
+
+		sizeArray = locationArray.Size();
+
+		if (sizeArray <= 0)
+		{
+			return;
+		}
+
+		for(idx = 0; idx < sizeArray; idx += 1)
+		{
+			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+
+			ent.AddTag( 'ACS_MonsterSpawner_ElementalTitanOfTerra' );
+		}
+	}
+
+	latent function GiantIceElemental_Static_Spawn_Latent()
+	{
+		var locationArray 													: array<Vector>;
+		var sizeArray , idx 												: int;
+		var ent																: CEntity;
+
+		if (!ACS_Elemental_Titans_Enabled())
+		{
+			return;
+		}
+
+		locationArray.Clear();
+
+		if ((theGame.GetWorld().GetDepotPath() == "levels\skellige\skellige.w2w"))
+		{
+			locationArray.PushBack(Vector(1183.560059, 189.393356, 89.293564, 1));
+			locationArray.PushBack(Vector(314.260742, 794.084473, 119.502014, 1));
+			locationArray.PushBack(Vector(-1513.627686, -731.456543, 59.752247, 1));
+			locationArray.PushBack(Vector(359.591278, -966.082092, 6.209056, 1));
+		}
+		else
+		{
+			locationArray.Clear();
+		}
+
+		sizeArray = locationArray.Size();
+
+		if (sizeArray <= 0)
+		{
+			return;
+		}
+
+		for(idx = 0; idx < sizeArray; idx += 1)
+		{
+			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+
+			ent.AddTag( 'ACS_MonsterSpawner_ElementalTitanOfIce' );
+		}
+	}
+
+	latent function GiantFireElemental_Static_Spawn_Latent()
+	{
+		var locationArray 													: array<Vector>;
+		var sizeArray , idx 												: int;
+		var ent																: CEntity;
+
+		if (!ACS_Elemental_Titans_Enabled())
+		{
+			return;
+		}
+
+		locationArray.Clear();
+
+		if ((theGame.GetWorld().GetDepotPath() == "dlc\bob\data\levels\bob\bob.w2w"))
+		{
+			locationArray.PushBack(Vector(-915.964355, -488.935425, 47.484203, 1));
+			locationArray.PushBack(Vector(-1290.276001, -1028.771240, 129.549973, 1));
+			locationArray.PushBack(Vector(-331.664551, -1749.667725, 69.612183, 1));
+			locationArray.PushBack(Vector(74.388710, 198.024963, -0.119638, 1));
+		}
+		else
+		{
+			locationArray.Clear();
+		}
+
+		sizeArray = locationArray.Size();
+
+		if (sizeArray <= 0)
+		{
+			return;
+		}
+
+		for(idx = 0; idx < sizeArray; idx += 1)
+		{
+			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+
+			ent.AddTag( 'ACS_MonsterSpawner_ElementalTitanOfFire' );
+		}
+	}
+
+	latent function DarkKnight_Static_Spawn_Latent()
+	{
+		var locationArray 													: array<Vector>;
+		var sizeArray , idx 												: int;
+		var ent																: CEntity;
+
+		if (!ACS_Dark_Knight_Enabled())
+		{
+			return;
+		}
+
+		locationArray.Clear();
+
+		if ((theGame.GetWorld().GetDepotPath() == "levels\novigrad\novigrad.w2w"))
+		{
+			locationArray.PushBack(Vector(836.191589, -395.673523, 2.224552, 1));
+			locationArray.PushBack(Vector(1381.291504, -1055.433960, 58.014816, 1));
+			locationArray.PushBack(Vector(1545.358398, -1124.355347, 80.713638, 1));
+			locationArray.PushBack(Vector(1428.787842, -1156.680664, 95.420837, 1));
+			locationArray.PushBack(Vector(1974.339722, 2232.804443, 27.868523, 1));
+			locationArray.PushBack(Vector(1542.161377, 2229.752441, 11.161452, 1));
+			locationArray.PushBack(Vector(1428.027954, 1828.565918, 2.368070, 1));
+			locationArray.PushBack(Vector(1590.977051, 1615.722534, 9.431250, 1));
+		}
+		else if ((theGame.GetWorld().GetDepotPath() == "levels\skellige\skellige.w2w"))
+		{
+			locationArray.PushBack(Vector(-1576.830322, -756.010864, 55.247936, 1));
+			locationArray.PushBack(Vector(-1792.773560, -602.607910, 6.070964, 1));
+			locationArray.PushBack(Vector(-1950.407227, -811.379333, 27.354528, 1));
+			locationArray.PushBack(Vector(1504.942993, 2018.200928, 46.665878, 1));
+			locationArray.PushBack(Vector(2436.818359, -19.264551, 2.124149, 1));
+			
+		}
+		else if ((theGame.GetWorld().GetDepotPath() == "dlc\bob\data\levels\bob\bob.w2w"))
+		{
+			locationArray.PushBack(Vector(1123.347168, -860.468994, 39.825954, 1));
+			locationArray.PushBack(Vector(633.753723, -1489.232300, 25.632366, 1));
+			locationArray.PushBack(Vector(-1175.391846, -1145.981934, 164.548019, 1));
+			locationArray.PushBack(Vector(-2.496078, 454.166565, 16.158661, 1));
+			locationArray.PushBack(Vector(-223.599854, 583.759888, 0.350415, 1));
+		}
+		else
+		{
+			locationArray.Clear();
+		}
+
+		sizeArray = locationArray.Size();
+
+		if (sizeArray <= 0)
+		{
+			return;
+		}
+
+		for(idx = 0; idx < sizeArray; idx += 1)
+		{
+			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+
+			ent.AddTag( 'ACS_MonsterSpawner_DarkKnight' );
+		}
+	}
+
+	latent function DarkKnightCalidus_Static_Spawn_Latent()
+	{
+		var locationArray 													: array<Vector>;
+		var sizeArray , idx 												: int;
+		var ent																: CEntity;
+
+		if (!ACS_Dark_Knight_Enabled())
+		{
+			return;
+		}
+
+		locationArray.Clear();
+
+		if ((theGame.GetWorld().GetDepotPath() == "levels\novigrad\novigrad.w2w"))
+		{
+			locationArray.PushBack(Vector(1439.434326, -1199.826416, 106.754715, 1));
+			locationArray.PushBack(Vector(1590.977051, 1615.722534, 9.431250, 1));
+			locationArray.PushBack(Vector(2437.777344, 986.931763, 40.605934, 1));
+			locationArray.PushBack(Vector(-286.669891, 921.278931, 14.871866, 1));
+		}
+		else if ((theGame.GetWorld().GetDepotPath() == "levels\skellige\skellige.w2w"))
+		{
+			locationArray.PushBack(Vector(722.866943, 455.438446, 145.939957, 1));
+			locationArray.PushBack(Vector(893.768738, 585.886963, 70.309082, 1));
+		}
+		else if ((theGame.GetWorld().GetDepotPath() == "dlc\bob\data\levels\bob\bob.w2w"))
+		{
+			locationArray.PushBack(Vector(-772.236755, -1674.176514, 96.629082, 1));
+			locationArray.PushBack(Vector(-1237.059204, -523.899353, 71.799675, 1));
+		}
+		else
+		{
+			locationArray.Clear();
+		}
+
+		sizeArray = locationArray.Size();
+
+		if (sizeArray <= 0)
+		{
+			return;
+		}
+
+		for(idx = 0; idx < sizeArray; idx += 1)
+		{
+			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+
+			ent.AddTag( 'ACS_MonsterSpawner_DarkKnightCalidus' );
+		}
+	}
+
+	latent function Voref_Static_Spawn_Latent()
+	{
+		var locationArray 													: array<Vector>;
+		var sizeArray , idx 												: int;
+		var ent																: CEntity;
+
+		if (!ACS_Voref_Enabled())
+		{
+			return;
+		}
+
+		locationArray.Clear();
+
+		if ((theGame.GetWorld().GetDepotPath() == "levels\skellige\skellige.w2w"))
+		{
+			locationArray.PushBack(Vector(-1858.732544, 1242.505371, 54.716381, 1));
+			locationArray.PushBack(Vector(-1639.657471, 1499.595093, 8.460683, 1));
+			locationArray.PushBack(Vector(1347.586548, 1895.510254, 13.347636, 1));
+			locationArray.PushBack(Vector(1507.984375, 1973.587402, 12.546463, 1));
+			locationArray.PushBack(Vector(2774.545898, -98.046440, 20.527134, 1));
+			locationArray.PushBack(Vector(2277.303223, 131.885757, 22.807037, 1));
+			locationArray.PushBack(Vector(2339.241455, -1968.287354, 11.821833, 1));
+			locationArray.PushBack(Vector(2068.948486, -1997.734863, 17.378977, 1));
+			locationArray.PushBack(Vector(1693.152466, -2017.753174, 17.882828, 1));
+			locationArray.PushBack(Vector(1644.724487, -1852.296631, 21.086523, 1));
+		}
+		else
+		{
+			locationArray.Clear();
+		}
+
+		sizeArray = locationArray.Size();
+
+		if (sizeArray <= 0)
+		{
+			return;
+		}
+
+		for(idx = 0; idx < sizeArray; idx += 1)
+		{
+			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+
+			ent.AddTag( 'ACS_MonsterSpawner_Voref' );
+		}
+	}
+
+	latent function Ifrit_Static_Spawn_Latent()
+	{
+		var locationArray 													: array<Vector>;
+		var sizeArray , idx 												: int;
+		var ent																: CEntity;
+
+		if (!ACS_Ifrit_Enabled())
+		{
+			return;
+		}
+
+		locationArray.Clear();
+
+		if ((theGame.GetWorld().GetDepotPath() == "levels\novigrad\novigrad.w2w"))
+		{
+			locationArray.PushBack(Vector(1730.903931, -900.514587, 7.117824, 1));
+		}
+		else
+		{
+			locationArray.Clear();
+		}
+
+		sizeArray = locationArray.Size();
+
+		if (sizeArray <= 0)
+		{
+			return;
+		}
+
+		for(idx = 0; idx < sizeArray; idx += 1)
+		{
+			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+
+			ent.AddTag( 'ACS_MonsterSpawner_Ifrit' );
+		}
+	}
+
+	latent function Carduin_Static_Spawn_Latent()
+	{
+		var locationArray 													: array<Vector>;
+		var sizeArray , idx 												: int;
+		var ent																: CEntity;
+
+		if (FactsQuerySum("mq3035_fdb_radovid_dead") <= 0
+		|| FactsQuerySum("ACS_Carduin_Killed") > 0)
+		{
+			return;
+		}
+
+		locationArray.Clear();
+
+		if ((theGame.GetWorld().GetDepotPath() == "levels\novigrad\novigrad.w2w"))
+		{
+			locationArray.PushBack(Vector(1964.925415, 985.420044, 1.828611, 1));
+		}
+		else
+		{
+			locationArray.Clear();
+		}
+
+		sizeArray = locationArray.Size();
+
+		if (sizeArray <= 0)
+		{
+			return;
+		}
+
+		for(idx = 0; idx < sizeArray; idx += 1)
+		{
+			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+
+			ent.AddTag( 'ACS_MonsterSpawner_Carduin' );
+		}
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	latent function Horse_Riders_Novigrad_Static_Spawn_Latent()
+	{
+		var locationArray 													: array<Vector>;
+		var sizeArray , idx 												: int;
+		var ent																: CEntity;
+
+		if (!ACS_HorseRiders_Enabled())
+		{
+			return;
+		}
+
+		locationArray.Clear();
+
+		if ((theGame.GetWorld().GetDepotPath() == "levels\novigrad\novigrad.w2w"))
+		{
+			locationArray.PushBack(Vector(559.804443, 1292.834473, 9.919272, 1));
+			locationArray.PushBack(Vector(626.770203, 1445.273315, 4.688265, 1));
+			locationArray.PushBack(Vector(777.864685, 1529.187256, 5.996058, 1));
+			locationArray.PushBack(Vector(786.411133, 1579.262695, 1.806557, 1));
+			locationArray.PushBack(Vector(827.466064, 1599.035034, 1.995532, 1));
+			locationArray.PushBack(Vector(841.997986, 1642.311035, 5.163556, 1));
+			locationArray.PushBack(Vector(891.803589, 1623.978394, 2.756525, 1));
+			locationArray.PushBack(Vector(940.476013, 1615.778931, 2.154349, 1));
+			locationArray.PushBack(Vector(981.116882, 1635.465332, 2.013911, 1));
+			locationArray.PushBack(Vector(1007.539856, 1748.234253, 3.210988, 1));
+			locationArray.PushBack(Vector(1019.289246, 1783.243408, 7.284018, 1));
+			locationArray.PushBack(Vector(988.604309, 1808.649536, 11.240920, 1));
+			locationArray.PushBack(Vector(941.202698, 1805.843628, 6.114297, 1));
+			locationArray.PushBack(Vector(922.937561, 1758.661743, 0.841169, 1));
+			locationArray.PushBack(Vector(881.182800, 1741.015503, 2.027400, 1));
+			locationArray.PushBack(Vector(827.453064, 1743.890381, 4.692541, 1));
+			locationArray.PushBack(Vector(802.076965, 1735.344238, 5.798975, 1));
+			locationArray.PushBack(Vector(798.924316, 1701.939697, 5.609519, 1));
+			locationArray.PushBack(Vector(817.108704, 1680.515381, 8.443353, 1));
+			locationArray.PushBack(Vector(804.355835, 1591.489014, 3.118973, 1));
+			locationArray.PushBack(Vector(699.809265, 1582.292725, 1.037407, 1));
+			locationArray.PushBack(Vector(637.489319, 1549.314941, 6.752225, 1));
+			locationArray.PushBack(Vector(615.151428, 1568.734131, 6.565228, 1));
+			locationArray.PushBack(Vector(649.136963, 1614.806885, 1.939423, 1));
+			locationArray.PushBack(Vector(679.148193, 1685.042969, 4.162844, 1));
+			locationArray.PushBack(Vector(714.279419, 1712.226929, 4.342856, 1));
+			locationArray.PushBack(Vector(707.908508, 1746.473755, 4.275872, 1));
+			locationArray.PushBack(Vector(667.339111, 1755.046875, 3.991571, 1));
+			locationArray.PushBack(Vector(626.909180, 1750.054565, 3.332775, 1));
+			locationArray.PushBack(Vector(592.320618, 1749.682617, 2.733042, 1));
+			locationArray.PushBack(Vector(569.994507, 1746.251465, 3.530958, 1));
+			locationArray.PushBack(Vector(546.997925, 1752.926514, 4.037784, 1));
+			locationArray.PushBack(Vector(549.058167, 1721.820801, 2.737222, 1));
+			locationArray.PushBack(Vector(576.248352, 1711.315674, 2.765430, 1));
+			locationArray.PushBack(Vector(574.178650, 1678.055176, 2.745425, 1));
+			locationArray.PushBack(Vector(676.974243, 1787.377197, 1.077542, 1));
+			locationArray.PushBack(Vector(699.022766, 1774.245117, 1.882885, 1));
+			locationArray.PushBack(Vector(734.696594, 1803.436646, 3.171304, 1));
+			locationArray.PushBack(Vector(747.296082, 1837.330322, 6.207741, 1));
+			locationArray.PushBack(Vector(723.387878, 1862.406494, 8.130503, 1));
+			locationArray.PushBack(Vector(693.268799, 1864.740479, 10.415036, 1));
+			locationArray.PushBack(Vector(667.678833, 1879.213867, 9.865468, 1));
+			locationArray.PushBack(Vector(667.065674, 1907.984619, 10.069596, 1));
+			locationArray.PushBack(Vector(667.809387, 1933.181152, 12.748077, 1));
+			locationArray.PushBack(Vector(661.394470, 1959.732056, 19.485044, 1));
+			locationArray.PushBack(Vector(641.407593, 2006.548340, 26.732508, 1));
+			locationArray.PushBack(Vector(646.360901, 2056.395264, 30.960327, 1));
+			locationArray.PushBack(Vector(672.580811, 2064.704590, 32.483738, 1));
+			locationArray.PushBack(Vector(705.145142, 2051.127930, 35.471329, 1));
+			locationArray.PushBack(Vector(687.579590, 1980.914429, 24.101236, 1));
+			locationArray.PushBack(Vector(687.579590, 1980.914429, 24.101236, 1));
+			locationArray.PushBack(Vector(606.221375, 1836.773071, 4.580671, 1));
+			locationArray.PushBack(Vector(577.206543, 1851.548584, 4.460234, 1));
+			locationArray.PushBack(Vector(560.922791, 1881.145020, 3.898340, 1));
+			locationArray.PushBack(Vector(574.965698, 1908.730835, 4.934678, 1));
+			locationArray.PushBack(Vector(582.241699, 1942.485718, 5.169654, 1));
+			locationArray.PushBack(Vector(609.031250, 1926.634399, 7.640145, 1));
+			locationArray.PushBack(Vector(572.713379, 1905.652710, 5.047591, 1));
+			locationArray.PushBack(Vector(514.613220, 1864.846680, 4.373676, 1));
+			locationArray.PushBack(Vector(487.588776, 1878.159424, 4.246819, 1));
+			locationArray.PushBack(Vector(432.304901, 1900.859619, 2.441375, 1));
+			locationArray.PushBack(Vector(423.872437, 1917.379517, 2.187095, 1));
+			locationArray.PushBack(Vector(439.886108, 1960.878052, 2.989876, 1));
+			locationArray.PushBack(Vector(480.748413, 1999.432861, 1.993202, 1));
+			locationArray.PushBack(Vector(554.924988, 2008.583496, 0.945228, 1));
+			locationArray.PushBack(Vector(545.887024, 1823.119019, 3.741268, 1));
+			locationArray.PushBack(Vector(553.286987, 1785.111450, 4.094858, 1));
+			locationArray.PushBack(Vector(546.797119, 1745.893555, 4.004136, 1));
+			locationArray.PushBack(Vector(514.200684, 1712.156494, 1.766035, 1));
+			locationArray.PushBack(Vector(483.030518, 1715.200684, 4.273919, 1));
+			locationArray.PushBack(Vector(442.358643, 1720.356812, 3.523132, 1));
+			locationArray.PushBack(Vector(408.354736, 1716.762573, 2.893276, 1));
+			locationArray.PushBack(Vector(353.660461, 1748.678101, 3.527761, 1));
+			locationArray.PushBack(Vector(312.378174, 1812.231934, 2.779862, 1));
+			locationArray.PushBack(Vector(546.447998, 1581.426025, 4.560590, 1));
+			locationArray.PushBack(Vector(550.437134, 1618.311157, 3.349564, 1));
+			locationArray.PushBack(Vector(548.704529, 1653.926392, 5.524598, 1));
+			locationArray.PushBack(Vector(550.694824, 1691.461060, 1.408275, 1));
+			locationArray.PushBack(Vector(571.221008, 1675.925415, 2.652921, 1));
+			locationArray.PushBack(Vector(616.582092, 1696.772461, 3.295815, 1));
+		}
+		else
+		{
+			locationArray.Clear();
+		}
+
+		sizeArray = locationArray.Size();
+
+		if (sizeArray <= 0)
+		{
+			return;
+		}
+
+		for(idx = 0; idx < sizeArray; idx += 1)
+		{
+			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+
+			ent.AddTag( 'ACS_MonsterSpawner_HorseRidersNovigrad' );
+		}
+	}
+
+	latent function Horse_Riders_Nilfgaard_Static_Spawn_Latent()
+	{
+		var locationArray 													: array<Vector>;
+		var sizeArray , idx 												: int;
+		var ent																: CEntity;
+
+		if (!ACS_HorseRiders_Enabled())
+		{
+			return;
+		}
+
+		locationArray.Clear();
+
+		if ((theGame.GetWorld().GetDepotPath() == "levels\novigrad\novigrad.w2w"))
+		{
+			locationArray.PushBack(Vector(2466.281494, -893.399902, 6.793127, 1));
+			locationArray.PushBack(Vector(2428.339844, -923.481384, 13.503413, 1));
+			locationArray.PushBack(Vector(2458.485107, -956.510071, 15.537817, 1));
+			locationArray.PushBack(Vector(2532.146729, -979.413635, 17.048088, 1));
+			locationArray.PushBack(Vector(2481.230957, -1004.989929, 22.102385, 1));
+			locationArray.PushBack(Vector(2424.871582, -1027.307373, 16.699303, 1));
+			locationArray.PushBack(Vector(2407.072998, -1065.895020, 16.452110, 1));
+			locationArray.PushBack(Vector(2380.022949, -1040.435791, 13.158699, 1));
+			locationArray.PushBack(Vector(2396.104980, -1035.843384, 11.626535, 1));
+			locationArray.PushBack(Vector(2388.740723, -990.363525, 10.828608, 1));
+			locationArray.PushBack(Vector(2412.333008, -929.406921, 12.793174, 1));
+			locationArray.PushBack(Vector(2377.936523, -901.019287, 15.148425, 1));
+			locationArray.PushBack(Vector(2443.541016, -911.930664, 10.890745, 1));
+			locationArray.PushBack(Vector(2490.681396, -866.127502, 4.416340, 1));
+			locationArray.PushBack(Vector(2338.140625, -897.091736, 14.075936, 1));
+			locationArray.PushBack(Vector(2315.433594, -914.326111, 13.513382, 1));
+			locationArray.PushBack(Vector(2277.500244, -838.670593, 18.885704, 1));
+			locationArray.PushBack(Vector(2235.349609, -800.985962, 13.757975, 1));
+			locationArray.PushBack(Vector(2213.363525, -749.072876, 4.433287, 1));
+		}
+		else
+		{
+			locationArray.Clear();
+		}
+
+		sizeArray = locationArray.Size();
+
+		if (sizeArray <= 0)
+		{
+			return;
+		}
+
+		for(idx = 0; idx < sizeArray; idx += 1)
+		{
+			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+
+			ent.AddTag( 'ACS_MonsterSpawner_HorseRidersNilfgaard' );
+		}
+	}
+
+	latent function Horse_Riders_Redania_Static_Spawn_Latent()
+	{
+		var locationArray 													: array<Vector>;
+		var sizeArray , idx 												: int;
+		var ent																: CEntity;
+
+		if (!ACS_HorseRiders_Enabled())
+		{
+			return;
+		}
+		
+		locationArray.Clear();
+
+		if ((theGame.GetWorld().GetDepotPath() == "levels\novigrad\novigrad.w2w"))
+		{
+			locationArray.PushBack(Vector(1465.958252, 784.778442, 16.446341, 1));
+			locationArray.PushBack(Vector(1407.601074, 735.999512, 20.292717, 1));
+			locationArray.PushBack(Vector(1311.785156, 693.150452, 27.286922, 1));
+			locationArray.PushBack(Vector(1374.735962, 712.657837, 24.236000, 1));
+			locationArray.PushBack(Vector(1455.147095, 754.743103, 12.448925, 1));
+			locationArray.PushBack(Vector(1473.313110, 795.962158, 17.800457, 1));
+			locationArray.PushBack(Vector(1524.016479, 796.382690, 12.599571, 1));
+			locationArray.PushBack(Vector(1552.367798, 748.240356, 6.686374, 1));
+			locationArray.PushBack(Vector(1517.720581, 820.937866, 19.875105, 1));
+			locationArray.PushBack(Vector(1553.853516, 837.139771, 24.376753, 1));
+			locationArray.PushBack(Vector(1704.479980, 907.655884, 16.390196, 1));
+			locationArray.PushBack(Vector(1737.160889, 913.022888, 13.461655, 1));
+			locationArray.PushBack(Vector(1786.758301, 946.775269, 7.173893, 1));
+			locationArray.PushBack(Vector(1778.848755, 989.085938, 5.434481, 1));
+			locationArray.PushBack(Vector(1743.482788, 990.343933, 6.351764, 1));
+			locationArray.PushBack(Vector(1697.981689, 1027.782349, 4.815741, 1));
+			locationArray.PushBack(Vector(1678.539673, 992.940125, 6.632220, 1));
+			locationArray.PushBack(Vector(1659.149902, 959.008972, 3.297548, 1));
+			locationArray.PushBack(Vector(1645.828491, 944.151489, 0.349907, 1));
+			locationArray.PushBack(Vector(1644.858521, 1001.239258, 0.958614, 1));
+			locationArray.PushBack(Vector(1671.532837, 1087.961914, 1.291269, 1));
+			locationArray.PushBack(Vector(1698.655151, 1123.668335, 2.611463, 1));
+			locationArray.PushBack(Vector(1728.511353, 1056.475952, 3.611060, 1));
+			locationArray.PushBack(Vector(1756.355347, 988.342896, 6.334800, 1));
+			locationArray.PushBack(Vector(1785.741455, 957.808899, 6.415081, 1));
+			locationArray.PushBack(Vector(1806.454224, 927.368164, 3.625343, 1));
+			locationArray.PushBack(Vector(1761.244263, 864.744263, 12.226563, 1));
+			locationArray.PushBack(Vector(1748.525635, 893.263916, 11.910158, 1));
+			locationArray.PushBack(Vector(1777.484009, 931.466125, 9.068529, 1));
+			locationArray.PushBack(Vector(1776.572021, 1036.940063, 6.366843, 1));
+			locationArray.PushBack(Vector(1820.379639, 1038.930664, 6.410772, 1));
+			locationArray.PushBack(Vector(1855.259766, 1050.624390, 5.604130, 1));
+			locationArray.PushBack(Vector(1887.046875, 1081.388306, 3.855273, 1));
+			locationArray.PushBack(Vector(1928.295166, 1120.715210, 5.250492, 1));
+			locationArray.PushBack(Vector(1868.810913, 1164.570190, 4.222408, 1));
+			locationArray.PushBack(Vector(1830.323730, 1206.231445, 8.353842, 1));
+			locationArray.PushBack(Vector(1740.551880, 1211.378540, 1.532006, 1));
+			locationArray.PushBack(Vector(1688.423462, 1242.124146, 0.214568, 1));
+			locationArray.PushBack(Vector(1629.176147, 1271.613525, 0.904921, 1));
+
+		}
+		else
+		{
+			locationArray.Clear();
+		}
+
+		sizeArray = locationArray.Size();
+
+		if (sizeArray <= 0)
+		{
+			return;
+		}
+
+		for(idx = 0; idx < sizeArray; idx += 1)
+		{
+			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+
+			ent.AddTag( 'ACS_MonsterSpawner_HorseRidersRedania' );
 		}
 	}
 

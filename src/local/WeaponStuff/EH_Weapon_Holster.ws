@@ -45,6 +45,8 @@ function ACS_WeaponHolsterInit()
 
 	GetWitcherPlayer().StopEffect('fury_403_ciri');
 
+	GetWitcherPlayer().StopEffect('acs_fury_ciri');
+
 	GetWitcherPlayer().StopEffect('teleport_glow_ciri');
 
 	if (GetWitcherPlayer().HasTag('igni_sword_equipped')

@@ -192,6 +192,12 @@ struct ACS_Cooldown_Manager
 
 	var last_wearable_pocket_item_refresh_time			: float;
 
+	var last_horse_follow_target_novigrad_teleport_time	: float;
+
+	var last_horse_follow_target_nilfgaard_teleport_time: float;
+
+	var last_horse_follow_target_redania_teleport_time	: float;
+
 	// Change the values below to adjust the cooldowns of specific attacks or skills.
 	
 	default parry_skill_doubletap_cooldown = 0.4;
@@ -1853,4 +1859,58 @@ function ACS_refresh_wearable_pocket_items_cooldown()
 	watcher = (W3ACSWatcher)theGame.GetEntityByTag( 'acswatcher' );
 
 	watcher.vACS_Cooldown_Manager.last_wearable_pocket_item_refresh_time = theGame.GetEngineTimeAsSeconds();
+}
+
+function ACS_horse_follow_target_novigrad_can_teleport(): bool 
+{
+	var property: ACS_Cooldown_Manager;
+
+	property = GetACSWatcher().vACS_Cooldown_Manager;
+
+	return theGame.GetEngineTimeAsSeconds() - property.last_horse_follow_target_novigrad_teleport_time > 120;
+}
+
+function ACS_refresh_horse_follow_target_novigrad_teleport_cooldown() 
+{
+	var watcher: W3ACSWatcher;
+
+	watcher = (W3ACSWatcher)theGame.GetEntityByTag( 'acswatcher' );
+
+	watcher.vACS_Cooldown_Manager.last_horse_follow_target_novigrad_teleport_time = theGame.GetEngineTimeAsSeconds();
+}
+
+function ACS_horse_follow_target_nilfgaard_can_teleport(): bool 
+{
+	var property: ACS_Cooldown_Manager;
+
+	property = GetACSWatcher().vACS_Cooldown_Manager;
+
+	return theGame.GetEngineTimeAsSeconds() - property.last_horse_follow_target_nilfgaard_teleport_time > 30;
+}
+
+function ACS_refresh_horse_follow_target_nilfgaard_teleport_cooldown() 
+{
+	var watcher: W3ACSWatcher;
+
+	watcher = (W3ACSWatcher)theGame.GetEntityByTag( 'acswatcher' );
+
+	watcher.vACS_Cooldown_Manager.last_horse_follow_target_nilfgaard_teleport_time = theGame.GetEngineTimeAsSeconds();
+}
+
+function ACS_horse_follow_target_redania_can_teleport(): bool 
+{
+	var property: ACS_Cooldown_Manager;
+
+	property = GetACSWatcher().vACS_Cooldown_Manager;
+
+	return theGame.GetEngineTimeAsSeconds() - property.last_horse_follow_target_redania_teleport_time > 60;
+}
+
+function ACS_refresh_horse_follow_target_redania_teleport_cooldown() 
+{
+	var watcher: W3ACSWatcher;
+
+	watcher = (W3ACSWatcher)theGame.GetEntityByTag( 'acswatcher' );
+
+	watcher.vACS_Cooldown_Manager.last_horse_follow_target_redania_teleport_time = theGame.GetEngineTimeAsSeconds();
 }

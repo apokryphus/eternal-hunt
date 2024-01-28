@@ -1646,9 +1646,12 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 
 				((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(claw_temp);
 
-				claw_temp = (CEntityTemplate)LoadResource(	"dlc\dlc_acs\data\entities\swords\vamp_claws.w2ent", true);	
+				if (!ACS_HideVampireClaws_Enabled())
+				{
+					claw_temp = (CEntityTemplate)LoadResource(	"dlc\dlc_acs\data\entities\swords\vamp_claws.w2ent", true);	
 
-				((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(claw_temp);
+					((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(claw_temp);
+				}
 			}
 
 			GetWitcherPlayer().PlayEffectSingle('claws_effect');
@@ -8553,9 +8556,12 @@ state Claw_Equip_Standalone_Engage in cClawEquipStandalone
 
 				((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(claw_temp);
 
-				claw_temp = (CEntityTemplate)LoadResource(	"dlc\dlc_acs\data\entities\swords\vamp_claws.w2ent", true);	
+				if (!ACS_HideVampireClaws_Enabled())
+				{
+					claw_temp = (CEntityTemplate)LoadResource(	"dlc\dlc_acs\data\entities\swords\vamp_claws.w2ent", true);	
 
-				((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(claw_temp);
+					((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(claw_temp);
+				}
 			}
 
 			GetWitcherPlayer().PlayEffectSingle('claws_effect');

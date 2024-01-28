@@ -5022,6 +5022,63 @@ class W3ACSFireLine extends W3TraceGroundProjectile
 	}
 }
 
+class W3ACSViyBaseEffectFireLine extends W3TraceGroundProjectile
+{
+	private var action 						: W3DamageAction;
+	private var damage						: float;
+	
+	event OnProjectileCollision( pos, normal : Vector, collidingComponent : CComponent, hitCollisionsGroups : array< name >, actorIndex : int, shapeIndex : int )
+	{
+		if ( !isActive )
+		{
+			return true;
+		}
+		
+		if(collidingComponent)
+		{
+			victim = (CGameplayEntity)collidingComponent.GetEntity();
+		}
+		else
+		{
+			victim = NULL;
+		}
+		
+		super.OnProjectileCollision(pos, normal, collidingComponent, hitCollisionsGroups, actorIndex, shapeIndex);
+		
+		if ( victim 
+		&& !collidedEntities.Contains(victim) 
+		&& victim != ACSViyOfMaribor()
+		)
+		{
+			if (((CActor)victim).UsesEssence())
+			{
+				damage = ((CActor)victim).GetStat( BCS_Essence ) * 0.125;
+			}
+			else if (((CActor)victim).UsesVitality())
+			{
+				damage = ((CActor)victim).GetStat( BCS_Vitality ) * 0.125;
+			}
+
+			action = new W3DamageAction in this;
+			action.Initialize((CGameplayEntity)caster,victim,this,caster.GetName(),EHRT_Light,CPS_SpellPower,false,true,false,false);
+			action.AddDamage(theGame.params.DAMAGE_NAME_FIRE, damage );		
+			action.AddEffectInfo(EET_Burning, 1.0);
+			action.SetCanPlayHitParticle(false);
+			theGame.damageMgr.ProcessAction( action );
+			collidedEntities.PushBack(victim);
+
+			/*
+			if ( deactivateOnCollisionWithVictim )
+			{
+				isActive = false;
+			}
+			*/
+
+			delete action;
+		}
+	}
+}
+
 class W3ACSRockLine extends W3TraceGroundProjectile
 {
 	private var action 						: W3DamageAction;
@@ -5234,7 +5291,20 @@ class W3ACSBloodTentacles extends CGameplayEntity
 {
 	event OnSpawned( spawnData : SEntitySpawnData )
 	{
+		if ( !theSound.SoundIsBankLoaded("mq_nml_1060.bnk") )
+		{
+			theSound.SoundLoadBank( "mq_nml_1060.bnk", false );
+		}
+
+		if (this.HasTag('ACS_Transformation_Red_Miasmal_Ability')
+		|| this.HasTag('ACS_Transformation_Red_Miasmal_Ability_Small')
+		)
+		{
+			PlayEffect('ground_fx_red');
+		}
+
 		PlayEffect('ground_fx');
+		
 		AddTimer('effect', 1.3);
 		AddTimer('attack', 1.4);
 		AddTimer('stop_effect', 2.f);
@@ -5248,14 +5318,31 @@ class W3ACSBloodTentacles extends CGameplayEntity
 	timer function stop_effect ( dt : float, optional id : int)
 	{
 		StopEffect('ground_fx');
+		StopEffect('ground_fx_red');
 	}
 
 	timer function attack ( dt : float, optional id : int)
 	{
 		var entities	 		: array<CGameplayEntity>;
 		var i					: int;
+
+		if (this.HasTag('ACS_Transformation_Red_Miasmal_Ability')
+		)
+		{
+			theGame.GetSurfacePostFX().AddSurfacePostFXGroup( TraceFloor( this.GetWorldPosition() ),  0.3,  5,  2 ,  1,  1 );
+			PlayEffect('attack_fx1_red');
+		}
 		
-		FindGameplayEntitiesInSphere( entities, GetWorldPosition(), 5, 50 );
+		if ( this.HasTag('ACS_Transformation_Red_Miasmal_Ability_Small')
+		)
+		{
+			FindGameplayEntitiesInSphere( entities, GetWorldPosition(), 2, 50 );
+		}
+		else
+		{
+			FindGameplayEntitiesInSphere( entities, GetWorldPosition(), 4, 50 );
+		}
+
 		for( i = 0; i < entities.Size(); i += 1 )
 		{
 			deal_damage( (CActor)entities[i] );
@@ -5291,10 +5378,53 @@ class W3ACSBloodTentacles extends CGameplayEntity
 				}
 				
 				action = new W3DamageAction in theGame.damageMgr;
-				action.Initialize(GetWitcherPlayer(),victimtarget,this,GetWitcherPlayer().GetName(),EHRT_Heavy,CPS_Undefined,false, false, true, false );
+				action.Initialize(thePlayer, victimtarget, NULL, thePlayer.GetName(), EHRT_Heavy, CPS_Undefined, false, false, true, false);
 				action.SetProcessBuffsIfNoDamage(true);
 				action.SetCanPlayHitParticle( true );
 				
+				action.AddEffectInfo( EET_Bleeding, 3 );
+
+				action.AddEffectInfo( EET_LongStagger );
+
+				action.AddDamage( theGame.params.DAMAGE_NAME_ELEMENTAL, damage  );
+				
+				theGame.damageMgr.ProcessAction( action );
+				delete action;
+			}
+		}
+		else if (this.HasTag('ACS_Transformation_Red_Miasmal_Ability')
+		|| this.HasTag('ACS_Transformation_Red_Miasmal_Ability_Small')
+		)
+		{
+			if ( victimtarget 
+			&& victimtarget.IsAlive() 
+			&& victimtarget != GetWitcherPlayer()
+			&& victimtarget != GetACSTransformationRedMiasmal()
+			) 
+			{
+				if (((CActor)victimtarget).UsesEssence())
+				{
+					damage = ((CActor)victimtarget).GetStatMax( BCS_Essence ) * 0.125;
+				}
+				else if (((CActor)victimtarget).UsesVitality())
+				{
+					damage = ((CActor)victimtarget).GetStatMax( BCS_Vitality ) * 0.125;
+				}
+
+				if ( VecDistance2D( this.GetWorldPosition(), victimtarget.GetWorldPosition() ) > 0.5 )
+				{
+					damage -= damage * VecDistance2D( this.GetWorldPosition(), victimtarget.GetWorldPosition() ) * 0.1;
+				}
+				
+				action = new W3DamageAction in theGame.damageMgr;
+
+				action.Initialize(thePlayer, victimtarget, NULL, thePlayer.GetName(), EHRT_Heavy, CPS_Undefined, false, false, true, false);
+				
+				action.SetProcessBuffsIfNoDamage(true);
+				action.SetCanPlayHitParticle( true );
+				
+				action.AddEffectInfo( EET_Poison, 3 );
+
 				action.AddEffectInfo( EET_Bleeding, 3 );
 
 				action.AddEffectInfo( EET_LongStagger );
@@ -6755,6 +6885,152 @@ class W3ACSRedPlagueProjectile extends W3ACSLeshyRootProjectile
 		damageAction.attacker = owner;
 
 		victims.Clear();
+		
+		
+		FindGameplayEntitiesInRange( victims, fxEntity, 2, 99, , FLAG_OnlyAliveActors );
+		if ( victims.Size() > 0 )
+		{
+			for ( i = 0 ; i < victims.Size() ; i += 1 )
+			{
+				if ( !((CActor)victims[i]).IsCurrentlyDodging() )
+				{
+					damageAction.Initialize( (CGameplayEntity)caster, victims[i], this, caster.GetName()+"_"+"root_projectile", EHRT_Light, CPS_AttackPower, false, true, false, false);
+					damageAction.AddDamage(theGame.params.DAMAGE_NAME_ELEMENTAL, rootDmg );
+					theGame.damageMgr.ProcessAction( damageAction );
+					victims[i].OnRootHit();
+				}
+			}
+		}
+		
+		delete damageAction;
+	}
+	
+	event OnRangeReached()
+	{
+		var normal : Vector;
+		
+		StopAllEffects();
+		StopProjectile();
+		
+		if( !projExpired )
+		{
+			projExpired = true;
+			projPos = this.GetWorldPosition();
+			theGame.GetWorld().StaticTrace( projPos + Vector(0,0,3), projPos - Vector(0,0,3), projPos, normal );
+			projRot = this.GetWorldRotation();
+			fxEntity = theGame.CreateEntity( fxEntityTemplate, projPos, projRot );
+			fxEntity.PlayEffect( 'attack_fx1', fxEntity );
+			GCameraShake(1.0, true, fxEntity.GetWorldPosition(), 30.0f);
+			DelayDamage( 0.3 );
+			fxEntity.DestroyAfter( 10.0 );
+			AddTimer('TimeDestroyNew', 5.0, false);
+
+			surface.AddSurfacePostFXGroup(fxEntity.GetWorldPosition(),  0.3,  5,  2 ,  2,  1 );	
+		}
+		RemoveTimer('SurfacePostFXTimer');
+	}
+	
+	function Expired() : bool
+	{
+		return projExpired;
+	}
+	
+	timer function TimeDestroyNew( deltaTime : float, id : int )
+	{
+		Destroy();
+	}
+}
+
+class W3ACSTransformationRedMiasmalRedPlagueProjectile extends W3ACSLeshyRootProjectile
+{
+	
+	default projExpired = false;
+	default collisions = 0;
+	
+	var surface : CGameplayFXSurfacePost;
+	
+	private var damageAction 			: W3DamageAction;
+	
+	event OnSpawned(spawnData : SEntitySpawnData)
+	{
+		surface = theGame.GetSurfacePostFX();
+	
+		super.OnSpawned(spawnData);
+		AddTimer('SurfacePostFXTimer', 0.01f, true);
+	}	
+
+	timer function SurfacePostFXTimer( deltaTime : float, id : int )
+	{
+		var z : float;
+		var position : Vector;
+		
+		position = this.GetWorldPosition();
+		theGame.GetWorld().NavigationComputeZ( position, -5.0, 5.0, z );
+		position.Z = z + 0.3;
+		this.Teleport(position);
+	
+		surface.AddSurfacePostFXGroup(this.GetWorldPosition(),  0.3,  5,  2 ,  1,  1 );	
+		this.PlayEffect('line_fx');
+	}
+
+	function SetOwner( actor : CActor )
+	{
+		owner = actor;
+	}
+	
+	event OnProjectileCollision( pos, normal : Vector, collidingComponent : CComponent, hitCollisionsGroups : array< name >, actorIndex : int, shapeIndex : int )
+	{	
+		var victim 			: CGameplayEntity;
+		
+		if(collidingComponent)
+			victim = (CGameplayEntity)collidingComponent.GetEntity();
+		else
+			victim = NULL;
+		
+		if ( victim && victim == ((CActor)caster).GetTarget() )
+		{
+			collisions += 1;
+			
+			if ( collisions == 1 )
+			{
+				this.StopEffect( 'ground_fx' );
+				projPos = this.GetWorldPosition();
+				theGame.GetWorld().StaticTrace( projPos + Vector(0,0,3), projPos - Vector(0,0,3), projPos, normal );
+				projRot = this.GetWorldRotation();
+				fxEntity = theGame.CreateEntity( fxEntityTemplate, projPos, projRot );
+				fxEntity.PlayEffect( 'attack_fx1', fxEntity );
+				fxEntity.DestroyAfter( 10.0 );
+				GCameraShake(1.0, true, fxEntity.GetWorldPosition(), 30.0f);
+				DelayDamage( 0.01 );
+				AddTimer('TimeDestroyNew', 5.0, false);
+				projExpired = true;
+
+				surface.AddSurfacePostFXGroup(fxEntity.GetWorldPosition(),  0.3,  5,  2 ,  2,  1 );
+			}
+		}
+		RemoveTimer('SurfacePostFXTimer');
+		
+		delete damageAction;
+	}
+	
+	function DelayDamage( time : float )
+	{
+		AddTimer('DelayDamageTimerNew',time,false);
+	}
+	
+	timer function DelayDamageTimerNew( delta : float , id : int)
+	{
+		var attributeName 	: name;
+		var victims 		: array<CGameplayEntity>;
+		var rootDmg 		: float;
+		var i 				: int;
+		
+		attributeName = GetBasicAttackDamageAttributeName(theGame.params.ATTACK_NAME_HEAVY, theGame.params.DAMAGE_NAME_PHYSICAL);
+		rootDmg = MaxF( RandRangeF(300,200) , CalculateAttributeValue(((CActor)caster).GetAttributeValue(attributeName)) + 200.0  );
+		
+		damageAction = new W3DamageAction in this;
+		damageAction.SetHitAnimationPlayType(EAHA_ForceYes);
+		damageAction.attacker = owner;
 		
 		
 		FindGameplayEntitiesInRange( victims, fxEntity, 2, 99, , FLAG_OnlyAliveActors );

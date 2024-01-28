@@ -138,6 +138,8 @@ function ACS_CombatBehSwitch()
 			
 			if (!thePlayer.IsInCombat())
 			{
+				GetACSWatcher().HudModuleAutoHideAfterCombat();
+				
 				GetACSWatcher().RemoveTimer( 'ACS_DelayedSheathSword' );
 
 				//if( !ACS_DisableAutomaticSwordSheathe_Enabled() )

@@ -243,7 +243,7 @@ statemachine class ACSTransformationCamera extends CStaticCamera
 
 			targetRot = GetACSTransformationVampireMonster().GetWorldRotation();
 		}
-		if (
+		else if (
 		FactsQuerySum("acs_toad_transformation_activated") > 0
 		)
 		{
@@ -253,6 +253,17 @@ statemachine class ACSTransformationCamera extends CStaticCamera
 			targetPos += VecConeRand(currentHeading, 0, -7.75, -7.75);
 
 			targetRot = GetACSTransformationToad().GetWorldRotation();
+		}
+		else if (
+		FactsQuerySum("acs_red_miasmal_curse_activated") > 0
+		)
+		{
+			targetPos = GetACSTransformationRedMiasmal().GetWorldPosition();
+
+			targetPos.Z += 1.625;
+			targetPos += VecConeRand(currentHeading, 0, -4.5, -4.5);
+
+			targetRot = GetACSTransformationRedMiasmal().GetWorldRotation();
 		}
 		else
 		{
@@ -357,6 +368,13 @@ statemachine class ACSTransformationCamera extends CStaticCamera
 			vampPos = GetACSTransformationToad().GetWorldPosition();
 			vampPos.Z += 2.25;
 		}
+		else if (
+		FactsQuerySum("acs_red_miasmal_curse_activated") > 0
+		)
+		{
+			vampPos = GetACSTransformationRedMiasmal().GetWorldPosition();
+			vampPos.Z += 1.625;
+		}
 
 		if ( theInput.LastUsedPCInput() )
 		{
@@ -435,6 +453,15 @@ statemachine class ACSTransformationCamera extends CStaticCamera
 		)
 		{
 			cameraPos = vampPos + VecConeRand(currentHeading, 0, -7.75, -7.75);
+
+			cameraPos = cameraPos + VecConeRand(currentHeading, 0, LerpF( AbsF(currentPitch)  , 0 , 3.0)/75, LerpF(AbsF(currentPitch)  , 0 , 3.0)/75);
+			cameraPos.Z = vampPos.Z + LerpF(currentPitch  , 1.0 , -1.0)/30;
+		}
+		else if (
+		FactsQuerySum("acs_red_miasmal_curse_activated") > 0
+		)
+		{
+			cameraPos = vampPos + VecConeRand(currentHeading, 0, -4.5, -4.5);
 
 			cameraPos = cameraPos + VecConeRand(currentHeading, 0, LerpF( AbsF(currentPitch)  , 0 , 3.0)/75, LerpF(AbsF(currentPitch)  , 0 , 3.0)/75);
 			cameraPos.Z = vampPos.Z + LerpF(currentPitch  , 1.0 , -1.0)/30;
