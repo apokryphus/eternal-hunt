@@ -402,13 +402,12 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 
 			WeaponSummonEffect();
 		}
-		
 		else if ( ACS_GetWeaponMode() == 1)
 		{
 			if 
 			(
-				ACS_GetFocusModeSilverWeapon() == 0 && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('igni_sword_equipped') 
-				|| ACS_GetFocusModeSteelWeapon() == 0 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('igni_sword_equipped')
+				( ACS_GetFocusModeSilverWeapon() == 0 && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('igni_sword_equipped') )
+				|| ( ACS_GetFocusModeSteelWeapon() == 0 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('igni_sword_equipped') )
 			)
 			{
 				IgniSword();
@@ -418,8 +417,8 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 			
 			else if  
 			(
-				ACS_GetFocusModeSilverWeapon() == 3 && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('axii_sword_equipped') 
-				|| ACS_GetFocusModeSteelWeapon() == 3 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('axii_sword_equipped')
+				( ACS_GetFocusModeSilverWeapon() == 3 && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('axii_sword_equipped') )
+				|| ( ACS_GetFocusModeSteelWeapon() == 3 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('axii_sword_equipped') )
 			)
 			{
 				FocusModeAxiiSword();
@@ -429,8 +428,8 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 			
 			else if  
 			(
-				ACS_GetFocusModeSilverWeapon() == 7 && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('aard_sword_equipped') 
-				|| ACS_GetFocusModeSteelWeapon() == 7 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('aard_sword_equipped')
+				( ACS_GetFocusModeSilverWeapon() == 7 && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('aard_sword_equipped') )
+				|| ( ACS_GetFocusModeSteelWeapon() == 7 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('aard_sword_equipped') )
 			)
 			{
 				FocusModeAardSword();
@@ -440,8 +439,8 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 			
 			else if  
 			(
-				ACS_GetFocusModeSilverWeapon() == 5 && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('yrden_sword_equipped') 
-				|| ACS_GetFocusModeSteelWeapon() == 5 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('yrden_sword_equipped')
+				( ACS_GetFocusModeSilverWeapon() == 5 && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('yrden_sword_equipped') )
+				|| ( ACS_GetFocusModeSteelWeapon() == 5 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('yrden_sword_equipped') )
 			)
 			{
 				FocusModeYrdenSword();
@@ -451,8 +450,8 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 			
 			else if 
 			(
-				ACS_GetFocusModeSilverWeapon() == 1 && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('quen_sword_equipped') 
-				|| ACS_GetFocusModeSteelWeapon() == 1 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('quen_sword_equipped')
+				( ACS_GetFocusModeSilverWeapon() == 1 && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('quen_sword_equipped') )
+				|| ( ACS_GetFocusModeSteelWeapon() == 1 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('quen_sword_equipped') )
 			)
 			{
 				FocusModeQuenSword();
@@ -482,7 +481,6 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 
 			WeaponSummonEffect();
 		}
-		
 		else if ( ACS_GetWeaponMode() == 2)
 		{
 			if 
@@ -587,8 +585,8 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 		{
 			if 
 			(
-				ACS_GetItem_Eredin_Silver() && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('axii_sword_equipped') 
-				|| ACS_GetItem_Eredin_Steel() && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('axii_sword_equipped')
+				( ACS_GetItem_Eredin_Silver() && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('axii_sword_equipped') )
+				|| ( ACS_GetItem_Eredin_Steel() && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('axii_sword_equipped') )
 			)
 			{
 				ACS_WeaponDestroyInit();
@@ -638,8 +636,8 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 			
 			else if 
 			(
-				ACS_GetItem_Claws_Silver() && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('aard_sword_equipped') 
-				|| ACS_GetItem_Claws_Steel() && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('aard_sword_equipped')
+				( ACS_GetItem_Claws_Silver() && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('aard_sword_equipped') )
+				|| ( ACS_GetItem_Claws_Steel() && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('aard_sword_equipped') )
 			)
 			{
 				EquipmentModeAardSword();
@@ -653,8 +651,9 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 			
 			else if 
 			(
-				ACS_GetItem_Imlerith_Silver() && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('yrden_sword_equipped') 
-				|| ACS_GetItem_Imlerith_Steel() && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('yrden_sword_equipped')
+				( ACS_GetItem_Imlerith_Silver() && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('yrden_sword_equipped') )
+				|| ( ACS_GetItem_Imlerith_Steel() && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('yrden_sword_equipped') )
+				|| ( ACS_GetItem_MageStaff_Steel() && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('yrden_sword_equipped') )
 			)
 			{
 				ACS_WeaponDestroyInit();
@@ -704,8 +703,8 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 			
 			else if 
 			(
-				ACS_GetItem_Olgierd_Silver() && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('quen_sword_equipped') 
-				|| ACS_GetItem_Olgierd_Steel() && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('quen_sword_equipped')
+				( ACS_GetItem_Olgierd_Silver() && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('quen_sword_equipped') )
+				|| ( ACS_GetItem_Olgierd_Steel() && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('quen_sword_equipped') )
 			)
 			{
 				ACS_WeaponDestroyInit();
@@ -750,7 +749,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 
 				GetWitcherPlayer().AddTag('quen_sword_equipped');
 
-				if (ACS_GetItem_Iris())
+				if (ACS_GetItem_Iris() && !ACS_IconicSwordVFXOff_Enabled())
 				{
 					ACS_Sword_Trail_2().StopEffect('red_charge_10');
 					ACS_Sword_Trail_2().PlayEffectSingle('red_charge_10');
@@ -763,8 +762,8 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 			}
 			else if 
 			(
-				ACS_GetItem_Katana_Silver() && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('axii_secondary_sword_equipped')
-				|| ACS_GetItem_Katana_Steel() && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('axii_secondary_sword_equipped')
+				( ACS_GetItem_Katana_Silver() && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('axii_secondary_sword_equipped') )
+				|| ( ACS_GetItem_Katana_Steel() && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('axii_secondary_sword_equipped') )
 			)
 			{
 				GetACSWatcher().SecondaryWeaponSwitch();
@@ -772,28 +771,80 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 
 			else if 
 			(
-				ACS_GetItem_VampClaw_Shades() && GetWitcherPlayer().IsWeaponHeld( 'fist' ) && !GetWitcherPlayer().HasTag('vampire_claws_equipped')
+				ACS_GetItem_MageStaff_Steel() && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('yrden_sword_equipped') 
 			)
 			{
 				ACS_WeaponDestroyInit();
+				
+				trail_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\fx\acs_sword_trail.w2ent" , true );
 
-				//GetWitcherPlayer().AddTag('vampire_claws_equipped');
+				sword_trail_1 = (CEntity)theGame.CreateEntity( trail_temp, GetWitcherPlayer().GetWorldPosition() + Vector( 0, 0, -20 ) );
 
-				VampireClaws();
+				sword_trail_2 = (CEntity)theGame.CreateEntity( trail_temp, GetWitcherPlayer().GetWorldPosition() + Vector( 0, 0, -20 ) );
 
-				VampireClawsSwitch();
+				sword_trail_3 = (CEntity)theGame.CreateEntity( trail_temp, GetWitcherPlayer().GetWorldPosition() + Vector( 0, 0, -20 ) );
+
+				attach_rot.Roll = 0;
+				attach_rot.Pitch = 0;
+				attach_rot.Yaw = 0;
+				attach_vec.X = 0;
+				attach_vec.Y = 0;
+				attach_vec.Z = 0;
+
+				sword_trail_1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
+				sword_trail_1.AddTag('acs_sword_trail_1');
+
+				attach_rot.Roll = 0;
+				attach_rot.Pitch = 0;
+				attach_rot.Yaw = 0;
+				attach_vec.X = 0;
+				attach_vec.Y = 0;
+				attach_vec.Z = 0.2;
+
+				sword_trail_2.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
+				sword_trail_2.AddTag('acs_sword_trail_2');
+
+				attach_rot.Roll = 0;
+				attach_rot.Pitch = 0;
+				attach_rot.Yaw = 0;
+				attach_vec.X = 0;
+				attach_vec.Y = 0;
+				attach_vec.Z = 0.4;
+
+				sword_trail_3.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
+				sword_trail_3.AddTag('acs_sword_trail_3');
+
+				GetWitcherPlayer().AddTag('yrden_sword_equipped');
+
+				YrdenSwordSwitch();
 			}
 
 			else if 
 			(
-				ACS_GetItem_VampClaw() && GetWitcherPlayer().IsWeaponHeld( 'fist' ) && !GetWitcherPlayer().HasTag('vampire_claws_equipped')
+				GetWitcherPlayer().IsWeaponHeld( 'fist' )
 			)
 			{
-				ACS_WeaponDestroyInit();
+				if 
+				(
+					ACS_GetItem_VampClaw_Shades() || ACS_GetItem_VampClaw()
+				)
+				{
+					if 
+					(
+						!GetWitcherPlayer().HasTag('vampire_claws_equipped')
+					)
+					{
+						ACS_WeaponDestroyInit();
 
-				VampireClaws();
+						VampireClaws();
 
-				VampireClawsSwitch();
+						VampireClawsSwitch();
+					}
+				}
+				else
+				{
+					NormalFistsSwitch();
+				}
 			}
 		}
 	}
@@ -1632,6 +1683,10 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 
 			if (ACS_Armor_Equipped_Check())
 			{
+				claw_temp = (CEntityTemplate)LoadResource(	"dlc\dlc_acs\data\entities\swords\vamp_claws_blood.w2ent", true);	
+
+				((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(claw_temp);
+
 				claw_temp = (CEntityTemplate)LoadResource(	"dlc\dlc_acs\data\entities\swords\vamp_claws.w2ent", true);	
 
 				((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(claw_temp);
@@ -1648,14 +1703,34 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 
 				if (!ACS_HideVampireClaws_Enabled())
 				{
-					claw_temp = (CEntityTemplate)LoadResource(	"dlc\dlc_acs\data\entities\swords\vamp_claws.w2ent", true);	
+					if (ACS_GetItem_VampClaw_Blood())
+					{
+						claw_temp = (CEntityTemplate)LoadResource(	"dlc\dlc_acs\data\entities\swords\vamp_claws.w2ent", true);	
 
-					((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(claw_temp);
+						((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(claw_temp);
+
+						claw_temp = (CEntityTemplate)LoadResource(	"dlc\dlc_acs\data\entities\swords\vamp_claws_blood.w2ent", true);	
+
+						((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(claw_temp);
+					}
+					else
+					{
+						claw_temp = (CEntityTemplate)LoadResource(	"dlc\dlc_acs\data\entities\swords\vamp_claws_blood.w2ent", true);	
+
+						((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(claw_temp);
+						
+						claw_temp = (CEntityTemplate)LoadResource(	"dlc\dlc_acs\data\entities\swords\vamp_claws.w2ent", true);	
+
+						((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(claw_temp);
+					}
 				}
 			}
 
-			GetWitcherPlayer().PlayEffectSingle('claws_effect');
-			GetWitcherPlayer().StopEffect('claws_effect');	
+			if (!ACS_HideVampireClaws_Enabled())
+			{
+				thePlayer.PlayEffectSingle('claws_effect');
+				thePlayer.StopEffect('claws_effect');
+			}
 		}
 
 		if ( GetWitcherPlayer().HasBuff(EET_BlackBlood) )
@@ -1687,7 +1762,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 
 			extra_arms_anchor_r.CreateAttachmentAtBoneWS( GetWitcherPlayer(), 'r_shoulder', bone_vec, bone_rot );
 
-			extra_arms_anchor_r.AddTag('extra_arms_anchor_r');
+			extra_arms_anchor_r.AddTag('acs_extra_arms_anchor_r');
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
@@ -1697,7 +1772,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 
 			extra_arms_anchor_l.CreateAttachmentAtBoneWS( GetWitcherPlayer(), 'l_shoulder', bone_vec, bone_rot );
 
-			extra_arms_anchor_l.AddTag('extra_arms_anchor_l');
+			extra_arms_anchor_l.AddTag('acs_extra_arms_anchor_l');
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1722,7 +1797,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 
 			extra_arms_1.PlayEffectSingle('blood');
 
-			extra_arms_1.AddTag('vampire_extra_arms_1');	
+			extra_arms_1.AddTag('acs_vampire_extra_arms_1');	
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1747,7 +1822,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 
 			extra_arms_2.PlayEffectSingle('blood');
 
-			extra_arms_2.AddTag('vampire_extra_arms_2');	
+			extra_arms_2.AddTag('acs_vampire_extra_arms_2');	
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1772,7 +1847,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 
 			extra_arms_3.PlayEffectSingle('blood');
 
-			extra_arms_3.AddTag('vampire_extra_arms_3');	
+			extra_arms_3.AddTag('acs_vampire_extra_arms_3');	
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1797,7 +1872,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 
 			extra_arms_4.PlayEffectSingle('blood');
 
-			extra_arms_4.AddTag('vampire_extra_arms_4');	
+			extra_arms_4.AddTag('acs_vampire_extra_arms_4');	
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1833,7 +1908,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 
 			vampire_head_anchor.CreateAttachmentAtBoneWS( GetWitcherPlayer(), 'head', bone_vec, bone_rot );
 
-			vampire_head_anchor.AddTag('vampire_head_anchor');
+			vampire_head_anchor.AddTag('acs_vampire_head_anchor');
 
 			head_temp = (CEntityTemplate)LoadResource(
 			"dlc\dlc_acs\data\entities\other\dettlaff_monster_head.w2ent"
@@ -1858,7 +1933,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 			
 			vampire_head.CreateAttachment( vampire_head_anchor, , attach_vec, attach_rot );
 
-			vampire_head.AddTag('vampire_head');
+			vampire_head.AddTag('acs_vampire_head');
 
 			GetWitcherPlayer().AddTag('ACS_blood_armor');
 
@@ -1871,7 +1946,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 
 		vampire_claw_anchor.CreateAttachmentAtBoneWS( GetWitcherPlayer(), 'torso3', bone_vec, bone_rot );
 
-		vampire_claw_anchor.AddTag('vampire_claw_anchor');
+		vampire_claw_anchor.AddTag('acs_vampire_claw_anchor');
 
 		back_claw_temp = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\entities\other\vampire_back_claws.w2ent", true);	
 
@@ -1892,7 +1967,11 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 		
 		back_claw.CreateAttachment( vampire_claw_anchor, , attach_vec, attach_rot );
 
-		back_claw.AddTag('back_claw');
+		back_claw.StopEffect('blood_color');
+
+		back_claw.PlayEffectSingle('blood_color');
+
+		back_claw.AddTag('acs_vampire_back_claw');
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
@@ -3214,6 +3293,15 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 		ACS_StopAerondightEffectInit();
 
 		ACS_HideSword();
+
+		r_anchor.PlayEffect('shadowdash_construct_small');
+		l_anchor.PlayEffect('shadowdash_construct_small');
+
+		r_anchor.PlayEffect('mist_regis');
+		l_anchor.PlayEffect('mist_regis');
+
+		r_anchor.PlayEffect('mist_regis_q702');
+		l_anchor.PlayEffect('mist_regis_q702');
 		
 		if (GetWitcherPlayer().IsWeaponHeld('steelsword'))
 		{
@@ -3302,6 +3390,15 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 
 		sword_trail_1 = (CEntity)theGame.CreateEntity( trail_temp, GetWitcherPlayer().GetWorldPosition() + Vector( 0, 0, -20 ) );
 		sword_trail_2 = (CEntity)theGame.CreateEntity( trail_temp, GetWitcherPlayer().GetWorldPosition() + Vector( 0, 0, -20 ) );
+
+		r_anchor.PlayEffect('shadowdash_construct_small');
+		l_anchor.PlayEffect('shadowdash_construct_small');
+
+		r_anchor.PlayEffect('mist_regis');
+		l_anchor.PlayEffect('mist_regis');
+
+		r_anchor.PlayEffect('mist_regis_q702');
+		l_anchor.PlayEffect('mist_regis_q702');
 
 		if ( GetWitcherPlayer().IsWeaponHeld( 'silversword' ) )
 		{
@@ -4002,6 +4099,15 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 		sword_trail_1 = (CEntity)theGame.CreateEntity( trail_temp, GetWitcherPlayer().GetWorldPosition() + Vector( 0, 0, -20 ) );
 		sword_trail_2 = (CEntity)theGame.CreateEntity( trail_temp, GetWitcherPlayer().GetWorldPosition() + Vector( 0, 0, -20 ) );
 
+		r_anchor.PlayEffect('shadowdash_construct_small');
+		l_anchor.PlayEffect('shadowdash_construct_small');
+
+		r_anchor.PlayEffect('mist_regis');
+		l_anchor.PlayEffect('mist_regis');
+
+		r_anchor.PlayEffect('mist_regis_q702');
+		l_anchor.PlayEffect('mist_regis_q702');
+
 		if ( GetWitcherPlayer().IsWeaponHeld( 'silversword' ) )
 		{
 			if ( GetWitcherPlayer().GetInventory().GetItemLevel( silverID ) <= 10 || GetWitcherPlayer().GetInventory().GetItemQuality( silverID ) == 1 )
@@ -4669,6 +4775,15 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 
 		sword_trail_1 = (CEntity)theGame.CreateEntity( trail_temp, GetWitcherPlayer().GetWorldPosition() + Vector( 0, 0, -20 ) );
 		sword_trail_2 = (CEntity)theGame.CreateEntity( trail_temp, GetWitcherPlayer().GetWorldPosition() + Vector( 0, 0, -20 ) );
+
+		r_anchor.PlayEffect('shadowdash_construct_small');
+		l_anchor.PlayEffect('shadowdash_construct_small');
+
+		r_anchor.PlayEffect('mist_regis');
+		l_anchor.PlayEffect('mist_regis');
+
+		r_anchor.PlayEffect('mist_regis_q702');
+		l_anchor.PlayEffect('mist_regis_q702');
 
 		if ( GetWitcherPlayer().IsWeaponHeld( 'silversword' ) )
 		{
@@ -5373,6 +5488,15 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 		sword_trail_6 = (CEntity)theGame.CreateEntity( trail_temp, GetWitcherPlayer().GetWorldPosition() + Vector( 0, 0, -20 ) );
 		sword_trail_7 = (CEntity)theGame.CreateEntity( trail_temp, GetWitcherPlayer().GetWorldPosition() + Vector( 0, 0, -20 ) );
 		sword_trail_8 = (CEntity)theGame.CreateEntity( trail_temp, GetWitcherPlayer().GetWorldPosition() + Vector( 0, 0, -20 ) );
+
+		r_anchor.PlayEffect('shadowdash_construct_small');
+		l_anchor.PlayEffect('shadowdash_construct_small');
+
+		r_anchor.PlayEffect('mist_regis');
+		l_anchor.PlayEffect('mist_regis');
+
+		r_anchor.PlayEffect('mist_regis_q702');
+		l_anchor.PlayEffect('mist_regis_q702');
 
 		if ( ACS_SOI_Installed() && ACS_SOI_Enabled() && ACS_Warglaives_Installed() && ACS_Warglaives_Enabled() )
 		{
@@ -7994,362 +8118,180 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 		sword_trail_3.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 		sword_trail_3.AddTag('acs_sword_trail_3');
 
-		if ( ACS_SOI_Installed() && ACS_SOI_Enabled() )
+		if ( GetWitcherPlayer().IsWeaponHeld( 'silversword' ) )
 		{
-			if ( GetWitcherPlayer().IsWeaponHeld( 'silversword' ) )
+			if ( GetWitcherPlayer().GetInventory().GetItemLevel( silverID ) <= 10 || GetWitcherPlayer().GetInventory().GetItemQuality( silverID ) == 1 )
 			{
-				if ( GetWitcherPlayer().GetInventory().GetItemLevel( silverID ) <= 10 || GetWitcherPlayer().GetInventory().GetItemQuality( silverID ) == 1 )
-				{
-					sword1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
-				
-					"dlc\dlc_shadesofiron\data\items\weapons\vulcan\vulcan.w2ent"
-					
-					, true), GetWitcherPlayer().GetWorldPosition() );
-					
-					attach_rot.Roll = 0;
-					attach_rot.Pitch = 0;
-					attach_rot.Yaw = 0;
-					attach_vec.X = 0;
-					attach_vec.Y = 0;
-					attach_vec.Z = 0.025;
-							
-					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('quen_sword_1');
-				}
-				else if ( GetWitcherPlayer().GetInventory().GetItemLevel( silverID ) <= 11 && GetWitcherPlayer().GetInventory().GetItemLevel(silverID) <= 20 && GetWitcherPlayer().GetInventory().GetItemQuality( silverID ) > 1 )
-				{
-					sword1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
-				
-					"dlc\dlc_acs\data\entities\swords\vulcan.w2ent"
-					
-					, true), GetWitcherPlayer().GetWorldPosition() );
-					
-					attach_rot.Roll = 0;
-					attach_rot.Pitch = 0;
-					attach_rot.Yaw = 0;
-					attach_vec.X = 0;
-					attach_vec.Y = 0;
-					attach_vec.Z = 0.025;
-							
-					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('quen_sword_1');
+				sword1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 
-					sword1.AddTag('quen_sword_upgraded_1');	
-				}
-				else if ( GetWitcherPlayer().GetInventory().GetItemLevel( silverID ) >= 21 && GetWitcherPlayer().GetInventory().GetItemQuality( silverID ) >= 2 ) 
-				{
-					sword1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
+				"dlc\ep1\data\items\weapons\swords\steel_swords\steel_sword_ep1_01.w2ent"
 				
-					"dlc\dlc_acs\data\entities\swords\vulcan.w2ent"
-					
-					, true), GetWitcherPlayer().GetWorldPosition() );
-					
-					attach_rot.Roll = 0;
-					attach_rot.Pitch = 0;
-					attach_rot.Yaw = 0;
-					attach_vec.X = 0;
-					attach_vec.Y = 0;
-					attach_vec.Z = 0.025;
-							
-					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('quen_sword_1');
-
-					physicalComponent = (CMeshComponent)(sword1.GetComponentByClassName('CRigidMeshComponent'));
-			
-					if( physicalComponent )
-					{
-						physicalComponent.SetVisible(false);
-					}
-
-					sword1.AddTag('quen_sword_upgraded_2');	
-				}
-				else
-				{
-					sword1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
+				, true), GetWitcherPlayer().GetWorldPosition() );
 				
-					"dlc\dlc_acs\data\entities\swords\vulcan.w2ent"
-					
-					, true), GetWitcherPlayer().GetWorldPosition() );
-					
-					attach_rot.Roll = 0;
-					attach_rot.Pitch = 0;
-					attach_rot.Yaw = 0;
-					attach_vec.X = 0;
-					attach_vec.Y = 0;
-					attach_vec.Z = 0.025;
-							
-					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('quen_sword_1');
-				}
+				attach_rot.Roll = 0;
+				attach_rot.Pitch = 0;
+				attach_rot.Yaw = 0;
+				attach_vec.X = 0;
+				attach_vec.Y = 0;
+				attach_vec.Z = 0.025;
+						
+				sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
+				sword1.AddTag('quen_sword_1');
 			}
-			else if ( GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) )
+			else if ( GetWitcherPlayer().GetInventory().GetItemLevel( silverID ) <= 11 && GetWitcherPlayer().GetInventory().GetItemLevel(silverID) <= 20 && GetWitcherPlayer().GetInventory().GetItemQuality( silverID ) > 1 )
 			{
-				if ( GetWitcherPlayer().GetInventory().GetItemLevel( steelID ) <= 10 || GetWitcherPlayer().GetInventory().GetItemQuality( steelID ) == 1 )
-				{
-					sword1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
-				
-					"dlc\dlc_shadesofiron\data\items\weapons\khopesh\khopesh.w2ent"
-					
-					, true), GetWitcherPlayer().GetWorldPosition() );
-					
-					attach_rot.Roll = 0;
-					attach_rot.Pitch = 0;
-					attach_rot.Yaw = 0;
-					attach_vec.X = 0.025;
-					attach_vec.Y = 0;
-					attach_vec.Z = 0.025;
-							
-					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('quen_sword_1');
-				}
-				else if ( GetWitcherPlayer().GetInventory().GetItemLevel( steelID ) >= 11 && GetWitcherPlayer().GetInventory().GetItemLevel( steelID ) <= 20 && GetWitcherPlayer().GetInventory().GetItemQuality( steelID ) > 1 )
-				{
-					sword1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
-				
-					"dlc\dlc_acs\data\entities\swords\khopesh.w2ent"
-					
-					, true), GetWitcherPlayer().GetWorldPosition() );
-					
-					attach_rot.Roll = 0;
-					attach_rot.Pitch = 0;
-					attach_rot.Yaw = 0;
-					attach_vec.X = 0;
-					attach_vec.Y = 0;
-					attach_vec.Z = 0.025;
-							
-					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('quen_sword_1');
-
-					sword1.AddTag('quen_sword_upgraded_1');	
-				}
-				else if ( GetWitcherPlayer().GetInventory().GetItemLevel( steelID ) >= 21 && GetWitcherPlayer().GetInventory().GetItemQuality( steelID ) >= 2 )
-				{
-					sword1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
-				
-					"dlc\dlc_acs\data\entities\swords\khopesh.w2ent"
-					
-					, true), GetWitcherPlayer().GetWorldPosition() );
-					
-					attach_rot.Roll = 0;
-					attach_rot.Pitch = 0;
-					attach_rot.Yaw = 0;
-					attach_vec.X = 0;
-					attach_vec.Y = 0;
-					attach_vec.Z = 0.025;
-							
-					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('quen_sword_1');
-
-					physicalComponent = (CMeshComponent)(sword1.GetComponentByClassName('CRigidMeshComponent'));
+				sword1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 			
-					if( physicalComponent )
-					{
-						physicalComponent.SetVisible(false);
-					}
-
-					sword1.AddTag('quen_sword_upgraded_2');	
-				}
-				else
-				{
-					sword1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
+				"dlc\dlc_acs\data\entities\equipment_mode_weapons\acs_novalis.w2ent"
 				
-					"dlc\dlc_acs\data\entities\swords\khopesh.w2ent"
-					
-					, true), GetWitcherPlayer().GetWorldPosition() );
-					
-					attach_rot.Roll = 0;
-					attach_rot.Pitch = 0;
-					attach_rot.Yaw = 0;
-					attach_vec.X = 0;
-					attach_vec.Y = 0;
-					attach_vec.Z = 0.025;
-							
-					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('quen_sword_1');
+				, true), GetWitcherPlayer().GetWorldPosition() );
+				
+				attach_rot.Roll = 0;
+				attach_rot.Pitch = 0;
+				attach_rot.Yaw = 0;
+				attach_vec.X = 0;
+				attach_vec.Y = 0;
+				attach_vec.Z = 0.025;
+						
+				sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
+				sword1.AddTag('quen_sword_1');
 
-					sword1.AddTag('quen_sword_upgraded_1');	
+				sword1.AddTag('quen_sword_upgraded_1');	
+			}
+			else if ( GetWitcherPlayer().GetInventory().GetItemLevel( silverID ) >= 21 && GetWitcherPlayer().GetInventory().GetItemQuality( silverID ) >= 2 ) 
+			{
+				sword1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
+			
+				"dlc\dlc_acs\data\entities\equipment_mode_weapons\acs_novalis.w2ent"
+				
+				, true), GetWitcherPlayer().GetWorldPosition() );
+				
+				attach_rot.Roll = 0;
+				attach_rot.Pitch = 0;
+				attach_rot.Yaw = 0;
+				attach_vec.X = 0;
+				attach_vec.Y = 0;
+				attach_vec.Z = 0.025;
+						
+				sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
+				sword1.AddTag('quen_sword_1');
+
+				physicalComponent = (CMeshComponent)(sword1.GetComponentByClassName('CRigidMeshComponent'));
+		
+				if( physicalComponent )
+				{
+					physicalComponent.SetVisible(false);
 				}
+
+				sword1.AddTag('quen_sword_upgraded_2');	
+			}
+			else
+			{
+				sword1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
+			
+				"dlc\dlc_acs\data\entities\equipment_mode_weapons\acs_novalis.w2ent"
+				
+				, true), GetWitcherPlayer().GetWorldPosition() );
+				
+				attach_rot.Roll = 0;
+				attach_rot.Pitch = 0;
+				attach_rot.Yaw = 0;
+				attach_vec.X = 0;
+				attach_vec.Y = 0;
+				attach_vec.Z = 0.025;
+						
+				sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
+				sword1.AddTag('quen_sword_1');
+
+				sword1.AddTag('quen_sword_upgraded_1');	
 			}
 		}
-		else
+		else if ( GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) )
 		{
-			if ( GetWitcherPlayer().IsWeaponHeld( 'silversword' ) )
+			if ( GetWitcherPlayer().GetInventory().GetItemLevel( steelID ) <= 10 || GetWitcherPlayer().GetInventory().GetItemQuality( steelID ) == 1 )
 			{
-				if ( GetWitcherPlayer().GetInventory().GetItemLevel( silverID ) <= 10 || GetWitcherPlayer().GetInventory().GetItemQuality( silverID ) == 1 )
-				{
-					sword1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
-
-					"dlc\ep1\data\items\weapons\swords\steel_swords\steel_sword_ep1_01.w2ent"
-					
-					, true), GetWitcherPlayer().GetWorldPosition() );
-					
-					attach_rot.Roll = 0;
-					attach_rot.Pitch = 0;
-					attach_rot.Yaw = 0;
-					attach_vec.X = 0;
-					attach_vec.Y = 0;
-					attach_vec.Z = 0.025;
-							
-					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('quen_sword_1');
-				}
-				else if ( GetWitcherPlayer().GetInventory().GetItemLevel( silverID ) <= 11 && GetWitcherPlayer().GetInventory().GetItemLevel(silverID) <= 20 && GetWitcherPlayer().GetInventory().GetItemQuality( silverID ) > 1 )
-				{
-					sword1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
-				
-					"dlc\dlc_acs\data\entities\swords\hakland_sabre.w2ent"
-					
-					, true), GetWitcherPlayer().GetWorldPosition() );
-					
-					attach_rot.Roll = 0;
-					attach_rot.Pitch = 0;
-					attach_rot.Yaw = 0;
-					attach_vec.X = 0;
-					attach_vec.Y = 0;
-					attach_vec.Z = 0.025;
-							
-					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('quen_sword_1');
-
-					sword1.AddTag('quen_sword_upgraded_1');	
-				}
-				else if ( GetWitcherPlayer().GetInventory().GetItemLevel( silverID ) >= 21 && GetWitcherPlayer().GetInventory().GetItemQuality( silverID ) >= 2 ) 
-				{
-					sword1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
-				
-					"dlc\dlc_acs\data\entities\swords\hakland_sabre.w2ent"
-					
-					, true), GetWitcherPlayer().GetWorldPosition() );
-					
-					attach_rot.Roll = 0;
-					attach_rot.Pitch = 0;
-					attach_rot.Yaw = 0;
-					attach_vec.X = 0;
-					attach_vec.Y = 0;
-					attach_vec.Z = 0.025;
-							
-					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('quen_sword_1');
-
-					physicalComponent = (CMeshComponent)(sword1.GetComponentByClassName('CRigidMeshComponent'));
+				sword1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 			
-					if( physicalComponent )
-					{
-						physicalComponent.SetVisible(false);
-					}
-
-					sword1.AddTag('quen_sword_upgraded_2');	
-				}
-				else
-				{
-					sword1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
+				"dlc\ep1\data\items\weapons\swords\unique\olgierd_sabre\olgierd_sabre.w2ent"
 				
-					"dlc\dlc_acs\data\entities\swords\hakland_sabre.w2ent"
-					
-					, true), GetWitcherPlayer().GetWorldPosition() );
-					
-					attach_rot.Roll = 0;
-					attach_rot.Pitch = 0;
-					attach_rot.Yaw = 0;
-					attach_vec.X = 0;
-					attach_vec.Y = 0;
-					attach_vec.Z = 0.025;
-							
-					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('quen_sword_1');
-
-					sword1.AddTag('quen_sword_upgraded_1');	
-				}
+				, true), GetWitcherPlayer().GetWorldPosition() );
+				
+				attach_rot.Roll = 0;
+				attach_rot.Pitch = 0;
+				attach_rot.Yaw = 0;
+				attach_vec.X = 0;
+				attach_vec.Y = 0;
+				attach_vec.Z = 0.025;
+						
+				sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
+				sword1.AddTag('quen_sword_1');
 			}
-			else if ( GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) )
+			else if ( GetWitcherPlayer().GetInventory().GetItemLevel( steelID ) >= 11 && GetWitcherPlayer().GetInventory().GetItemLevel( steelID ) <= 20 && GetWitcherPlayer().GetInventory().GetItemQuality( steelID ) > 1 )
 			{
-				if ( GetWitcherPlayer().GetInventory().GetItemLevel( steelID ) <= 10 || GetWitcherPlayer().GetInventory().GetItemQuality( steelID ) == 1 )
-				{
-					sword1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
-				
-					"dlc\ep1\data\items\weapons\swords\unique\olgierd_sabre\olgierd_sabre.w2ent"
-					
-					, true), GetWitcherPlayer().GetWorldPosition() );
-					
-					attach_rot.Roll = 0;
-					attach_rot.Pitch = 0;
-					attach_rot.Yaw = 0;
-					attach_vec.X = 0;
-					attach_vec.Y = 0;
-					attach_vec.Z = 0.025;
-							
-					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('quen_sword_1');
-				}
-				else if ( GetWitcherPlayer().GetInventory().GetItemLevel( steelID ) >= 11 && GetWitcherPlayer().GetInventory().GetItemLevel( steelID ) <= 20 && GetWitcherPlayer().GetInventory().GetItemQuality( steelID ) > 1 )
-				{
-					sword1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
-				
-					"dlc\dlc_acs\data\entities\swords\olgierd_sabre.w2ent"
-
-					, true), GetWitcherPlayer().GetWorldPosition() );
-					
-					attach_rot.Roll = 0;
-					attach_rot.Pitch = 0;
-					attach_rot.Yaw = 0;
-					attach_vec.X = 0;
-					attach_vec.Y = 0;
-					attach_vec.Z = 0.025;
-							
-					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('quen_sword_1');
-
-					sword1.AddTag('quen_sword_upgraded_1');	
-				}
-				else if ( GetWitcherPlayer().GetInventory().GetItemLevel( steelID ) >= 21 && GetWitcherPlayer().GetInventory().GetItemQuality( steelID ) >= 2 )
-				{
-					sword1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
-				
-					"dlc\dlc_acs\data\entities\swords\olgierd_sabre.w2ent"
-					
-					, true), GetWitcherPlayer().GetWorldPosition() );
-					
-					attach_rot.Roll = 0;
-					attach_rot.Pitch = 0;
-					attach_rot.Yaw = 0;
-					attach_vec.X = 0;
-					attach_vec.Y = 0;
-					attach_vec.Z = 0.025;
-							
-					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('quen_sword_1');	
-
-					physicalComponent = (CMeshComponent)(sword1.GetComponentByClassName('CRigidMeshComponent'));
+				sword1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 			
-					if( physicalComponent )
-					{
-						physicalComponent.SetVisible(false);
-					}
+				"dlc\dlc_acs\data\entities\equipment_mode_weapons\acs_true_iris.w2ent"
 
-					sword1.AddTag('quen_sword_upgraded_2');	
-				}
-				else
-				{
-					sword1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
+				, true), GetWitcherPlayer().GetWorldPosition() );
 				
-					//"dlc\dlc_acs\data\entities\swords\olgierd_sabre.w2ent"
+				attach_rot.Roll = 0;
+				attach_rot.Pitch = 0;
+				attach_rot.Yaw = 0;
+				attach_vec.X = 0;
+				attach_vec.Y = 0;
+				attach_vec.Z = 0.025;
+						
+				sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
+				sword1.AddTag('quen_sword_1');
 
-					"dlc\ep1\data\items\weapons\swords\unique\olgierd_sabre\olgierd_sabre.w2ent"
-					
-					, true), GetWitcherPlayer().GetWorldPosition() );
-					
-					attach_rot.Roll = 0;
-					attach_rot.Pitch = 0;
-					attach_rot.Yaw = 0;
-					attach_vec.X = 0;
-					attach_vec.Y = 0;
-					attach_vec.Z = 0.025;
-							
-					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('quen_sword_1');
+				sword1.AddTag('quen_sword_upgraded_1');	
+			}
+			else if ( GetWitcherPlayer().GetInventory().GetItemLevel( steelID ) >= 21 && GetWitcherPlayer().GetInventory().GetItemQuality( steelID ) >= 2 )
+			{
+				sword1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
+			
+				"dlc\dlc_acs\data\entities\equipment_mode_weapons\acs_true_iris.w2ent"
+				
+				, true), GetWitcherPlayer().GetWorldPosition() );
+				
+				attach_rot.Roll = 0;
+				attach_rot.Pitch = 0;
+				attach_rot.Yaw = 0;
+				attach_vec.X = 0;
+				attach_vec.Y = 0;
+				attach_vec.Z = 0.025;
+						
+				sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
+				sword1.AddTag('quen_sword_1');	
 
-					sword1.AddTag('quen_sword_upgraded_1');	
+				physicalComponent = (CMeshComponent)(sword1.GetComponentByClassName('CRigidMeshComponent'));
+		
+				if( physicalComponent )
+				{
+					physicalComponent.SetVisible(false);
 				}
+
+				sword1.AddTag('quen_sword_upgraded_2');	
+			}
+			else
+			{
+				sword1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
+			
+				"dlc\dlc_acs\data\entities\equipment_mode_weapons\acs_true_iris.w2ent"
+				
+				, true), GetWitcherPlayer().GetWorldPosition() );
+				
+				attach_rot.Roll = 0;
+				attach_rot.Pitch = 0;
+				attach_rot.Yaw = 0;
+				attach_vec.X = 0;
+				attach_vec.Y = 0;
+				attach_vec.Z = 0.025;
+						
+				sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
+				sword1.AddTag('quen_sword_1');
+
+				sword1.AddTag('quen_sword_upgraded_1');	
 			}
 		}
 	}
@@ -8405,7 +8347,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 		{
 			sword1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 			
-			"dlc\dlc_acs\data\entities\swords\hakland_sabre.w2ent"
+			"dlc\dlc_acs\data\entities\equipment_mode_weapons\acs_true_iris.w2ent"
 				
 			, true), GetWitcherPlayer().GetWorldPosition() );
 				
@@ -8425,7 +8367,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 		{
 			sword1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 
-			"dlc\dlc_acs\data\entities\swords\olgierd_sabre.w2ent"
+			"dlc\dlc_acs\data\entities\equipment_mode_weapons\acs_true_iris.w2ent"
 			
 			, true), GetWitcherPlayer().GetWorldPosition() );
 			
@@ -8542,6 +8484,10 @@ state Claw_Equip_Standalone_Engage in cClawEquipStandalone
 
 			if (ACS_Armor_Equipped_Check())
 			{
+				claw_temp = (CEntityTemplate)LoadResource(	"dlc\dlc_acs\data\entities\swords\vamp_claws_blood.w2ent", true);	
+
+				((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(claw_temp);
+
 				claw_temp = (CEntityTemplate)LoadResource(	"dlc\dlc_acs\data\entities\swords\vamp_claws.w2ent", true);	
 
 				((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(claw_temp);
@@ -8558,14 +8504,34 @@ state Claw_Equip_Standalone_Engage in cClawEquipStandalone
 
 				if (!ACS_HideVampireClaws_Enabled())
 				{
-					claw_temp = (CEntityTemplate)LoadResource(	"dlc\dlc_acs\data\entities\swords\vamp_claws.w2ent", true);	
+					if (ACS_GetItem_VampClaw_Blood())
+					{
+						claw_temp = (CEntityTemplate)LoadResource(	"dlc\dlc_acs\data\entities\swords\vamp_claws.w2ent", true);	
 
-					((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(claw_temp);
+						((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(claw_temp);
+
+						claw_temp = (CEntityTemplate)LoadResource(	"dlc\dlc_acs\data\entities\swords\vamp_claws_blood.w2ent", true);	
+
+						((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(claw_temp);
+					}
+					else
+					{
+						claw_temp = (CEntityTemplate)LoadResource(	"dlc\dlc_acs\data\entities\swords\vamp_claws_blood.w2ent", true);	
+
+						((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(claw_temp);
+
+						claw_temp = (CEntityTemplate)LoadResource(	"dlc\dlc_acs\data\entities\swords\vamp_claws.w2ent", true);	
+
+						((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(claw_temp);
+					}
 				}
 			}
 
-			GetWitcherPlayer().PlayEffectSingle('claws_effect');
-			GetWitcherPlayer().StopEffect('claws_effect');
+			if (!ACS_HideVampireClaws_Enabled())
+			{
+				thePlayer.PlayEffectSingle('claws_effect');
+				thePlayer.StopEffect('claws_effect');
+			}
 		}
 
 		if ( GetWitcherPlayer().HasBuff(EET_BlackBlood) )
@@ -8597,7 +8563,7 @@ state Claw_Equip_Standalone_Engage in cClawEquipStandalone
 
 			extra_arms_anchor_r.CreateAttachmentAtBoneWS( GetWitcherPlayer(), 'r_shoulder', bone_vec, bone_rot );
 
-			extra_arms_anchor_r.AddTag('extra_arms_anchor_r');
+			extra_arms_anchor_r.AddTag('acs_extra_arms_anchor_r');
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
@@ -8607,7 +8573,7 @@ state Claw_Equip_Standalone_Engage in cClawEquipStandalone
 
 			extra_arms_anchor_l.CreateAttachmentAtBoneWS( GetWitcherPlayer(), 'l_shoulder', bone_vec, bone_rot );
 
-			extra_arms_anchor_l.AddTag('extra_arms_anchor_l');
+			extra_arms_anchor_l.AddTag('acs_extra_arms_anchor_l');
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -8632,7 +8598,7 @@ state Claw_Equip_Standalone_Engage in cClawEquipStandalone
 
 			extra_arms_1.PlayEffectSingle('blood');
 
-			extra_arms_1.AddTag('vampire_extra_arms_1');	
+			extra_arms_1.AddTag('acs_vampire_extra_arms_1');	
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -8657,7 +8623,7 @@ state Claw_Equip_Standalone_Engage in cClawEquipStandalone
 
 			extra_arms_2.PlayEffectSingle('blood');
 
-			extra_arms_2.AddTag('vampire_extra_arms_2');	
+			extra_arms_2.AddTag('acs_vampire_extra_arms_2');	
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -8682,7 +8648,7 @@ state Claw_Equip_Standalone_Engage in cClawEquipStandalone
 
 			extra_arms_3.PlayEffectSingle('blood');
 
-			extra_arms_3.AddTag('vampire_extra_arms_3');	
+			extra_arms_3.AddTag('acs_vampire_extra_arms_3');	
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -8707,7 +8673,7 @@ state Claw_Equip_Standalone_Engage in cClawEquipStandalone
 
 			extra_arms_4.PlayEffectSingle('blood');
 
-			extra_arms_4.AddTag('vampire_extra_arms_4');	
+			extra_arms_4.AddTag('acs_vampire_extra_arms_4');	
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -8743,7 +8709,7 @@ state Claw_Equip_Standalone_Engage in cClawEquipStandalone
 
 			vampire_head_anchor.CreateAttachmentAtBoneWS( GetWitcherPlayer(), 'head', bone_vec, bone_rot );
 
-			vampire_head_anchor.AddTag('vampire_head_anchor');
+			vampire_head_anchor.AddTag('acs_vampire_head_anchor');
 
 			head_temp = (CEntityTemplate)LoadResource(
 			"dlc\dlc_acs\data\entities\other\dettlaff_monster_head.w2ent"
@@ -8769,7 +8735,7 @@ state Claw_Equip_Standalone_Engage in cClawEquipStandalone
 			
 			vampire_head.CreateAttachment( vampire_head_anchor, , attach_vec, attach_rot );
 
-			vampire_head.AddTag('vampire_head');
+			vampire_head.AddTag('acs_vampire_head');
 
 			GetWitcherPlayer().AddTag('ACS_blood_armor');
 		}
@@ -8782,7 +8748,7 @@ state Claw_Equip_Standalone_Engage in cClawEquipStandalone
 
 		vampire_claw_anchor.CreateAttachmentAtBoneWS( GetWitcherPlayer(), 'torso3', bone_vec, bone_rot );
 
-		vampire_claw_anchor.AddTag('vampire_claw_anchor');
+		vampire_claw_anchor.AddTag('acs_vampire_claw_anchor');
 
 		back_claw_temp = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\entities\other\vampire_back_claws.w2ent", true);	
 
@@ -8803,7 +8769,11 @@ state Claw_Equip_Standalone_Engage in cClawEquipStandalone
 		
 		back_claw.CreateAttachment( vampire_claw_anchor, , attach_vec, attach_rot );
 
-		back_claw.AddTag('back_claw');
+		back_claw.StopEffect('blood_color');
+
+		back_claw.PlayEffectSingle('blood_color');
+
+		back_claw.AddTag('acs_vampire_back_claw');
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			
@@ -8979,7 +8949,7 @@ state Blood_Armor_Standalone_Engage in cBloodArmorStandalone
 
 			extra_arms_anchor_r.CreateAttachmentAtBoneWS( GetWitcherPlayer(), 'r_shoulder', bone_vec, bone_rot );
 
-			extra_arms_anchor_r.AddTag('extra_arms_anchor_r');
+			extra_arms_anchor_r.AddTag('acs_extra_arms_anchor_r');
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
@@ -8989,7 +8959,7 @@ state Blood_Armor_Standalone_Engage in cBloodArmorStandalone
 
 			extra_arms_anchor_l.CreateAttachmentAtBoneWS( GetWitcherPlayer(), 'l_shoulder', bone_vec, bone_rot );
 
-			extra_arms_anchor_l.AddTag('extra_arms_anchor_l');
+			extra_arms_anchor_l.AddTag('acs_extra_arms_anchor_l');
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -9014,7 +8984,7 @@ state Blood_Armor_Standalone_Engage in cBloodArmorStandalone
 
 			extra_arms_1.PlayEffectSingle('blood');
 
-			extra_arms_1.AddTag('vampire_extra_arms_1');	
+			extra_arms_1.AddTag('acs_vampire_extra_arms_1');	
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -9039,7 +9009,7 @@ state Blood_Armor_Standalone_Engage in cBloodArmorStandalone
 
 			extra_arms_2.PlayEffectSingle('blood');
 
-			extra_arms_2.AddTag('vampire_extra_arms_2');	
+			extra_arms_2.AddTag('acs_vampire_extra_arms_2');	
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -9064,7 +9034,7 @@ state Blood_Armor_Standalone_Engage in cBloodArmorStandalone
 
 			extra_arms_3.PlayEffectSingle('blood');
 
-			extra_arms_3.AddTag('vampire_extra_arms_3');	
+			extra_arms_3.AddTag('acs_vampire_extra_arms_3');	
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -9089,7 +9059,7 @@ state Blood_Armor_Standalone_Engage in cBloodArmorStandalone
 
 			extra_arms_4.PlayEffectSingle('blood');
 
-			extra_arms_4.AddTag('vampire_extra_arms_4');	
+			extra_arms_4.AddTag('acs_vampire_extra_arms_4');	
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -9119,8 +9089,11 @@ state Blood_Armor_Standalone_Engage in cBloodArmorStandalone
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-			GetWitcherPlayer().PlayEffectSingle('claws_effect');
-			GetWitcherPlayer().StopEffect('claws_effect');
+			if (!ACS_HideVampireClaws_Enabled())
+			{
+				thePlayer.PlayEffectSingle('claws_effect');
+				thePlayer.StopEffect('claws_effect');
+			}
 
 			GetWitcherPlayer().GetBoneWorldPositionAndRotationByIndex( GetWitcherPlayer().GetBoneIndex( 'head' ), bone_vec, bone_rot );
 
@@ -9128,7 +9101,7 @@ state Blood_Armor_Standalone_Engage in cBloodArmorStandalone
 
 			vampire_head_anchor.CreateAttachmentAtBoneWS( GetWitcherPlayer(), 'head', bone_vec, bone_rot );
 
-			vampire_head_anchor.AddTag('vampire_head_anchor');
+			vampire_head_anchor.AddTag('acs_vampire_head_anchor');
 
 			head_temp = (CEntityTemplate)LoadResource(
 			"dlc\dlc_acs\data\entities\other\dettlaff_monster_head.w2ent"
@@ -9154,7 +9127,7 @@ state Blood_Armor_Standalone_Engage in cBloodArmorStandalone
 			
 			vampire_head.CreateAttachment( vampire_head_anchor, , attach_vec, attach_rot );
 
-			vampire_head.AddTag('vampire_head');
+			vampire_head.AddTag('acs_vampire_head');
 
 			GetWitcherPlayer().AddTag('ACS_blood_armor');
 		}

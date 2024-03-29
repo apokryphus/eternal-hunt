@@ -4,6 +4,7 @@ function ACS_OnTakeDamage(action: W3DamageAction)
 	var movementAdjustor				: CMovementAdjustor;
 	var ticket 							: SMovementAdjustmentRequestTicket;
 
+
 	if (GetWitcherPlayer().HasTag('ACS_IsPerformingFinisher')
 	|| GetWitcherPlayer().IsPerformingFinisher())
 	{
@@ -12,6 +13,43 @@ function ACS_OnTakeDamage(action: W3DamageAction)
 
 	if( GetWitcherPlayer().HasBuff( EET_Mutation11Immortal ) )
 	{
+		ACS_ThingsThatShouldBeRemoved();
+
+		if (ACS_Transformation_Werewolf_Check())
+		{
+			GetACSWatcher().DisableWerewolf_Actual();
+		}
+
+		if (ACS_Transformation_Vampiress_Check())
+		{
+			GetACSWatcher().DisableVampiress_Actual();
+		}
+
+		if (ACS_Transformation_Vampire_Monster_Check())
+		{
+			GetACSWatcher().DisableTransformationVampireMonster_Actual_No_Teleport();
+		}
+
+		if (ACS_Transformation_Toad_Check())
+		{
+			GetACSWatcher().DisableTransformationToad_Actual();
+		}
+
+		if (ACS_Transformation_Red_Miasmal_Check())
+		{
+			GetACSWatcher().DisableRedMiasmal_Actual();
+		}
+
+		if (ACS_Transformation_Sharley_Check())
+		{
+			GetACSWatcher().DisableSharley_Actual();
+		}
+
+		if (ACS_Transformation_Black_Wolf_Check())
+		{
+			GetACSWatcher().DisableBlackWolf_Actual();
+		}
+
 		GetWitcherPlayer().AddTag('ACS_Second_Life_Active');
 
 		return;
@@ -19,6 +57,43 @@ function ACS_OnTakeDamage(action: W3DamageAction)
 
 	if( GetWitcherPlayer().IsActionBlockedBy(EIAB_Movement, 'Mutation11') && GetWitcherPlayer().IsMutationActive( EPMT_Mutation11 ) && !GetWitcherPlayer().HasBuff( EET_Mutation11Debuff ) && !GetWitcherPlayer().IsInAir() )
 	{
+		ACS_ThingsThatShouldBeRemoved();
+
+		if (ACS_Transformation_Werewolf_Check())
+		{
+			GetACSWatcher().DisableWerewolf_Actual();
+		}
+
+		if (ACS_Transformation_Vampiress_Check())
+		{
+			GetACSWatcher().DisableVampiress_Actual();
+		}
+
+		if (ACS_Transformation_Vampire_Monster_Check())
+		{
+			GetACSWatcher().DisableTransformationVampireMonster_Actual_No_Teleport();
+		}
+
+		if (ACS_Transformation_Toad_Check())
+		{
+			GetACSWatcher().DisableTransformationToad_Actual();
+		}
+
+		if (ACS_Transformation_Red_Miasmal_Check())
+		{
+			GetACSWatcher().DisableRedMiasmal_Actual();
+		}
+
+		if (ACS_Transformation_Sharley_Check())
+		{
+			GetACSWatcher().DisableSharley_Actual();
+		}
+
+		if (ACS_Transformation_Black_Wolf_Check())
+		{
+			GetACSWatcher().DisableBlackWolf_Actual();
+		}
+
 		GetWitcherPlayer().AddTag('ACS_Second_Life_Active');
 
 		return;
@@ -46,9 +121,15 @@ function ACS_OnTakeDamage(action: W3DamageAction)
 
 	ACS_Plumard_On_Take_Damage(action);
 
+	ACS_Nekurat_On_Take_Damage(action);
+
 	ACS_Harpy_Queen_On_Take_Damage(action);
 
 	ACS_Harpy_Praetorian_On_Take_Damage(action);
+
+	ACS_Chironex_On_Take_Damage(action);
+
+	ACS_Weaponized_Rabbit_On_Take_Damage(action);
 
 	ACS_She_Who_Knows_On_Take_Damage(action);
 
@@ -90,9 +171,11 @@ function ACS_OnTakeDamage(action: W3DamageAction)
 
 	ACS_ShadowWolf_On_Take_Damage(action);
 
-	ACS_Fluffy_ShadowWolf_On_Take_Damage(action);
-
 	ACS_Fluffy_On_Take_Damage(action);
+
+	ACS_Botchling_On_Take_Damage(action);
+
+	ACS_Mula_On_Take_Damage(action);
 
 	ACS_Fog_Assassin_On_Take_Damage(action);
 
@@ -111,8 +194,6 @@ function ACS_OnTakeDamage(action: W3DamageAction)
 	ACS_Cultist_Boss_On_Take_Damage(action);
 
 	ACS_Cultist_On_Take_Damage(action);
-
-	ACS_Cultist_Thrall_On_Take_Damage(action);
 
 	ACS_Cultist_Singer_On_Take_Damage(action);
 
@@ -188,6 +269,18 @@ function ACS_OnTakeDamage(action: W3DamageAction)
 
 	ACS_Carduin_On_Take_Damage(action);
 
+	ACS_Dao_On_Take_Damage(action);
+
+	ACS_Dao_Turret_On_Take_Damage(action);
+
+	ACS_Knocker_On_Take_Damage(action);
+
+	ACS_Vendigo_On_Take_Damage(action);
+
+	ACS_Swarm_Mother_On_Take_Damage(action);
+
+	ACS_Maerolorn_On_Take_Damage(action);
+
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	ACS_Ghoul_Base_On_Take_Damage(action);
@@ -214,6 +307,8 @@ function ACS_OnTakeDamage(action: W3DamageAction)
 	ACS_Fire_Bear_Attack(action);
 
 	ACS_Fire_Gargoyle_Attack(action);
+
+	ACS_Vendigo_Attack(action);
 
 	ACS_Knightmare_Attack(action);
 
@@ -267,11 +362,15 @@ function ACS_OnTakeDamage(action: W3DamageAction)
 
 	ACS_Guardian_Hym_Attack(action);
 
+	ACS_Knocker_Attack(action);
+
 	ACS_Bumbakvetch_Attack(action);
 
 	ACS_Viy_Attack(action);
 
 	ACS_Plumard_Attack(action);
+
+	ACS_Demonic_Construct_Attack(action);
 
 	ACS_Shades_Rogue_Attack(action);
 
@@ -280,6 +379,12 @@ function ACS_OnTakeDamage(action: W3DamageAction)
 	ACS_Vanilla_Vampires_Attack(action);
 
 	ACS_Carduin_Attack(action);
+
+	ACS_Chironex_Attack(action);
+
+	ACS_Botchling_Attack(action);
+
+	ACS_Draugir_Attack(action);
 
 	//ACS_Infected_Prime_Attack(action);
 
@@ -293,6 +398,8 @@ function ACS_OnTakeDamage(action: W3DamageAction)
 
 	ACS_Wolf_Companion_Attack(action);
 
+	ACS_SummonedCreatures_Attack(action);
+
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	ACS_Rage_Attack(action);
@@ -303,6 +410,26 @@ function ACS_OnTakeDamage(action: W3DamageAction)
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	if (!GetWitcherPlayer().IsMutationActive( EPMT_Mutation11 ) 
+	|| GetWitcherPlayer().HasBuff( EET_Mutation11Debuff ) 
+	)
+	{
+		if (thePlayer.HasTag('ACS_Second_Life_Active'))
+		{
+			thePlayer.ActionPlaySlotAnimationAsync('PLAYER_SLOT','', 0.1, 1, false);
+
+			action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
+
+			thePlayer.BlockAllActions( 'Mutation11', false );	
+			theGame.GetGameCamera().StopAnimation( 'camera_shake_loop_lvl1_1' );
+			theGame.StopVibrateController();
+			thePlayer.SetInteractionPriority( thePlayer.GetInteractionPriority() );
+			thePlayer.RemoveBuff( EET_Mutation11Buff, true );
+			
+			thePlayer.RemoveTag('ACS_Second_Life_Active');
+		}
+	}
+
 	if (
 	(CPlayer)action.victim 
 	&& action.GetBuffSourceName() != "FallingDamage"
@@ -312,192 +439,33 @@ function ACS_OnTakeDamage(action: W3DamageAction)
 	&& (GetWitcherPlayer().GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.1)
 	) 
 	{
-		if (((CNewNPC)action.attacker).GetNPCType() == ENGT_Guard)
+		if (!GetWitcherPlayer().IsMutationActive( EPMT_Mutation11 ) 
+		|| GetWitcherPlayer().HasBuff( EET_Mutation11Debuff ) 
+		|| !GetWitcherPlayer().CanUseSkill(S_Sword_s01)
+		)
 		{
-			if (FactsQuerySum("ACS_Enter_Unconscious_Start") <= 0)
+			if (((CNewNPC)action.attacker).GetNPCType() == ENGT_Guard)
 			{
-				if (ACS_Transformation_Werewolf_Check())
+				if (FactsQuerySum("ACS_Enter_Unconscious_Start") <= 0)
 				{
-					GetACSWatcher().DisableWerewolf();
-				}
-
-				if (ACS_Transformation_Vampiress_Check())
-				{
-					GetACSWatcher().DisableVampiress();
-				}
-
-				if (ACS_Transformation_Vampire_Monster_Check())
-				{
-					GetACSWatcher().DisableTransformationVampireMonster();
-				}
-
-				if (ACS_Transformation_Toad_Check())
-				{
-					GetACSWatcher().DisableTransformationToad();
-				}
-
-				if (ACS_Transformation_Red_Miasmal_Check())
-				{
-					GetACSWatcher().DisableRedMiasmal_Actual();
-				}
-
-				ACS_Guards_Tutorial();
-
-				action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
-
-				if (GetWitcherPlayer().GetStat( BCS_Focus ) != 0)
-				{
-					GetWitcherPlayer().DrainFocus( GetWitcherPlayer().GetStatMax( BCS_Focus ) );
-				}
-				
-				money = GetWitcherPlayer().GetMoney();
-
-				switch ( theGame.GetDifficultyLevel() )
-				{
-					case EDM_Easy:		money *= 0.025;  break;
-					case EDM_Medium:	money *= 0.050;  break;
-					case EDM_Hard:		money *= 0.075;  break;
-					case EDM_Hardcore:	money *= 0.1;    break;
-					default : 			money *= 0; 	 break;
-				}
-				
-				if (money != 0)
-				{
-					GetWitcherPlayer().RemoveMoney((int)money);
-				}
-				
-				GetACSWatcher().ACS_Combo_Mode_Reset_Hard();
-
-				/*
-				if (!GetWitcherPlayer().HasTag('ACS_IsPerformingFinisher')
-				&& !GetWitcherPlayer().IsPerformingFinisher())
-				{
-					ACS_Hit_Animations(action);
-				}
-				*/
-
-				movementAdjustor = thePlayer.GetMovingAgentComponent().GetMovementAdjustor();
-
-				ticket = movementAdjustor.GetRequest( 'ACS_Player_Hit_Rotate');
-				movementAdjustor.CancelByName( 'ACS_Player_Hit_Rotate' );
-				movementAdjustor.CancelAll();
-
-				ticket = movementAdjustor.CreateNewRequest( 'ACS_Player_Hit_Rotate' );
-				movementAdjustor.AdjustmentDuration( ticket, 0.5 );
-				movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000 );
-
-				movementAdjustor.RotateTowards( ticket, ((CActor)action.attacker) );
-
-				GetWitcherPlayer().DrainVitality( GetWitcherPlayer().GetStat( BCS_Vitality ) * 0.99 );
-
-				if (GetWitcherPlayer().IsAnyWeaponHeld() && !GetWitcherPlayer().IsWeaponHeld('fist'))
-				{
-					if (RandF() < 0.5)
-					{
-						GetACSWatcher().PlayerPlayAnimation('man_npc_longsword_effect_knockdown_f_start');
-						((CAnimatedComponent)thePlayer.GetComponentByClassName('CAnimatedComponent')).FreezePoseFadeIn(2.125);
-					}
-					else
-					{
-						GetACSWatcher().PlayerPlayAnimation('man_npc_longsword_effect_knockdownfar_f_start');
-						((CAnimatedComponent)thePlayer.GetComponentByClassName('CAnimatedComponent')).FreezePoseFadeIn(2.125);
-					}
-				}
-				else
-				{
-					if (thePlayer.HasTag('vampire_claws_equipped'))
-					{
-						GetACSWatcher().PlayerPlayAnimation('bruxa_death_front_ACS');
-						//((CAnimatedComponent)thePlayer.GetComponentByClassName('CAnimatedComponent')).FreezePoseFadeIn(3.125);
-					}
-					else
-					{
-						GetACSWatcher().PlayerPlayAnimation('man_fistfight_hit_knockdown_f_start_right');
-						((CAnimatedComponent)thePlayer.GetComponentByClassName('CAnimatedComponent')).FreezePoseFadeIn(2.125);
-					}
-				}
-
-				theGame.GetBehTreeReactionManager().CreateReactionEventIfPossible( thePlayer, 'PlayerUnconsciousAction', -1.f, 60.0f, -1, -1, true ); 
-
-				GetWitcherPlayer().AddBuffImmunity_AllNegative('ACS_Unconscious', true); 
-
-				GetWitcherPlayer().AddBuffImmunity_AllCritical('ACS_Unconscious', true); 
-
-				GetWitcherPlayer().AddBuffImmunity(EET_Poison , 'ACS_Unconscious', true);
-
-				GetWitcherPlayer().AddBuffImmunity(EET_PoisonCritical , 'ACS_Unconscious', true);
-
-				GetWitcherPlayer().SetImmortalityMode( AIM_Invulnerable, AIC_Default, true );
-
-				GetWitcherPlayer().SetCanPlayHitAnim(false);
-
-				GetWitcherPlayer().AddBuffImmunity_AllNegative('god', true);
-
-				GetACSWatcher().ChangeInteractionPriority();
-
-				ACS_GuardCheer();
-
-				GetACSWatcher().RemoveTimer('Gerry_Unconscious_State');
-
-				GetACSWatcher().AddTimer('Gerry_Unconscious_State', 1, false);
-
-				thePlayer.BlockAction( EIAB_Crossbow, 			'ACS_Unconscious_State');
-				thePlayer.BlockAction( EIAB_CallHorse,			'ACS_Unconscious_State');
-				thePlayer.BlockAction( EIAB_Signs, 				'ACS_Unconscious_State');
-				thePlayer.BlockAction( EIAB_DrawWeapon, 		'ACS_Unconscious_State'); 
-				thePlayer.BlockAction( EIAB_FastTravel, 		'ACS_Unconscious_State');
-				thePlayer.BlockAction( EIAB_Fists, 				'ACS_Unconscious_State');
-				thePlayer.BlockAction( EIAB_InteractionAction, 	'ACS_Unconscious_State');
-				thePlayer.BlockAction( EIAB_UsableItem,			'ACS_Unconscious_State');
-				thePlayer.BlockAction( EIAB_ThrowBomb,			'ACS_Unconscious_State');
-				thePlayer.BlockAction( EIAB_SwordAttack,		'ACS_Unconscious_State');
-				thePlayer.BlockAction( EIAB_Jump,				'ACS_Unconscious_State');
-				thePlayer.BlockAction( EIAB_LightAttacks,		'ACS_Unconscious_State');
-				thePlayer.BlockAction( EIAB_HeavyAttacks,		'ACS_Unconscious_State');
-				thePlayer.BlockAction( EIAB_SpecialAttackLight,	'ACS_Unconscious_State');
-				thePlayer.BlockAction( EIAB_SpecialAttackHeavy,	'ACS_Unconscious_State');
-				thePlayer.BlockAction( EIAB_Dodge,				'ACS_Unconscious_State');
-				thePlayer.BlockAction( EIAB_Roll,				'ACS_Unconscious_State');
-				thePlayer.BlockAction( EIAB_Parry,				'ACS_Unconscious_State');
-				thePlayer.BlockAction( EIAB_MeditationWaiting,	'ACS_Unconscious_State');
-				thePlayer.BlockAction( EIAB_OpenMeditation,		'ACS_Unconscious_State');
-				thePlayer.BlockAction( EIAB_RadialMenu,			'ACS_Unconscious_State');
-				thePlayer.BlockAction( EIAB_Movement,			'ACS_Unconscious_State');
-				thePlayer.BlockAction( EIAB_Interactions, 		'ACS_Unconscious_State');
-				thePlayer.BlockAction( EIAB_QuickSlots, 		'ACS_Unconscious_State');
-				thePlayer.BlockAction( EIAB_Explorations, 		'ACS_Unconscious_State');
-
-				GetACSWatcher().ACS_Unconscious_Create_Savelock();
-
-				FactsAdd("ACS_Enter_Unconscious_Start", 1, -1);
-			}
-		}
-		else
-		{
-			if (!GetWitcherPlayer().IsMutationActive( EPMT_Mutation11 ) || GetWitcherPlayer().HasBuff( EET_Mutation11Debuff ) || !GetWitcherPlayer().CanUseSkill(S_Sword_s01))
-			{
-				if(!GetWitcherPlayer().HasTag('ACS_Enter_Death_Scene_Start') && !ACS_New_Replacers_Female_Active())
-				{
-					ACS_ThingsThatShouldBeRemoved();
-
 					if (ACS_Transformation_Werewolf_Check())
 					{
-						GetACSWatcher().DisableWerewolf_Actual();
+						GetACSWatcher().DisableWerewolf();
 					}
 
 					if (ACS_Transformation_Vampiress_Check())
 					{
-						GetACSWatcher().DisableVampiress_Actual();
+						GetACSWatcher().DisableVampiress();
 					}
 
 					if (ACS_Transformation_Vampire_Monster_Check())
 					{
-						GetACSWatcher().DisableTransformationVampireMonster_Actual_No_Teleport();
+						GetACSWatcher().DisableTransformationVampireMonster();
 					}
 
 					if (ACS_Transformation_Toad_Check())
 					{
-						GetACSWatcher().DisableTransformationToad_Actual();
+						GetACSWatcher().DisableTransformationToad();
 					}
 
 					if (ACS_Transformation_Red_Miasmal_Check())
@@ -505,114 +473,348 @@ function ACS_OnTakeDamage(action: W3DamageAction)
 						GetACSWatcher().DisableRedMiasmal_Actual();
 					}
 
-					GetWitcherPlayer().EnableCharacterCollisions(true); 
+					if (ACS_Transformation_Sharley_Check())
+					{
+						GetACSWatcher().DisableSharley_Actual();
+					}
 
-					GetWitcherPlayer().EnableCollisions(true);
+					if (ACS_Transformation_Black_Wolf_Check())
+					{
+						GetACSWatcher().DisableBlackWolf_Actual();
+					}
 
-					GetWitcherPlayer().SetIsCurrentlyDodging(false);
+					ACS_Guards_Tutorial();
+
+					action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
 
 					if (GetWitcherPlayer().GetStat( BCS_Focus ) != 0)
 					{
 						GetWitcherPlayer().DrainFocus( GetWitcherPlayer().GetStatMax( BCS_Focus ) );
 					}
+					
+					money = GetWitcherPlayer().GetMoney();
 
-					if (GetWitcherPlayer().HasTag('ACS_Size_Adjusted'))
+					switch ( theGame.GetDifficultyLevel() )
 					{
-						GetACSWatcher().Grow_Geralt_Immediate_Fast();
-
-						GetWitcherPlayer().RemoveTag('ACS_Size_Adjusted');
+						case EDM_Easy:		money *= 0.025;  break;
+						case EDM_Medium:	money *= 0.050;  break;
+						case EDM_Hard:		money *= 0.075;  break;
+						case EDM_Hardcore:	money *= 0.1;    break;
+						default : 			money *= 0; 	 break;
 					}
+					
+					if (money != 0)
+					{
+						GetWitcherPlayer().RemoveMoney((int)money);
+					}
+					
+					GetACSWatcher().ACS_Combo_Mode_Reset_Hard();
 
-					GetWitcherPlayer().SoundEvent("cmb_play_dismemberment_gore");
-
-					GetWitcherPlayer().SoundEvent("monster_dettlaff_monster_vein_hit_blood");
-
-					GetWitcherPlayer().SoundEvent("cmb_play_hit_heavy");
-
-					GetACSWatcher().RemoveTimer('ACS_Death_Delay_Animation');
-
-					GetACSWatcher().RemoveTimer('ACS_ResetAnimation_On_Death');
-
+					/*
 					if (!GetWitcherPlayer().HasTag('ACS_IsPerformingFinisher')
 					&& !GetWitcherPlayer().IsPerformingFinisher())
 					{
 						ACS_Hit_Animations(action);
 					}
+					*/
 
-					GetWitcherPlayer().DestroyEffect('blood');
-					GetWitcherPlayer().DestroyEffect('death_blood');
-					GetWitcherPlayer().DestroyEffect('heavy_hit');
-					GetWitcherPlayer().DestroyEffect('light_hit');
-					GetWitcherPlayer().DestroyEffect('blood_spill');
-					GetWitcherPlayer().DestroyEffect('fistfight_heavy_hit');
-					GetWitcherPlayer().DestroyEffect('heavy_hit_horseriding');
-					GetWitcherPlayer().DestroyEffect('fistfight_hit');
-					GetWitcherPlayer().DestroyEffect('critical hit');
-					GetWitcherPlayer().DestroyEffect('death_hit');
-					GetWitcherPlayer().DestroyEffect('blood_throat_cut');
-					GetWitcherPlayer().DestroyEffect('hit_back');
-					GetWitcherPlayer().DestroyEffect('standard_hit');
-					GetWitcherPlayer().DestroyEffect('critical_bleeding'); 
-					GetWitcherPlayer().DestroyEffect('fistfight_hit_back'); 
-					GetWitcherPlayer().DestroyEffect('heavy_hit_back'); 
-					GetWitcherPlayer().DestroyEffect('light_hit_back'); 
+					movementAdjustor = thePlayer.GetMovingAgentComponent().GetMovementAdjustor();
 
-					GetWitcherPlayer().PlayEffectSingle('blood');
-					GetWitcherPlayer().PlayEffectSingle('death_blood');
-					GetWitcherPlayer().PlayEffectSingle('heavy_hit');
-					GetWitcherPlayer().PlayEffectSingle('light_hit');
-					GetWitcherPlayer().PlayEffectSingle('blood_spill');
-					GetWitcherPlayer().PlayEffectSingle('fistfight_heavy_hit');
-					GetWitcherPlayer().PlayEffectSingle('heavy_hit_horseriding');
-					GetWitcherPlayer().PlayEffectSingle('fistfight_hit');
-					GetWitcherPlayer().PlayEffectSingle('critical hit');
-					GetWitcherPlayer().PlayEffectSingle('death_hit');
-					GetWitcherPlayer().PlayEffectSingle('blood_throat_cut');
-					GetWitcherPlayer().PlayEffectSingle('hit_back');
-					GetWitcherPlayer().PlayEffectSingle('standard_hit');
-					GetWitcherPlayer().PlayEffectSingle('critical_bleeding'); 
-					GetWitcherPlayer().PlayEffectSingle('fistfight_hit_back'); 
-					GetWitcherPlayer().PlayEffectSingle('heavy_hit_back'); 
-					GetWitcherPlayer().PlayEffectSingle('light_hit_back'); 
+					ticket = movementAdjustor.GetRequest( 'ACS_Player_Hit_Rotate');
+					movementAdjustor.CancelByName( 'ACS_Player_Hit_Rotate' );
+					movementAdjustor.CancelAll();
 
-					GetWitcherPlayer().AddBuffImmunity_AllNegative('ACS_Death', true); 
+					ticket = movementAdjustor.CreateNewRequest( 'ACS_Player_Hit_Rotate' );
+					movementAdjustor.AdjustmentDuration( ticket, 0.5 );
+					movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000 );
 
-					GetWitcherPlayer().AddBuffImmunity_AllCritical('ACS_Death', true); 
-
-					GetWitcherPlayer().AddBuffImmunity(EET_Poison , 'ACS_Death', true);
-
-					GetWitcherPlayer().AddBuffImmunity(EET_PoisonCritical , 'ACS_Death', true);
-
-					action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
+					movementAdjustor.RotateTowards( ticket, ((CActor)action.attacker) );
 
 					GetWitcherPlayer().DrainVitality( GetWitcherPlayer().GetStat( BCS_Vitality ) * 0.99 );
 
-					GetWitcherPlayer().SetImmortalityMode( AIM_Invulnerable, AIC_Default, true );
-
-					if(GetWitcherPlayer().HasTag('ACS_Manual_Combat_Control')){GetWitcherPlayer().RemoveTag('ACS_Manual_Combat_Control');} 
-		
-					GetACSWatcher().RemoveTimer('Manual_Combat_Control_Remove');
-
-					GetACSWatcher().RemoveTimer('Gerry_Death_Scene');
-
-					GetACSWatcher().AddTimer('Gerry_Death_Scene', 0.5, false);
-
-					if (((CActor)action.attacker).HasTag('ACS_Blade_Of_The_Unseen'))
+					if (GetWitcherPlayer().IsAnyWeaponHeld() && !GetWitcherPlayer().IsWeaponHeld('fist'))
 					{
-						thePlayer.AddTag('ACS_Killed_By_Blade_Of_The_Unseen');
+						if (RandF() < 0.5)
+						{
+							GetACSWatcher().PlayerPlayAnimation('man_npc_longsword_effect_knockdown_f_start');
+							((CAnimatedComponent)thePlayer.GetComponentByClassName('CAnimatedComponent')).FreezePoseFadeIn(2.125);
+						}
+						else
+						{
+							GetACSWatcher().PlayerPlayAnimation('man_npc_longsword_effect_knockdownfar_f_start');
+							((CAnimatedComponent)thePlayer.GetComponentByClassName('CAnimatedComponent')).FreezePoseFadeIn(2.125);
+						}
 					}
 					else
 					{
-						thePlayer.RemoveTag('ACS_Killed_By_Blade_Of_The_Unseen');
+						if (thePlayer.HasTag('vampire_claws_equipped'))
+						{
+							GetACSWatcher().PlayerPlayAnimation('bruxa_death_front_ACS');
+							//((CAnimatedComponent)thePlayer.GetComponentByClassName('CAnimatedComponent')).FreezePoseFadeIn(3.125);
+						}
+						else
+						{
+							GetACSWatcher().PlayerPlayAnimation('man_fistfight_hit_knockdown_f_start_right');
+							((CAnimatedComponent)thePlayer.GetComponentByClassName('CAnimatedComponent')).FreezePoseFadeIn(2.125);
+						}
 					}
 
-					((CAnimatedComponent)thePlayer.GetComponentByClassName('CAnimatedComponent')).UnfreezePoseFadeOut(0.1);
+					theGame.GetBehTreeReactionManager().CreateReactionEventIfPossible( thePlayer, 'PlayerUnconsciousAction', -1.f, 60.0f, -1, -1, true ); 
 
-					((CAnimatedComponent)thePlayer.GetComponentByClassName('CAnimatedComponent')).UnfreezePose();
-					
-					GetWitcherPlayer().AddTag('ACS_Enter_Death_Scene_Start');
+					GetWitcherPlayer().AddBuffImmunity_AllNegative('ACS_Unconscious', true); 
+
+					GetWitcherPlayer().AddBuffImmunity_AllCritical('ACS_Unconscious', true); 
+
+					GetWitcherPlayer().AddBuffImmunity(EET_Poison , 'ACS_Unconscious', true);
+
+					GetWitcherPlayer().AddBuffImmunity(EET_PoisonCritical , 'ACS_Unconscious', true);
+
+					GetWitcherPlayer().SetImmortalityMode( AIM_Invulnerable, AIC_Default, true );
+
+					GetWitcherPlayer().SetCanPlayHitAnim(false);
+
+					GetWitcherPlayer().AddBuffImmunity_AllNegative('god', true);
+
+					GetACSWatcher().ChangeInteractionPriority();
+
+					ACS_GuardCheer();
+
+					GetACSWatcher().RemoveTimer('Gerry_Unconscious_State');
+
+					GetACSWatcher().AddTimer('Gerry_Unconscious_State', 1, false);
+
+					thePlayer.BlockAction( EIAB_Crossbow, 			'ACS_Unconscious_State');
+					thePlayer.BlockAction( EIAB_CallHorse,			'ACS_Unconscious_State');
+					thePlayer.BlockAction( EIAB_Signs, 				'ACS_Unconscious_State');
+					thePlayer.BlockAction( EIAB_DrawWeapon, 		'ACS_Unconscious_State'); 
+					thePlayer.BlockAction( EIAB_FastTravel, 		'ACS_Unconscious_State');
+					thePlayer.BlockAction( EIAB_Fists, 				'ACS_Unconscious_State');
+					thePlayer.BlockAction( EIAB_InteractionAction, 	'ACS_Unconscious_State');
+					thePlayer.BlockAction( EIAB_UsableItem,			'ACS_Unconscious_State');
+					thePlayer.BlockAction( EIAB_ThrowBomb,			'ACS_Unconscious_State');
+					thePlayer.BlockAction( EIAB_SwordAttack,		'ACS_Unconscious_State');
+					thePlayer.BlockAction( EIAB_Jump,				'ACS_Unconscious_State');
+					thePlayer.BlockAction( EIAB_LightAttacks,		'ACS_Unconscious_State');
+					thePlayer.BlockAction( EIAB_HeavyAttacks,		'ACS_Unconscious_State');
+					thePlayer.BlockAction( EIAB_SpecialAttackLight,	'ACS_Unconscious_State');
+					thePlayer.BlockAction( EIAB_SpecialAttackHeavy,	'ACS_Unconscious_State');
+					thePlayer.BlockAction( EIAB_Dodge,				'ACS_Unconscious_State');
+					thePlayer.BlockAction( EIAB_Roll,				'ACS_Unconscious_State');
+					thePlayer.BlockAction( EIAB_Parry,				'ACS_Unconscious_State');
+					thePlayer.BlockAction( EIAB_MeditationWaiting,	'ACS_Unconscious_State');
+					thePlayer.BlockAction( EIAB_OpenMeditation,		'ACS_Unconscious_State');
+					thePlayer.BlockAction( EIAB_RadialMenu,			'ACS_Unconscious_State');
+					thePlayer.BlockAction( EIAB_Movement,			'ACS_Unconscious_State');
+					thePlayer.BlockAction( EIAB_Interactions, 		'ACS_Unconscious_State');
+					thePlayer.BlockAction( EIAB_QuickSlots, 		'ACS_Unconscious_State');
+					thePlayer.BlockAction( EIAB_Explorations, 		'ACS_Unconscious_State');
+
+					GetACSWatcher().ACS_Unconscious_Create_Savelock();
+
+					FactsAdd("ACS_Enter_Unconscious_Start", 1, -1);
 				}
 			}
+			else
+			{
+				if (!GetWitcherPlayer().IsMutationActive( EPMT_Mutation11 ) 
+				|| GetWitcherPlayer().HasBuff( EET_Mutation11Debuff ) 
+				|| !GetWitcherPlayer().CanUseSkill(S_Sword_s01)
+				)
+				{
+					if(!GetWitcherPlayer().HasTag('ACS_Enter_Death_Scene_Start') 
+					&& !ACS_New_Replacers_Female_Active()
+					&& !GetWitcherPlayer().IsInFistFightMiniGame()
+					&& !((CActor)action.attacker).HasTag('dandelion')
+					&& !StrContains( ((CActor)action.attacker).GetReadableName(), "quests\main_npcs\dandelion.w2ent" )
+					)
+					{
+						ACS_ThingsThatShouldBeRemoved();
+
+						if (ACS_Transformation_Werewolf_Check())
+						{
+							GetACSWatcher().DisableWerewolf_Actual();
+						}
+
+						if (ACS_Transformation_Vampiress_Check())
+						{
+							GetACSWatcher().DisableVampiress_Actual();
+						}
+
+						if (ACS_Transformation_Vampire_Monster_Check())
+						{
+							GetACSWatcher().DisableTransformationVampireMonster_Actual_No_Teleport();
+						}
+
+						if (ACS_Transformation_Toad_Check())
+						{
+							GetACSWatcher().DisableTransformationToad_Actual();
+						}
+
+						if (ACS_Transformation_Red_Miasmal_Check())
+						{
+							GetACSWatcher().DisableRedMiasmal_Actual();
+						}
+
+						if (ACS_Transformation_Sharley_Check())
+						{
+							GetACSWatcher().DisableSharley_Actual();
+						}
+
+						if (ACS_Transformation_Black_Wolf_Check())
+						{
+							GetACSWatcher().DisableBlackWolf_Actual();
+						}
+
+						GetWitcherPlayer().EnableCharacterCollisions(true); 
+
+						GetWitcherPlayer().EnableCollisions(true);
+
+						GetWitcherPlayer().SetIsCurrentlyDodging(false);
+
+						if (GetWitcherPlayer().GetStat( BCS_Focus ) != 0)
+						{
+							GetWitcherPlayer().DrainFocus( GetWitcherPlayer().GetStatMax( BCS_Focus ) );
+						}
+
+						if (GetWitcherPlayer().HasTag('ACS_Size_Adjusted'))
+						{
+							GetACSWatcher().Grow_Geralt_Immediate_Fast();
+
+							GetWitcherPlayer().RemoveTag('ACS_Size_Adjusted');
+						}
+
+						GetWitcherPlayer().SoundEvent("cmb_play_dismemberment_gore");
+
+						GetWitcherPlayer().SoundEvent("monster_dettlaff_monster_vein_hit_blood");
+
+						GetWitcherPlayer().SoundEvent("cmb_play_hit_heavy");
+
+						GetACSWatcher().RemoveTimer('ACS_Death_Delay_Animation');
+
+						GetACSWatcher().RemoveTimer('ACS_ResetAnimation_On_Death');
+
+						if (!GetWitcherPlayer().HasTag('ACS_IsPerformingFinisher')
+						&& !GetWitcherPlayer().IsPerformingFinisher())
+						{
+							ACS_Hit_Animations(action);
+						}
+
+						GetWitcherPlayer().DestroyEffect('blood');
+						GetWitcherPlayer().DestroyEffect('death_blood');
+						GetWitcherPlayer().DestroyEffect('heavy_hit');
+						GetWitcherPlayer().DestroyEffect('light_hit');
+						GetWitcherPlayer().DestroyEffect('blood_spill');
+						GetWitcherPlayer().DestroyEffect('fistfight_heavy_hit');
+						GetWitcherPlayer().DestroyEffect('heavy_hit_horseriding');
+						GetWitcherPlayer().DestroyEffect('fistfight_hit');
+						GetWitcherPlayer().DestroyEffect('critical hit');
+						GetWitcherPlayer().DestroyEffect('death_hit');
+						GetWitcherPlayer().DestroyEffect('blood_throat_cut');
+						GetWitcherPlayer().DestroyEffect('hit_back');
+						GetWitcherPlayer().DestroyEffect('standard_hit');
+						GetWitcherPlayer().DestroyEffect('critical_bleeding'); 
+						GetWitcherPlayer().DestroyEffect('fistfight_hit_back'); 
+						GetWitcherPlayer().DestroyEffect('heavy_hit_back'); 
+						GetWitcherPlayer().DestroyEffect('light_hit_back'); 
+
+						GetWitcherPlayer().PlayEffectSingle('blood');
+						GetWitcherPlayer().PlayEffectSingle('death_blood');
+						GetWitcherPlayer().PlayEffectSingle('heavy_hit');
+						GetWitcherPlayer().PlayEffectSingle('light_hit');
+						GetWitcherPlayer().PlayEffectSingle('blood_spill');
+						GetWitcherPlayer().PlayEffectSingle('fistfight_heavy_hit');
+						GetWitcherPlayer().PlayEffectSingle('heavy_hit_horseriding');
+						GetWitcherPlayer().PlayEffectSingle('fistfight_hit');
+						GetWitcherPlayer().PlayEffectSingle('critical hit');
+						GetWitcherPlayer().PlayEffectSingle('death_hit');
+						GetWitcherPlayer().PlayEffectSingle('blood_throat_cut');
+						GetWitcherPlayer().PlayEffectSingle('hit_back');
+						GetWitcherPlayer().PlayEffectSingle('standard_hit');
+						GetWitcherPlayer().PlayEffectSingle('critical_bleeding'); 
+						GetWitcherPlayer().PlayEffectSingle('fistfight_hit_back'); 
+						GetWitcherPlayer().PlayEffectSingle('heavy_hit_back'); 
+						GetWitcherPlayer().PlayEffectSingle('light_hit_back'); 
+
+						GetWitcherPlayer().AddBuffImmunity_AllNegative('ACS_Death', true); 
+
+						GetWitcherPlayer().AddBuffImmunity_AllCritical('ACS_Death', true); 
+
+						GetWitcherPlayer().AddBuffImmunity(EET_Poison , 'ACS_Death', true);
+
+						GetWitcherPlayer().AddBuffImmunity(EET_PoisonCritical , 'ACS_Death', true);
+
+						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
+
+						GetWitcherPlayer().DrainVitality( GetWitcherPlayer().GetStat( BCS_Vitality ) * 0.99 );
+
+						GetWitcherPlayer().SetImmortalityMode( AIM_Invulnerable, AIC_Default, true );
+
+						if(GetWitcherPlayer().HasTag('ACS_Manual_Combat_Control')){GetWitcherPlayer().RemoveTag('ACS_Manual_Combat_Control');} 
+			
+						GetACSWatcher().RemoveTimer('Manual_Combat_Control_Remove');
+
+						GetACSWatcher().RemoveTimer('Gerry_Death_Scene');
+
+						GetACSWatcher().AddTimer('Gerry_Death_Scene', 0.5, false);
+
+						if (((CActor)action.attacker).HasTag('ACS_Blade_Of_The_Unseen'))
+						{
+							thePlayer.AddTag('ACS_Killed_By_Blade_Of_The_Unseen');
+						}
+						else
+						{
+							thePlayer.RemoveTag('ACS_Killed_By_Blade_Of_The_Unseen');
+						}
+
+						((CAnimatedComponent)thePlayer.GetComponentByClassName('CAnimatedComponent')).UnfreezePoseFadeOut(0.1);
+
+						((CAnimatedComponent)thePlayer.GetComponentByClassName('CAnimatedComponent')).UnfreezePose();
+						
+						GetWitcherPlayer().AddTag('ACS_Enter_Death_Scene_Start');
+					}
+				}
+			}
+		}
+		else
+		{
+			ACS_ThingsThatShouldBeRemoved();
+
+			if (ACS_Transformation_Werewolf_Check())
+			{
+				GetACSWatcher().DisableWerewolf_Actual();
+			}
+
+			if (ACS_Transformation_Vampiress_Check())
+			{
+				GetACSWatcher().DisableVampiress_Actual();
+			}
+
+			if (ACS_Transformation_Vampire_Monster_Check())
+			{
+				GetACSWatcher().DisableTransformationVampireMonster_Actual_No_Teleport();
+			}
+
+			if (ACS_Transformation_Toad_Check())
+			{
+				GetACSWatcher().DisableTransformationToad_Actual();
+			}
+
+			if (ACS_Transformation_Red_Miasmal_Check())
+			{
+				GetACSWatcher().DisableRedMiasmal_Actual();
+			}
+
+			if (ACS_Transformation_Sharley_Check())
+			{
+				GetACSWatcher().DisableSharley_Actual();
+			}
+
+			if (ACS_Transformation_Black_Wolf_Check())
+			{
+				GetACSWatcher().DisableBlackWolf_Actual();
+			}
+
+			thePlayer.AddTag('ACS_Second_Life_Active');
 		}
 		
 		return;
@@ -634,9 +836,22 @@ function ACS_Player_Fall_Negate(action: W3DamageAction)
 		(GetWitcherPlayer().GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.1)
 		) 
 		{
+			if (GetWitcherPlayer().IsMutationActive( EPMT_Mutation11 ) 
+			&& !GetWitcherPlayer().HasBuff( EET_Mutation11Debuff ) 
+			&& GetWitcherPlayer().CanUseSkill(S_Sword_s01)
+			)
+			{
+				return;
+			}
+
 			if (!GetWitcherPlayer().IsMutationActive( EPMT_Mutation11 ) || GetWitcherPlayer().HasBuff( EET_Mutation11Debuff ) || !GetWitcherPlayer().CanUseSkill(S_Sword_s01))
 			{
-				if(!GetWitcherPlayer().HasTag('ACS_Enter_Death_Scene_Start') && !ACS_New_Replacers_Female_Active())
+				if(!GetWitcherPlayer().HasTag('ACS_Enter_Death_Scene_Start') 
+				&& !ACS_New_Replacers_Female_Active()
+				&& !GetWitcherPlayer().IsInFistFightMiniGame()
+				&& !((CActor)action.attacker).HasTag('dandelion')
+				&& !StrContains( ((CActor)action.attacker).GetReadableName(), "quests\main_npcs\dandelion.w2ent" )
+				)
 				{
 					ACS_ThingsThatShouldBeRemoved();
 
@@ -669,6 +884,16 @@ function ACS_Player_Fall_Negate(action: W3DamageAction)
 					if (ACS_Transformation_Red_Miasmal_Check())
 					{
 						GetACSWatcher().DisableRedMiasmal_Actual();
+					}
+
+					if (ACS_Transformation_Sharley_Check())
+					{
+						GetACSWatcher().DisableSharley_Actual();
+					}
+
+					if (ACS_Transformation_Black_Wolf_Check())
+					{
+						GetACSWatcher().DisableBlackWolf_Actual();
 					}
 
 					if (GetWitcherPlayer().GetStat( BCS_Focus ) != 0)
@@ -900,7 +1125,7 @@ function ACS_Player_Attack_Steel_Silver_Switch(action: W3DamageAction)
 	{
 		if ( !action.IsDoTDamage() 
 		&& !action.WasDodged() 
-		&& action.IsActionMelee()
+		&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 		&& !(((W3Action_Attack)action).IsParried())
 		//&& action.DealsAnyDamage()
 		)
@@ -923,19 +1148,39 @@ function ACS_Player_Attack_Steel_Silver_Switch(action: W3DamageAction)
 					+ GetWitcherPlayer().GetTotalWeaponDamage(item_steel, theGame.params.DAMAGE_NAME_BLUDGEONING, GetInvalidUniqueId());
 
 					action.processedDmg.essenceDamage += dmgValSilver;
-					action.processedDmg.essenceDamage += npc.GetStat(BCS_Essence) * RandRangeF(0.05, 0);
-					//action.processedDmg.essenceDamage += ( npc.GetStatMax(BCS_Essence) - npc.GetStat( BCS_Essence ) ) * RandRangeF(0.05, 0);
-
+					
 					if (ACS_GetItem_Aerondight() || ACS_GetItem_Iris())
 					{
-						action.processedDmg.essenceDamage += ( npc.GetStatMax(BCS_Essence) - npc.GetStat( BCS_Essence ) ) * 0.05;
+						if ( action.GetHitReactionType() == EHRT_Light )
+						{
+							action.processedDmg.essenceDamage += ( npc.GetStatMax(BCS_Essence) - npc.GetStat( BCS_Essence ) ) * 0.025;
+						}
+						else if ( action.GetHitReactionType() == EHRT_Heavy )
+						{
+							action.processedDmg.essenceDamage += ( npc.GetStatMax(BCS_Essence) - npc.GetStat( BCS_Essence ) ) * 0.05;
+						}
+
+						GetWitcherPlayer().GetInventory().SetItemDurabilityScript(item_steel, GetWitcherPlayer().GetInventory().GetItemMaxDurability(item_steel) );
+					}
+					else
+					{
+						action.processedDmg.essenceDamage += npc.GetStat(BCS_Essence) * RandRangeF(0.025, 0);
 					}
 				}
 				else if (npc.UsesVitality())
 				{
 					if (ACS_GetItem_Aerondight() || ACS_GetItem_Iris())
 					{
-						action.processedDmg.essenceDamage += ( npc.GetStatMax(BCS_Essence) - npc.GetStat( BCS_Essence ) ) * 0.05;
+						if ( action.GetHitReactionType() == EHRT_Light )
+						{
+							action.processedDmg.essenceDamage += ( npc.GetStatMax(BCS_Vitality) - npc.GetStat( BCS_Vitality ) ) * 0.025;
+						}
+						else if ( action.GetHitReactionType() == EHRT_Heavy )
+						{
+							action.processedDmg.essenceDamage += ( npc.GetStatMax(BCS_Vitality) - npc.GetStat( BCS_Vitality ) ) * 0.05;
+						}
+
+						GetWitcherPlayer().GetInventory().SetItemDurabilityScript(item_steel, GetWitcherPlayer().GetInventory().GetItemMaxDurability(item_steel) );
 					}
 				}
 			}
@@ -947,22 +1192,40 @@ function ACS_Player_Attack_Steel_Silver_Switch(action: W3DamageAction)
 
 					action.processedDmg.vitalityDamage += dmgValSteel;
 
-					action.processedDmg.vitalityDamage += npc.GetStat(BCS_Vitality) * RandRangeF(0.05, 0);
-
-					if (ACS_GetItem_Aerondight())
+					if (ACS_GetItem_Aerondight() || ACS_GetItem_Iris())
 					{
-						action.processedDmg.vitalityDamage += ( npc.GetStatMax(BCS_Vitality) - npc.GetStat( BCS_Vitality ) ) * 0.05;
+						if ( action.GetHitReactionType() == EHRT_Light )
+						{
+							action.processedDmg.essenceDamage += ( npc.GetStatMax(BCS_Vitality) - npc.GetStat( BCS_Vitality ) ) * 0.025;
+						}
+						else if ( action.GetHitReactionType() == EHRT_Heavy )
+						{
+							action.processedDmg.essenceDamage += ( npc.GetStatMax(BCS_Vitality) - npc.GetStat( BCS_Vitality ) ) * 0.05;
+						}
+
+						GetWitcherPlayer().GetInventory().SetItemDurabilityScript(item_silver, GetWitcherPlayer().GetInventory().GetItemMaxDurability(item_silver) );
 					}
 					else
 					{
+						action.processedDmg.vitalityDamage += npc.GetStat(BCS_Vitality) * RandRangeF(0.025, 0);
+
 						GetWitcherPlayer().GetInventory().SetItemDurabilityScript(item_silver, (GetWitcherPlayer().GetInventory().GetItemDurability(item_silver) - (GetWitcherPlayer().GetInventory().GetItemDurability(item_silver) * 0.025)) );
 					}
 				}
 				else if (npc.UsesEssence())
 				{
-					if (ACS_GetItem_Aerondight())
+					if (ACS_GetItem_Aerondight() || ACS_GetItem_Iris())
 					{
-						action.processedDmg.essenceDamage += ( npc.GetStatMax(BCS_Essence) - npc.GetStat( BCS_Essence ) ) * 0.05;
+						if ( action.GetHitReactionType() == EHRT_Light )
+						{
+							action.processedDmg.essenceDamage += ( npc.GetStatMax(BCS_Essence) - npc.GetStat( BCS_Essence ) ) * 0.025;
+						}
+						else if ( action.GetHitReactionType() == EHRT_Heavy )
+						{
+							action.processedDmg.essenceDamage += ( npc.GetStatMax(BCS_Essence) - npc.GetStat( BCS_Essence ) ) * 0.05;
+						}
+
+						GetWitcherPlayer().GetInventory().SetItemDurabilityScript(item_silver, GetWitcherPlayer().GetInventory().GetItemMaxDurability(item_silver) );
 					}
 				}
 			}	
@@ -992,7 +1255,7 @@ function ACS_Player_Attack_FX_Switch(action: W3DamageAction)
 	{
 		if ( !action.IsDoTDamage() 
 		&& !action.WasDodged() 
-		&& action.IsActionMelee()
+		&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 		&& !(((W3Action_Attack)action).IsParried())
 		)
 		{
@@ -1201,9 +1464,6 @@ function ACS_Red_Miasmal_Ability_Spawn( pos : Vector )
 	proj_1.DestroyAfter(10);	
 }
 
-
-
-
 function ACS_Enemy_On_Take_Damage_General(action: W3DamageAction)
 {
     var playerAttacker, playerVictim																								: CPlayer;
@@ -1217,307 +1477,142 @@ function ACS_Enemy_On_Take_Damage_General(action: W3DamageAction)
 	
 	playerVictim = (CPlayer)action.victim;
 
-	if 
-	(playerAttacker && npc)
+	if (npc)
 	{
-		if (ACS_Player_Damage_Multiplier() != 1)
+		if 
+		(playerAttacker)
 		{
-			if (npc.UsesVitality())
-			{
-				action.processedDmg.vitalityDamage *= ACS_Player_Damage_Multiplier();
-			}
-			else if (npc.UsesEssence())
-			{
-				action.processedDmg.essenceDamage *= ACS_Player_Damage_Multiplier();
-			}
-		}
-
-		ACS_Record_Kill(action);
-
-		if ((npc.UsesVitality() && npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.01)
-		||
-		(npc.UsesEssence() && npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= 0.01))
-		{
-			if (ACS_Transformation_Red_Miasmal_Check())
-			{
-				if (!npc.HasTag('ACS_Red_Miasmal_Ability_Spawn_From_Player'))
-				{
-					ACS_Red_Miasmal_Ability_Spawn(npc.GetWorldPosition());
-
-					npc.AddTag('ACS_Red_Miasmal_Ability_Spawn_From_Player');
-				}
-			}
-		}
-
-		if ( !action.IsDoTDamage() 
-		&& !action.IsActionMelee()
-		&& thePlayer.IsCrossbowHeld()
-		&& !action.IsActionWitcherSign()
-		)
-		{
-			if (ACS_CrossbowDamageMaxHealthOrCurrentHealth() == 0)
+			if (ACS_Player_Damage_Multiplier() != 1)
 			{
 				if (npc.UsesVitality())
 				{
-					if (ACS_Crossbow_Human_Min_Damage() > 0 || ACS_Crossbow_Human_Max_Damage() > 0)
-					{
-						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
-
-						action.processedDmg.vitalityDamage += npc.GetMaxHealth() * RandRangeF(ACS_Crossbow_Human_Max_Damage(), ACS_Crossbow_Human_Min_Damage());
-					}
+					action.processedDmg.vitalityDamage *= ACS_Player_Damage_Multiplier();
 				}
 				else if (npc.UsesEssence())
 				{
-					if (ACS_Crossbow_Monster_Min_Damage() > 0 || ACS_Crossbow_Monster_Max_Damage() > 0)
-					{
-						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage;
-
-						if (((CMovingPhysicalAgentComponent)(npc.GetMovingAgentComponent())).GetCapsuleHeight() >= 2
-						|| npc.GetRadius() >= 0.7
-						)
-						{
-							action.processedDmg.essenceDamage += npc.GetMaxHealth() * RandRangeF(ACS_Crossbow_Monster_Max_Damage()/2, ACS_Crossbow_Monster_Min_Damage()/2);
-						}
-						else
-						{
-							action.processedDmg.essenceDamage += npc.GetMaxHealth() * RandRangeF(ACS_Crossbow_Monster_Max_Damage(), ACS_Crossbow_Monster_Min_Damage());
-						}
-					}
+					action.processedDmg.essenceDamage *= ACS_Player_Damage_Multiplier();
 				}
 			}
-			else if (ACS_CrossbowDamageMaxHealthOrCurrentHealth() == 1)
+
+			if (thePlayer.HasTag('ACS_Player_In_Everstorm_Distance_1'))
 			{
 				if (npc.UsesVitality())
 				{
-					if (ACS_Crossbow_Human_Min_Damage() > 0 || ACS_Crossbow_Human_Max_Damage() > 0)
-					{
-						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
-
-						action.processedDmg.vitalityDamage += npc.GetCurrentHealth() * RandRangeF(ACS_Crossbow_Human_Max_Damage(), ACS_Crossbow_Human_Min_Damage());
-					}
+					action.processedDmg.vitalityDamage += action.processedDmg.vitalityDamage;
 				}
 				else if (npc.UsesEssence())
 				{
-					if (ACS_Crossbow_Monster_Min_Damage() > 0 || ACS_Crossbow_Monster_Max_Damage() > 0)
-					{
-						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage;
-
-						if (((CMovingPhysicalAgentComponent)(npc.GetMovingAgentComponent())).GetCapsuleHeight() >= 2
-						|| npc.GetRadius() >= 0.7
-						)
-						{
-							action.processedDmg.essenceDamage += npc.GetMaxHealth() * RandRangeF(ACS_Crossbow_Monster_Max_Damage()/2, ACS_Crossbow_Monster_Min_Damage()/2);
-						}
-						else
-						{
-							action.processedDmg.essenceDamage += npc.GetMaxHealth() * RandRangeF(ACS_Crossbow_Monster_Max_Damage(), ACS_Crossbow_Monster_Min_Damage());
-						}
-					}
+					action.processedDmg.essenceDamage += action.processedDmg.essenceDamage;
 				}
 			}
 
-			if (npc.IsHuman() && !((CNewNPC)npc).IsShielded( GetWitcherPlayer() ))
+			if(ACS_GetItem_MageStaff() && action.IsActionMelee())
 			{
-				npc.GainStat( BCS_Morale, npc.GetStatMax( BCS_Morale ) );  
-
-				npc.GainStat( BCS_Focus, npc.GetStatMax( BCS_Focus ) );  
-
-				if (
-				npc.GetStat(BCS_Stamina) != npc.GetStatMax( BCS_Stamina ) 
-				&& npc.GetBehaviorGraphInstanceName() != 'Shield'
-				)	
+				if (npc.UsesVitality())
 				{
-					if (
-					(ACS_W3EE_Installed() && ACS_W3EE_Enabled() )
-					||
-					(ACS_W3EE_Redux_Installed() && ACS_W3EE_Redux_Enabled() )
-					)
-					{
-						npc.GainStat( BCS_Stamina, npc.GetStat( BCS_Stamina ) * 0.05 );
-					}
-					else
-					{
-						npc.GainStat( BCS_Stamina, npc.GetStat( BCS_Stamina ) * 0.25 );
-					}
-				}	
-			}
-
-			return;
-		}
-
-		if ( !action.IsDoTDamage() 
-		&& !action.IsActionMelee()
-		&& action.IsActionWitcherSign()
-		&& thePlayer.IsCastingSign()
-		)
-		{
-			if (npc.IsHuman() && !((CNewNPC)npc).IsShielded( GetWitcherPlayer() ))
-			{
-				npc.GainStat( BCS_Morale, npc.GetStatMax( BCS_Morale ) );  
-
-				npc.GainStat( BCS_Focus, npc.GetStatMax( BCS_Focus ) );  
-
-				if (
-				npc.GetStat(BCS_Stamina) != npc.GetStatMax( BCS_Stamina ) 
-				&& npc.GetBehaviorGraphInstanceName() != 'Shield'
-				)	
-				{
-					if (
-					(ACS_W3EE_Installed() && ACS_W3EE_Enabled() )
-					||
-					(ACS_W3EE_Redux_Installed() && ACS_W3EE_Redux_Enabled() )
-					)
-					{
-						npc.GainStat( BCS_Stamina, npc.GetStat( BCS_Stamina ) * 0.05 );
-					}
-					else
-					{
-						npc.GainStat( BCS_Stamina, npc.GetStat( BCS_Stamina ) * 0.25 );
-					}
-				}	
-			}
-
-			if (ACS_Forgotten_Wolf_Check_For_Item() || ACS_Armor_Equipped_Check())
-			{
-				if ( GetWitcherPlayer().GetEquippedSign() == ST_Igni )
-				{
-					if ( 
-					(theGame.GetWorld().GetDepotPath() == "levels\skellige\skellige.w2w")
-					)
-					{
-						if (npc.UsesVitality())
-						{
-							action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.25;
-						}
-						else if (npc.UsesEssence())
-						{
-							action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.25;
-						}
-					}
-					else
-					{
-						action.AddEffectInfo(EET_Burning, 1);
-
-						if (npc.UsesVitality())
-						{
-							action.processedDmg.vitalityDamage += npc.GetCurrentHealth() * RandRangeF(0.25, 0.125);
-						}
-						else if (npc.UsesEssence())
-						{
-							if (((CMovingPhysicalAgentComponent)(npc.GetMovingAgentComponent())).GetCapsuleHeight() >= 2
-							|| npc.GetRadius() >= 0.7
-							)
-							{
-								action.processedDmg.essenceDamage += npc.GetMaxHealth() * RandRangeF(0.125, 0.06125);
-							}
-							else
-							{
-								action.processedDmg.essenceDamage += npc.GetMaxHealth() * RandRangeF(0.25, 0.125);
-							}
-						}
-					}
+					action.processedDmg.vitalityDamage *= 0.001;
 				}
-				else if ( GetWitcherPlayer().GetEquippedSign() == ST_Aard )
+				else if (npc.UsesEssence())
 				{
-					action.AddEffectInfo(EET_Knockdown, 1);
-					action.AddEffectInfo(EET_Stagger, 1);
-
-					if (npc.UsesVitality())
-					{
-						action.processedDmg.vitalityDamage += npc.GetCurrentHealth() * RandRangeF(0.125, 0.06125);
-					}
-					else if (npc.UsesEssence())
-					{
-						if (((CMovingPhysicalAgentComponent)(npc.GetMovingAgentComponent())).GetCapsuleHeight() >= 2
-						|| npc.GetRadius() >= 0.7
-						)
-						{
-							action.processedDmg.essenceDamage += npc.GetMaxHealth() * 0.06125;
-						}
-						else
-						{
-							action.processedDmg.essenceDamage += npc.GetMaxHealth() * RandRangeF(0.125, 0.06125);
-						}
-					}
-				}
-			}
-			else
-			{
-				if ( 
-				GetWitcherPlayer().GetEquippedSign() == ST_Igni 
-				&& (theGame.GetWorld().GetDepotPath() == "levels\skellige\skellige.w2w")
-				)
-				{
-					if (npc.UsesVitality())
-					{
-						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.5;
-					}
-					else if (npc.UsesEssence())
-					{
-						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.5;
-					}
+					action.processedDmg.essenceDamage *= 0.001;
 				}
 			}
 
-			return;
-		}
+			ACS_Record_Kill(action);
 
-		if ( !action.IsDoTDamage() 
-		&& !action.WasDodged() 
-		&& action.IsActionMelee()
-		&& !(((W3Action_Attack)action).IsParried())
-		)
-		{
 			if ((npc.UsesVitality() && npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.01)
 			||
 			(npc.UsesEssence() && npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= 0.01))
 			{
-				if (thePlayer.IsWeaponHeld('fist') && !thePlayer.HasTag('vampire_claws_equipped') )
+				if (ACS_Transformation_Red_Miasmal_Check())
 				{
-					
-				}
-				else
-				{
-					GetACSWatcher().Blood_Spatter_Switch();
-				}
-
-				if (ACS_GetItem_AllBlack_Equipped_Held())
-				{
-					if (!npc.HasTag('ACS_AllBlack_Ability_Spawn_From_Player'))
+					if (!npc.HasTag('ACS_Red_Miasmal_Ability_Spawn_From_Player'))
 					{
-						ACS_AllBlack_Ability_Spawn(npc.GetWorldPosition());
+						ACS_Red_Miasmal_Ability_Spawn(npc.GetWorldPosition());
 
-						npc.AddTag('ACS_AllBlack_Ability_Spawn_From_Player');
+						npc.AddTag('ACS_Red_Miasmal_Ability_Spawn_From_Player');
 					}
 				}
 			}
-			else
+
+			if ( !action.IsDoTDamage() 
+			&& !action.IsActionMelee()
+			&& thePlayer.IsCrossbowHeld()
+			&& !action.IsActionWitcherSign()
+			)
 			{
-				if(action.DealsAnyDamage())
+				if (ACS_CrossbowDamageMaxHealthOrCurrentHealth() == 0)
 				{
-					GetACSWatcher().NPC_BloodCovered_Effect(action);
-
-					if (thePlayer.IsWeaponHeld('fist') && !thePlayer.HasTag('vampire_claws_equipped') )
+					if (npc.UsesVitality())
 					{
-
-					}
-					else
-					{
-						if (RandF() < 0.5)
+						if (ACS_Crossbow_Human_Min_Damage() > 0 || ACS_Crossbow_Human_Max_Damage() > 0)
 						{
-							GetACSWatcher().Blood_Spatter_Switch();
+							action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
+
+							action.processedDmg.vitalityDamage += npc.GetMaxHealth() * RandRangeF(ACS_Crossbow_Human_Max_Damage(), ACS_Crossbow_Human_Min_Damage());
+						}
+					}
+					else if (npc.UsesEssence())
+					{
+						if (ACS_Crossbow_Monster_Min_Damage() > 0 || ACS_Crossbow_Monster_Max_Damage() > 0)
+						{
+							action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage;
+
+							if (((CMovingPhysicalAgentComponent)(npc.GetMovingAgentComponent())).GetCapsuleHeight() >= 2
+							|| npc.GetRadius() >= 0.7
+							)
+							{
+								action.processedDmg.essenceDamage += npc.GetMaxHealth() * RandRangeF(ACS_Crossbow_Monster_Max_Damage()/2, ACS_Crossbow_Monster_Min_Damage()/2);
+							}
+							else
+							{
+								action.processedDmg.essenceDamage += npc.GetMaxHealth() * RandRangeF(ACS_Crossbow_Monster_Max_Damage(), ACS_Crossbow_Monster_Min_Damage());
+							}
+						}
+					}
+				}
+				else if (ACS_CrossbowDamageMaxHealthOrCurrentHealth() == 1)
+				{
+					if (npc.UsesVitality())
+					{
+						if (ACS_Crossbow_Human_Min_Damage() > 0 || ACS_Crossbow_Human_Max_Damage() > 0)
+						{
+							action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
+
+							action.processedDmg.vitalityDamage += npc.GetCurrentHealth() * RandRangeF(ACS_Crossbow_Human_Max_Damage(), ACS_Crossbow_Human_Min_Damage());
+						}
+					}
+					else if (npc.UsesEssence())
+					{
+						if (ACS_Crossbow_Monster_Min_Damage() > 0 || ACS_Crossbow_Monster_Max_Damage() > 0)
+						{
+							action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage;
+
+							if (((CMovingPhysicalAgentComponent)(npc.GetMovingAgentComponent())).GetCapsuleHeight() >= 2
+							|| npc.GetRadius() >= 0.7
+							)
+							{
+								action.processedDmg.essenceDamage += npc.GetMaxHealth() * RandRangeF(ACS_Crossbow_Monster_Max_Damage()/2, ACS_Crossbow_Monster_Min_Damage()/2);
+							}
+							else
+							{
+								action.processedDmg.essenceDamage += npc.GetMaxHealth() * RandRangeF(ACS_Crossbow_Monster_Max_Damage(), ACS_Crossbow_Monster_Min_Damage());
+							}
 						}
 					}
 				}
 
-				if (action.GetHitReactionType() != EHRT_Reflect)
+				if (npc.IsHuman() && !((CNewNPC)npc).IsShielded( GetWitcherPlayer() ))
 				{
-					if (npc.IsHuman() && !((CNewNPC)npc).IsShielded( GetWitcherPlayer() ))
+					npc.GainStat( BCS_Morale, npc.GetStatMax( BCS_Morale ) );  
+
+					npc.GainStat( BCS_Focus, npc.GetStatMax( BCS_Focus ) );  
+
+					if (
+					npc.GetStat(BCS_Stamina) != npc.GetStatMax( BCS_Stamina ) 
+					&& npc.GetBehaviorGraphInstanceName() != 'Shield'
+					)	
 					{
-						npc.GainStat( BCS_Morale, npc.GetStatMax( BCS_Morale ) * 0.05 );  
-
-						npc.GainStat( BCS_Focus, npc.GetStatMax( BCS_Focus ) * 0.05 );  
-
 						if (
 						(ACS_W3EE_Installed() && ACS_W3EE_Enabled() )
 						||
@@ -1530,122 +1625,474 @@ function ACS_Enemy_On_Take_Damage_General(action: W3DamageAction)
 						{
 							npc.GainStat( BCS_Stamina, npc.GetStat( BCS_Stamina ) * 0.25 );
 						}
+					}	
+				}
+
+				return;
+			}
+
+			if ( !action.IsDoTDamage() 
+			&& !action.WasDodged() 
+			&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
+			&& !(((W3Action_Attack)action).IsParried())
+			)
+			{
+				if ((npc.UsesVitality() && npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.01)
+				||
+				(npc.UsesEssence() && npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= 0.01))
+				{
+					if (thePlayer.IsWeaponHeld('fist') && !thePlayer.HasTag('vampire_claws_equipped') )
+					{
+						
 					}
 					else
 					{
-						npc.GainStat( BCS_Morale, npc.GetStatMax( BCS_Morale ) );  
+						GetACSWatcher().Blood_Spatter_Switch();
+					}
 
-						npc.GainStat( BCS_Focus, npc.GetStatMax( BCS_Focus ) );  
-							
+					if (ACS_GetItem_AllBlack_Equipped_Held())
+					{
+						if (!npc.HasTag('ACS_AllBlack_Ability_Spawn_From_Player'))
+						{
+							ACS_AllBlack_Ability_Spawn(npc.GetWorldPosition());
+
+							npc.AddTag('ACS_AllBlack_Ability_Spawn_From_Player');
+						}
+					}
+				}
+				else
+				{
+					ACS_Sign_Combo_System(action);
+
+					if(action.DealsAnyDamage())
+					{
+						GetACSWatcher().NPC_BloodCovered_Effect(action);
+
+						if (thePlayer.IsWeaponHeld('fist') && !thePlayer.HasTag('vampire_claws_equipped') )
+						{
+
+						}
+						else
+						{
+							if (RandF() < 0.5)
+							{
+								GetACSWatcher().Blood_Spatter_Switch();
+							}
+						}
+					}
+
+					if (action.GetHitReactionType() != EHRT_Reflect)
+					{
+						if (npc.IsHuman() && !((CNewNPC)npc).IsShielded( GetWitcherPlayer() ))
+						{
+							npc.GainStat( BCS_Morale, npc.GetStatMax( BCS_Morale ) * 0.05 );  
+
+							npc.GainStat( BCS_Focus, npc.GetStatMax( BCS_Focus ) * 0.05 );  
+
+							if (
+							(ACS_W3EE_Installed() && ACS_W3EE_Enabled() )
+							||
+							(ACS_W3EE_Redux_Installed() && ACS_W3EE_Redux_Enabled() )
+							)
+							{
+								npc.GainStat( BCS_Stamina, npc.GetStat( BCS_Stamina ) * 0.05 );
+							}
+							else
+							{
+								npc.GainStat( BCS_Stamina, npc.GetStat( BCS_Stamina ) * 0.25 );
+							}
+						}
+						else
+						{
+							npc.GainStat( BCS_Morale, npc.GetStatMax( BCS_Morale ) );  
+
+							npc.GainStat( BCS_Focus, npc.GetStatMax( BCS_Focus ) );  
+								
+							npc.GainStat( BCS_Stamina, npc.GetStat( BCS_Stamina ) * 0.5 );
+						}
+					}
+				}
+			}
+			else if ( action.WasDodged() 
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
+			&& !action.IsDoTDamage() )
+			{
+				if (npc.IsHuman() && !((CNewNPC)npc).IsShielded( GetWitcherPlayer() ))
+				{
+					npc.GainStat( BCS_Morale, npc.GetStatMax( BCS_Morale ) );  
+
+					npc.GainStat( BCS_Focus, npc.GetStatMax( BCS_Focus ) );  
+
+					npc.GainStat( BCS_Stamina, npc.GetStatMax( BCS_Stamina ) );  	
+				}
+				else
+				{
+					npc.GainStat( BCS_Morale, npc.GetStatMax( BCS_Morale ) );  
+
+					npc.GainStat( BCS_Focus, npc.GetStatMax( BCS_Focus ) );  
+						
+					if (npc.GetStat(BCS_Stamina) != npc.GetStatMax( BCS_Stamina ))	
+					{
+						npc.GainStat( BCS_Stamina, npc.GetStat( BCS_Stamina ) * 0.5 );
+					}
+				}
+			}
+			else if ( ((W3Action_Attack)action).IsParried() 
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
+			&& !action.IsDoTDamage() )
+			{
+				if (npc.IsHuman() && !((CNewNPC)npc).IsShielded( GetWitcherPlayer() ))
+				{
+					npc.GainStat( BCS_Morale, npc.GetStatMax( BCS_Morale ) );  
+
+					npc.GainStat( BCS_Focus, npc.GetStatMax( BCS_Focus ) );  
+
+					if (
+					npc.GetStat(BCS_Stamina) != npc.GetStatMax( BCS_Stamina ) 
+					&& npc.GetBehaviorGraphInstanceName() != 'Shield'
+					)	
+					{
+						if (
+						(ACS_W3EE_Installed() && ACS_W3EE_Enabled() )
+						||
+						(ACS_W3EE_Redux_Installed() && ACS_W3EE_Redux_Enabled() )
+						)
+						{
+							npc.GainStat( BCS_Stamina, npc.GetStat( BCS_Stamina ) * 0.05 );
+						}
+						else
+						{
+							npc.GainStat( BCS_Stamina, npc.GetStat( BCS_Stamina ) * 0.25 );
+						}
+					}	
+				}
+				else
+				{
+					npc.GainStat( BCS_Morale, npc.GetStatMax( BCS_Morale ) );  
+
+					npc.GainStat( BCS_Focus, npc.GetStatMax( BCS_Focus ) );  
+						
+					if (npc.GetStat(BCS_Stamina) != npc.GetStatMax( BCS_Stamina ))	
+					{
+						npc.GainStat( BCS_Stamina, npc.GetStat( BCS_Stamina ) * 0.5 );
+					}
+				}
+			}
+			else
+			{
+				if (npc.IsHuman() && !((CNewNPC)npc).IsShielded( GetWitcherPlayer() ))
+				{
+					npc.GainStat( BCS_Morale, npc.GetStatMax( BCS_Morale ) );  
+
+					npc.GainStat( BCS_Focus, npc.GetStatMax( BCS_Focus ) );  
+
+					if (
+					npc.GetStat(BCS_Stamina) != npc.GetStatMax( BCS_Stamina ) 
+					&& npc.GetBehaviorGraphInstanceName() != 'Shield'
+					)	
+					{
+						if (
+						(ACS_W3EE_Installed() && ACS_W3EE_Enabled() )
+						||
+						(ACS_W3EE_Redux_Installed() && ACS_W3EE_Redux_Enabled() )
+						)
+						{
+							npc.GainStat( BCS_Stamina, npc.GetStat( BCS_Stamina ) * 0.05 );
+						}
+						else
+						{
+							npc.GainStat( BCS_Stamina, npc.GetStat( BCS_Stamina ) * 0.25 );
+						}
+					}	
+				}
+				else
+				{
+					npc.GainStat( BCS_Morale, npc.GetStatMax( BCS_Morale ) );  
+
+					npc.GainStat( BCS_Focus, npc.GetStatMax( BCS_Focus ) );  
+						
+					if (npc.GetStat(BCS_Stamina) != npc.GetStatMax( BCS_Stamina ))	
+					{
 						npc.GainStat( BCS_Stamina, npc.GetStat( BCS_Stamina ) * 0.5 );
 					}
 				}
 			}
 		}
-		else if ( action.WasDodged() 
-		//&& action.IsActionMelee()
-		&& !action.IsDoTDamage() )
+		else
 		{
-			if (npc.IsHuman() && !((CNewNPC)npc).IsShielded( GetWitcherPlayer() ))
+			if ((thePlayer.GetAttitude( npc ) == AIA_Friendly 
+			|| theGame.GetGlobalAttitude( npc.GetBaseAttitudeGroup(), 'player' ) == AIA_Friendly)
+			&& !playerVictim)
 			{
-				npc.GainStat( BCS_Morale, npc.GetStatMax( BCS_Morale ) );  
-
-				npc.GainStat( BCS_Focus, npc.GetStatMax( BCS_Focus ) );  
-
-				npc.GainStat( BCS_Stamina, npc.GetStatMax( BCS_Stamina ) );  	
-			}
-			else
-			{
-				npc.GainStat( BCS_Morale, npc.GetStatMax( BCS_Morale ) );  
-
-				npc.GainStat( BCS_Focus, npc.GetStatMax( BCS_Focus ) );  
-					
-				if (npc.GetStat(BCS_Stamina) != npc.GetStatMax( BCS_Stamina ))	
+				if (npc.UsesVitality())
 				{
-					npc.GainStat( BCS_Stamina, npc.GetStat( BCS_Stamina ) * 0.5 );
+					action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.99;
+				}
+				else if (npc.UsesEssence())
+				{
+					action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.99;
+				}
+			}
+
+			if (npc.HasTag('acs_was_dismembered'))
+			{
+				npc.SetCanPlayHitAnim(false);
+
+				((CNewNPC)npc).SetUnstoppable( true );
+
+				if (npc.UsesVitality())
+				{
+					action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
+				}
+				else if (npc.UsesEssence())
+				{
+					action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage;
 				}
 			}
 		}
-		else if ( ((W3Action_Attack)action).IsParried() 
-		//&& action.IsActionMelee()
-		&& !action.IsDoTDamage() )
+	}
+}
+
+
+function ACS_Sign_Combo_System(action: W3DamageAction)
+{
+    var playerAttacker, playerVictim																								: CPlayer;
+	var npc, npcAttacker 																											: CActor;
+	var ent 																														: CEntity;
+	var attach_rot                        																							: EulerAngles;
+	var attach_vec																													: Vector;
+   
+    npc = (CActor)action.victim;
+	
+	npcAttacker = (CActor)action.attacker;
+	
+	playerAttacker = (CPlayer)action.attacker;
+	
+	playerVictim = (CPlayer)action.victim;
+
+	if ( !ACS_SignComboSystem_Enabled() )
+	{
+		return;
+	}
+
+	if ( ACS_Transformation_Activated_Check() )
+	{
+		return;
+	}
+
+	if ( thePlayer.IsInFistFightMiniGame() )
+	{
+		return;
+	}
+
+	if ( !thePlayer.IsActionAllowed(EIAB_Signs) )
+	{
+		return;
+	}
+
+	GetACSWatcher().RemoveTimer('RemoveSignComboStuffRepeating');
+	GetACSWatcher().RemoveTimer('RemoveSignComboStuff');
+	GetACSWatcher().AddTimer('RemoveSignComboStuff', 10, false);
+
+	if (!npc.HasTag('ACS_Sign_Combo_Attack_1')
+	&& !npc.HasTag('ACS_Sign_Combo_Attack_2')
+	&& !npc.HasTag('ACS_Sign_Combo_Igni_Ready')
+	&& !npc.HasTag('ACS_Sign_Combo_Aard_Ready')
+	)
+	{
+		npc.AddTag('ACS_Sign_Combo_Attack_1');
+	}
+	else if (npc.HasTag('ACS_Sign_Combo_Attack_1')
+	&& !npc.HasTag('ACS_Sign_Combo_Attack_2')
+	&& !npc.HasTag('ACS_Sign_Combo_Igni_Ready')
+	&& !npc.HasTag('ACS_Sign_Combo_Aard_Ready')
+	)
+	{
+		npc.AddTag('ACS_Sign_Combo_Attack_2');
+	} 
+	else if (npc.HasTag('ACS_Sign_Combo_Attack_1')
+	&& npc.HasTag('ACS_Sign_Combo_Attack_2')
+	&& !npc.HasTag('ACS_Sign_Combo_Igni_Ready')
+	&& !npc.HasTag('ACS_Sign_Combo_Aard_Ready')
+	)
+	{
+		//ACSSignComboIconDestroyAll();
+
+		//ACSSignComboSystemRemoveTags();
+
+		ACS_Sign_Combo_System_Tutorial();
+
+		ent = theGame.CreateEntity( (CEntityTemplate)LoadResource( 
+
+		"dlc\dlc_acs\data\fx\sign_icons.w2ent"
+
+		, true ), npc.GetWorldPosition(), npc.GetWorldRotation() );
+
+		attach_vec.X = 0;
+		attach_vec.Y = 0;
+
+		if (((CMovingPhysicalAgentComponent)(npc.GetMovingAgentComponent())).GetCapsuleHeight() > 2.25
+		|| npc.GetRadius() > 0.7
+		)
 		{
-			if (npc.IsHuman() && !((CNewNPC)npc).IsShielded( GetWitcherPlayer() ))
-			{
-				npc.GainStat( BCS_Morale, npc.GetStatMax( BCS_Morale ) );  
-
-				npc.GainStat( BCS_Focus, npc.GetStatMax( BCS_Focus ) );  
-
-				if (
-				npc.GetStat(BCS_Stamina) != npc.GetStatMax( BCS_Stamina ) 
-				&& npc.GetBehaviorGraphInstanceName() != 'Shield'
-				)	
-				{
-					if (
-					(ACS_W3EE_Installed() && ACS_W3EE_Enabled() )
-					||
-					(ACS_W3EE_Redux_Installed() && ACS_W3EE_Redux_Enabled() )
-					)
-					{
-						npc.GainStat( BCS_Stamina, npc.GetStat( BCS_Stamina ) * 0.05 );
-					}
-					else
-					{
-						npc.GainStat( BCS_Stamina, npc.GetStat( BCS_Stamina ) * 0.25 );
-					}
-				}	
-			}
-			else
-			{
-				npc.GainStat( BCS_Morale, npc.GetStatMax( BCS_Morale ) );  
-
-				npc.GainStat( BCS_Focus, npc.GetStatMax( BCS_Focus ) );  
-					
-				if (npc.GetStat(BCS_Stamina) != npc.GetStatMax( BCS_Stamina ))	
-				{
-					npc.GainStat( BCS_Stamina, npc.GetStat( BCS_Stamina ) * 0.5 );
-				}
-			}
+			attach_vec.Z = 4.25;
 		}
 		else
 		{
-			if (npc.IsHuman() && !((CNewNPC)npc).IsShielded( GetWitcherPlayer() ))
+			attach_vec.Z = 2.5;
+		}
+
+		ent.CreateAttachment( npc, , attach_vec, EulerAngles(0,0,0) );
+
+		if (RandF() < 0.5)
+		{
+			ent.PlayEffectSingle('igni_icon_small');
+
+			ent.AddTag('ACS_Sign_Combo_Igni_Symbol_Active');
+
+			npc.AddTag('ACS_Sign_Combo_Igni_Ready');
+		}
+		else
+		{
+			ent.PlayEffectSingle('aard_icon_small');
+
+			ent.AddTag('ACS_Sign_Combo_Aard_Symbol_Active');
+
+			npc.AddTag('ACS_Sign_Combo_Aard_Ready');
+		}
+
+		ent.AddTag('ACS_Sign_Combo_Icon');
+	}
+	else
+	{
+		return;
+	}
+}
+
+function ACSSignComboNPCAliveCheck() : bool
+{	
+	var actors 											: array<CActor>;
+	var i												: int;
+	
+	actors.Clear();
+
+	theGame.GetActorsByTag( 'ACS_Sign_Combo_Attack_1', actors );	
+
+	if (actors.Size() <= 0)
+	{
+		return false;
+	}
+	
+	for( i = 0; i < actors.Size(); i += 1 )
+	{
+		if (!actors[i].IsAlive())
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+function ACSSignComboIconCheck()
+{	
+	var ents 											: array<CEntity>;
+	var i												: int;
+
+	var actors_igni 									: array<CActor>;
+	var j												: int;
+
+	var actors_aard 									: array<CActor>;
+	var k												: int;
+
+	if ( !ACS_SignComboSystem_Enabled() )
+	{
+		return;
+	}
+	
+	ents.Clear();
+
+	theGame.GetEntitiesByTag( 'ACS_Sign_Combo_Icon', ents );	
+
+	if (ents.Size() <= 0)
+	{
+		return;
+	}
+
+	if (ACS_can_activate_sign_combo_system())
+	{
+		ACS_refresh_sign_combo_system_cooldown();
+
+		for( i = 0; i < ents.Size(); i += 1 )
+		{
+			if (!ents[i].HasTag('ACS_Sign_Combo_Icon_Ready_To_Activate'))
 			{
-				npc.GainStat( BCS_Morale, npc.GetStatMax( BCS_Morale ) );  
-
-				npc.GainStat( BCS_Focus, npc.GetStatMax( BCS_Focus ) );  
-
-				if (
-				npc.GetStat(BCS_Stamina) != npc.GetStatMax( BCS_Stamina ) 
-				&& npc.GetBehaviorGraphInstanceName() != 'Shield'
-				)	
+				if (ents[i].HasTag('ACS_Sign_Combo_Igni_Symbol_Active'))
 				{
-					if (
-					(ACS_W3EE_Installed() && ACS_W3EE_Enabled() )
-					||
-					(ACS_W3EE_Redux_Installed() && ACS_W3EE_Redux_Enabled() )
-					)
-					{
-						npc.GainStat( BCS_Stamina, npc.GetStat( BCS_Stamina ) * 0.05 );
-					}
-					else
-					{
-						npc.GainStat( BCS_Stamina, npc.GetStat( BCS_Stamina ) * 0.25 );
-					}
-				}	
-			}
-			else
-			{
-				npc.GainStat( BCS_Morale, npc.GetStatMax( BCS_Morale ) );  
-
-				npc.GainStat( BCS_Focus, npc.GetStatMax( BCS_Focus ) );  
-					
-				if (npc.GetStat(BCS_Stamina) != npc.GetStatMax( BCS_Stamina ))	
-				{
-					npc.GainStat( BCS_Stamina, npc.GetStat( BCS_Stamina ) * 0.5 );
+					ents[i].PlayEffect('igni_icon');
 				}
+				else if (ents[i].HasTag('ACS_Sign_Combo_Aard_Symbol_Active'))
+				{
+					ents[i].PlayEffect('aard_icon');
+				}
+
+				ents[i].AddTag('ACS_Sign_Combo_Icon_Ready_To_Activate');
 			}
 		}
+
+		actors_igni.Clear();
+
+		theGame.GetActorsByTag( 'ACS_Sign_Combo_Igni_Ready', actors_igni );	
+
+		for( j = 0; j < actors_igni.Size(); j += 1 )
+		{
+			actors_igni[j].AddTag('ACS_Sign_Combo_Icon_Ready_To_Activate_NPC_Igni');
+		}
+
+
+		actors_aard.Clear();
+
+		theGame.GetActorsByTag( 'ACS_Sign_Combo_Aard_Ready', actors_aard );	
+
+		for( k = 0; k < actors_aard.Size(); k += 1 )
+		{
+			actors_aard[k].AddTag('ACS_Sign_Combo_Icon_Ready_To_Activate_NPC_Aard');
+		}
+	}
+}
+
+function ACSSignComboIconDestroyAll()
+{	
+	var ents 											: array<CEntity>;
+	var i												: int;
+	
+	ents.Clear();
+
+	theGame.GetEntitiesByTag( 'ACS_Sign_Combo_Icon', ents );	
+	
+	for( i = 0; i < ents.Size(); i += 1 )
+	{
+		ents[i].Destroy();
+	}
+}
+
+function ACSSignComboSystemRemoveTags()
+{
+	var actors_igni 									: array<CActor>;
+	var j												: int;
+
+	actors_igni.Clear();
+
+	theGame.GetActorsByTag( 'ACS_Sign_Combo_Attack_1', actors_igni );	
+
+	for( j = 0; j < actors_igni.Size(); j += 1 )
+	{
+		actors_igni[j].RemoveTag('ACS_Sign_Combo_Attack_1');
+		actors_igni[j].RemoveTag('ACS_Sign_Combo_Attack_2');
+		actors_igni[j].RemoveTag('ACS_Sign_Combo_Igni_Ready');
+		actors_igni[j].RemoveTag('ACS_Sign_Combo_Aard_Ready');
+		actors_igni[j].RemoveTag('ACS_Sign_Combo_Icon_Ready_To_Activate_NPC_Igni');
+		actors_igni[j].RemoveTag('ACS_Sign_Combo_Icon_Ready_To_Activate_NPC_Aard');
 	}
 }
 
@@ -1943,7 +2390,7 @@ function ACS_Rage_Enemy_On_Take_Damage(action: W3DamageAction)
 	{
 		if ( !action.IsDoTDamage() 
 		&& !action.WasDodged() 
-		//&& action.IsActionMelee()
+		//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 		&& !(((W3Action_Attack)action).IsParried())
 		)
 		{
@@ -2021,17 +2468,19 @@ function ACS_Harpy_Queen_On_Take_Damage(action: W3DamageAction)
 	{
 		if (playerAttacker)
 		{
+			npc.SetCanPlayHitAnim(false);
+
+			((CNewNPC)npc).SetUnstoppable( true );
+
 			npc.SignalGameplayEvent('DisableFinisher');
 
 			((CActor)npc).AddBuffImmunity(EET_Knockdown , 'ACS_Enemy_Buff', true);
 
 			((CActor)npc).AddBuffImmunity(EET_HeavyKnockdown , 'ACS_Enemy_Buff', true);
 
-			((CActor)npc).SetCanPlayHitAnim(false);
-
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -2111,7 +2560,7 @@ function ACS_Harpy_Praetorian_On_Take_Damage(action: W3DamageAction)
 
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -2147,6 +2596,146 @@ function ACS_Harpy_Praetorian_On_Take_Damage(action: W3DamageAction)
 				movementAdjustorNPC.MaxRotationAdjustmentSpeed( ticket, 125 );
 
 				movementAdjustorNPC.RotateTowards( ticket, GetWitcherPlayer() );
+			}
+		}
+	}
+}
+
+function ACS_Chironex_On_Take_Damage(action: W3DamageAction)
+{
+    var playerAttacker, playerVictim																								: CPlayer;
+	var npc, npcAttacker 																											: CActor;
+	var movementAdjustor, movementAdjustorNPC																						: CMovementAdjustor;
+	var ticket 																														: SMovementAdjustmentRequestTicket;
+
+    npc = (CActor)action.victim;
+	
+	npcAttacker = (CActor)action.attacker;
+	
+	playerAttacker = (CPlayer)action.attacker;
+	
+	playerVictim = (CPlayer)action.victim;
+
+	movementAdjustor = GetWitcherPlayer().GetMovingAgentComponent().GetMovementAdjustor();
+
+	movementAdjustorNPC = npc.GetMovingAgentComponent().GetMovementAdjustor();
+
+	if 
+	(npc && npc.HasTag('ACS_Chironex'))
+	{
+		//if (playerAttacker)
+		{
+			if ( !action.IsDoTDamage() 
+			&& !action.WasDodged() 
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
+			&& !(((W3Action_Attack)action).IsParried())
+			)
+			{
+				if (npc.UsesVitality())
+				{
+					if( thePlayer.IsDoingSpecialAttack(false))
+					{
+						action.processedDmg.vitalityDamage += npc.GetMaxHealth() * 0.05;
+					}
+					else
+					{
+						action.processedDmg.vitalityDamage += npc.GetMaxHealth() * 0.1;
+					}
+				}
+				else if (npc.UsesEssence())
+				{
+					if( thePlayer.IsDoingSpecialAttack(false))
+					{
+						action.processedDmg.essenceDamage += npc.GetMaxHealth() * 0.05;
+					}
+					else
+					{
+						action.processedDmg.essenceDamage += npc.GetMaxHealth() * 0.1;
+					}
+				}
+			}
+
+			if ((npc.UsesVitality() && npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= npc.GetMaxHealth() * 0.05)
+			||
+			(npc.UsesEssence() && npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= npc.GetMaxHealth() * 0.05))
+			{
+				if ( !npc.HasTag('ACS_Chironex_Death'))
+				{
+					GetWitcherPlayer().AddPoints(EExperiencePoint, 15, false );
+
+					npc.DestroyEffect('demonic_cast');
+
+					npc.DestroyEffect('ghost');
+
+					npc.DestroyEffect('demon_horse');
+
+					npc.PlayEffectSingle('disappear');
+
+					((CNewNPC)npc).SetVisibility(false);
+					
+					//npc.Teleport(thePlayer.GetWorldPosition() + Vector(0,0,-200));
+
+					npc.DestroyAfter(2);
+
+					((CActor)npc).SetInteractionPriority( IP_Prio_0 );
+
+					((CNewNPC)npc).EnableCollisions(false);
+
+					ACS_Chironex_Corpse_Spawn(npc, npc.GetWorldPosition());
+
+					npc.AddTag('ACS_Chironex_Death');
+				}
+			}
+		}
+	}
+}
+
+function ACS_Weaponized_Rabbit_On_Take_Damage(action: W3DamageAction)
+{
+    var playerAttacker, playerVictim																								: CPlayer;
+	var npc, npcAttacker 																											: CActor;
+	var movementAdjustor, movementAdjustorNPC																						: CMovementAdjustor;
+	var ticket 																														: SMovementAdjustmentRequestTicket;
+
+    npc = (CActor)action.victim;
+	
+	npcAttacker = (CActor)action.attacker;
+	
+	playerAttacker = (CPlayer)action.attacker;
+	
+	playerVictim = (CPlayer)action.victim;
+
+	movementAdjustor = GetWitcherPlayer().GetMovingAgentComponent().GetMovementAdjustor();
+
+	movementAdjustorNPC = npc.GetMovingAgentComponent().GetMovementAdjustor();
+
+	if 
+	(npc && npc.HasTag('ACS_WeaponizedRabbit'))
+	{
+		if (playerAttacker)
+		{
+			if ( !action.WasDodged() 
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
+			&& !(((W3Action_Attack)action).IsParried())
+			)
+			{
+				
+			}
+
+			if ((npc.UsesVitality() && npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.01)
+			||
+			(npc.UsesEssence() && npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= 0.01))
+			{
+				if ( !npc.HasTag('ACS_Weaponized_Rabbit_Death'))
+				{
+					npc.Teleport(thePlayer.GetWorldPosition() + Vector(0,0,-200));
+
+					npc.DestroyAfter(2);
+
+					ACS_Weaponized_Rabbit_Corpse_Spawn(npc, npc.GetWorldPosition());
+
+					npc.AddTag('ACS_Weaponized_Rabbit_Death');
+				}
 			}
 		}
 		else
@@ -2188,11 +2777,11 @@ function ACS_Nekker_Guardian_On_Take_Damage(action: W3DamageAction)
 	if 
 	(npc && npc.HasTag('ACS_Nekker_Guardian'))
 	{
-		if (playerAttacker)
+		//if (playerAttacker)
 		{
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -2234,7 +2823,10 @@ function ACS_Nekker_Guardian_On_Take_Damage(action: W3DamageAction)
 				npc.SoundEvent("monster_bies_vo_pain_normal");
 			}
 
-			if (npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= 0.1)
+			if (
+			(npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.1)
+			||(npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= 0.1)
+			)
 			{
 				if (!npc.HasTag('ACS_Nekker_Guardian_End_Stage'))
 				{
@@ -2242,30 +2834,12 @@ function ACS_Nekker_Guardian_On_Take_Damage(action: W3DamageAction)
 
 					animatedComponentA.FreezePoseFadeIn(5);
 
-					npc.AddTag('ACS_Nekker_Guardian_End_Stage');
-				}
-			}
-			else if (npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.1)
-			{
-				if (!npc.HasTag('ACS_Nekker_Guardian_End_Stage'))
-				{
-					ACS_Ghoul_Explode(npc, npc.GetWorldPosition());
+					GetACSWatcher().CanSpawnNekkerGuardian(false);
 
-					animatedComponentA.FreezePoseFadeIn(5);
+					GetACSWatcher().AddTimer('Nekker_Guardian_Spawn_Reset', 60, false);
 
 					npc.AddTag('ACS_Nekker_Guardian_End_Stage');
 				}
-			}
-		}
-		else
-		{
-			if (npc.UsesVitality())
-			{
-				action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
-			}
-			else if (npc.UsesEssence())
-			{
-				action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage;
 			}
 		}
 	}
@@ -2296,11 +2870,11 @@ function ACS_Phooca_On_Take_Damage(action: W3DamageAction)
 	if 
 	(npc && npc.HasTag('ACS_Phooca'))
 	{
-		if (playerAttacker)
+		//if (playerAttacker)
 		{
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -2338,7 +2912,10 @@ function ACS_Phooca_On_Take_Damage(action: W3DamageAction)
 				movementAdjustorNPC.RotateTowards( ticket, GetWitcherPlayer() );
 			}
 
-			if (npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= 0.1)
+			if (
+			(npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.1)
+			||(npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= 0.1)
+			)
 			{
 				if (!npc.HasTag('ACS_Phooca_End_Stage'))
 				{
@@ -2348,28 +2925,6 @@ function ACS_Phooca_On_Take_Damage(action: W3DamageAction)
 
 					npc.AddTag('ACS_Phooca_End_Stage');
 				}
-			}
-			else if (npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.1)
-			{
-				if (!npc.HasTag('ACS_Phooca_End_Stage'))
-				{
-					ACS_Ghoul_Explode(npc, npc.GetWorldPosition());
-
-					animatedComponentA.FreezePoseFadeIn(5);
-
-					npc.AddTag('ACS_Phooca_End_Stage');
-				}
-			}
-		}
-		else
-		{
-			if (npc.UsesVitality())
-			{
-				action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
-			}
-			else if (npc.UsesEssence())
-			{
-				action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage;
 			}
 		}
 	}
@@ -2398,7 +2953,7 @@ function ACS_Plumard_On_Take_Damage(action: W3DamageAction)
 		{
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -2431,15 +2986,72 @@ function ACS_Plumard_On_Take_Damage(action: W3DamageAction)
 				}
 			}
 		}
-		else
+	}
+}
+
+function ACS_Nekurat_On_Take_Damage(action: W3DamageAction)
+{
+    var playerAttacker, playerVictim																								: CPlayer;
+	var npc, npcAttacker 																											: CActor;
+	var animatedComponentA 																											: CAnimatedComponent;
+	
+    npc = (CActor)action.victim;
+	
+	npcAttacker = (CActor)action.attacker;
+	
+	playerAttacker = (CPlayer)action.attacker;
+	
+	playerVictim = (CPlayer)action.victim;
+
+	animatedComponentA = (CAnimatedComponent)npc.GetComponentByClassName( 'CAnimatedComponent' );
+
+	if 
+	(npc && npc.HasTag('ACS_Nekurat'))
+	{
+		if (playerAttacker)
 		{
-			if (npc.UsesVitality())
+			if ( !action.IsDoTDamage() 
+			&& !action.WasDodged() 
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
+			&& !(((W3Action_Attack)action).IsParried())
+			)
 			{
-				action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
-			}
-			else if (npc.UsesEssence())
-			{
-				action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage;
+				if (ACS_IsNight())
+				{
+					if (npc.UsesVitality())
+					{
+						if( thePlayer.IsDoingSpecialAttack(false))
+						{
+							action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.5;
+						}
+						else
+						{
+							action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.25;
+						}
+					}
+					else if (npc.UsesEssence())
+					{
+						if( thePlayer.IsDoingSpecialAttack(false))
+						{
+							action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.5;
+						}
+						else
+						{
+							action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.25;
+						}
+					}
+				}
+				else
+				{
+					if (npc.UsesVitality())
+					{
+						action.processedDmg.vitalityDamage += npc.GetMaxHealth() * 0.025;
+					}
+					else if (npc.UsesEssence())
+					{
+						action.processedDmg.essenceDamage += npc.GetMaxHealth() * 0.025;
+					}
+				}
 			}
 		}
 	}
@@ -2471,7 +3083,7 @@ function ACS_She_Who_Knows_On_Take_Damage(action: W3DamageAction)
 		{
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -2537,7 +3149,7 @@ function ACS_Wild_Hunt_Bosses_On_Take_Damage(action: W3DamageAction)
 		{
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -2594,7 +3206,7 @@ function ACS_NightStalker_On_Take_Damage(action: W3DamageAction)
 		{
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -2693,7 +3305,8 @@ function ACS_XenoTyrant_On_Take_Damage(action: W3DamageAction)
 {
     var playerAttacker, playerVictim																								: CPlayer;
 	var npc, npcAttacker 																											: CActor;
-
+	var params 																														: SCustomEffectParams;
+	
     npc = (CActor)action.victim;
 	
 	npcAttacker = (CActor)action.attacker;
@@ -2709,7 +3322,7 @@ function ACS_XenoTyrant_On_Take_Damage(action: W3DamageAction)
 		{
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -2724,26 +3337,79 @@ function ACS_XenoTyrant_On_Take_Damage(action: W3DamageAction)
 					GetACSXenoTyrant().AddAbility('mon_kikimore_small');
 				}
 
-				if (npc.UsesVitality())
+				if (ACS_ActionDealsFireDamage(action)
+				|| action.HasBuff(EET_Burning))
 				{
-					if( thePlayer.IsDoingSpecialAttack(false))
+					if (npc.UsesVitality())
 					{
-						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.5;
+						action.processedDmg.vitalityDamage += action.processedDmg.vitalityDamage * 5;
 					}
-					else
+					else if (npc.UsesEssence())
 					{
-						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.25;
+						action.processedDmg.essenceDamage += action.processedDmg.vitalityDamage * 5;
+					}
+
+					if (!npc.HasBuff(EET_Burning))
+					{
+						params.effectType = EET_Burning;
+						params.creator = playerAttacker;
+						params.sourceName = "ACS_Xeno_Swarm_Fire_Damage";
+						params.duration = 2.5;
+
+						npc.AddEffectCustom( params );		
 					}
 				}
-				else if (npc.UsesEssence())
+				else
 				{
-					if( thePlayer.IsDoingSpecialAttack(false))
+					if (npc.HasBuff(EET_Burning))
 					{
-						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.5;
+						if (npc.UsesVitality())
+						{
+							if( thePlayer.IsDoingSpecialAttack(false))
+							{
+								action.processedDmg.vitalityDamage += npc.GetMaxHealth() * 0.0125;
+							}
+							else
+							{
+								action.processedDmg.vitalityDamage += npc.GetMaxHealth() * 0.025;
+							}
+						}
+						else if (npc.UsesEssence())
+						{
+							if( thePlayer.IsDoingSpecialAttack(false))
+							{
+								action.processedDmg.essenceDamage += npc.GetMaxHealth() * 0.0125;
+							}
+							else
+							{
+								action.processedDmg.essenceDamage += npc.GetMaxHealth() * 0.025;
+							}
+						}
 					}
 					else
 					{
-						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.25;
+						if (npc.UsesVitality())
+						{
+							if( thePlayer.IsDoingSpecialAttack(false))
+							{
+								action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.5;
+							}
+							else
+							{
+								action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.25;
+							}
+						}
+						else if (npc.UsesEssence())
+						{
+							if( thePlayer.IsDoingSpecialAttack(false))
+							{
+								action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.5;
+							}
+							else
+							{
+								action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.25;
+							}
+						}
 					}
 				}
 			}
@@ -2766,7 +3432,8 @@ function ACS_XenoSoldier_On_Take_Damage(action: W3DamageAction)
 {
     var playerAttacker, playerVictim																								: CPlayer;
 	var npc, npcAttacker 																											: CActor;
-
+	var params 																														: SCustomEffectParams;
+	
     npc = (CActor)action.victim;
 	
 	npcAttacker = (CActor)action.attacker;
@@ -2780,7 +3447,7 @@ function ACS_XenoSoldier_On_Take_Damage(action: W3DamageAction)
 	{
 		if ( !action.IsDoTDamage() 
 		&& !action.WasDodged() 
-		//&& action.IsActionMelee()
+		//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 		&& !(((W3Action_Attack)action).IsParried())
 		)
 		{
@@ -2833,26 +3500,79 @@ function ACS_XenoSoldier_On_Take_Damage(action: W3DamageAction)
 				npc.AddAbility('mon_kikimore_small');
 			}
 
-			if (npc.UsesVitality())
+			if (ACS_ActionDealsFireDamage(action)
+			|| action.HasBuff(EET_Burning))
 			{
-				if( thePlayer.IsDoingSpecialAttack(false))
+				if (npc.UsesVitality())
 				{
-					action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.5;
+					action.processedDmg.vitalityDamage += action.processedDmg.vitalityDamage * 5;
 				}
-				else
+				else if (npc.UsesEssence())
 				{
-					action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.25;
+					action.processedDmg.essenceDamage += action.processedDmg.vitalityDamage * 5;
+				}
+
+				if (!npc.HasBuff(EET_Burning))
+				{
+					params.effectType = EET_Burning;
+					params.creator = playerAttacker;
+					params.sourceName = "ACS_Xeno_Swarm_Fire_Damage";
+					params.duration = 5;
+
+					npc.AddEffectCustom( params );		
 				}
 			}
-			else if (npc.UsesEssence())
+			else
 			{
-				if( thePlayer.IsDoingSpecialAttack(false))
+				if (npc.HasBuff(EET_Burning))
 				{
-					action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.5;
+					if (npc.UsesVitality())
+					{
+						if( thePlayer.IsDoingSpecialAttack(false))
+						{
+							action.processedDmg.vitalityDamage += npc.GetMaxHealth() * 0.0125;
+						}
+						else
+						{
+							action.processedDmg.vitalityDamage += npc.GetMaxHealth() * 0.025;
+						}
+					}
+					else if (npc.UsesEssence())
+					{
+						if( thePlayer.IsDoingSpecialAttack(false))
+						{
+							action.processedDmg.essenceDamage += npc.GetMaxHealth() * 0.0125;
+						}
+						else
+						{
+							action.processedDmg.essenceDamage += npc.GetMaxHealth() * 0.025;
+						}
+					}
 				}
 				else
 				{
-					action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.25;
+					if (npc.UsesVitality())
+					{
+						if( thePlayer.IsDoingSpecialAttack(false))
+						{
+							action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.5;
+						}
+						else
+						{
+							action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.25;
+						}
+					}
+					else if (npc.UsesEssence())
+					{
+						if( thePlayer.IsDoingSpecialAttack(false))
+						{
+							action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.5;
+						}
+						else
+						{
+							action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.25;
+						}
+					}
 				}
 			}
 		}
@@ -2863,7 +3583,8 @@ function ACS_XenoArmoredWorker_On_Take_Damage(action: W3DamageAction)
 {
     var playerAttacker, playerVictim																								: CPlayer;
 	var npc, npcAttacker 																											: CActor;
-
+	var params 																														: SCustomEffectParams;
+	
     npc = (CActor)action.victim;
 	
 	npcAttacker = (CActor)action.attacker;
@@ -2877,7 +3598,7 @@ function ACS_XenoArmoredWorker_On_Take_Damage(action: W3DamageAction)
 	{
 		if ( !action.IsDoTDamage() 
 		&& !action.WasDodged() 
-		//&& action.IsActionMelee()
+		//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 		&& !(((W3Action_Attack)action).IsParried())
 		)
 		{
@@ -2975,26 +3696,80 @@ function ACS_XenoArmoredWorker_On_Take_Damage(action: W3DamageAction)
 					}
 				}
 			}
-			if (npc.UsesVitality())
+
+			if (ACS_ActionDealsFireDamage(action)
+			|| action.HasBuff(EET_Burning))
 			{
-				if( thePlayer.IsDoingSpecialAttack(false))
+				if (npc.UsesVitality())
 				{
-					action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.25;
+					action.processedDmg.vitalityDamage += action.processedDmg.vitalityDamage * 5;
 				}
-				else
+				else if (npc.UsesEssence())
 				{
-					action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.25;
+					action.processedDmg.essenceDamage += action.processedDmg.vitalityDamage * 5;
+				}
+
+				if (!npc.HasBuff(EET_Burning))
+				{
+					params.effectType = EET_Burning;
+					params.creator = playerAttacker;
+					params.sourceName = "ACS_Xeno_Swarm_Fire_Damage";
+					params.duration = 5;
+
+					npc.AddEffectCustom( params );		
 				}
 			}
-			else if (npc.UsesEssence())
+			else
 			{
-				if( thePlayer.IsDoingSpecialAttack(false))
+				if (npc.HasBuff(EET_Burning))
 				{
-					action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.25;
+					if (npc.UsesVitality())
+					{
+						if( thePlayer.IsDoingSpecialAttack(false))
+						{
+							action.processedDmg.vitalityDamage += npc.GetMaxHealth() * 0.0125;
+						}
+						else
+						{
+							action.processedDmg.vitalityDamage += npc.GetMaxHealth() * 0.025;
+						}
+					}
+					else if (npc.UsesEssence())
+					{
+						if( thePlayer.IsDoingSpecialAttack(false))
+						{
+							action.processedDmg.essenceDamage += npc.GetMaxHealth() * 0.0125;
+						}
+						else
+						{
+							action.processedDmg.essenceDamage += npc.GetMaxHealth() * 0.025;
+						}
+					}
 				}
 				else
 				{
-					action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.25;
+					if (npc.UsesVitality())
+					{
+						if( thePlayer.IsDoingSpecialAttack(false))
+						{
+							action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.25;
+						}
+						else
+						{
+							action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.25;
+						}
+					}
+					else if (npc.UsesEssence())
+					{
+						if( thePlayer.IsDoingSpecialAttack(false))
+						{
+							action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.25;
+						}
+						else
+						{
+							action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.25;
+						}
+					}
 				}
 			}
 		}
@@ -3027,7 +3802,7 @@ function ACS_Fire_Bear_On_Take_Damage(action: W3DamageAction)
 		{
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -3110,7 +3885,7 @@ function ACS_Ice_Titan_On_Take_Damage(action: W3DamageAction)
 		{
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -3186,7 +3961,7 @@ function ACS_Knightmare_On_Take_Damage(action: W3DamageAction)
 		{
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -3277,7 +4052,7 @@ function ACS_Unseen_Blade_On_Take_Damage(action: W3DamageAction)
 		{
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -3353,7 +4128,7 @@ function ACS_Big_Lizard_On_Take_Damage(action: W3DamageAction)
 		{
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -3436,7 +4211,7 @@ function ACS_Rat_Mage_On_Take_Damage(action: W3DamageAction)
 		{
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -3515,7 +4290,7 @@ function ACS_Canaris_On_Take_Damage(action: W3DamageAction)
 		{
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			////&& action.IsActionMelee()
+			////&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -3630,7 +4405,7 @@ function ACS_Fire_Gargoyle_On_Take_Damage(action: W3DamageAction)
 		{
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -3710,7 +4485,7 @@ function ACS_Lynx_Witcher_On_Take_Damage(action: W3DamageAction)
 		{
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -3745,7 +4520,10 @@ function ACS_Lynx_Witcher_On_Take_Damage(action: W3DamageAction)
 				}
 			}
 
-			if (npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.1)
+			if (
+			(npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.1)
+			||(npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= 0.1)
+			)
 			{
 				if (!npc.HasTag('ACS_Lynx_Witcher_End_Stage'))
 				{
@@ -3789,10 +4567,27 @@ function ACS_Elderblood_Assassin_On_Take_Damage(action: W3DamageAction)
 		{
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
+				if (!npc.HasTag('ACS_Elderblood_Assassin_Set_Unstoppable'))
+				{
+					npc.SetCanPlayHitAnim(false);
+
+					((CNewNPC)npc).SetUnstoppable( true );
+
+					npc.AddTag('ACS_Elderblood_Assassin_Set_Unstoppable');
+				}
+				else
+				{
+					npc.SetCanPlayHitAnim(true);
+
+					((CNewNPC)npc).SetUnstoppable( false );
+
+					npc.RemoveTag('ACS_Elderblood_Assassin_Set_Unstoppable');
+				}
+
 				if( thePlayer.IsDoingSpecialAttack(false))
 				{
 					action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.25;
@@ -3820,10 +4615,15 @@ function ACS_Elderblood_Assassin_On_Take_Damage(action: W3DamageAction)
 				}
 			}
 
-			if (npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.1)
+			if (
+			(npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.1)
+			||(npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= 0.1)
+			)
 			{
 				if (!npc.HasTag('ACS_Elderblood_Assassin_End_Stage'))
 				{
+					GetWitcherPlayer().AddPoints(EExperiencePoint, 25, false );
+
 					npc.StopEffect('fury');
 
 					npc.StopEffect('fury_403');
@@ -3876,10 +4676,27 @@ function ACS_Elderblood_Assassin_Clone_On_Take_Damage(action: W3DamageAction)
 		{
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
+				if (!npc.HasTag('ACS_Elderblood_Assassin_Clone_Set_Unstoppable'))
+				{
+					npc.SetCanPlayHitAnim(false);
+
+					((CNewNPC)npc).SetUnstoppable( true );
+
+					npc.AddTag('ACS_Elderblood_Assassin_Clone_Set_Unstoppable');
+				}
+				else
+				{
+					npc.SetCanPlayHitAnim(true);
+
+					((CNewNPC)npc).SetUnstoppable( false );
+
+					npc.RemoveTag('ACS_Elderblood_Assassin_Clone_Set_Unstoppable');
+				}
+
 				if( thePlayer.IsDoingSpecialAttack(false))
 				{
 					action.processedDmg.vitalityDamage += action.processedDmg.vitalityDamage * 0.125;
@@ -3890,10 +4707,15 @@ function ACS_Elderblood_Assassin_Clone_On_Take_Damage(action: W3DamageAction)
 				}
 			}
 
-			if (npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.1)
+			if (
+			(npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.1)
+			||(npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= 0.1)
+			)
 			{
 				if (!npc.HasTag('ACS_Elderblood_Assassin_Clone_End_Stage'))
 				{
+					GetWitcherPlayer().AddPoints(EExperiencePoint, 10, false );
+
 					npc.StopEffect('fury');
 
 					npc.StopEffect('fury_403');
@@ -3910,17 +4732,6 @@ function ACS_Elderblood_Assassin_Clone_On_Take_Damage(action: W3DamageAction)
 
 					npc.AddTag('ACS_Elderblood_Assassin_Clone_End_Stage');
 				}
-			}
-		}
-		else
-		{
-			if (npc.UsesVitality())
-			{
-				action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
-			}
-			else if (npc.UsesEssence())
-			{
-				action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage;
 			}
 		}
 	}
@@ -3952,7 +4763,10 @@ function ACS_Wolf_On_Take_Damage(action: W3DamageAction)
 		&& GetACSFluffy().IsAlive()
 		)
 		{
-			if (npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.1)
+			if (
+			(npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.1)
+			||(npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= 0.1)
+			)
 			{
 				if (!npc.HasTag('ACS_Wolf_End_Stage'))
 				{
@@ -3982,13 +4796,15 @@ function ACS_ShadowWolf_On_Take_Damage(action: W3DamageAction)
 	playerVictim = (CPlayer)action.victim;
 
 	if 
-	(npc && npc.HasTag('ACS_Shadow_Wolf'))
+	(npc 
+	&& 
+	(npc.HasTag('ACS_Shadow_Wolf') || npc.HasTag('ACS_Fluffy_Shadow_Wolf')))
 	{
 		if ( playerAttacker )
 		{
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -3996,53 +4812,41 @@ function ACS_ShadowWolf_On_Take_Damage(action: W3DamageAction)
 				{
 					if( thePlayer.IsDoingSpecialAttack(false))
 					{
-						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.5;
+						action.processedDmg.vitalityDamage += npc.GetMaxHealth() * 0.05;
 					}
 					else
 					{
-						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.25;
-					}
-
-					if (npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.1)
-					{
-						if (!npc.HasTag('ACS_ShadowWolf_End_Stage'))
-						{
-							npc.PlayEffectSingle('appear');
-							npc.StopEffect('appear');
-
-							npc.StopAllEffects();
-
-							((CNewNPC)npc).SetVisibility(false);
-
-							npc.AddTag('ACS_ShadowWolf_End_Stage');
-						}
+						action.processedDmg.vitalityDamage += npc.GetMaxHealth() * 0.075;
 					}
 				}
 				else if (npc.UsesEssence())
 				{
 					if( thePlayer.IsDoingSpecialAttack(false))
 					{
-						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.5;
+						action.processedDmg.essenceDamage += npc.GetMaxHealth() * 0.05;
 					}
 					else
 					{
-						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.25;
+						action.processedDmg.essenceDamage += npc.GetMaxHealth() * 0.075;
 					}
+				}
+			}
 
-					if (npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= 0.1)
-					{
-						if (!npc.HasTag('ACS_ShadowWolf_End_Stage'))
-						{
-							npc.PlayEffectSingle('appear');
-							npc.StopEffect('appear');
+			if (
+			(npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.1)
+			||(npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= 0.1)
+			)
+			{
+				if (!npc.HasTag('ACS_ShadowWolf_End_Stage'))
+				{
+					npc.PlayEffectSingle('appear');
+					npc.StopEffect('appear');
 
-							npc.StopAllEffects();
+					npc.StopAllEffects();
 
-							((CNewNPC)npc).SetVisibility(false);
+					((CNewNPC)npc).SetVisibility(false);
 
-							npc.AddTag('ACS_ShadowWolf_End_Stage');
-						}
-					}
+					npc.AddTag('ACS_ShadowWolf_End_Stage');
 				}
 			}
 		}
@@ -4069,7 +4873,7 @@ function ACS_Fluffy_ShadowWolf_On_Take_Damage(action: W3DamageAction)
 		{
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -4083,21 +4887,6 @@ function ACS_Fluffy_ShadowWolf_On_Take_Damage(action: W3DamageAction)
 					{
 						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.25;
 					}
-
-					if (npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.1)
-					{
-						if (!npc.HasTag('ACS_ShadowWolf_End_Stage'))
-						{
-							npc.PlayEffectSingle('appear');
-							npc.StopEffect('appear');
-
-							npc.StopAllEffects();
-
-							((CNewNPC)npc).SetVisibility(false);
-
-							npc.AddTag('ACS_ShadowWolf_End_Stage');
-						}
-					}
 				}
 				else if (npc.UsesEssence())
 				{
@@ -4109,21 +4898,24 @@ function ACS_Fluffy_ShadowWolf_On_Take_Damage(action: W3DamageAction)
 					{
 						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.25;
 					}
+				}
+			}
 
-					if (npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= 0.1)
-					{
-						if (!npc.HasTag('ACS_ShadowWolf_End_Stage'))
-						{
-							npc.PlayEffectSingle('appear');
-							npc.StopEffect('appear');
+			if (
+			(npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.1)
+			||(npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= 0.1)
+			)
+			{
+				if (!npc.HasTag('ACS_ShadowWolf_End_Stage'))
+				{
+					npc.PlayEffectSingle('appear');
+					npc.StopEffect('appear');
 
-							npc.StopAllEffects();
+					npc.StopAllEffects();
 
-							((CNewNPC)npc).SetVisibility(false);
+					((CNewNPC)npc).SetVisibility(false);
 
-							npc.AddTag('ACS_ShadowWolf_End_Stage');
-						}
-					}
+					npc.AddTag('ACS_ShadowWolf_End_Stage');
 				}
 			}
 		}
@@ -4167,7 +4959,7 @@ function ACS_Fluffy_On_Take_Damage(action: W3DamageAction)
 		{
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -4175,22 +4967,22 @@ function ACS_Fluffy_On_Take_Damage(action: W3DamageAction)
 				{
 					if( thePlayer.IsDoingSpecialAttack(false))
 					{
-						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.5;
+						action.processedDmg.vitalityDamage += npc.GetMaxHealth() * 0.05;
 					}
 					else
 					{
-						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.25;
+						action.processedDmg.vitalityDamage += npc.GetMaxHealth() * 0.075;
 					}
 				}
 				else if (npc.UsesEssence())
 				{
 					if( thePlayer.IsDoingSpecialAttack(false))
 					{
-						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.5;
+						action.processedDmg.essenceDamage += npc.GetMaxHealth() * 0.05;
 					}
 					else
 					{
-						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.25;
+						action.processedDmg.essenceDamage += npc.GetMaxHealth() * 0.075;
 					}
 				}
 
@@ -4208,7 +5000,8 @@ function ACS_Fluffy_On_Take_Damage(action: W3DamageAction)
 					movementAdjustorNPC.RotateTowards( ticket, GetWitcherPlayer() );
 				}
 
-				if (npc.GetCurrentHealth() - action.processedDmg.vitalityDamage < npc.GetMaxHealth() * 0.5)
+				if (npc.GetCurrentHealth() - action.processedDmg.vitalityDamage < npc.GetMaxHealth() * 0.5
+				|| npc.GetCurrentHealth() - action.processedDmg.essenceDamage < npc.GetMaxHealth() * 0.5)
 				{
 					if (!npc.HasTag('ACS_Fluffy_Summon_Adds'))
 					{
@@ -4240,6 +5033,163 @@ function ACS_Fluffy_On_Take_Damage(action: W3DamageAction)
 	}
 }
 
+function ACS_Botchling_On_Take_Damage(action: W3DamageAction)
+{
+    var playerAttacker, playerVictim																								: CPlayer;
+	var npc, npcAttacker 																											: CActor;
+	var movementAdjustor, movementAdjustorNPC																						: CMovementAdjustor;
+	var ticket 																														: SMovementAdjustmentRequestTicket;
+
+    npc = (CActor)action.victim;
+	
+	npcAttacker = (CActor)action.attacker;
+	
+	playerAttacker = (CPlayer)action.attacker;
+	
+	playerVictim = (CPlayer)action.victim;
+
+	movementAdjustor = GetWitcherPlayer().GetMovingAgentComponent().GetMovementAdjustor();
+
+	movementAdjustorNPC = npc.GetMovingAgentComponent().GetMovementAdjustor();
+
+	if 
+	(npc && npc.HasTag('ACS_Botchling'))
+	{
+		if ( playerAttacker )
+		{
+			if ( !action.IsDoTDamage() 
+			&& !action.WasDodged() 
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
+			&& !(((W3Action_Attack)action).IsParried())
+			)
+			{
+				((CNewNPC)npc).SetUnstoppable( true );
+
+				if (npc.UsesVitality())
+				{
+					action.processedDmg.vitalityDamage += npc.GetMaxHealth() * 0.025;
+				}
+				else if (npc.UsesEssence())
+				{
+					action.processedDmg.essenceDamage += npc.GetMaxHealth() * 0.025;
+				}
+
+				GetWitcherPlayer().SoundEvent("cmb_play_hit_heavy");
+
+				npc.SoundEvent("cmb_play_hit_heavy");
+
+				if (!((CNewNPC)npc).IsFlying()
+				&& npc.IsOnGround())
+				{
+					ticket = movementAdjustorNPC.GetRequest( 'ACS_Botchling_Attacked_Rotate');
+					movementAdjustorNPC.CancelByName( 'ACS_Botchling_Attacked_Rotate' );
+					movementAdjustorNPC.CancelAll();
+
+					ticket = movementAdjustorNPC.CreateNewRequest( 'ACS_Botchling_Attacked_Rotate' );
+					movementAdjustorNPC.AdjustmentDuration( ticket, 0.5 );
+					movementAdjustorNPC.MaxRotationAdjustmentSpeed( ticket, 500 );
+
+					movementAdjustorNPC.RotateTowards( ticket, GetWitcherPlayer() );
+				}
+
+				if (npc.HasTag('ACS_Botchling_Wild'))
+				{
+					if (npc.GetCurrentHealth() - action.processedDmg.vitalityDamage < npc.GetMaxHealth() * 0.5
+					|| npc.GetCurrentHealth() - action.processedDmg.essenceDamage < npc.GetMaxHealth() * 0.5)
+					{
+						if (!npc.HasTag('ACS_Botchling_Wild_Summon_Adds'))
+						{
+							if (npc && npc.IsAlive())
+							{
+								GetACSBotchling().PlayEffect('fx_quest_q103');
+								GetACSBotchling().StopEffect('fx_quest_q103');
+
+								GetACSBotchling().PlayEffect('appear_fx');
+								GetACSBotchling().PlayEffect('morph_fx');
+
+								GetACSBotchling().StopEffect('appear_fx');
+								GetACSBotchling().StopEffect('morph_fx');
+
+								ACS_BotchlingWraithSpawn(npc, npc.GetWorldPosition());
+							}
+
+							npc.AddTag('ACS_Botchling_Wild_Summon_Adds');
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			if (npc.UsesVitality())
+			{
+				action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
+			}
+			else if (npc.UsesEssence())
+			{
+				action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage;
+			}
+		}
+	}
+}
+
+function ACS_Mula_On_Take_Damage(action: W3DamageAction)
+{
+    var playerAttacker, playerVictim																								: CPlayer;
+	var npc, npcAttacker 																											: CActor;
+	var movementAdjustor, movementAdjustorNPC																						: CMovementAdjustor;
+	var ticket 																														: SMovementAdjustmentRequestTicket;
+
+    npc = (CActor)action.victim;
+	
+	npcAttacker = (CActor)action.attacker;
+	
+	playerAttacker = (CPlayer)action.attacker;
+	
+	playerVictim = (CPlayer)action.victim;
+
+	movementAdjustor = GetWitcherPlayer().GetMovingAgentComponent().GetMovementAdjustor();
+
+	movementAdjustorNPC = npc.GetMovingAgentComponent().GetMovementAdjustor();
+
+	if 
+	(npc && npc.HasTag('ACS_Mula'))
+	{
+		if ( playerAttacker )
+		{
+			if ( !action.IsDoTDamage() 
+			&& !action.WasDodged() 
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
+			&& !(((W3Action_Attack)action).IsParried())
+			)
+			{
+				if (npc.UsesVitality())
+				{
+					if( thePlayer.IsDoingSpecialAttack(false))
+					{
+						action.processedDmg.vitalityDamage += npc.GetMaxHealth() * 0.025;
+					}
+					else
+					{
+						action.processedDmg.vitalityDamage += npc.GetMaxHealth() * 0.05;
+					}
+				}
+				else if (npc.UsesEssence())
+				{
+					if( thePlayer.IsDoingSpecialAttack(false))
+					{
+						action.processedDmg.essenceDamage += npc.GetMaxHealth() * 0.025;
+					}
+					else
+					{
+						action.processedDmg.essenceDamage += npc.GetMaxHealth() * 0.05;
+					}
+				}
+			}
+		}
+	}
+}
+
 function ACS_Ice_Boar_On_Take_Damage(action: W3DamageAction)
 {
     var playerAttacker, playerVictim																								: CPlayer;
@@ -4260,7 +5210,7 @@ function ACS_Ice_Boar_On_Take_Damage(action: W3DamageAction)
 		{
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -4310,7 +5260,7 @@ function ACS_Fog_Assassin_On_Take_Damage(action: W3DamageAction)
 		{
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -4392,27 +5342,10 @@ function ACS_Ghoul_Base_On_Take_Damage(action: W3DamageAction)
 		|| npc.HasAbility('ghoul_hardcore')
 		)
 		{
-			if (npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= 0.1)
-			{
-				if (!npc.HasTag('ACS_Ghoul_End_Stage'))
-				{
-					ACS_Ghoul_Explode(npc, npc.GetWorldPosition());
-
-					if(RandF() < 0.5)
-					{
-						animatedComponentA.PlaySlotAnimationAsync ( 'death_front', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
-					}
-					else
-					{
-						animatedComponentA.PlaySlotAnimationAsync ( 'death_back', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
-					}
-
-					animatedComponentA.FreezePoseFadeIn(2);
-
-					npc.AddTag('ACS_Ghoul_End_Stage');
-				}
-			}
-			else if (npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.1)
+			if (
+			(npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.1)
+			||(npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= 0.1)
+			)
 			{
 				if (!npc.HasTag('ACS_Ghoul_End_Stage'))
 				{
@@ -4438,27 +5371,10 @@ function ACS_Ghoul_Base_On_Take_Damage(action: W3DamageAction)
 		|| npc.HasAbility('mon_greater_miscreant')
 		)
 		{
-			if (npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= 0.1)
-			{
-				if (!npc.HasTag('ACS_Ghoul_End_Stage'))
-				{
-					ACS_Alghoul_Explode(npc, npc.GetWorldPosition());
-
-					if(RandF() < 0.5)
-					{
-						animatedComponentA.PlaySlotAnimationAsync ( 'death_front', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
-					}
-					else
-					{
-						animatedComponentA.PlaySlotAnimationAsync ( 'death_back', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
-					}
-
-					animatedComponentA.FreezePoseFadeIn(2);
-
-					npc.AddTag('ACS_Ghoul_End_Stage');
-				}
-			}
-			else if (npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.1)
+			if (
+			(npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.1)
+			||(npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= 0.1)
+			)
 			{
 				if (!npc.HasTag('ACS_Ghoul_End_Stage'))
 				{
@@ -4484,29 +5400,10 @@ function ACS_Ghoul_Base_On_Take_Damage(action: W3DamageAction)
 		|| npc.HasAbility('mon_wild_hunt_minion')
 		)
 		{
-			if (npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= 0.1)
-			{
-				if (!npc.HasTag('ACS_Ghoul_End_Stage'))
-				{
-					ACS_Alghoul_Explode(npc, npc.GetWorldPosition());
-
-					ACS_Wildhunt_Minion_Explode(npc, npc.GetWorldPosition());
-
-					if(RandF() < 0.5)
-					{
-						animatedComponentA.PlaySlotAnimationAsync ( 'death_front', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
-					}
-					else
-					{
-						animatedComponentA.PlaySlotAnimationAsync ( 'death_back', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
-					}
-
-					animatedComponentA.FreezePoseFadeIn(2);
-
-					npc.AddTag('ACS_Ghoul_End_Stage');
-				}
-			}
-			else if (npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.1)
+			if (
+			(npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.1)
+			||(npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= 0.1)
+			)
 			{
 				if (!npc.HasTag('ACS_Ghoul_End_Stage'))
 				{
@@ -4553,16 +5450,10 @@ function ACS_Siren_Base_On_Take_Damage(action: W3DamageAction)
 			npc.AddAbility('DisableDismemberment');
 		}
 
-		if (npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= 0.1)
-		{
-			if (!npc.HasTag('ACS_Siren_End_Stage'))
-			{
-				ACS_Alghoul_Explode(npc, npc.GetWorldPosition());
-
-				npc.AddTag('ACS_Siren_End_Stage');
-			}
-		}
-		else if (npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.1)
+		if (
+		(npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.1)
+		||(npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= 0.1)
+		)
 		{
 			if (!npc.HasTag('ACS_Siren_End_Stage'))
 			{
@@ -4741,16 +5632,53 @@ function ACS_Forest_God_Shadow_On_Take_Damage(action: W3DamageAction)
 	{
 		if (playerAttacker)
 		{
+			if ( !action.IsDoTDamage() 
+			&& !action.WasDodged() 
+			&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
+			&& !(((W3Action_Attack)action).IsParried())
+			)
+			{
+				action.processedDmg.essenceDamage += npc.GetMaxHealth() * 0.025;
+			}
+			else
+			{
+				if (npc.UsesVitality())
+				{
+					action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
+				}
+				else if (npc.UsesEssence())
+				{
+					action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage;
+				}
+			}
+
 			if ((npc.UsesVitality() && npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.01)
 			||
 			(npc.UsesEssence() && npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= 0.01))
 			{
 				if ( !npc.HasTag('ACS_Forest_God_Shadow_Death'))
 				{
+					((CNewNPC)npc).StopAllEffects();
+
 					((CNewNPC)npc).SetVisibility(false);
+
+					GetWitcherPlayer().DisplayHudMessage( "<b>SHADOW DEFEATED</b>" );
+
+					GetWitcherPlayer().AddPoints(EExperiencePoint, 50, false );
 
 					npc.AddTag('ACS_Forest_God_Shadow_Death');
 				}
+			}
+		}
+		else
+		{
+			if (npc.UsesVitality())
+			{
+				action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
+			}
+			else if (npc.UsesEssence())
+			{
+				action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage;
 			}
 		}
 	}
@@ -4785,7 +5713,7 @@ function ACS_Nimean_Panther_On_Take_Damage(action: W3DamageAction)
 		{
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -4800,6 +5728,8 @@ function ACS_Nimean_Panther_On_Take_Damage(action: W3DamageAction)
 				if ( !npc.HasTag('ACS_Nimean_Panther_Death'))
 				{
 					animatedComponentA.FreezePoseFadeIn(5);
+
+					GetWitcherPlayer().AddPoints(EExperiencePoint, 500, false );
 
 					npc.AddTag('ACS_Nimean_Panther_Death');
 				}
@@ -4841,18 +5771,21 @@ function ACS_Melusine_Original_On_Take_Damage(action: W3DamageAction)
 			||
 			(npc.UsesEssence() && npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= 0.01))
 			{
-				if ( !npc.HasTag('ACS_Melusine_Original_Death') && ACS_MelusineOfTheStorm_Enabled())
+				if ( !npc.HasTag('ACS_Melusine_Original_Death') )
 				{
-					if (GetWeatherConditionName() != 'WT_Rain_Storm')
+					if (RandF() < ACS_MelusineOfTheStorm_Enabled())
 					{
-						RequestWeatherChangeTo('WT_Rain_Storm', 5.0, false);
+						if (GetWeatherConditionName() != 'WT_Rain_Storm')
+						{
+							RequestWeatherChangeTo('WT_Rain_Storm', 5.0, false);
+						}
+
+						ACS_Lightning_Strike_No_Condition();
+
+						GetACSWatcher().RemoveTimer('MelusineSpawnDelay');
+						GetACSWatcher().AddTimer('MelusineSpawnDelay', RandRangeF(10,5), false);
 					}
-
-					ACS_Lightning_Strike_No_Condition();
-
-					GetACSWatcher().RemoveTimer('MelusineSpawnDelay');
-					GetACSWatcher().AddTimer('MelusineSpawnDelay', RandRangeF(10,5), false);
-
+					
 					npc.AddTag('ACS_Melusine_Original_Death');
 				}
 			}
@@ -4882,7 +5815,7 @@ function ACS_Melusine_On_Take_Damage(action: W3DamageAction)
 
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -4956,6 +5889,8 @@ function ACS_Melusine_On_Take_Damage(action: W3DamageAction)
 					GetACSMelusineCloud().Destroy();
 
 					GetACSMelusineBossbar().Destroy();
+
+					GetWitcherPlayer().AddPoints(EExperiencePoint, 500, false );
 
 					ACS_Lightning_Strike_No_Condition_Mult();
 
@@ -5059,7 +5994,7 @@ function ACS_Cultist_Boss_On_Take_Damage(action: W3DamageAction)
 
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -5238,41 +6173,6 @@ function ACS_Cultist_On_Take_Damage(action: W3DamageAction)
 	}
 }
 
-function ACS_Cultist_Thrall_On_Take_Damage(action: W3DamageAction)
-{
-    var playerAttacker, playerVictim																								: CPlayer;
-	var npc, npcAttacker 																											: CActor;
-	var npcPos																														: Vector;
-
-    npc = (CActor)action.victim;
-	
-	npcAttacker = (CActor)action.attacker;
-	
-	playerAttacker = (CPlayer)action.attacker;
-	
-	playerVictim = (CPlayer)action.victim;
-
-	if 
-	(npc && npc.HasTag('ACS_Cultist_Thrall'))
-	{
-		if ( playerAttacker )
-		{
-			npc.SignalGameplayEvent('DisableFinisher');
-		}
-		else
-		{
-			if (npc.UsesVitality())
-			{
-				action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
-			}
-			else if (npc.UsesEssence())
-			{
-				action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage;
-			}
-		}
-	}
-}
-
 function ACS_Cultist_Singer_On_Take_Damage(action: W3DamageAction)
 {
     var playerAttacker, playerVictim																								: CPlayer;
@@ -5302,7 +6202,7 @@ function ACS_Cultist_Singer_On_Take_Damage(action: W3DamageAction)
 		{
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -5394,7 +6294,7 @@ function ACS_Pirate_Zombie_On_Take_Damage(action: W3DamageAction)
 		{
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -5473,6 +6373,8 @@ function ACS_Pirate_Zombie_On_Take_Damage(action: W3DamageAction)
 
 					GetACSPirateZombieChestBone4().Destroy();
 
+					GetWitcherPlayer().AddPoints(EExperiencePoint, 250, false );
+
 					npc.AddTag('ACS_Pirate_Zombie_Despawn');
 				}
 			}
@@ -5518,7 +6420,7 @@ function ACS_Svalblod_On_Take_Damage(action: W3DamageAction)
 
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -5559,7 +6461,7 @@ function ACS_Svalblod_On_Take_Damage(action: W3DamageAction)
 			{
 				if ( !npc.HasTag('ACS_Svalblod_Transform'))
 				{
-					ACS_Svalblod_Bear_Spawn();
+					GetACSWatcher().ACS_Svalblod_Bear_Spawn();
 
 					animcomp.FreezePose();
 
@@ -5614,7 +6516,7 @@ function ACS_Svalblod_Bear_On_Take_Damage(action: W3DamageAction)
 
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -5772,7 +6674,7 @@ function ACS_Berserker_Human_On_Take_Damage(action: W3DamageAction)
 
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -5782,11 +6684,11 @@ function ACS_Berserker_Human_On_Take_Damage(action: W3DamageAction)
 					{
 						if( thePlayer.IsDoingSpecialAttack(false))
 						{
-							action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.9;
+							action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.5;
 						}
 						else
 						{
-							action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.75;
+							action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.25;
 						}
 
 						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage/2;
@@ -5795,11 +6697,11 @@ function ACS_Berserker_Human_On_Take_Damage(action: W3DamageAction)
 					{
 						if( thePlayer.IsDoingSpecialAttack(false))
 						{
-							action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.9;
+							action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.5;
 						}
 						else
 						{
-							action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.75;
+							action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.25;
 						}
 
 						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage/2;
@@ -5811,11 +6713,11 @@ function ACS_Berserker_Human_On_Take_Damage(action: W3DamageAction)
 					{
 						if( thePlayer.IsDoingSpecialAttack(false))
 						{
-							action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.75;
+							action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.25;
 						}
 						else
 						{
-							action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.5;
+							action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.125;
 						}
 
 						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage/2;
@@ -5824,11 +6726,11 @@ function ACS_Berserker_Human_On_Take_Damage(action: W3DamageAction)
 					{
 						if( thePlayer.IsDoingSpecialAttack(false))
 						{
-							action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.75;
+							action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.25;
 						}
 						else
 						{
-							action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.5;
+							action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.125;
 						}
 
 						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage/2;
@@ -5897,17 +6799,6 @@ function ACS_Berserker_Human_On_Take_Damage(action: W3DamageAction)
 				}
 			}
 		}
-		else
-		{
-			if (npc.UsesVitality())
-			{
-				action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
-			}
-			else if (npc.UsesEssence())
-			{
-				action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage;
-			}
-		}
 	}
 }
 
@@ -5937,31 +6828,17 @@ function ACS_Berserker_Bear_On_Take_Damage(action: W3DamageAction)
 
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
 				if (npc.UsesVitality())
 				{
-					if( thePlayer.IsDoingSpecialAttack(false))
-					{
-						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.9;
-					}
-					else
-					{
-						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.875;
-					}
+					action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.5;
 				}
 				else if (npc.UsesEssence())
 				{
-					if( thePlayer.IsDoingSpecialAttack(false))
-					{
-						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.9;
-					}
-					else
-					{
-						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.875;
-					}
+					action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.5;
 				}
 
 				ticket = movementAdjustor.GetRequest( 'ACS_Berserker_Bear_Rotate');
@@ -5973,17 +6850,6 @@ function ACS_Berserker_Bear_On_Take_Damage(action: W3DamageAction)
 				movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 500 );
 
 				movementAdjustor.RotateTowards(ticket, thePlayer);
-			}
-		}
-		else
-		{
-			if (npc.UsesVitality())
-			{
-				action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
-			}
-			else if (npc.UsesEssence())
-			{
-				action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage;
 			}
 		}
 	}
@@ -6015,7 +6881,7 @@ function ACS_Wildhunt_Warriors_On_Take_Damage(action: W3DamageAction)
 
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -6041,17 +6907,6 @@ function ACS_Wildhunt_Warriors_On_Take_Damage(action: W3DamageAction)
 						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.25;
 					}
 				}
-			}
-		}
-		else
-		{
-			if (npc.UsesVitality())
-			{
-				action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
-			}
-			else if (npc.UsesEssence())
-			{
-				action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage;
 			}
 		}
 	}
@@ -6083,7 +6938,7 @@ function ACS_Duskwraith_On_Take_Damage(action: W3DamageAction)
 
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -6201,7 +7056,7 @@ function ACS_Duskwraith_Adds_On_Take_Damage(action: W3DamageAction)
 		{
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -6214,23 +7069,6 @@ function ACS_Duskwraith_Adds_On_Take_Damage(action: W3DamageAction)
 				else if (npc.UsesEssence())
 				{
 					action.processedDmg.essenceDamage += npc.GetMaxHealth();
-				}
-			}
-		}
-		else
-		{
-			if ( !action.IsDoTDamage() 
-			&& !action.WasDodged() )
-			{
-				npc.SetCanPlayHitAnim(false); 
-
-				if (npc.UsesVitality())
-				{
-					action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
-				}
-				else if (npc.UsesEssence())
-				{
-					action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage;
 				}
 			}
 		}
@@ -6257,7 +7095,7 @@ function ACS_Incubus_On_Take_Damage(action: W3DamageAction)
 		{
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -6281,27 +7119,18 @@ function ACS_Incubus_On_Take_Damage(action: W3DamageAction)
 			{
 				if ( !npc.HasTag('ACS_Incubus_Despawn'))
 				{
+					GetWitcherPlayer().AddPoints(EExperiencePoint, 250, false );
+
 					npc.StopAllEffects();
 
 					npc.PlayEffect('teleport_in');
 
 					npc.PlayEffect('teleport_out');
 
-					npc.DestroyAfter(1);
+					npc.DestroyAfter(5);
 
 					npc.AddTag('ACS_Incubus_Despawn');
 				}
-			}
-		}
-		else
-		{
-			if (npc.UsesVitality())
-			{
-				action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
-			}
-			else if (npc.UsesEssence())
-			{
-				action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage;
 			}
 		}
 	}
@@ -6329,7 +7158,7 @@ function ACS_Mage_On_Take_Damage(action: W3DamageAction)
 
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -6342,27 +7171,18 @@ function ACS_Mage_On_Take_Damage(action: W3DamageAction)
 			{
 				if ( !npc.HasTag('ACS_Mage_Despawn'))
 				{
+					GetWitcherPlayer().AddPoints(EExperiencePoint, 100, false );
+
 					npc.StopAllEffects();
 
 					npc.PlayEffect('teleport_in');
 
 					npc.PlayEffect('teleport_out');
 
-					npc.DestroyAfter(1);
+					npc.DestroyAfter(10);
 
 					npc.AddTag('ACS_Mage_Despawn');
 				}
-			}
-		}
-		else
-		{
-			if (npc.UsesVitality())
-			{
-				action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
-			}
-			else if (npc.UsesEssence())
-			{
-				action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage;
 			}
 		}
 	}
@@ -6425,7 +7245,7 @@ function ACS_Shades_Crusader_On_Take_Damage(action: W3DamageAction)
 		{
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -6503,40 +7323,48 @@ function ACS_Shades_Crusader_On_Take_Damage(action: W3DamageAction)
 				{
 					if( thePlayer.IsDoingSpecialAttack(false))
 					{
-						action.processedDmg.vitalityDamage += action.processedDmg.vitalityDamage * 1.25;
+						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.5;
 					}
 					else
 					{
-						action.processedDmg.vitalityDamage += action.processedDmg.vitalityDamage * 1.5;
+						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.25;
 					}
 				}
 				else if (npc.UsesEssence())
 				{
 					if( thePlayer.IsDoingSpecialAttack(false))
 					{
-						action.processedDmg.essenceDamage += action.processedDmg.essenceDamage * 1.25;
+						action.processedDmg.essenceDamage += action.processedDmg.essenceDamage * 0.5;
 					}
 					else
 					{
-						action.processedDmg.essenceDamage += action.processedDmg.essenceDamage * 1.5;
+						action.processedDmg.essenceDamage += action.processedDmg.essenceDamage * 0.25;
 					}
 				}
 			}
 
-			if ((npc.UsesVitality() && npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.01)
+			if ((npc.UsesVitality() && npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= npc.GetMaxHealth() * 0.05)
 			||
-			(npc.UsesEssence() && npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= 0.01))
+			(npc.UsesEssence() && npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= npc.GetMaxHealth() * 0.05))
 			{
 				if ( !npc.HasTag('ACS_Shades_Crusader_Despawn'))
 				{
+					GetWitcherPlayer().AddPoints(EExperiencePoint, 100, false );
+
+					ACS_Alghoul_Explode(npc, npc.GetWorldPosition());
+
 					npc.StopAllEffects();
 					
 					npc.PlayEffectSingle('ethereal_buff');
 					npc.PlayEffectSingle('ethereal_debuff');
 
-					npc.GetInventory().RemoveAllItems();
+					//npc.GetInventory().RemoveAllItems();
 
 					((CNewNPC)npc).SetVisibility(false);
+
+					npc.Teleport(thePlayer.GetWorldPosition() + Vector(0,0,-200));
+
+					npc.DestroyAfter(0.5);
 
 					npc.AddTag('ACS_Shades_Crusader_Despawn');
 				}
@@ -6576,7 +7404,7 @@ function ACS_Shades_Hunter_On_Take_Damage(action: W3DamageAction)
 		{
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -6584,35 +7412,43 @@ function ACS_Shades_Hunter_On_Take_Damage(action: W3DamageAction)
 				{
 					if( thePlayer.IsDoingSpecialAttack(false))
 					{
-						action.processedDmg.vitalityDamage += action.processedDmg.vitalityDamage * 1.25;
+						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.25;
 					}
 					else
 					{
-						action.processedDmg.vitalityDamage += action.processedDmg.vitalityDamage * 1.5;
+						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.125;
 					}
 				}
 				else if (npc.UsesEssence())
 				{
 					if( thePlayer.IsDoingSpecialAttack(false))
 					{
-						action.processedDmg.essenceDamage += action.processedDmg.essenceDamage * 1.25;
+						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.25;
 					}
 					else
 					{
-						action.processedDmg.essenceDamage += action.processedDmg.essenceDamage * 1.5;
+						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.125;
 					}
 				}
+			}
 
-				if ((npc.UsesVitality() && npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.01)
-				||
-				(npc.UsesEssence() && npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= 0.01))
+			if ((npc.UsesVitality() && npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.01)
+			||
+			(npc.UsesEssence() && npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= 0.01))
+			{
+				if ( !npc.HasTag('ACS_Shades_Hunters_Despawn'))
 				{
-					if ( !npc.HasTag('ACS_Shades_Hunters_Despawn'))
-					{
-						npc.GetInventory().RemoveAllItems();
+					GetWitcherPlayer().AddPoints(EExperiencePoint, 100, false );
 
-						npc.AddTag('ACS_Shades_Hunters_Despawn');
-					}
+					ACS_Ghoul_Explode(npc, npc.GetWorldPosition());
+
+					//npc.GetInventory().RemoveAllItems();
+
+					npc.Teleport(thePlayer.GetWorldPosition() + Vector(0,0,-200));
+
+					npc.DestroyAfter(0.5);
+
+					npc.AddTag('ACS_Shades_Hunters_Despawn');
 				}
 			}
 		}
@@ -6650,7 +7486,7 @@ function ACS_Shades_Rogue_On_Take_Damage(action: W3DamageAction)
 		{
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -6658,35 +7494,37 @@ function ACS_Shades_Rogue_On_Take_Damage(action: W3DamageAction)
 				{
 					if( thePlayer.IsDoingSpecialAttack(false))
 					{
-						action.processedDmg.vitalityDamage += action.processedDmg.vitalityDamage * 1.5;
+						action.processedDmg.vitalityDamage += action.processedDmg.vitalityDamage * 1.25;
 					}
 					else
 					{
-						action.processedDmg.vitalityDamage += action.processedDmg.vitalityDamage * 1.75;
+						action.processedDmg.vitalityDamage += action.processedDmg.vitalityDamage * 1.5;
 					}
 				}
 				else if (npc.UsesEssence())
 				{
 					if( thePlayer.IsDoingSpecialAttack(false))
 					{
-						action.processedDmg.essenceDamage += action.processedDmg.essenceDamage * 1.5;
+						action.processedDmg.essenceDamage += action.processedDmg.essenceDamage * 1.25;
 					}
 					else
 					{
-						action.processedDmg.essenceDamage += action.processedDmg.essenceDamage * 1.75;
+						action.processedDmg.essenceDamage += action.processedDmg.essenceDamage * 1.5;
 					}
 				}
+			}
 
-				if ((npc.UsesVitality() && npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.01)
-				||
-				(npc.UsesEssence() && npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= 0.01))
+			if ((npc.UsesVitality() && npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.01)
+			||
+			(npc.UsesEssence() && npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= 0.01))
+			{
+				if ( !npc.HasTag('ACS_Shades_Rogue_Despawn'))
 				{
-					if ( !npc.HasTag('ACS_Shades_Rogue_Despawn'))
-					{
-						npc.GetInventory().RemoveAllItems();
+					GetWitcherPlayer().AddPoints(EExperiencePoint, 25, false );
 
-						npc.AddTag('ACS_Shades_Rogue_Despawn');
-					}
+					npc.GetInventory().RemoveAllItems();
+
+					npc.AddTag('ACS_Shades_Rogue_Despawn');
 				}
 			}
 		}
@@ -6770,7 +7608,7 @@ function ACS_Draug_On_Take_Damage(action: W3DamageAction)
 
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -6808,6 +7646,8 @@ function ACS_Draug_On_Take_Damage(action: W3DamageAction)
 			{
 				if ( !npc.HasTag('ACS_Draug_Death'))
 				{
+					GetWitcherPlayer().AddPoints(EExperiencePoint, 500, false );
+
 					GetACSWatcher().RemoveTimer('ACS_Draug_Anchor_Respawn');
 
 					((CActor)npc).GetInventory().AddAnItem( 'acs_crossbow_item', 1 );
@@ -6866,7 +7706,21 @@ function ACS_Draugir_On_Take_Damage(action: W3DamageAction)
 	{
 		if ( playerAttacker )
 		{
-			npc.SignalGameplayEvent('DisableFinisher');
+			if ( !action.IsDoTDamage() 
+			&& !action.WasDodged() 
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
+			&& !(((W3Action_Attack)action).IsParried())
+			)
+			{
+				if (npc.UsesVitality())
+				{
+					action.processedDmg.vitalityDamage += npc.GetMaxHealth() * 0.1;
+				}
+				else if (npc.UsesEssence())
+				{
+					action.processedDmg.essenceDamage += npc.GetMaxHealth() * 0.1;
+				}
+			}
 
 			if ((npc.UsesVitality() && npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.01)
 			||
@@ -6874,6 +7728,8 @@ function ACS_Draugir_On_Take_Damage(action: W3DamageAction)
 			{
 				if ( !npc.HasTag('ACS_Draugir_Death'))
 				{
+					GetWitcherPlayer().AddPoints(EExperiencePoint, 25, false );
+
 					npc.StopAllEffects();
 
 					//((CNewNPC)npc).SetVisibility(false);
@@ -6888,8 +7744,6 @@ function ACS_Draugir_On_Take_Damage(action: W3DamageAction)
 
 					npc.StopAllEffects();
 
-					
-
 					npc.AddTag('ACS_Draugir_Death');
 				}
 			}
@@ -6898,11 +7752,11 @@ function ACS_Draugir_On_Take_Damage(action: W3DamageAction)
 		{
 			if (npc.UsesVitality())
 			{
-				action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
+				action.processedDmg.vitalityDamage += action.processedDmg.vitalityDamage;
 			}
 			else if (npc.UsesEssence())
 			{
-				action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage;
+				action.processedDmg.essenceDamage += action.processedDmg.essenceDamage;
 			}
 		}
 	}
@@ -6949,6 +7803,8 @@ function ACS_MegaWraith_On_Take_Damage(action: W3DamageAction)
 			{
 				if ( !npc.HasTag('ACS_Megawraith_Death'))
 				{
+					GetWitcherPlayer().AddPoints(EExperiencePoint, 500, false );
+
 					GetACSMegaWraithRWeapon().Destroy();
 
 					GetACSMegaWraithLWeapon().Destroy();
@@ -6999,7 +7855,7 @@ function ACS_Fire_Gryphon_On_Take_Damage(action: W3DamageAction)
 
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -7039,7 +7895,7 @@ function ACS_Fire_Gryphon_On_Take_Damage(action: W3DamageAction)
 			{
 				if ( !npc.HasTag('ACS_Fire_Gryphon_Death'))
 				{
-					
+					GetWitcherPlayer().AddPoints(EExperiencePoint, 500, false );
 
 					npc.AddTag('ACS_Fire_Gryphon_Death');
 				}
@@ -7083,7 +7939,7 @@ function ACS_Big_Hym_On_Take_Damage(action: W3DamageAction)
 
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -7125,6 +7981,8 @@ function ACS_Big_Hym_On_Take_Damage(action: W3DamageAction)
 			{
 				if ( !npc.HasTag('ACS_Big_Hym_Death'))
 				{
+					GetWitcherPlayer().AddPoints(EExperiencePoint, 500, false );
+
 					npc.StopAllEffects();
 
 					npc.PlayEffect('avatar_death_swollen');
@@ -7186,7 +8044,7 @@ function ACS_Mini_Hym_On_Take_Damage(action: W3DamageAction)
 
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			////&& action.IsActionMelee()
+			////&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -7311,7 +8169,7 @@ function ACS_Guardian_Hym_On_Take_Damage(action: W3DamageAction)
 		{
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -7377,7 +8235,7 @@ function ACS_Necrofiend_On_Take_Damage(action: W3DamageAction)
 
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -7441,7 +8299,7 @@ function ACS_Bumbakvetch_On_Take_Damage(action: W3DamageAction)
 
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -7505,7 +8363,7 @@ function ACS_Viy_On_Take_Damage(action: W3DamageAction)
 
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -7539,6 +8397,8 @@ function ACS_Viy_On_Take_Damage(action: W3DamageAction)
 			{
 				if ( !npc.HasTag('ACS_Viy_Death'))
 				{
+					GetWitcherPlayer().AddPoints(EExperiencePoint, 1500, false );
+
 					npc.StopAllEffects();
 
 					npc.AddTag('ACS_Viy_Death');
@@ -7590,7 +8450,8 @@ function ACS_Giant_Troll_On_Take_Damage(action: W3DamageAction)
 {
     var playerAttacker, playerVictim																								: CPlayer;
 	var npc, npcAttacker 																											: CActor;
-
+	var animatedComponentA 																											: CAnimatedComponent;
+	
     npc = (CActor)action.victim;
 	
 	npcAttacker = (CActor)action.attacker;
@@ -7598,6 +8459,8 @@ function ACS_Giant_Troll_On_Take_Damage(action: W3DamageAction)
 	playerAttacker = (CPlayer)action.attacker;
 	
 	playerVictim = (CPlayer)action.victim;
+
+	animatedComponentA = (CAnimatedComponent)npc.GetComponentByClassName( 'CAnimatedComponent' );
 
 	if 
 	(npc && npc.HasTag('ACS_Giant_Troll'))
@@ -7610,7 +8473,7 @@ function ACS_Giant_Troll_On_Take_Damage(action: W3DamageAction)
 
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -7638,16 +8501,29 @@ function ACS_Giant_Troll_On_Take_Damage(action: W3DamageAction)
 				}
 			}
 
+			if ((npc.UsesVitality() && npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= npc.GetCurrentHealth() * 0.01)
+			||
+			(npc.UsesEssence() && npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= npc.GetCurrentHealth() * 0.01))
+			{
+				if ( !npc.HasTag('ACS_Giant_Troll_Death'))
+				{
+					animatedComponentA.PlaySlotAnimationAsync ( 'monster_cave_troll_death_1', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
+
+					animatedComponentA.FreezePoseFadeIn(3);
+
+					npc.AddTag('ACS_Giant_Troll_Death');
+				}
+			}
 		}
 		else
 		{
 			if (npc.UsesVitality())
 			{
-				action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
+				action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.75;
 			}
 			else if (npc.UsesEssence())
 			{
-				action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage;
+				action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.75;
 			}
 		}
 	}
@@ -7677,7 +8553,7 @@ function ACS_Elemental_Titan_On_Take_Damage(action: W3DamageAction)
 
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -7709,11 +8585,11 @@ function ACS_Elemental_Titan_On_Take_Damage(action: W3DamageAction)
 		{
 			if (npc.UsesVitality())
 			{
-				action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
+				action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.75;
 			}
 			else if (npc.UsesEssence())
 			{
-				action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage;
+				action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.75;
 			}
 		}
 	}
@@ -7739,7 +8615,7 @@ function ACS_Hellhound_On_Take_Damage(action: W3DamageAction)
 		{
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -7771,11 +8647,11 @@ function ACS_Hellhound_On_Take_Damage(action: W3DamageAction)
 		{
 			if (npc.UsesVitality())
 			{
-				action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
+				action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.75;
 			}
 			else if (npc.UsesEssence())
 			{
-				action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage;
+				action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.75;
 			}
 		}
 	}
@@ -7806,7 +8682,7 @@ function ACS_Dark_Knight_On_Take_Damage(action: W3DamageAction)
 		{
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -7819,6 +8695,8 @@ function ACS_Dark_Knight_On_Take_Damage(action: W3DamageAction)
 			{
 				if ( !npc.HasTag('ACS_Dark_Knight_Death'))
 				{
+					GetWitcherPlayer().AddPoints(EExperiencePoint, 100, false );
+
 					npc.DestroyEffect('ghost');
 					npc.DestroyEffect('him_smoke_red');
 					npc.DestroyEffect('shadow_form');
@@ -7837,11 +8715,11 @@ function ACS_Dark_Knight_On_Take_Damage(action: W3DamageAction)
 		{
 			if (npc.UsesVitality())
 			{
-				action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
+				action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.75;
 			}
 			else if (npc.UsesEssence())
 			{
-				action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage;
+				action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.75;
 			}
 		}
 	}
@@ -7874,7 +8752,7 @@ function ACS_Dark_Knight_Calidus_On_Take_Damage(action: W3DamageAction)
 		{
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -7908,6 +8786,8 @@ function ACS_Dark_Knight_Calidus_On_Take_Damage(action: W3DamageAction)
 			{
 				if ( !npc.HasTag('ACS_Dark_Knight_Calidus_Death'))
 				{
+					GetWitcherPlayer().AddPoints(EExperiencePoint, 100, false );
+
 					npc.DestroyEffect('lugos_vision_burning_mat');
 					npc.DestroyEffect('burning_body');
 					npc.DestroyEffect('him_smoke_red');
@@ -7928,11 +8808,11 @@ function ACS_Dark_Knight_Calidus_On_Take_Damage(action: W3DamageAction)
 		{
 			if (npc.UsesVitality())
 			{
-				action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
+				action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.75;
 			}
 			else if (npc.UsesEssence())
 			{
-				action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage;
+				action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.75;
 			}
 		}
 	}
@@ -7963,7 +8843,7 @@ function ACS_Carduin_On_Take_Damage(action: W3DamageAction)
 		{
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
@@ -7997,6 +8877,8 @@ function ACS_Carduin_On_Take_Damage(action: W3DamageAction)
 			{
 				if ( !npc.HasTag('ACS_Carduin_Death'))
 				{
+					GetWitcherPlayer().AddPoints(EExperiencePoint, 1500, false );
+
 					ACS_Carduin_Spawn_Ifrit(npc.GetWorldPosition());
 
 					FactsAdd("ACS_Carduin_Killed", 1, -1);
@@ -8036,8 +8918,637 @@ function ACS_Carduin_Spawn_Ifrit( pos : Vector )
 	ent.AddTag('ACS_MonsterSpawner_Spawn_In_Frame');
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+function ACS_Dao_On_Take_Damage(action: W3DamageAction)
+{
+    var playerAttacker, playerVictim																								: CPlayer;
+	var npc, npcAttacker 																											: CActor;
 
+    npc = (CActor)action.victim;
+	
+	npcAttacker = (CActor)action.attacker;
+	
+	playerAttacker = (CPlayer)action.attacker;
+	
+	playerVictim = (CPlayer)action.victim;
+
+	if 
+	(npc 
+	&& 
+	(
+		npc.HasTag('ACS_Dao')
+	)
+	)
+	{
+		if ( playerAttacker )
+		{
+			if ( !action.IsDoTDamage() 
+			&& !action.WasDodged() 
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
+			&& !(((W3Action_Attack)action).IsParried())
+			)
+			{
+				if (npc.UsesVitality())
+				{
+					if( thePlayer.IsDoingSpecialAttack(false))
+					{
+						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.5;
+					}
+					else
+					{
+						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.75;
+					}
+				}
+				else if (npc.UsesEssence())
+				{
+					if( thePlayer.IsDoingSpecialAttack(false))
+					{
+						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.5;
+					}
+					else
+					{
+						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.75;
+					}
+				}
+			}
+
+			if ((npc.UsesVitality() && npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.01)
+			||
+			(npc.UsesEssence() && npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= 0.01))
+			{
+				if ( !npc.HasTag('ACS_Dao_Death'))
+				{
+					GetWitcherPlayer().AddPoints(EExperiencePoint, 1000, false );
+
+					npc.AddTag('ACS_Dao_Death');
+				}
+			}
+		}
+		else
+		{
+			if (npc.UsesVitality())
+			{
+				action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
+			}
+			else if (npc.UsesEssence())
+			{
+				action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage;
+			}
+		}
+	}
+}
+
+function ACS_Dao_Turret_On_Take_Damage(action: W3DamageAction)
+{
+    var playerAttacker, playerVictim																								: CPlayer;
+	var npc, npcAttacker 																											: CActor;
+
+    npc = (CActor)action.victim;
+	
+	npcAttacker = (CActor)action.attacker;
+	
+	playerAttacker = (CPlayer)action.attacker;
+	
+	playerVictim = (CPlayer)action.victim;
+
+	if 
+	(npc 
+	&& 
+	(
+		npc.HasTag('ACS_Dao_Turret_1')
+		|| npc.HasTag('ACS_Dao_Turret_2')
+		|| npc.HasTag('ACS_Dao_Turret_3')
+	)
+	)
+	{
+		if ( playerAttacker )
+		{
+			if ( !action.IsDoTDamage() 
+			&& !action.WasDodged() 
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
+			&& !(((W3Action_Attack)action).IsParried())
+			)
+			{
+				if (npc.UsesVitality())
+				{
+					action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.5;
+				}
+				else if (npc.UsesEssence())
+				{
+					action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.5;
+				}
+			}
+
+			if ((npc.UsesVitality() && npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.01)
+			||
+			(npc.UsesEssence() && npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= 0.01))
+			{
+				if ( !npc.HasTag('ACS_Dao_Turret_Death'))
+				{
+					if (GetACS_Dao().UsesEssence())
+					{
+						if (GetACS_Dao().GetStat(BCS_Essence) > GetACS_Dao().GetStatMax(BCS_Essence) * 0.05)
+						{
+							GetACS_Dao().DrainEssence(GetACS_Dao().GetStatMax(BCS_Essence) * 0.125 );
+						}
+					}
+					else if (GetACS_Dao().UsesVitality())
+					{
+						if (GetACS_Dao().GetStat(BCS_Vitality) > GetACS_Dao().GetStatMax(BCS_Vitality) * 0.05)
+						{
+							GetACS_Dao().DrainVitality(GetACS_Dao().GetStatMax(BCS_Vitality) * 0.125 );
+						}
+					}
+
+					npc.AddTag('ACS_Dao_Turret_Death');
+				}
+			}
+		}
+		else
+		{
+			if (npc.UsesVitality())
+			{
+				action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
+			}
+			else if (npc.UsesEssence())
+			{
+				action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage;
+			}
+		}
+	}
+}
+
+function ACS_Knocker_On_Take_Damage(action: W3DamageAction)
+{
+    var playerAttacker, playerVictim																								: CPlayer;
+	var npc, npcAttacker 																											: CActor;
+	var movementAdjustor																											: CMovementAdjustor;
+	var ticket 																														: SMovementAdjustmentRequestTicket;
+	var animatedComponentA 																											: CAnimatedComponent;
+	
+    npc = (CActor)action.victim;
+	
+	npcAttacker = (CActor)action.attacker;
+	
+	playerAttacker = (CPlayer)action.attacker;
+	
+	playerVictim = (CPlayer)action.victim;
+
+	movementAdjustor = npc.GetMovingAgentComponent().GetMovementAdjustor();
+
+	animatedComponentA = (CAnimatedComponent)npc.GetComponentByClassName( 'CAnimatedComponent' );
+
+	if 
+	(npc && npc.HasTag('ACS_Knocker'))
+	{
+		//if ( playerAttacker)
+		{
+			((CNewNPC)npc).SetUnstoppable( true );
+
+			if ( !action.IsDoTDamage() 
+			&& !action.WasDodged() 
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
+			&& !(((W3Action_Attack)action).IsParried())
+			)
+			{
+				if (npc.UsesVitality())
+				{
+					if( thePlayer.IsDoingSpecialAttack(false))
+					{
+						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.25;
+					}
+					else
+					{
+						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.125;
+					}
+				}
+				else if (npc.UsesEssence())
+				{
+					if( thePlayer.IsDoingSpecialAttack(false))
+					{
+						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.25;
+					}
+					else
+					{
+						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.125;
+					}
+				}
+
+				if 
+				(npc.HasTag('ACS_Knocker_Fist'))
+				{
+					animatedComponentA.PlaySlotAnimationAsync ( 'giant_combat_block_igni', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.125f, 0.125f));
+				}
+
+				ticket = movementAdjustor.GetRequest( 'ACS_Knocker_Rotate');
+				movementAdjustor.CancelByName( 'ACS_Knocker_Rotate' );
+				movementAdjustor.CancelAll();
+
+				ticket = movementAdjustor.CreateNewRequest( 'ACS_Knocker_Rotate' );
+				movementAdjustor.AdjustmentDuration( ticket, 0.5 );
+				movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 500000 );
+
+				movementAdjustor.RotateTowards(ticket, thePlayer);
+			}
+
+			if (
+			(npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.1)
+			||(npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= 0.1)
+			)
+			{
+				if (!npc.HasTag('ACS_Knocker_End_Stage'))
+				{
+					ACS_Ghoul_Explode(npc, npc.GetWorldPosition());
+
+					animatedComponentA.PlaySlotAnimationAsync ( 'giant_combat_death', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
+
+					animatedComponentA.FreezePoseFadeIn(4);
+
+					//npc.DestroyAfter(10);
+
+					npc.AddTag('ACS_Knocker_End_Stage');
+				}
+			}
+		}
+	}
+}
+
+function ACS_Vendigo_On_Take_Damage(action: W3DamageAction)
+{
+    var playerAttacker, playerVictim																								: CPlayer;
+	var npc, npcAttacker 																											: CActor;
+	var params 																														: SCustomEffectParams;
+	
+    npc = (CActor)action.victim;
+	
+	npcAttacker = (CActor)action.attacker;
+	
+	playerAttacker = (CPlayer)action.attacker;
+	
+	playerVictim = (CPlayer)action.victim;
+
+	if 
+	( npc && npc.HasTag('ACS_Vendigo'))
+	{
+		if ( playerAttacker )
+		{
+			if ( !action.IsDoTDamage() 
+			&& !action.WasDodged() 
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
+			&& !(((W3Action_Attack)action).IsParried())
+			)
+			{
+				if ( !theSound.SoundIsBankLoaded("animals_deer.bnk") )
+				{
+					theSound.SoundLoadBank( "animals_deer.bnk", false );
+				}
+
+				if (!npc.HasTag('ACS_Vendigo_Set_Unstoppable'))
+				{
+					npc.SoundEvent("animals_deer_sniff");
+					thePlayer.SoundEvent("animals_deer_sniff");
+
+					npc.SoundEvent("animals_deer_breath");
+					thePlayer.SoundEvent("animals_deer_breath");
+
+					npc.SoundEvent("animals_deer_sniff");
+					thePlayer.SoundEvent("animals_deer_sniff");
+
+					npc.SoundEvent("animals_deer_breath");
+					thePlayer.SoundEvent("animals_deer_breath");
+
+					npc.SoundEvent("animals_deer_sniff");
+					thePlayer.SoundEvent("animals_deer_sniff");
+
+					npc.SetCanPlayHitAnim(false);
+
+					((CNewNPC)npc).SetUnstoppable( true );
+
+					npc.AddTag('ACS_Vendigo_Set_Unstoppable');
+				}
+				else
+				{
+					npc.SoundEvent("animals_deer_hit");
+					thePlayer.SoundEvent("animals_deer_hit");
+
+					npc.SoundEvent("animals_deer_hit");
+					thePlayer.SoundEvent("animals_deer_hit");
+
+					npc.SoundEvent("animals_deer_hit");
+					thePlayer.SoundEvent("animals_deer_hit");
+
+					npc.SoundEvent("animals_deer_hit");
+					thePlayer.SoundEvent("animals_deer_hit");
+
+					npc.SoundEvent("animals_deer_hit");
+					thePlayer.SoundEvent("animals_deer_hit");
+
+					npc.SetCanPlayHitAnim(true);
+
+					((CNewNPC)npc).SetUnstoppable( false );
+
+					npc.RemoveTag('ACS_Vendigo_Set_Unstoppable');
+				}
+			}
+
+			if (ACS_ActionDealsFireDamage(action)
+			|| action.HasBuff(EET_Burning))
+			{
+				npc.DestroyEffect('critical_frozen_constant');
+
+				if (npc.UsesVitality())
+				{
+					action.processedDmg.vitalityDamage += action.processedDmg.vitalityDamage * 5;
+				}
+				else if (npc.UsesEssence())
+				{
+					action.processedDmg.essenceDamage += action.processedDmg.vitalityDamage * 5;
+				}
+
+				if (npc.HasTag('ACS_Vendigo_Set_Unstoppable'))
+				{
+					npc.SetCanPlayHitAnim(true);
+
+					((CNewNPC)npc).SetUnstoppable( false );
+
+					npc.RemoveTag('ACS_Vendigo_Set_Unstoppable');
+				}
+
+				if (!npc.HasBuff(EET_Burning))
+				{
+					params.effectType = EET_Burning;
+					params.creator = playerAttacker;
+					params.sourceName = "ACS_Vendigo_Fire_Damage";
+					params.duration = 5;
+
+					npc.AddEffectCustom( params );		
+				}
+			}
+			else
+			{
+				if (npc.HasBuff(EET_Burning))
+				{
+					if (npc.UsesVitality())
+					{
+						if( thePlayer.IsDoingSpecialAttack(false))
+						{
+							action.processedDmg.vitalityDamage += npc.GetMaxHealth() * 0.0125;
+						}
+						else
+						{
+							action.processedDmg.vitalityDamage += npc.GetMaxHealth() * 0.025;
+						}
+					}
+					else if (npc.UsesEssence())
+					{
+						if( thePlayer.IsDoingSpecialAttack(false))
+						{
+							action.processedDmg.essenceDamage += npc.GetMaxHealth() * 0.0125;
+						}
+						else
+						{
+							action.processedDmg.essenceDamage += npc.GetMaxHealth() * 0.025;
+						}
+					}
+
+					npc.DestroyEffect('critical_frozen_constant');
+				}
+				else
+				{
+					if (!npc.IsEffectActive('critical_frozen_constant', false))
+					{
+						npc.DestroyEffect('critical_burning');
+						npc.DestroyEffect('igni_cone_hit');
+						npc.PlayEffect('critical_frozen_constant');
+					}
+
+					if (npc.UsesVitality())
+					{
+						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.75;
+					}
+					else if (npc.UsesEssence())
+					{
+						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.75;
+					}
+				}
+			}
+
+			if (
+			(npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.1)
+			||(npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= 0.1)
+			)
+			{
+				if (!npc.HasTag('ACS_Vendigo_End_Stage'))
+				{
+					npc.StopAllEffects();
+
+					npc.SoundEvent("animals_deer_die");
+					npc.SoundEvent("animals_deer_die");
+					npc.SoundEvent("animals_deer_die");
+					npc.SoundEvent("animals_deer_die");
+					npc.SoundEvent("animals_deer_die");
+					npc.SoundEvent("animals_deer_die");
+
+					thePlayer.SoundEvent("animals_deer_die");
+					thePlayer.SoundEvent("animals_deer_die");
+					thePlayer.SoundEvent("animals_deer_die");
+					thePlayer.SoundEvent("animals_deer_die");
+					thePlayer.SoundEvent("animals_deer_die");
+					thePlayer.SoundEvent("animals_deer_die");
+
+					ACS_Vendigo_Release_Thralls();
+
+					npc.AddTag('ACS_Vendigo_End_Stage');
+				}
+			}
+		}
+		else
+		{
+			if (npc.UsesVitality())
+			{
+				action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
+			}
+			else if (npc.UsesEssence())
+			{
+				action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage;
+			}
+		}
+	}
+}
+
+function ACS_Swarm_Mother_On_Take_Damage(action: W3DamageAction)
+{
+    var playerAttacker, playerVictim																								: CPlayer;
+	var npc, npcAttacker 																											: CActor;
+	var params 																														: SCustomEffectParams;
+	
+    npc = (CActor)action.victim;
+	
+	npcAttacker = (CActor)action.attacker;
+	
+	playerAttacker = (CPlayer)action.attacker;
+	
+	playerVictim = (CPlayer)action.victim;
+
+	if 
+	( npc && npc.HasTag('ACS_Swarm_Mother'))
+	{
+		if ( playerAttacker )
+		{
+			if ( !action.IsDoTDamage() 
+			&& !action.WasDodged() 
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
+			&& !(((W3Action_Attack)action).IsParried())
+			)
+			{
+				if ( !theSound.SoundIsBankLoaded("monster_uma.bnk") )
+				{
+					theSound.SoundLoadBank( "monster_uma.bnk", false );
+				}
+
+				if (!npc.HasTag('ACS_Swarm_Mother_Set_Unstoppable'))
+				{
+					npc.SoundEvent("monster_uma_bell_heavy");
+					thePlayer.SoundEvent("monster_uma_bell_heavy");
+
+					npc.SoundEvent("monster_uma_bell_light");
+					thePlayer.SoundEvent("monster_uma_bell_light");
+
+					npc.SoundEvent("monster_uma_dialog_bell_heavy");
+					thePlayer.SoundEvent("monster_uma_dialog_bell_heavy");
+
+					npc.SoundEvent("monster_uma_dialog_bell_light");
+					thePlayer.SoundEvent("monster_uma_dialog_bell_light");
+
+					npc.SetCanPlayHitAnim(false);
+
+					((CNewNPC)npc).SetUnstoppable( true );
+
+					npc.AddTag('ACS_Swarm_Mother_Set_Unstoppable');
+				}
+				else
+				{
+					npc.SoundEvent("monster_uma_dialog_vo_excited_pain");
+					thePlayer.SoundEvent("monster_uma_dialog_vo_excited_pain");
+
+					npc.SoundEvent("monster_uma_dialog_vo_pain_extreme");
+					thePlayer.SoundEvent("monster_uma_dialog_vo_pain_extreme");
+
+					npc.SoundEvent("monster_uma_dialog_vo_pain_short");
+					thePlayer.SoundEvent("monster_uma_dialog_vo_pain_short");
+
+					npc.SoundEvent("monster_uma_dialog_vo_pain_medium");
+					thePlayer.SoundEvent("monster_uma_dialog_vo_pain_medium");
+
+					npc.SetCanPlayHitAnim(true);
+
+					((CNewNPC)npc).SetUnstoppable( false );
+
+					npc.RemoveTag('ACS_Swarm_Mother_Set_Unstoppable');
+				}
+			}
+
+			if (npc.UsesVitality())
+			{
+				action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.5;
+			}
+			else if (npc.UsesEssence())
+			{
+				action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.5;
+			}
+
+			if (
+			(npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.1)
+			||(npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= 0.1)
+			)
+			{
+				if (!npc.HasTag('ACS_Swarm_Mother_End_Stage'))
+				{
+					ACS_SwarmMotherDestroyHives();
+
+					GetWitcherPlayer().AddPoints(EExperiencePoint, 50, false );
+
+					npc.AddTag('ACS_Swarm_Mother_End_Stage');
+				}
+			}
+		}
+		else
+		{
+			if (npc.UsesVitality())
+			{
+				action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
+			}
+			else if (npc.UsesEssence())
+			{
+				action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage;
+			}
+		}
+	}
+}
+
+function ACS_Maerolorn_On_Take_Damage(action: W3DamageAction)
+{
+    var playerAttacker, playerVictim																								: CPlayer;
+	var npc, npcAttacker 																											: CActor;
+	var params 																														: SCustomEffectParams;
+	
+    npc = (CActor)action.victim;
+	
+	npcAttacker = (CActor)action.attacker;
+	
+	playerAttacker = (CPlayer)action.attacker;
+	
+	playerVictim = (CPlayer)action.victim;
+
+	if 
+	( npc && npc.HasTag('ACS_Maerolorn'))
+	{
+		if ( playerAttacker )
+		{
+			if ( !action.IsDoTDamage() 
+			&& !action.WasDodged() 
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
+			&& !(((W3Action_Attack)action).IsParried())
+			)
+			{
+				if (npc.UsesVitality())
+				{
+					if( thePlayer.IsDoingSpecialAttack(false))
+					{
+						action.processedDmg.vitalityDamage += npc.GetMaxHealth() * 0.05;
+					}
+					else
+					{
+						action.processedDmg.vitalityDamage += npc.GetMaxHealth() * 0.1;
+					}
+				}
+				else if (npc.UsesEssence())
+				{
+					if( thePlayer.IsDoingSpecialAttack(false))
+					{
+						action.processedDmg.essenceDamage += npc.GetMaxHealth() * 0.05;
+					}
+					else
+					{
+						action.processedDmg.essenceDamage += npc.GetMaxHealth() * 0.1;
+					}
+				}
+			}
+		}
+		else
+		{
+			if (npc.UsesVitality())
+			{
+				action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
+			}
+			else if (npc.UsesEssence())
+			{
+				action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage;
+			}
+		}
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function ACS_Red_Blood_Death_On_Take_Damage(action: W3DamageAction)
 {
@@ -8076,7 +9587,7 @@ function ACS_Red_Blood_Death_On_Take_Damage(action: W3DamageAction)
 		if ( playerAttacker )
 		{
 			if ( !action.IsDoTDamage() 
-			//&& action.IsActionMelee()
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 			&& targetDistance <= 4 * 4
 			)
 			{
@@ -8127,7 +9638,6 @@ function ACS_Add_Weapon_On_Take_Damage(action: W3DamageAction)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 
 function ACS_Player_Attack(action: W3DamageAction)
 {
@@ -8199,6 +9709,7 @@ function ACS_Player_Attack(action: W3DamageAction)
 
 		if (npc.HasTag('ACS_Final_Fear_Stack')
 		&& !action.IsDoTDamage() 
+		/*
 		&& (
 		thePlayer.IsWeaponHeld('fist')
 		|| thePlayer.HasTag('aard_sword_equipped')
@@ -8210,6 +9721,7 @@ function ACS_Player_Attack(action: W3DamageAction)
 		|| thePlayer.HasTag('acs_bow_active') 
 		|| thePlayer.HasTag('acs_crossbow_active')
 		)
+		*/
 		)
 		{
 			if (npc.UsesEssence())
@@ -8277,7 +9789,7 @@ function ACS_Player_Attack(action: W3DamageAction)
 
 		if (ACS_Armor_Equipped_Check() 
 		&& !action.IsDoTDamage() 
-		//&& action.IsActionMelee()
+		//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 		&& action.WasDodged() 
 		)
 		{
@@ -8289,7 +9801,7 @@ function ACS_Player_Attack(action: W3DamageAction)
 
 		if ( !action.IsDoTDamage() 
 		&& !action.WasDodged() 
-		//&& action.IsActionMelee()
+		//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
 		&& !(((W3Action_Attack)action).IsParried())
 		)
 		{
@@ -9489,9 +11001,12 @@ function ACS_Player_Guard(action: W3DamageAction)
 				}
 
 				GetWitcherPlayer().SoundEvent("grunt_vo_block");
-									
-				GetWitcherPlayer().SoundEvent("cmb_play_parry");
 
+				if (thePlayer.IsDeadlySwordHeld())
+				{
+					GetWitcherPlayer().SoundEvent("cmb_play_parry");
+				}
+	
 				if ( theInput.GetActionValue('LockAndGuard') > 0.5
 				&& !GetWitcherPlayer().IsInCombat())
 				{
@@ -9568,13 +11083,13 @@ function ACS_Create_Red_Quen_Hit_Effect()
 
 function ACS_Take_Damage(action: W3DamageAction)
 {
-    var playerAttacker, playerVictim																																	: CPlayer;
-	var npc, npcAttacker 																																				: CActor;
-	var movementAdjustor, movementAdjustorWerewolf, movementAdjustorVampiress, movementAdjustorTransformationVampireMonster, movementAdjustorRedMiasmal					: CMovementAdjustor;
-	var ticket, ticketWerewolf, ticketVampiress, ticketTransformationVampireMonster, ticketRedMiasmal 																	: SMovementAdjustmentRequestTicket;
-	var item																																							: SItemUniqueId;
-	var dmg																																								: W3DamageAction;
-	var damageMax, damageMin																																			: float;
+    var playerAttacker, playerVictim																																														: CPlayer;
+	var npc, npcAttacker 																																																	: CActor;
+	var movementAdjustor, movementAdjustorWerewolf, movementAdjustorVampiress, movementAdjustorTransformationVampireMonster, movementAdjustorRedMiasmal, movementAdjustorSharley, movementAdjustorBlackWolf					: CMovementAdjustor;
+	var ticket, ticketWerewolf, ticketVampiress, ticketTransformationVampireMonster, ticketRedMiasmal, ticketSharley, ticketBlackWolf 																						: SMovementAdjustmentRequestTicket;
+	var item																																																				: SItemUniqueId;
+	var dmg																																																					: W3DamageAction;
+	var damageMax, damageMin																																																: float;
 
     npc = (CActor)action.victim;
 	
@@ -9594,11 +11109,20 @@ function ACS_Take_Damage(action: W3DamageAction)
 
 	movementAdjustorRedMiasmal = GetACSTransformationRedMiasmal().GetMovingAgentComponent().GetMovementAdjustor();
 
+	movementAdjustorSharley = GetACSTransformationSharley().GetMovingAgentComponent().GetMovementAdjustor();
+
+	movementAdjustorBlackWolf = GetACSTransformationBlackWolf().GetMovingAgentComponent().GetMovementAdjustor();
+
 	if (playerVictim && npcAttacker)
 	{
 		if (ACS_Player_DamageTaken_Multiplier() != 1)
 		{
 			action.processedDmg.vitalityDamage *= ACS_Player_DamageTaken_Multiplier();
+		}
+
+		if (thePlayer.HasTag('ACS_Player_In_Everstorm_Distance_1'))
+		{
+			action.processedDmg.vitalityDamage += action.processedDmg.vitalityDamage;
 		}
 	}
 
@@ -9862,6 +11386,70 @@ function ACS_Take_Damage(action: W3DamageAction)
 							action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.95;
 						}
 					}
+				}
+
+				if (ACS_Transformation_Sharley_Check())
+				{
+					((CNewNPC)GetACSTransformationSharley()).SetUnstoppable( true );
+
+					if (GetACSTransformationSharley().HasTag('ACS_Sharley_Is_Spinning')
+					|| GetACSTransformationSharley().HasTag('ACS_Sharley_Roll_Init')
+					)
+					{
+						GetACSTransformationSharley().StopEffect('sonar');
+						GetACSTransformationSharley().PlayEffectSingle('sonar');
+						GetACSTransformationSharley().StopEffect('sonar');
+
+						GetACSWatcher().SharleyReflectDamage();
+
+						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.95;
+					}
+					else
+					{
+						if (RandF() < 0.06125)
+						{
+							ticketSharley = movementAdjustorSharley.GetRequest( 'ACS_Transformation_Sharley_Hit_Rotate');
+							movementAdjustorSharley.CancelByName( 'ACS_Transformation_Sharley_Hit_Rotate' );
+							movementAdjustorSharley.CancelAll();
+
+							ticketSharley = movementAdjustorSharley.CreateNewRequest( 'ACS_Transformation_Sharley_Hit_Rotate' );
+							movementAdjustorSharley.AdjustmentDuration( ticketSharley, 0.25 );
+							movementAdjustorSharley.MaxRotationAdjustmentSpeed( ticketSharley, 500000 );
+
+							action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.8;
+
+							movementAdjustorSharley.RotateTowards( ticketSharley, npcAttacker);
+
+							ACS_Transformation_Sharley_Hit_Animations();
+						}
+						else
+						{
+							GetACSTransformationSharley().StopEffect('sonar');
+							GetACSTransformationSharley().PlayEffectSingle('sonar');
+							GetACSTransformationSharley().StopEffect('sonar');
+
+							GetACSWatcher().SharleyReflectDamage();
+
+							action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.95;
+						}
+					}
+				}
+
+				if (ACS_Transformation_Black_Wolf_Check())
+				{
+					ticketBlackWolf = movementAdjustorBlackWolf.GetRequest( 'ACS_Transformation_Black_Wolf_Hit_Rotate');
+					movementAdjustorBlackWolf.CancelByName( 'ACS_Transformation_Black_Wolf_Hit_Rotate' );
+					movementAdjustorBlackWolf.CancelAll();
+
+					ticketBlackWolf = movementAdjustorBlackWolf.CreateNewRequest( 'ACS_Transformation_Black_Wolf_Hit_Rotate' );
+					movementAdjustorBlackWolf.AdjustmentDuration( ticketBlackWolf, 0.25 );
+					movementAdjustorBlackWolf.MaxRotationAdjustmentSpeed( ticketBlackWolf, 500000 );
+
+					action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.85;
+
+					movementAdjustorBlackWolf.RotateTowards( ticketBlackWolf, npcAttacker);
+
+					ACS_Transformation_Black_Wolf_Hit_Animations();
 				}
 
 				return;
@@ -10356,7 +11944,34 @@ function ACS_Hit_Animations(action: W3DamageAction)
 {
     var npcAttacker 									    : CActor;
 	var hit_anim_names										: array< name >;
+
+	if (thePlayer.IsCiri())
+	{
+		return;
+	}
+
+	if (!GetWitcherPlayer())
+	{
+		return;
+	}
+
+	if (!GetWitcherPlayer().IsActionAllowed(EIAB_Movement))
+	{
+		return;
+	}
 	
+	if (!GetWitcherPlayer().IsActionAllowed(EIAB_LightAttacks))
+	{
+		return;
+	}
+
+	if (GetWitcherPlayer().IsMutationActive( EPMT_Mutation11 ) 
+	&& !GetWitcherPlayer().HasBuff( EET_Mutation11Debuff ) 
+	&& GetWitcherPlayer().CanUseSkill(S_Sword_s01)
+	)
+	{
+		return;
+	}
 
 	if (GetWitcherPlayer().HasTag('blood_sucking')
 	|| GetWitcherPlayer().HasTag('ACS_IsPerformingFinisher')
@@ -10379,6 +11994,8 @@ function ACS_Hit_Animations(action: W3DamageAction)
 		GetWitcherPlayer().RemoveTag('ACS_Size_Adjusted');
 	}
 
+	GetACSWatcher().RemoveTimer('SignIconDelay');
+
 	npcAttacker = (CActor)action.attacker;
 
 	GetWitcherPlayer().GetMovingAgentComponent().GetMovementAdjustor().CancelAll();
@@ -10393,7 +12010,7 @@ function ACS_Hit_Animations(action: W3DamageAction)
 
 		Bruxa_Camo_Decoy_Deactivate();
 
-		GetWitcherPlayer().StopEffect('shadowdash');
+		GetWitcherPlayer().StopEffect('shadowdash_ACS');
 
 		GetWitcherPlayer().StopEffect('shadowdash_short');
 
@@ -10810,6 +12427,52 @@ function ACS_Transformation_Red_Miasmal_Hit_Animations()
 	
 }
 
+function ACS_Transformation_Sharley_Hit_Animations()
+{
+	var hit_anim_names	: array<name>;
+
+	hit_anim_names.Clear();
+
+	GetACSTransformationSharley().DestroyEffect('light_hit');
+	GetACSTransformationSharley().DestroyEffect('heavy_hit');
+	GetACSTransformationSharley().DestroyEffect('light_hit_back');
+	GetACSTransformationSharley().DestroyEffect('heavy_hit_back');
+	GetACSTransformationSharley().DestroyEffect('blood_spill');
+
+	GetACSTransformationSharley().PlayEffectSingle('light_hit');
+	GetACSTransformationSharley().PlayEffectSingle('heavy_hit');
+	GetACSTransformationSharley().PlayEffectSingle('light_hit_back');
+	GetACSTransformationSharley().PlayEffectSingle('heavy_hit_back');
+	GetACSTransformationSharley().PlayEffectSingle('blood_spill');
+
+	hit_anim_names.PushBack('hit_light_front');
+	hit_anim_names.PushBack('hit_light_left');
+	hit_anim_names.PushBack('hit_light_right');
+
+	GetACSWatcher().ACSTransformationSharleyRemoveMoveTimers();
+
+	GetACSWatcher().ACSTransformSharleyPlayAnim(hit_anim_names[RandRange(hit_anim_names.Size())], 0.25f, 0.25f);
+}
+
+function ACS_Transformation_Black_Wolf_Hit_Animations()
+{
+	var hit_anim_names	: array<name>;
+
+	hit_anim_names.Clear();
+
+	GetACSTransformationBlackWolf().DestroyEffect('light_hit');
+
+	GetACSTransformationBlackWolf().PlayEffectSingle('light_hit');
+
+	hit_anim_names.PushBack('wolf_hit_front');
+	hit_anim_names.PushBack('wolf_hit_left');
+	hit_anim_names.PushBack('wolf_hit_right');
+
+	GetACSWatcher().ACSTransformationBlackWolfRemoveMoveTimers();
+
+	GetACSWatcher().ACSTransformBlackWolfPlayAnim(hit_anim_names[RandRange(hit_anim_names.Size())], 0.25f, 0.25f);
+}
+
 function ACS_Forest_God_Attack(action: W3DamageAction)
 {
     var playerAttacker, playerVictim						: CPlayer;
@@ -11017,7 +12680,7 @@ function ACS_Forest_God_Shadows_Attack(action: W3DamageAction)
 
 						npcAttacker.GainStat( BCS_Stamina, npcAttacker.GetStatMax(BCS_Stamina) * 0.25 );
 
-						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.25;
+						//action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.25;
 					}
 				}
 			}
@@ -11048,8 +12711,6 @@ function ACS_Forest_God_Shadows_Attack(action: W3DamageAction)
 						npcAttacker.GainStat( BCS_Essence, npcAttacker.GetStatMax(BCS_Essence) * 0.025 );
 
 						npcAttacker.GainStat( BCS_Stamina, npcAttacker.GetStatMax(BCS_Stamina) * 0.25 );
-
-						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.25;
 					}	
 				}
 			}
@@ -11477,25 +13138,37 @@ function ACS_NightStalker_Attack(action: W3DamageAction)
 					{
 						playerVictim.AddEffectDefault( EET_Poison, npcAttacker, 'ACS_Night_Stalker' );
 					}
-					
-					if (!playerVictim.HasBuff(EET_Bleeding))
-					{
-						playerVictim.AddEffectDefault( EET_Bleeding, npcAttacker, 'ACS_Night_Stalker' );
-					}
 
-					if (!playerVictim.HasBuff(EET_HeavyKnockdown))
+					if (!npcAttacker.HasTag('ACS_Night_Stalker_1st_Hit_Melee_Guarded')
+					&& !npcAttacker.HasTag('ACS_Night_Stalker_2nd_Hit_Melee_Guarded')
+					)
 					{
-						playerVictim.AddEffectDefault( EET_HeavyKnockdown, npcAttacker, 'ACS_Night_Stalker' );
+						npcAttacker.AddTag('ACS_Night_Stalker_1st_Hit_Melee_Guarded');
+					}
+					else if (npcAttacker.HasTag('ACS_Night_Stalker_1st_Hit_Melee_Guarded'))
+					{
+						npcAttacker.RemoveTag('ACS_Night_Stalker_1st_Hit_Melee_Guarded');
+
+						npcAttacker.AddTag('ACS_Night_Stalker_2nd_Hit_Melee_Guarded');
+					}
+					else if (npcAttacker.HasTag('ACS_Night_Stalker_2nd_Hit_Melee_Guarded'))
+					{
+						npcAttacker.RemoveTag('ACS_Night_Stalker_2nd_Hit_Melee_Guarded');
+
+						if (!playerVictim.HasBuff(EET_HeavyKnockdown))
+						{
+							playerVictim.AddEffectDefault( EET_HeavyKnockdown, npcAttacker, 'ACS_Night_Stalker' );
+						}
 					}
 				}
 
 				if (npcAttacker.UsesVitality()) 
 				{ 
-					npcAttacker.GainStat( BCS_Vitality, npcAttacker.GetStatMax(BCS_Vitality) * 0.05 );
+					npcAttacker.GainStat( BCS_Vitality, (npcAttacker.GetStatMax(BCS_Vitality) - npcAttacker.GetStat(BCS_Vitality)) * 0.0125 );
 				} 
 				else if (npcAttacker.UsesEssence()) 
 				{ 
-					npcAttacker.GainStat( BCS_Essence, npcAttacker.GetStatMax(BCS_Essence) * 0.05 );
+					npcAttacker.GainStat( BCS_Essence, (npcAttacker.GetStatMax(BCS_Essence) - npcAttacker.GetStat(BCS_Essence))  * 0.0125 );
 				} 
 
 				if (
@@ -11549,9 +13222,26 @@ function ACS_XenoTyrant_Attack(action: W3DamageAction)
 						playerVictim.AddEffectDefault( EET_Bleeding, npcAttacker, 'ACS_Xeno_Tyrant' );
 					}
 
-					if (!playerVictim.HasBuff(EET_HeavyKnockdown))
+					if (!npcAttacker.HasTag('ACS_Xeno_Tyrant_1st_Hit_Melee_Guarded')
+					&& !npcAttacker.HasTag('ACS_Xeno_Tyrant_2nd_Hit_Melee_Guarded')
+					)
 					{
-						playerVictim.AddEffectDefault( EET_HeavyKnockdown, npcAttacker, 'ACS_Xeno_Tyrant' );	
+						npcAttacker.AddTag('ACS_Xeno_Tyrant_1st_Hit_Melee_Guarded');
+					}
+					else if (npcAttacker.HasTag('ACS_Xeno_Tyrant_1st_Hit_Melee_Guarded'))
+					{
+						npcAttacker.RemoveTag('ACS_Xeno_Tyrant_1st_Hit_Melee_Guarded');
+
+						npcAttacker.AddTag('ACS_Xeno_Tyrant_2nd_Hit_Melee_Guarded');
+					}
+					else if (npcAttacker.HasTag('ACS_Xeno_Tyrant_2nd_Hit_Melee_Guarded'))
+					{
+						npcAttacker.RemoveTag('ACS_Xeno_Tyrant_2nd_Hit_Melee_Guarded');
+
+						if (!playerVictim.HasBuff(EET_HeavyKnockdown))
+						{
+							playerVictim.AddEffectDefault( EET_HeavyKnockdown, npcAttacker, 'ACS_Xeno_Tyrant' );
+						}
 					}
 
 					if (GetACSXenoTyrant().HasAbility('mon_kikimore_small'))
@@ -11562,25 +13252,14 @@ function ACS_XenoTyrant_Attack(action: W3DamageAction)
 
 				if (npcAttacker.UsesVitality()) 
 				{ 
-					npcAttacker.GainStat( BCS_Vitality, npcAttacker.GetStatMax(BCS_Vitality) * 0.0125 );
+					npcAttacker.GainStat( BCS_Vitality, (npcAttacker.GetStatMax(BCS_Vitality) - npcAttacker.GetStat(BCS_Vitality)) * 0.0125 );
 				} 
 				else if (npcAttacker.UsesEssence()) 
 				{ 
-					npcAttacker.GainStat( BCS_Essence, npcAttacker.GetStatMax(BCS_Essence) * 0.0125 );
+					npcAttacker.GainStat( BCS_Essence, (npcAttacker.GetStatMax(BCS_Essence) - npcAttacker.GetStat(BCS_Essence)) * 0.0125 );
 				} 
 
-				if (
-					(ACS_W3EE_Installed() && ACS_W3EE_Enabled() )
-					||
-					(ACS_W3EE_Redux_Installed() && ACS_W3EE_Redux_Enabled() )
-					)
-				{
-					action.processedDmg.vitalityDamage += action.processedDmg.vitalityDamage * 1.5;
-				}
-				else
-				{
-					action.processedDmg.vitalityDamage += action.processedDmg.vitalityDamage * 2;
-				}
+				action.processedDmg.vitalityDamage += action.processedDmg.vitalityDamage * 0.5;
 			}
 		}
 	}
@@ -11893,11 +13572,11 @@ function ACS_Unseen_Monster_Attack(action: W3DamageAction)
 
 				if (npcAttacker.UsesVitality()) 
 				{ 
-					ACSVampireMonsterBossBar().GainStat( BCS_Vitality, ACSVampireMonsterBossBar().GetStatMax(BCS_Vitality) * 0.10 );
+					ACSVampireMonsterBossBar().GainStat( BCS_Vitality, (ACSVampireMonsterBossBar().GetStatMax(BCS_Vitality) - ACSVampireMonsterBossBar().GetStat(BCS_Vitality)) * 0.025 );
 				} 
 				else if (npcAttacker.UsesEssence()) 
 				{ 
-					ACSVampireMonsterBossBar().GainStat( BCS_Essence, ACSVampireMonsterBossBar().GetStatMax(BCS_Essence) * 0.10 );
+					ACSVampireMonsterBossBar().GainStat( BCS_Essence, (ACSVampireMonsterBossBar().GetStatMax(BCS_Essence) - ACSVampireMonsterBossBar().GetStat(BCS_Essence))  * 0.025 );
 				} 
 			}
 		}
@@ -12166,9 +13845,26 @@ function ACS_Svalblod_Attack(action: W3DamageAction)
 	&& playerVictim
 	)
 	{	
-		if (!playerVictim.HasBuff(EET_HeavyKnockdown))
+		if (!npcAttacker.HasTag('ACS_Svalblod_1st_Hit_Melee_Guarded')
+		&& !npcAttacker.HasTag('ACS_Svalblod_2nd_Hit_Melee_Guarded')
+		)
 		{
-			playerVictim.AddEffectDefault( EET_HeavyKnockdown, npcAttacker, 'ACS_Svalblod' );
+			npcAttacker.AddTag('ACS_Svalblod_1st_Hit_Melee_Guarded');
+		}
+		else if (npcAttacker.HasTag('ACS_Svalblod_1st_Hit_Melee_Guarded'))
+		{
+			npcAttacker.RemoveTag('ACS_Svalblod_1st_Hit_Melee_Guarded');
+
+			npcAttacker.AddTag('ACS_Svalblod_2nd_Hit_Melee_Guarded');
+		}
+		else if (npcAttacker.HasTag('ACS_Svalblod_2nd_Hit_Melee_Guarded'))
+		{
+			npcAttacker.RemoveTag('ACS_Svalblod_2nd_Hit_Melee_Guarded');
+
+			if (!playerVictim.HasBuff(EET_HeavyKnockdown))
+			{
+				playerVictim.AddEffectDefault( EET_HeavyKnockdown, npcAttacker, 'ACS_Svalblod' );
+			}
 		}
 	}
 }
@@ -12195,12 +13891,29 @@ function ACS_Svalblod_Bear_Attack(action: W3DamageAction)
 	&& playerVictim
 	)
 	{	
-		if (!playerVictim.HasBuff(EET_HeavyKnockdown))
+		if (!npcAttacker.HasTag('ACS_Svalblod_Bear_1st_Hit_Melee_Guarded')
+		&& !npcAttacker.HasTag('ACS_Svalblod_Bear_2nd_Hit_Melee_Guarded')
+		)
 		{
-			playerVictim.AddEffectDefault( EET_HeavyKnockdown, npcAttacker, 'ACS_Svalblod_Bear' );
+			npcAttacker.AddTag('ACS_Svalblod_Bear_1st_Hit_Melee_Guarded');
+		}
+		else if (npcAttacker.HasTag('ACS_Svalblod_Bear_1st_Hit_Melee_Guarded'))
+		{
+			npcAttacker.RemoveTag('ACS_Svalblod_Bear_1st_Hit_Melee_Guarded');
+
+			npcAttacker.AddTag('ACS_Svalblod_Bear_2nd_Hit_Melee_Guarded');
+		}
+		else if (npcAttacker.HasTag('ACS_Svalblod_Bear_2nd_Hit_Melee_Guarded'))
+		{
+			npcAttacker.RemoveTag('ACS_Svalblod_Bear_2nd_Hit_Melee_Guarded');
+
+			if (!playerVictim.HasBuff(EET_HeavyKnockdown))
+			{
+				playerVictim.AddEffectDefault( EET_HeavyKnockdown, npcAttacker, 'ACS_Svalblod_Bear' );
+			}
 		}
 
-		action.processedDmg.vitalityDamage += action.processedDmg.vitalityDamage * 7;
+		action.processedDmg.vitalityDamage += action.processedDmg.vitalityDamage * 3;
 	}
 }
 
@@ -12225,7 +13938,7 @@ function ACS_Berserkers_Bear_Attack(action: W3DamageAction)
 	&& playerVictim
 	)
 	{	
-		action.processedDmg.vitalityDamage += action.processedDmg.vitalityDamage * 5;
+		action.processedDmg.vitalityDamage += action.processedDmg.vitalityDamage * 1.5;
 	}
 }
 
@@ -12595,6 +14308,34 @@ function ACS_Guardian_Hym_Attack(action: W3DamageAction)
 	}
 }
 
+function ACS_Knocker_Attack(action: W3DamageAction)
+{
+    var playerAttacker, playerVictim						: CPlayer;
+	var npc, npcAttacker 									: CActor;
+
+    npc = (CActor)action.victim;
+	
+	npcAttacker = (CActor)action.attacker;
+	
+	playerAttacker = (CPlayer)action.attacker;
+	
+	playerVictim = (CPlayer)action.victim;
+
+    if ( npcAttacker
+	&& (npcAttacker.HasTag('ACS_Knocker'))
+	&& !action.IsDoTDamage()
+	&& playerVictim
+	)
+	{	
+		if (!action.WasDodged() && !GetWitcherPlayer().IsCurrentlyDodging())
+		{
+			action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.25;
+
+			//thePlayer.AddEffectDefault( EET_Knockdown, thePlayer, 'ACS_Knocker' );
+		}
+	}
+}
+
 function ACS_Infected_Prime_Attack(action: W3DamageAction)
 {
     var playerAttacker, playerVictim						: CPlayer;
@@ -12703,6 +14444,84 @@ function ACS_Bumbakvetch_Attack(action: W3DamageAction)
 	}
 }
 
+function ACS_Chironex_Attack(action: W3DamageAction)
+{
+    var playerAttacker, playerVictim						: CPlayer;
+	var npc, npcAttacker 									: CActor;
+
+    npc = (CActor)action.victim;
+	
+	npcAttacker = (CActor)action.attacker;
+	
+	playerAttacker = (CPlayer)action.attacker;
+	
+	playerVictim = (CPlayer)action.victim;
+
+    if ( npcAttacker
+	&& npcAttacker.HasTag('ACS_Chironex')
+	&& !action.IsDoTDamage()
+	&& playerVictim
+	)
+	{	
+		if (!action.WasDodged() && !GetWitcherPlayer().IsCurrentlyDodging())
+		{
+			action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.5;
+		}
+	}
+}
+
+function ACS_Botchling_Attack(action: W3DamageAction)
+{
+    var playerAttacker, playerVictim						: CPlayer;
+	var npc, npcAttacker 									: CActor;
+
+    npc = (CActor)action.victim;
+	
+	npcAttacker = (CActor)action.attacker;
+	
+	playerAttacker = (CPlayer)action.attacker;
+	
+	playerVictim = (CPlayer)action.victim;
+
+    if ( npcAttacker
+	&& npcAttacker.HasTag('ACS_Botchling')
+	&& !action.IsDoTDamage()
+	&& playerVictim
+	)
+	{	
+		if (!action.WasDodged() && !GetWitcherPlayer().IsCurrentlyDodging())
+		{
+			action.processedDmg.vitalityDamage += action.processedDmg.vitalityDamage;
+		}
+	}
+}
+
+function ACS_Draugir_Attack(action: W3DamageAction)
+{
+    var playerAttacker, playerVictim						: CPlayer;
+	var npc, npcAttacker 									: CActor;
+
+    npc = (CActor)action.victim;
+	
+	npcAttacker = (CActor)action.attacker;
+	
+	playerAttacker = (CPlayer)action.attacker;
+	
+	playerVictim = (CPlayer)action.victim;
+
+    if ( npcAttacker
+	&& npcAttacker.HasTag('ACS_Draugir')
+	&& !action.IsDoTDamage()
+	&& playerVictim
+	)
+	{	
+		if (!action.WasDodged() && !GetWitcherPlayer().IsCurrentlyDodging())
+		{
+			action.processedDmg.vitalityDamage += action.processedDmg.vitalityDamage;
+		}
+	}
+}
+
 function ACS_Viy_Attack(action: W3DamageAction)
 {
     var playerAttacker, playerVictim						: CPlayer;
@@ -12759,6 +14578,35 @@ function ACS_Plumard_Attack(action: W3DamageAction)
 			if (!playerVictim.HasBuff(EET_Bleeding))
 			{
 				playerVictim.AddEffectDefault( EET_Bleeding, npcAttacker, 'ACS_Plumard' );
+			}
+		}
+	}
+}
+
+function ACS_Demonic_Construct_Attack(action: W3DamageAction)
+{
+    var playerAttacker, playerVictim						: CPlayer;
+	var npc, npcAttacker 									: CActor;
+
+    npc = (CActor)action.victim;
+	
+	npcAttacker = (CActor)action.attacker;
+	
+	playerAttacker = (CPlayer)action.attacker;
+	
+	playerVictim = (CPlayer)action.victim;
+
+    if ( npcAttacker
+	&& npcAttacker.HasTag('ACS_Demonic_Construct')
+	&& !action.IsDoTDamage()
+	&& playerVictim
+	)
+	{	
+		if (!action.WasDodged() && !GetWitcherPlayer().IsCurrentlyDodging())
+		{
+			if (!playerVictim.HasBuff(EET_SlowdownFrost))
+			{
+				playerVictim.AddEffectDefault( EET_SlowdownFrost, npcAttacker, 'ACS_Demonic_Construct' );
 			}
 		}
 	}
@@ -12899,6 +14747,97 @@ function ACS_Carduin_Attack(action: W3DamageAction)
 			if (!playerVictim.HasBuff(EET_Burning))
 			{
 				playerVictim.AddEffectDefault( EET_Burning, npcAttacker, 'ACS_Carduin' );
+			}
+		}
+	}
+}
+
+function ACS_Fire_Gargoyle_Attack(action: W3DamageAction)
+{
+    var playerAttacker, playerVictim						: CPlayer;
+	var npc, npcAttacker 									: CActor;
+
+    npc = (CActor)action.victim;
+	
+	npcAttacker = (CActor)action.attacker;
+	
+	playerAttacker = (CPlayer)action.attacker;
+	
+	playerVictim = (CPlayer)action.victim;
+
+    if ( npcAttacker
+	&& npcAttacker.HasTag('ACS_Fire_Gargoyle')
+	&& !action.IsDoTDamage()
+	)
+	{	
+		if (!action.WasDodged() && !GetWitcherPlayer().IsCurrentlyDodging())
+		{
+			if ( playerVictim)
+			{
+				if (!playerVictim.HasBuff(EET_Burning))
+				{
+					playerVictim.AddEffectDefault( EET_Burning, npcAttacker, 'ACS_Fire_Gargoyle' );
+				}
+			}
+		}
+	}
+}
+
+function ACS_Vendigo_Attack(action: W3DamageAction)
+{
+    var playerAttacker, playerVictim						: CPlayer;
+	var npc, npcAttacker 									: CActor;
+
+    npc = (CActor)action.victim;
+	
+	npcAttacker = (CActor)action.attacker;
+	
+	playerAttacker = (CPlayer)action.attacker;
+	
+	playerVictim = (CPlayer)action.victim;
+
+    if ( npcAttacker
+	&& npcAttacker.HasTag('ACS_Vendigo')
+	&& !action.IsDoTDamage()
+	)
+	{	
+		if (!action.WasDodged() && !GetWitcherPlayer().IsCurrentlyDodging())
+		{
+			if ( playerVictim)
+			{
+				npc.SoundEvent("animals_deer_sniff");
+				thePlayer.SoundEvent("animals_deer_sniff");
+
+				npc.SoundEvent("animals_deer_breath");
+				thePlayer.SoundEvent("animals_deer_breath");
+
+				npc.SoundEvent("animals_deer_sniff");
+				thePlayer.SoundEvent("animals_deer_sniff");
+
+				npc.SoundEvent("animals_deer_breath");
+				thePlayer.SoundEvent("animals_deer_breath");
+
+				npc.SoundEvent("animals_deer_sniff");
+				thePlayer.SoundEvent("animals_deer_sniff");
+
+				npc.SoundEvent("animals_deer_breath");
+				thePlayer.SoundEvent("animals_deer_breath");
+
+				npc.SoundEvent("animals_deer_sniff");
+				thePlayer.SoundEvent("animals_deer_sniff");
+
+				npc.SoundEvent("animals_deer_breath");
+				thePlayer.SoundEvent("animals_deer_breath");
+
+				if (!playerVictim.HasBuff(EET_Poison))
+				{
+					playerVictim.AddEffectDefault( EET_Poison, npcAttacker, 'ACS_Vendigo' );
+				}
+
+				if (!playerVictim.HasBuff(EET_Bleeding))
+				{
+					playerVictim.AddEffectDefault( EET_Bleeding, npcAttacker, 'ACS_Vendigo' );
+				}
 			}
 		}
 	}
@@ -13068,11 +15007,13 @@ function ACS_Wolf_Companion_Attack(action: W3DamageAction)
 	}
 }
 
-function ACS_Fire_Gargoyle_Attack(action: W3DamageAction)
+function ACS_SummonedCreatures_Attack(action: W3DamageAction)
 {
     var playerAttacker, playerVictim						: CPlayer;
 	var npc, npcAttacker 									: CActor;
-
+	var dmg													: W3DamageAction;
+	var damageMax, damageMin								: float;
+	
     npc = (CActor)action.victim;
 	
 	npcAttacker = (CActor)action.attacker;
@@ -13082,22 +15023,64 @@ function ACS_Fire_Gargoyle_Attack(action: W3DamageAction)
 	playerVictim = (CPlayer)action.victim;
 
     if ( npcAttacker
-	&& npcAttacker.HasTag('ACS_Fire_Gargoyle')
+	&& 
+	(npcAttacker.HasTag('ACS_Revenant') 
+	|| npcAttacker.HasTag('ACS_Summoned_Skeleton')
+	|| npcAttacker.HasTag('ACS_Summoned_Wolf')
+	|| npcAttacker.HasTag('ACS_Summoned_Centipede')
+	)
 	&& !action.IsDoTDamage()
+	&& npc
 	)
 	{	
-		if (!action.WasDodged() && !GetWitcherPlayer().IsCurrentlyDodging())
+		if (!action.WasDodged() && !npc.IsCurrentlyDodging())
 		{
-			if ( playerVictim)
+			if ( npc )
 			{
-				if (!playerVictim.HasBuff(EET_Burning))
+				action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage;
+
+				action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
+
+				dmg = new W3DamageAction in theGame.damageMgr;
+					
+				dmg.Initialize(GetWitcherPlayer(), npc, NULL, npcAttacker.GetName(), EHRT_Light, CPS_Undefined, false, false, true, false);
+				
+				dmg.SetProcessBuffsIfNoDamage(true);
+
+				if (npc.HasTag('ACS_Final_Fear_Stack') || npc.GetCurrentHealth() <= npc.GetMaxHealth() * 0.01)
 				{
-					playerVictim.AddEffectDefault( EET_Burning, npcAttacker, 'ACS_Fire_Gargoyle' );
+					damageMax = npc.GetMaxHealth(); 
+
+					if (((CNewNPC)npc).GetNPCType() == ENGT_Guard)
+					{
+						npc.DestroyAfter(10);
+					}
 				}
+				else
+				{
+					if (npc.GetCurrentHealth() >= npc.GetMaxHealth() * 0.5)
+					{
+						damageMax = npc.GetCurrentHealth() * RandRangeF(0.125, 0.06125);
+					}
+					else
+					{
+						damageMax = (npc.GetMaxHealth() - npc.GetCurrentHealth()) * RandRangeF(0.06125, 0.030625);
+					}
+				}
+
+				dmg.SetForceExplosionDismemberment();
+
+				dmg.AddDamage( theGame.params.DAMAGE_NAME_DIRECT, damageMax );
+					
+				theGame.damageMgr.ProcessAction( dmg );
+					
+				delete dmg;
 			}
 		}
 	}
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function ACS_Rage_Attack(action: W3DamageAction)
 {
@@ -13144,7 +15127,7 @@ function ACS_Rage_Attack(action: W3DamageAction)
 			ACS_Rage_Markers_Player_Destroy();
 
 			GetACSWatcher().RemoveTimer('ACS_Rage_Remove');
-			GetACSWatcher().AddTimer('ACS_Rage_Remove', 0.0001, false);
+			GetACSWatcher().Rage_Remove_Actual();
 
 			((CNewNPC)npcAttacker).SetAttitude(GetWitcherPlayer(), AIA_Hostile);
 
@@ -13361,14 +15344,27 @@ function ACS_NPC_Normal_Attack(action: W3DamageAction)
 	}
 }
 
-function ACS_EnemyBehSwitch_Watcher()
+function ACS_ActionDealsFireDamage(action : W3DamageAction) : bool
 {
-	var vACS_EnemyBehSwitch 	: cACS_EnemyBehSwitch;
+	var i, size 				: int;
+	var dmgTypes 				: array< SRawDamage >;
 
-	vACS_EnemyBehSwitch = new cACS_EnemyBehSwitch in theGame;
+	action.GetDTs( dmgTypes );
+	
+	size = dmgTypes.Size();
 
-	vACS_EnemyBehSwitch.EnemyBehSwitch();
+	for(i=0; i<size; i+=1)
+	{
+		if( dmgTypes[i].dmgType == theGame.params.DAMAGE_NAME_FIRE )
+		{
+			return true;
+		}
+	}
+			
+	return false;		
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 statemachine class cACS_EnemyBehSwitch
 {
@@ -13389,6 +15385,8 @@ state EnemyBehSwitch in cACS_EnemyBehSwitch
 	private var behGraphNames 													: array< name >;
 	private var itemId_r, itemId_l 												: SItemUniqueId;
 	private var itemTags_r, itemTags_l 											: array<name>;
+	private var voiceTagName 													: name;
+	private var voiceTagStr														: string;
 
 	event OnEnterState(prevStateName : name)
 	{
@@ -13406,6 +15404,10 @@ state EnemyBehSwitch in cACS_EnemyBehSwitch
 			for( i = 0; i < actors.Size(); i += 1 )
 			{
 				npc = actors[i];
+
+				voiceTagName =  npc.GetVoicetag();
+
+				voiceTagStr = NameToString( voiceTagName );
 
 				if(!theGame.IsDialogOrCutscenePlaying()
 				&& !GetWitcherPlayer().IsUsingHorse() 
@@ -13511,6 +15513,10 @@ state EnemyBehSwitch in cACS_EnemyBehSwitch
 				&& !StrContains( npc.I_GetDisplayName(), "暴徒" )
 				&& !StrContains( npc.GetReadableName(), "bandit" ) 
 				&& !StrContains( npc.GetReadableName(), "cannibal" ) 
+
+				&& !npc.HasTag('mq1060_witcher')
+
+				&& StrFindFirst(voiceTagStr, "REINALD") < 0
 				)
 				{
 					itemId_r = npc.GetInventory().GetItemFromSlot('r_weapon');
@@ -13628,7 +15634,14 @@ state EnemyBehSwitch in cACS_EnemyBehSwitch
 										{
 											if( RandF() < 0.95 ) 
 											{
-												Shield_Switch(npc);
+												if (npc.UsesVitality())
+												{
+													Shield_Switch(npc);
+												}
+												else
+												{
+													Vamp_Switch(npc);
+												}
 											}
 											else
 											{
@@ -13686,7 +15699,14 @@ state EnemyBehSwitch in cACS_EnemyBehSwitch
 										{
 											if( RandF() < 0.95 ) 
 											{
-												Shield_Switch(npc);
+												if (npc.UsesVitality())
+												{
+													Shield_Switch(npc);
+												}
+												else
+												{
+													Vamp_Switch(npc);
+												}
 											}
 											else
 											{
@@ -13735,7 +15755,14 @@ state EnemyBehSwitch in cACS_EnemyBehSwitch
 										{
 											if( RandF() < 0.95 ) 
 											{
-												Shield_Switch(npc);
+												if (npc.UsesVitality())
+												{
+													Shield_Switch(npc);
+												}
+												else
+												{
+													Vamp_Switch(npc);
+												}
 											}
 											else
 											{
@@ -13793,7 +15820,14 @@ state EnemyBehSwitch in cACS_EnemyBehSwitch
 										{
 											if( RandF() < 0.95 ) 
 											{
-												Shield_Switch(npc);
+												if (npc.UsesVitality())
+												{
+													Shield_Switch(npc);
+												}
+												else
+												{
+													Vamp_Switch(npc);
+												}
 											}
 											else
 											{
@@ -13842,7 +15876,14 @@ state EnemyBehSwitch in cACS_EnemyBehSwitch
 										{
 											if( RandF() < 0.95 ) 
 											{
-												Shield_Switch(npc);
+												if (npc.UsesVitality())
+												{
+													Shield_Switch(npc);
+												}
+												else
+												{
+													Vamp_Switch(npc);
+												}
 											}
 											else
 											{
@@ -13900,7 +15941,14 @@ state EnemyBehSwitch in cACS_EnemyBehSwitch
 										{
 											if( RandF() < 0.95 ) 
 											{
-												Shield_Switch(npc);
+												if (npc.UsesVitality())
+												{
+													Shield_Switch(npc);
+												}
+												else
+												{
+													Vamp_Switch(npc);
+												}
 											}
 											else
 											{
@@ -14040,6 +16088,8 @@ state EnemyBehSwitch in cACS_EnemyBehSwitch
 			shield = (ACSShieldSpawner)theGame.CreateEntity( shield_temp, npc.GetBoneWorldPosition('l_weapon') );
 
 			shield.CreateAttachment( npc, 'l_weapon', Vector(0,0,0), EulerAngles(0,0,0) );
+
+			shield.AddTag('ACS_ShieldSpawner');
 
 			npc.AddTag('ACS_Swapped_To_Shield');
 		}

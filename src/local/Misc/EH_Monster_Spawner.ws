@@ -130,6 +130,7 @@ state ACS_Ghoul_Venom_Start_Engage in cACS_Ghoul_Venom
 						movementAdjustor.CancelAll();
 						ticket = movementAdjustor.CreateNewRequest( 'ACS_Ghoul_Proj_Rotate_1' );
 						movementAdjustor.AdjustmentDuration( ticket, 1 );
+						movementAdjustor.Continuous(ticket);
 						movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000 );
 
 						movementAdjustor.RotateTowards( ticket, GetWitcherPlayer() );
@@ -271,7 +272,7 @@ state ACS_Ghoul_Venom_Engage in cACS_Ghoul_Venom
 					)
 					{ 	
 						proj_1 = (W3ACSPoisonProjectile)theGame.CreateEntity( 
-						(CEntityTemplate)LoadResource( 
+						(CEntityTemplate)LoadResourceAsync( 
 
 							"dlc\dlc_acs\data\entities\projectiles\ghoul_projectile.w2ent"
 							
@@ -291,7 +292,7 @@ state ACS_Ghoul_Venom_Engage in cACS_Ghoul_Venom
 					)
 					{ 	
 						proj_1 = (W3ACSPoisonProjectile)theGame.CreateEntity( 
-						(CEntityTemplate)LoadResource( 
+						(CEntityTemplate)LoadResourceAsync( 
 
 							"dlc\dlc_acs\data\entities\projectiles\ghoul_projectile.w2ent"
 							
@@ -309,7 +310,7 @@ state ACS_Ghoul_Venom_Engage in cACS_Ghoul_Venom
 						Sleep(0.375);
 
 						proj_2 = (W3ACSPoisonProjectile)theGame.CreateEntity( 
-						(CEntityTemplate)LoadResource( 
+						(CEntityTemplate)LoadResourceAsync( 
 
 							"dlc\dlc_acs\data\entities\projectiles\ghoul_projectile.w2ent"
 							
@@ -327,7 +328,7 @@ state ACS_Ghoul_Venom_Engage in cACS_Ghoul_Venom
 						Sleep(0.375);
 
 						proj_3 = (W3ACSPoisonProjectile)theGame.CreateEntity( 
-						(CEntityTemplate)LoadResource( 
+						(CEntityTemplate)LoadResourceAsync( 
 
 							"dlc\dlc_acs\data\entities\projectiles\ghoul_projectile.w2ent"
 							
@@ -345,7 +346,7 @@ state ACS_Ghoul_Venom_Engage in cACS_Ghoul_Venom
 					)
 					{ 	
 						proj_1 = (W3ACSPoisonProjectile)theGame.CreateEntity( 
-						(CEntityTemplate)LoadResource( 
+						(CEntityTemplate)LoadResourceAsync( 
 
 							"dlc\dlc_acs\data\entities\projectiles\ghoul_projectile.w2ent"
 							
@@ -360,7 +361,7 @@ state ACS_Ghoul_Venom_Engage in cACS_Ghoul_Venom
 						proj_1.DestroyAfter(10);
 
 						proj_2 = (W3ACSPoisonProjectile)theGame.CreateEntity( 
-						(CEntityTemplate)LoadResource( 
+						(CEntityTemplate)LoadResourceAsync( 
 
 							"dlc\dlc_acs\data\entities\projectiles\ghoul_projectile.w2ent"
 							
@@ -375,7 +376,7 @@ state ACS_Ghoul_Venom_Engage in cACS_Ghoul_Venom
 
 
 						proj_3 = (W3ACSPoisonProjectile)theGame.CreateEntity( 
-						(CEntityTemplate)LoadResource( 
+						(CEntityTemplate)LoadResourceAsync( 
 
 							"dlc\dlc_acs\data\entities\projectiles\ghoul_projectile.w2ent"
 							
@@ -431,7 +432,7 @@ state ACS_Ghoul_Venom_Engage in cACS_Ghoul_Venom
 						GetWitcherPlayer().SoundEvent('monster_wildhunt_minion_ice_spike_out');
 
 						ice_proj_1 = (W3WHMinionProjectile)theGame.CreateEntity( 
-						(CEntityTemplate)LoadResource( 
+						(CEntityTemplate)LoadResourceAsync( 
 
 							"dlc\dlc_acs\data\entities\projectiles\wh_minion_projectile.w2ent"
 							
@@ -443,7 +444,7 @@ state ACS_Ghoul_Venom_Engage in cACS_Ghoul_Venom
 						ice_proj_1.DestroyAfter(10);
 
 						ice_proj_2 = (W3WHMinionProjectile)theGame.CreateEntity( 
-						(CEntityTemplate)LoadResource( 
+						(CEntityTemplate)LoadResourceAsync( 
 
 							"dlc\dlc_acs\data\entities\projectiles\wh_minion_projectile.w2ent"
 							
@@ -455,7 +456,7 @@ state ACS_Ghoul_Venom_Engage in cACS_Ghoul_Venom
 						ice_proj_2.DestroyAfter(10);
 
 						ice_proj_3 = (W3WHMinionProjectile)theGame.CreateEntity( 
-						(CEntityTemplate)LoadResource( 
+						(CEntityTemplate)LoadResourceAsync( 
 
 							"dlc\dlc_acs\data\entities\projectiles\wh_minion_projectile.w2ent"
 							
@@ -489,7 +490,7 @@ state ACS_Ghoul_Venom_Engage in cACS_Ghoul_Venom
 						GetWitcherPlayer().SoundEvent('monster_wildhunt_minion_ice_spike_out');
 
 						ice_proj_1 = (W3WHMinionProjectile)theGame.CreateEntity( 
-						(CEntityTemplate)LoadResource( 
+						(CEntityTemplate)LoadResourceAsync( 
 
 							"dlc\dlc_acs\data\entities\projectiles\wh_minion_projectile.w2ent"
 							
@@ -503,7 +504,7 @@ state ACS_Ghoul_Venom_Engage in cACS_Ghoul_Venom
 
 					/*
 					proj_2 = (W3ACSPoisonProjectile)theGame.CreateEntity( 
-					(CEntityTemplate)LoadResource( 
+					(CEntityTemplate)LoadResourceAsync( 
 
 						"dlc\dlc_acs\data\entities\projectiles\ghoul_projectile.w2ent"
 						
@@ -517,7 +518,7 @@ state ACS_Ghoul_Venom_Engage in cACS_Ghoul_Venom
 
 
 					proj_3 = (W3ACSPoisonProjectile)theGame.CreateEntity( 
-					(CEntityTemplate)LoadResource( 
+					(CEntityTemplate)LoadResourceAsync( 
 
 						"dlc\dlc_acs\data\entities\projectiles\ghoul_projectile.w2ent"
 						
@@ -567,6 +568,9 @@ state ACS_Witch_Hunter_Throw_Bomb_Engage in cACS_Witch_Hunter_Throw_Bomb
 	private var ticket 															: SMovementAdjustmentRequestTicket;
 	private var targetDistance, chance											: float;
 	private var witchHunterAnimatedComponent, animatedComponentA 				: CAnimatedComponent;
+	private var voiceTagName 													: name;
+	private var voiceTagStr														: string;
+
 	
 	event OnEnterState(prevStateName : name)
 	{
@@ -593,6 +597,10 @@ state ACS_Witch_Hunter_Throw_Bomb_Engage in cACS_Witch_Hunter_Throw_Bomb
 				npc = (CNewNPC)actors[i];
 
 				actor = actors[i];
+
+				voiceTagName =  npc.GetVoicetag();
+
+				voiceTagStr = NameToString( voiceTagName );
 
 				targetDistance = VecDistanceSquared2D( GetWitcherPlayer().GetWorldPosition(), npc.GetWorldPosition() ) ;
 
@@ -634,6 +642,8 @@ state ACS_Witch_Hunter_Throw_Bomb_Engage in cACS_Witch_Hunter_Throw_Bomb
 				&& GetACSWatcher().ACS_Rage_Process == false
 				&& !animatedComponentA.HasFrozenPose()
 				&& !npc.GetIsRecoveringFromKnockdown()
+				&& !npc.HasTag('mq1060_witcher')
+				&& StrFindFirst(voiceTagStr, "REINALD") < 0
 				&& ((CHumanAICombatStorage)npc.GetScriptStorageObject('CombatData')).GetActiveCombatStyle() != EBG_Combat_Fists
 				&& ((CHumanAICombatStorage)npc.GetScriptStorageObject('CombatData')).GetActiveCombatStyle() != EBG_Combat_Undefined
 				&& ((CHumanAICombatStorage)npc.GetScriptStorageObject('CombatData')).GetActiveCombatStyle() != EBG_Combat_Crossbow
@@ -829,6 +839,9 @@ state ACS_Witch_Hunter_Throw_Bomb_Actual_Engage in cACS_Witch_Hunter_Throw_Bomb
 	private var animatedComponentA 												: CAnimatedComponent;
 	private var initpos, targetPosition											: Vector;
 	private var  blade_temp														: CEntityTemplate;
+	private var voiceTagName 													: name;
+	private var voiceTagStr														: string;
+
 	
 	event OnEnterState(prevStateName : name)
 	{
@@ -864,6 +877,10 @@ state ACS_Witch_Hunter_Throw_Bomb_Actual_Engage in cACS_Witch_Hunter_Throw_Bomb
 				actor = actors[i];
 
 				animatedComponentA = (CAnimatedComponent)actor.GetComponentByClassName( 'CAnimatedComponent' );
+
+				voiceTagName =  npc.GetVoicetag();
+
+				voiceTagStr = NameToString( voiceTagName );
 
 				npc.RemoveTag('ACS_Bomber');
 
@@ -902,6 +919,8 @@ state ACS_Witch_Hunter_Throw_Bomb_Actual_Engage in cACS_Witch_Hunter_Throw_Bomb
 				&& !animatedComponentA.HasFrozenPose()
 				&& !npc.GetIsRecoveringFromKnockdown()
 				&& npc.IsAnyWeaponHeld()
+				&& !npc.HasTag('mq1060_witcher')
+				&& StrFindFirst(voiceTagStr, "REINALD") < 0
 				&& ((CHumanAICombatStorage)npc.GetScriptStorageObject('CombatData')).GetActiveCombatStyle() != EBG_Combat_Fists
 				&& ((CHumanAICombatStorage)npc.GetScriptStorageObject('CombatData')).GetActiveCombatStyle() != EBG_Combat_Undefined
 				&& ((CHumanAICombatStorage)npc.GetScriptStorageObject('CombatData')).GetActiveCombatStyle() != EBG_Combat_Crossbow
@@ -1240,7 +1259,7 @@ state ACS_Tentacle_Start_Engage in cACS_Tentacle
 
 					pos = npc.GetWorldPosition() + npc.GetWorldForward() * 5;
 
-					anchor_temp = (CEntityTemplate)LoadResource( 
+					anchor_temp = (CEntityTemplate)LoadResourceAsync( 
 						
 					"dlc\dlc_acs\data\fx\drowner_warning.w2ent"
 					
@@ -1260,9 +1279,9 @@ state ACS_Tentacle_Start_Engage in cACS_Tentacle
 					((CActor)anchor).EnableCollisions(false);
 					((CActor)anchor).EnableCharacterCollisions(false);
 
-					//ent_1_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\entities\monsters\toad_tongue.w2ent", true );
+					//ent_1_temp = (CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\monsters\toad_tongue.w2ent", true );
 
-					ent_2_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\entities\monsters\toad_tongue_no_face.w2ent", true );
+					ent_2_temp = (CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\monsters\toad_tongue_no_face.w2ent", true );
 
 					ent_1 = theGame.CreateEntity( ent_2_temp, pos, rot );
 
@@ -1423,7 +1442,7 @@ function ACS_Tentacle_Damage_Actual()
 
 	victims.Clear();
 
-	victims = npc.GetNPCsAndPlayersInCone(3, VecHeading(npc.GetHeadingVector()), 15, 20, , FLAG_OnlyAliveActors );
+	victims = npc.GetNPCsAndPlayersInCone(3, VecHeading(npc.GetHeadingVector()), 30, 20, , FLAG_OnlyAliveActors );
 
 	if( victims.Size() > 0)
 	{
@@ -1507,6 +1526,13 @@ function ACS_Tentacle_Damage_Actual()
 					params.effectType = EET_Knockdown;
 					params.creator = npc;
 					params.sourceName = "ACS_Tentacle_Knockdown";
+					params.duration = 1;
+
+					actortarget.AddEffectCustom( params );	
+
+					params.effectType = EET_Poison;
+					params.creator = npc;
+					params.sourceName = "ACS_Tentacle_Poison";
 					params.duration = 1;
 
 					actortarget.AddEffectCustom( params );	
@@ -1675,7 +1701,7 @@ state ACS_Necrofiend_Proj_Start_Engage in cACS_Necrofiend
 
 				pos = npc.GetWorldPosition() + npc.GetWorldForward() * 5;
 
-				anchor_temp = (CEntityTemplate)LoadResource( 
+				anchor_temp = (CEntityTemplate)LoadResourceAsync( 
 					
 				"dlc\dlc_acs\data\fx\drowner_warning.w2ent"
 				
@@ -1695,9 +1721,9 @@ state ACS_Necrofiend_Proj_Start_Engage in cACS_Necrofiend
 				((CActor)anchor).EnableCollisions(false);
 				((CActor)anchor).EnableCharacterCollisions(false);
 
-				ent_1_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\entities\monsters\toad_tongue.w2ent", true );
+				ent_1_temp = (CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\monsters\toad_tongue.w2ent", true );
 
-				ent_2_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\entities\monsters\toad_tongue_no_face.w2ent", true );
+				ent_2_temp = (CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\monsters\toad_tongue_no_face.w2ent", true );
 
 
 				/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2074,7 +2100,7 @@ state ACS_Necrofiend_Proj_Engage in cACS_Necrofiend
 			//targetPosition_3.Z += 0.5;
 
 			proj_1 = (W3ACSZombieSpawnerProjectile)theGame.CreateEntity( 
-			(CEntityTemplate)LoadResource( 
+			(CEntityTemplate)LoadResourceAsync( 
 
 				"dlc\dlc_acs\data\entities\projectiles\zombie_spawner_projectile.w2ent"
 				
@@ -2391,83 +2417,89 @@ state ACS_Nekker_Guardian_Start_Engage in cACS_Nekker_Guardian
 				&& !npc.HasTag('ACS_Has_Summoned_Nekker_Guardian')
 				)			
 				{
-					if (!GetACSNekkerGuardian() || !GetACSNekkerGuardian().IsAlive())
+					if (RandF() < ACS_NekkerGuardian_Enabled())
 					{
-
-						if (npc.HasAbility('mon_q704_ft_pixies'))
+						if (!GetACSNekkerGuardian() || !GetACSNekkerGuardian().IsAlive())
 						{
-							temp = (CEntityTemplate)LoadResourceAsync( 
 
-							"dlc\dlc_acs\data\entities\monsters\pixie_guardian.w2ent"
+							if (npc.HasAbility('mon_q704_ft_pixies'))
+							{
+								temp = (CEntityTemplate)LoadResourceAsync( 
+
+								"dlc\dlc_acs\data\entities\monsters\pixie_guardian.w2ent"
+								
+								, true );
+							}
+							else
+							{
+								temp = (CEntityTemplate)LoadResourceAsync( 
+
+								"dlc\dlc_acs\data\entities\monsters\nekker_guardian.w2ent"
+								
+								, true );
+							}
 							
-							, true );
-						}
-						else
-						{
-							temp = (CEntityTemplate)LoadResourceAsync( 
 
-							"dlc\dlc_acs\data\entities\monsters\nekker_guardian.w2ent"
+							randRange = 1.5 + 1.5 * RandF();
+							randAngle = 1.5 * Pi() * RandF();
+
+							playerPos = GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * 5;
 							
-							, true );
+							spawnPos.X = randRange * CosF( randAngle ) + playerPos.X;
+							spawnPos.Y = randRange * SinF( randAngle ) + playerPos.Y;
+							spawnPos.Z = playerPos.Z;
+
+							GetACSNekkerGuardian().Destroy();
+
+							playerRot = thePlayer.GetWorldRotation();
+
+							playerRot.Yaw += RandRangeF(360,0);
+
+							adjustedRot = EulerAngles(0,0,0);
+
+							adjustedRot.Yaw = playerRot.Yaw;
+							
+							ent = theGame.CreateEntity( temp, spawnPos, adjustedRot );
+
+							animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+							meshcomp = ent.GetComponentByClassName('CMeshComponent');
+							h = 2;
+							animcomp.SetScale(Vector(h,h,h,1));
+							meshcomp.SetScale(Vector(h,h,h,1));	
+
+							((CNewNPC)ent).SetLevel(GetWitcherPlayer().GetLevel() + 7);
+							((CNewNPC)ent).SetAttitude(GetWitcherPlayer(), AIA_Hostile);
+
+							//((CNewNPC)ent).SetCanPlayHitAnim(false); 
+
+							//((CNewNPC)ent).SetTemporaryAttitudeGroup( 'hostile_to_player', AGP_Default );
+							((CActor)ent).SetAnimationSpeedMultiplier(0.75);
+
+							((CActor)ent).AddBuffImmunity_AllNegative('ACS_Nekker_Guardian', true);
+
+							((CActor)ent).AddBuffImmunity_AllCritical('ACS_Nekker_Guardian', true);
+
+							((CActor)ent).GetInventory().RemoveItemByName('Devine', -1);
+
+							actor.SetInteractionPriority( IP_Max_Unpushable );
+
+							if (npc.HasAbility('mon_q704_ft_pixies'))
+							{
+								ent.PlayEffectSingle('demonic_possession');
+
+								ent.AddTag('ACS_Pixie_Guardian');
+							}
+
+							ent.AddTag( 'ACS_Nekker_Guardian' );
+
+							ent.AddTag( 'NoBestiaryEntry' );
 						}
-						
-
-						randRange = 1.5 + 1.5 * RandF();
-						randAngle = 1.5 * Pi() * RandF();
-
-						playerPos = GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * 5;
-						
-						spawnPos.X = randRange * CosF( randAngle ) + playerPos.X;
-						spawnPos.Y = randRange * SinF( randAngle ) + playerPos.Y;
-						spawnPos.Z = playerPos.Z;
-
-						GetACSNekkerGuardian().Destroy();
-
-						playerRot = thePlayer.GetWorldRotation();
-
-						playerRot.Yaw += 180;
-
-						adjustedRot = EulerAngles(0,0,0);
-
-						adjustedRot.Yaw = playerRot.Yaw;
-						
-						ent = theGame.CreateEntity( temp, spawnPos, adjustedRot );
-
-						animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
-						meshcomp = ent.GetComponentByClassName('CMeshComponent');
-						h = 2;
-						animcomp.SetScale(Vector(h,h,h,1));
-						meshcomp.SetScale(Vector(h,h,h,1));	
-
-						((CNewNPC)ent).SetLevel(GetWitcherPlayer().GetLevel() + 7);
-						((CNewNPC)ent).SetAttitude(GetWitcherPlayer(), AIA_Hostile);
-
-						//((CNewNPC)ent).SetCanPlayHitAnim(false); 
-
-						//((CNewNPC)ent).SetTemporaryAttitudeGroup( 'hostile_to_player', AGP_Default );
-						((CActor)ent).SetAnimationSpeedMultiplier(0.75);
-
-						((CActor)ent).AddBuffImmunity_AllNegative('ACS_Nekker_Guardian', true);
-
-						((CActor)ent).AddBuffImmunity_AllCritical('ACS_Nekker_Guardian', true);
-
-						((CActor)ent).GetInventory().RemoveItemByName('Devine', -1);
-
-						actor.SetInteractionPriority( IP_Max_Unpushable );
-
-						if (npc.HasAbility('mon_q704_ft_pixies'))
-						{
-							ent.PlayEffectSingle('demonic_possession');
-
-							ent.AddTag('ACS_Pixie_Guardian');
-						}
-
-						ent.AddTag( 'ACS_Nekker_Guardian' );
-
-						ent.AddTag( 'NoBestiaryEntry' );
 					}
-
-					npc.SetAttitude(GetACSNekkerGuardian(), AIA_Friendly);
+					
+					if (GetACSNekkerGuardian() && GetACSNekkerGuardian().IsAlive())
+					{
+						npc.SetAttitude(GetACSNekkerGuardian(), AIA_Friendly);
+					}
 
 					npc.AddTag('ACS_Has_Summoned_Nekker_Guardian');
 				}
@@ -2522,7 +2554,7 @@ state ACS_Nekker_Guardian_Heal_Engage in cACS_Nekker_Guardian
 	{
 		actors.Clear();
 		
-		actors = GetWitcherPlayer().GetNPCsAndPlayersInRange( 20, 20, , FLAG_ExcludePlayer + FLAG_Attitude_Hostile + FLAG_OnlyAliveActors);
+		actors = GetACSNekkerGuardian().GetNPCsAndPlayersInRange( 5, 5, , FLAG_OnlyAliveActors);
 
 		if( actors.Size() > 0 )
 		{
@@ -2794,24 +2826,6 @@ function GetACSKatakan() : CActor
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function ACS_Unseen_Blade_Summon_Start()
-{
-	var vACS_Unseen_Blade_Summon 		: cACS_Unseen_Blade_Summon;
-
-	vACS_Unseen_Blade_Summon = new cACS_Unseen_Blade_Summon in theGame;
-
-	vACS_Unseen_Blade_Summon.ACS_Unseen_Blade_Summon_Start_Engage();
-}
-
-function ACS_Unseen_Monster_Summon_Start()
-{
-	var vACS_Unseen_Blade_Summon 		: cACS_Unseen_Blade_Summon;
-
-	vACS_Unseen_Blade_Summon = new cACS_Unseen_Blade_Summon in theGame;
-
-	vACS_Unseen_Blade_Summon.ACS_Unseen_Monster_Summon_Start_Engage();
-}
-
 statemachine class cACS_Unseen_Blade_Summon
 {
 	function ACS_Unseen_Blade_Summon_Start_Engage()
@@ -2849,7 +2863,22 @@ state ACS_Unseen_Blade_Summon_Start_Engage in cACS_Unseen_Blade_Summon
 	
 	entry function ACS_Unseen_Blade_Summon_Start_Entry()
 	{
-		ACS_Unseen_Blade_Summon_Start_Latent();
+		if (GetACSStorage().Unseen_Blade_Death_Count() == 0)
+		{
+			ACS_Unseen_Blade_Summon_Start_Latent();
+		}
+		else if (GetACSStorage().Unseen_Blade_Death_Count() == 1)
+		{
+			ACS_Unseen_Blade_Summon_Start_Latent();
+
+			NekuratSpawn1();
+		}
+		else if (GetACSStorage().Unseen_Blade_Death_Count() == 2)
+		{
+			ACS_Unseen_Blade_Summon_Start_Latent();
+
+			NekuratSpawn2();
+		}
 
 		UnseenBladeSetAttitude();
 	}
@@ -2872,7 +2901,7 @@ state ACS_Unseen_Blade_Summon_Start_Engage in cACS_Unseen_Blade_Summon
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -3012,6 +3041,106 @@ state ACS_Unseen_Blade_Summon_Start_Engage in cACS_Unseen_Blade_Summon
 		}
 	}
 
+	latent function NekuratSpawn1()
+	{
+		var temp, anchor_temp, ent_1_temp, blade_temp						: CEntityTemplate;
+		var ent																: CACSMonsterSpawner;
+		var i, count, j														: int;
+		var playerPos, spawnPos, newSpawnPos								: Vector;
+		var randAngle, randRange											: float;
+		var meshcomp														: CComponent;
+		var animcomp 														: CAnimatedComponent;
+		var h 																: float;
+		var bone_vec, pos, attach_vec										: Vector;
+		var bone_rot, rot, attach_rot, playerRot, adjustedRot				: EulerAngles;
+		var actors															: array<CActor>;
+		var npc																: CNewNPC;
+
+		playerPos = theCamera.GetCameraPosition() + VecFromHeading(theCamera.GetCameraHeading()) * 10;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += RandRangeF(360,0);
+
+		adjustedRot = EulerAngles(0,0,0);
+
+		adjustedRot.Yaw = playerRot.Yaw;
+		
+		count = 1;
+			
+		for( i = 0; i < count; i += 1 )
+		{
+			randRange = 5 + 5 * RandF();
+			randAngle = 2 * Pi() * RandF();
+			
+			spawnPos.X = randRange * CosF( randAngle ) + playerPos.X;
+			spawnPos.Y = randRange * SinF( randAngle ) + playerPos.Y;
+			spawnPos.Z = playerPos.Z;
+
+			ent = (CACSMonsterSpawner)theGame.CreateEntity( 
+
+			(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\other\acs_monster_spawner.w2ent", true ), 
+			
+			spawnPos, 
+
+			playerRot );
+			
+			ent.AddTag('ACS_MonsterSpawner_Nekurat_No_Restriction');
+
+			ent.AddTag('ACS_MonsterSpawner_Spawn_In_Frame');
+		}
+	}
+
+	latent function NekuratSpawn2()
+	{
+		var temp, anchor_temp, ent_1_temp, blade_temp						: CEntityTemplate;
+		var ent																: CACSMonsterSpawner;
+		var i, count, j														: int;
+		var playerPos, spawnPos, newSpawnPos								: Vector;
+		var randAngle, randRange											: float;
+		var meshcomp														: CComponent;
+		var animcomp 														: CAnimatedComponent;
+		var h 																: float;
+		var bone_vec, pos, attach_vec										: Vector;
+		var bone_rot, rot, attach_rot, playerRot, adjustedRot				: EulerAngles;
+		var actors															: array<CActor>;
+		var npc																: CNewNPC;
+
+		playerPos = theCamera.GetCameraPosition() + VecFromHeading(theCamera.GetCameraHeading()) * 10;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += RandRangeF(360,0);
+
+		adjustedRot = EulerAngles(0,0,0);
+
+		adjustedRot.Yaw = playerRot.Yaw;
+		
+		count = 2;
+			
+		for( i = 0; i < count; i += 1 )
+		{
+			randRange = 5 + 5 * RandF();
+			randAngle = 2 * Pi() * RandF();
+			
+			spawnPos.X = randRange * CosF( randAngle ) + playerPos.X;
+			spawnPos.Y = randRange * SinF( randAngle ) + playerPos.Y;
+			spawnPos.Z = playerPos.Z;
+
+			ent = (CACSMonsterSpawner)theGame.CreateEntity( 
+
+			(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\other\acs_monster_spawner.w2ent", true ), 
+			
+			spawnPos, 
+
+			playerRot );
+			
+			ent.AddTag('ACS_MonsterSpawner_Nekurat_No_Restriction');
+
+			ent.AddTag('ACS_MonsterSpawner_Spawn_In_Frame');
+		}
+	}
+
 	latent function UnseenBladeSetAttitude()
 	{
 		actors.Clear();
@@ -3083,7 +3212,7 @@ state ACS_Unseen_Monster_Summon_Start_Engage in cACS_Unseen_Blade_Summon
 	{
 		temp = (CEntityTemplate)LoadResourceAsync( 
 
-		"dlc\dlc_acs\data\entities\monsters\vampire_monster.w2ent"
+		"dlc\dlc_acs\data\entities\monsters\vampire_monster_backup.w2ent"
 			
 		, true );
 
@@ -3097,7 +3226,7 @@ state ACS_Unseen_Monster_Summon_Start_Engage in cACS_Unseen_Blade_Summon
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -3489,7 +3618,7 @@ function ACS_VampireMonsterFlyAttackActual()
 
 	playerRot = thePlayer.GetWorldRotation();
 
-	playerRot.Yaw += 180;
+	playerRot.Yaw += RandRangeF(360,0);
 
 	adjustedRot = EulerAngles(0,0,0);
 
@@ -3945,7 +4074,7 @@ function ACS_VampireMonsterDiveActual()
 
 	playerRot = thePlayer.GetWorldRotation();
 
-	playerRot.Yaw += 180;
+	playerRot.Yaw += RandRangeF(360,0);
 
 	adjustedRot = EulerAngles(0,0,0);
 
@@ -4112,15 +4241,17 @@ class CACSVampireMonster extends CNewNPC
 		ForceSetStat( BCS_Essence, ( GetStat( BCS_Essence ) - chunkLife ));
 		CheckHitsCounter();
 
+		((CActor)this).SetVisibility(true);
+
 		if (ACSVampireMonster().IsAlive() && !ACSVampireMonster().HasTag('acs_vampire_monster_not_alive_state'))
 		{
 			if (ACSVampireMonsterBossBar().UsesEssence())
 			{
-				ACSVampireMonsterBossBar().DrainEssence(ACSVampireMonsterBossBar().GetStatMax( BCS_Essence ) * 0.0125);
+				ACSVampireMonsterBossBar().DrainEssence(ACSVampireMonsterBossBar().GetStatMax( BCS_Essence ) * 0.025);
 			}
 			else if (ACSVampireMonsterBossBar().UsesVitality())
 			{
-				ACSVampireMonsterBossBar().DrainVitality(ACSVampireMonsterBossBar().GetStatMax( BCS_Vitality ) * 0.0125);
+				ACSVampireMonsterBossBar().DrainVitality(ACSVampireMonsterBossBar().GetStatMax( BCS_Vitality ) * 0.025);
 			}
 
 			StopEffect('vampire_monster_on_hit');
@@ -4261,7 +4392,7 @@ function GetACS_Blade_Of_The_Unseen_L_Anchor() : CEntity
 	return entity;
 }
 
-function ACS_BladeOfTheUnseenDespawnEffect()
+function ACS_VampireBatsSpawnEffect( pos : Vector )
 {
 	var ent : CEntity;
 
@@ -4269,101 +4400,7 @@ function ACS_BladeOfTheUnseenDespawnEffect()
 
 		"dlc\bob\data\fx\monsters\dettlaff\dettlaff_swarm_trap.w2ent"
 
-		, true ), ACS_Blade_Of_The_Unseen().GetWorldPosition(), ACS_Blade_Of_The_Unseen().GetWorldRotation() );
-
-	ent.PlayEffectSingle('swarm_attack');
-
-	ent.DestroyAfter(2);
-}
-
-function ACS_VampireMonsterDespawnEffect()
-{
-	var ent : CEntity;
-
-	ent = theGame.CreateEntity( (CEntityTemplate)LoadResource( 
-
-		"dlc\bob\data\fx\monsters\dettlaff\dettlaff_swarm_trap.w2ent"
-
-		, true ), ACSVampireMonster().GetWorldPosition(), ACSVampireMonster().GetWorldRotation() );
-
-	ent.PlayEffectSingle('swarm_attack');
-	ent.PlayEffectSingle('swarm_attack');
-	ent.PlayEffectSingle('swarm_attack');
-	ent.PlayEffectSingle('swarm_attack');
-	ent.PlayEffectSingle('swarm_attack');
-
-	ent.DestroyAfter(2);
-}
-
-function ACS_NovigradUndergroundVampireDespawnEffect()
-{
-	var ent : CEntity;
-
-	ent = theGame.CreateEntity( (CEntityTemplate)LoadResource( 
-
-		"dlc\bob\data\fx\monsters\dettlaff\dettlaff_swarm_trap.w2ent"
-
-		, true ), ACS_Novigrad_Underground_Vampire().GetWorldPosition(), ACS_Novigrad_Underground_Vampire().GetWorldRotation() );
-
-	ent.PlayEffectSingle('swarm_attack');
-
-	ent.DestroyAfter(2);
-}
-
-function ACS_HubertRejkVampireDespawnEffect()
-{
-	var ent : CEntity;
-
-	ent = theGame.CreateEntity( (CEntityTemplate)LoadResource( 
-
-		"dlc\bob\data\fx\monsters\dettlaff\dettlaff_swarm_trap.w2ent"
-
-		, true ), ACS_Hubert_Rejk_Vampire().GetWorldPosition(), ACS_Hubert_Rejk_Vampire().GetWorldRotation() );
-
-	ent.PlayEffectSingle('swarm_attack');
-
-	ent.DestroyAfter(2);
-}
-
-function ACS_OriannaVampireDespawnEffect()
-{
-	var ent : CEntity;
-
-	ent = theGame.CreateEntity( (CEntityTemplate)LoadResource( 
-
-		"dlc\bob\data\fx\monsters\dettlaff\dettlaff_swarm_trap.w2ent"
-
-		, true ), ACS_Orianna_Vampire().GetWorldPosition(), ACS_Orianna_Vampire().GetWorldRotation() );
-
-	ent.PlayEffectSingle('swarm_attack');
-
-	ent.DestroyAfter(2);
-}
-
-function ACS_OriannaVampireSpawnEffect()
-{
-	var ent : CEntity;
-
-	ent = theGame.CreateEntity( (CEntityTemplate)LoadResource( 
-
-		"dlc\bob\data\fx\monsters\dettlaff\dettlaff_swarm_trap.w2ent"
-
-		, true ), ACS_Orianna_Vampire_Base().GetWorldPosition(), ACS_Orianna_Vampire_Base().GetWorldRotation() );
-
-	ent.PlayEffectSingle('swarm_attack');
-
-	ent.DestroyAfter(2);
-}
-
-function ACS_TransformationVampireMonsterDespawnEffect()
-{
-	var ent : CEntity;
-
-	ent = theGame.CreateEntity( (CEntityTemplate)LoadResource( 
-
-		"dlc\bob\data\fx\monsters\dettlaff\dettlaff_swarm_trap.w2ent"
-
-		, true ), ACSFixZAxis(thePlayer.GetWorldPosition()), thePlayer.GetWorldRotation() );
+		, true ), pos, thePlayer.GetWorldRotation() );
 
 	ent.PlayEffectSingle('swarm_attack');
 
@@ -4594,7 +4631,7 @@ statemachine class ACSOriannaDisappearController extends CEntity
 
 			GetACSWatcher().ACSOriannaBasePlayAnim('bruxa_jump_up_start', 0.25, 0.25f);
 
-			ACS_OriannaVampireSpawnEffect();
+			ACS_VampireBatsSpawnEffect(ACS_Orianna_Vampire_Base().GetWorldPosition());
 
 			AddTimer('OriannaTurnOffVisibility', 0.75, false);
 
@@ -4682,7 +4719,7 @@ state SpawnOriannaBase in ACSOriannaDisappearController
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -4757,21 +4794,6 @@ state SpawnOriannaVamp in ACSOriannaDisappearController
 		Orianna_Vampire_Spawn_Latent();
 	}
 
-	latent function OriannaVampireDespawnEffect()
-	{
-		var ent : CEntity;
-
-		ent = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( 
-
-		"dlc\bob\data\fx\monsters\dettlaff\dettlaff_swarm_trap.w2ent"
-
-		, true ), ACS_Orianna_Vampire().GetWorldPosition(), ACS_Orianna_Vampire().GetWorldRotation() );
-
-		ent.PlayEffectSingle('swarm_attack');
-
-		ent.DestroyAfter(2);
-	}
-
 	latent function Orianna_Vampire_Spawn_Latent()
 	{
 		var temp, temp_2, temp_3, ent_1_temp, trail_temp					: CEntityTemplate;
@@ -4797,7 +4819,7 @@ state SpawnOriannaVamp in ACSOriannaDisappearController
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -4856,7 +4878,7 @@ state SpawnOriannaVamp in ACSOriannaDisappearController
 
 		((CActor)ent).GetInventory().AddAnItem( 'acs_bruxa_fang' , 1 );
 
-		OriannaVampireDespawnEffect();
+		ACS_VampireBatsSpawnEffect(ent.GetWorldPosition());
 
 		ent.PlayEffectSingle( 'shadowdash' );
 		ent.StopEffect( 'shadowdash' );
@@ -5256,7 +5278,7 @@ state ACS_Fire_Bear_FireballLeft_Start_Engage in cACS_Fire_Bear_Projectiles
 		collisionGroups.PushBack('Terrain');
 		collisionGroups.PushBack('Static');
 
-		meteorEntityTemplate = (CEntityTemplate)LoadResourceAsync(
+		meteorEntityTemplate = (CEntityTemplate)LoadResource(
 
 		"dlc\dlc_acs\data\entities\projectiles\bear_fireball_proj_2.w2ent"
 		
@@ -5320,7 +5342,7 @@ state ACS_Fire_Bear_FireballRight_Start_Engage in cACS_Fire_Bear_Projectiles
 		collisionGroups.PushBack('Terrain');
 		collisionGroups.PushBack('Static');
 
-		meteorEntityTemplate = (CEntityTemplate)LoadResourceAsync(
+		meteorEntityTemplate = (CEntityTemplate)LoadResource(
 
 		"dlc\dlc_acs\data\entities\projectiles\bear_fireball_proj_2.w2ent"
 		
@@ -5381,7 +5403,7 @@ state ACS_Fire_Bear_FireLines_Start_Engage in cACS_Fire_Bear_Projectiles
 		
 		ACSFireBear().SoundEvent("monster_golem_dao_cmb_swoosh_light");
 
-		meteorEntityTemplate = (CEntityTemplate)LoadResourceAsync(
+		meteorEntityTemplate = (CEntityTemplate)LoadResource(
 
 		//"dlc\dlc_acs\data\entities\projectiles\elemental_ifryt_proj.w2ent"
 
@@ -5422,7 +5444,7 @@ state ACS_Fire_Bear_FireLines_Start_Engage in cACS_Fire_Bear_Projectiles
 		
 		ACSFireBear().SoundEvent("monster_golem_dao_cmb_swoosh_light");
 
-		meteorEntityTemplate = (CEntityTemplate)LoadResourceAsync(
+		meteorEntityTemplate = (CEntityTemplate)LoadResource(
 
 		//"dlc\dlc_acs\data\entities\projectiles\elemental_ifryt_proj.w2ent"
 
@@ -6329,7 +6351,7 @@ state ACS_Rat_Mage_Rat_Spawner_Engage in cACS_Rat_Mage_Spawner
 
 			adjustedRot = GetACSRatMage().GetWorldRotation();
 
-			//playerRot.Yaw += 180;
+			//playerRot.Yaw += RandRangeF(360,0);
 			
 			count = RandRange(10,5);
 				
@@ -6524,7 +6546,7 @@ function ACS_spawnratmage()
 
 	playerRot = thePlayer.GetWorldRotation();
 
-	playerRot.Yaw += 180;
+	playerRot.Yaw += RandRangeF(360,0);
 
 	adjustedRot = EulerAngles(0,0,0);
 
@@ -6863,7 +6885,7 @@ function ACS_SheWhoKnowsTeleportActual()
 
 	playerRot = thePlayer.GetWorldRotation();
 
-	playerRot.Yaw += 180;
+	playerRot.Yaw += RandRangeF(360,0);
 
 	adjustedRot = EulerAngles(0,0,0);
 
@@ -7347,25 +7369,25 @@ statemachine class cACS_Werewolf_Spawn_Adds
 
 state ACS_Werewolf_Spawn_Adds_Engage in cACS_Werewolf_Spawn_Adds
 {
-	private var actors, victims																		: array<CActor>;
-	private var i, count, j 																		: int;
-	private var npc 																				: CNewNPC;
-	private var actor, actortarget 																	: CActor;
-	private var spawnPos, playerPos, newPlayerPos													: Vector;
-	private var movementAdjustor																	: CMovementAdjustor;
-	private var ticket 																				: SMovementAdjustmentRequestTicket;
-	private var targetDistance																		: float;
-	private var ent_1, ent_2, ent_3, vfxEnt_1, vfxEnt_2												: CEntity;
-	private var rot, attach_rot                        						 						: EulerAngles;
-   	private var pos, attach_vec																		: Vector;
-	private var meshcomp																			: CComponent;
-	private var animcomp 																			: CAnimatedComponent;
-	private var playerRot, adjustedRot																: EulerAngles;
-	private var temp, ent_1_temp, ent_2_temp														: CEntityTemplate;
+	private var actors, victims																												: array<CActor>;
+	private var i, count, j 																												: int;
+	private var npc 																														: CNewNPC;
+	private var actor, actortarget 																											: CActor;
+	private var spawnPos, playerPos, newPlayerPos																							: Vector;
+	private var movementAdjustor																											: CMovementAdjustor;
+	private var ticket 																														: SMovementAdjustmentRequestTicket;
+	private var targetDistance																												: float;
+	private var ent_1, ent_2, ent_3, vfxEnt_1, vfxEnt_2, skull_ent_1, skull_ent_2, skull_ent_3												: CEntity;
+	private var rot, attach_rot                        						 																: EulerAngles;
+   	private var pos, attach_vec																												: Vector;
+	private var meshcomp																													: CComponent;
+	private var animcomp 																													: CAnimatedComponent;
+	private var playerRot, adjustedRot																										: EulerAngles;
+	private var temp, ent_1_temp, ent_2_temp																								: CEntityTemplate;
 
-	private var randAngle, randRange																: float;
+	private var randAngle, randRange																										: float;
 
-	private var animatedComponentA																	: CAnimatedComponent;
+	private var animatedComponentA																											: CAnimatedComponent;
 	
 	event OnEnterState(prevStateName : name)
 	{
@@ -7566,6 +7588,324 @@ state ACS_Werewolf_Spawn_Adds_Engage in cACS_Werewolf_Spawn_Adds
 						}
 					}
 				}
+				else if (
+				(
+				npc.HasTag('ACS_Vendigo')
+				&& npc.GetCurrentHealth() <= npc.GetMaxHealth() * 0.5
+				&& npc.IsAlive()
+				)
+				)			
+				{
+					if (targetDistance > 5 * 5 && targetDistance <= 20 * 20)
+					{
+						if ( !theSound.SoundIsBankLoaded("animals_deer.bnk") )
+						{
+							theSound.SoundLoadBank( "animals_deer.bnk", false );
+						}
+
+						if (!npc.HasTag('ACS_Vendigo_Has_Summoned_Adds'))
+						{
+							npc.AddTag('ACS_Vendigo_Has_Summoned_Adds');
+
+
+							npc.PlayEffect('sonar');
+							npc.PlayEffect('pre_sonar');
+							npc.PlayEffect('sonar_ready');
+							npc.PlayEffect('scream_01');
+							npc.PlayEffect('scream_02');
+
+							npc.StopEffect('sonar');
+							npc.StopEffect('pre_sonar');
+							npc.StopEffect('sonar_ready');
+							npc.StopEffect('scream_01');
+							npc.StopEffect('scream_02');
+
+
+							vfxEnt_1 = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync(
+							"dlc\bob\data\fx\gameplay\mutation\mutation_7\mutation_7.w2ent"
+							, true ), npc.GetWorldPosition(), npc.GetWorldRotation() );
+
+							vfxEnt_1.CreateAttachment( npc, , Vector( 0, 0, 0 ), EulerAngles(0,0,0) );
+
+							vfxEnt_1.PlayEffectSingle('sonar_mesh');
+
+							vfxEnt_1.PlayEffectSingle('sonar');
+
+							vfxEnt_1.PlayEffectSingle('fx_sonar');
+
+							vfxEnt_1.DestroyAfter(2);
+
+
+
+							vfxEnt_2 = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync(
+								"dlc\dlc_acs\data\fx\acs_sonar.w2ent"
+								, true ), npc.GetWorldPosition(), npc.GetWorldRotation() );
+
+							vfxEnt_2.CreateAttachment( npc, , Vector( 0, 0, 0 ), EulerAngles(0,0,0) );
+
+
+							vfxEnt_2.PlayEffectSingle('sonar_mesh');
+
+							vfxEnt_2.PlayEffectSingle('sonar');
+
+							vfxEnt_2.PlayEffectSingle('fx_sonar');
+
+							vfxEnt_2.DestroyAfter(2);
+
+
+
+
+							movementAdjustor = ((CActor)npc).GetMovingAgentComponent().GetMovementAdjustor();
+
+							ticket = movementAdjustor.GetRequest( 'ACS_Vendigo_Smmmon_Rotate');
+							movementAdjustor.CancelByName( 'ACS_Vendigo_Smmmon_Rotate' );
+							movementAdjustor.CancelAll();
+
+							ticket = movementAdjustor.CreateNewRequest( 'ACS_Vendigo_Smmmon_Rotate' );
+							movementAdjustor.AdjustmentDuration( ticket, 0.5 );
+							movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 500000 );
+
+							movementAdjustor.RotateTowards(ticket, ((CActor)(npc.GetTarget())));
+
+							((CAnimatedComponent)((CNewNPC)npc).GetComponentByClassName( 'CAnimatedComponent' )).RaiseBehaviorForceEvent('Howl');
+
+							if ( npc.IsInInterior() )
+							{
+								((CActor)npc).SetCanPlayHitAnim(false); 
+
+								npc.AddBuffImmunity(EET_Stagger, 'acs_vendigo_howl_interior', true);
+
+								npc.AddBuffImmunity(EET_LongStagger, 'acs_vendigo_howl_interior', true);
+
+								npc.AddBuffImmunity(EET_Knockdown , 'acs_vendigo_howl_interior', true);
+
+								npc.AddBuffImmunity(EET_HeavyKnockdown , 'acs_vendigo_howl_interior', true);
+							}
+							else
+							{
+								npc.SoundEvent("animals_deer_die");
+								npc.SoundEvent("animals_deer_die");
+								npc.SoundEvent("animals_deer_die");
+								npc.SoundEvent("animals_deer_die");
+								npc.SoundEvent("animals_deer_die");
+								npc.SoundEvent("animals_deer_die");
+
+								thePlayer.SoundEvent("animals_deer_die");
+								thePlayer.SoundEvent("animals_deer_die");
+								thePlayer.SoundEvent("animals_deer_die");
+								thePlayer.SoundEvent("animals_deer_die");
+								thePlayer.SoundEvent("animals_deer_die");
+								thePlayer.SoundEvent("animals_deer_die");
+
+								ent_1_temp = (CEntityTemplate)LoadResourceAsync( 
+
+								"dlc\dlc_acs\data\entities\monsters\vendigo_spawn_melee.w2ent"
+									
+								, true );
+
+								ent_2_temp = (CEntityTemplate)LoadResourceAsync( 
+
+								"dlc\dlc_acs\data\entities\monsters\vendigo_spawn_melee_spear.w2ent"
+									
+								, true );
+
+								playerPos = theCamera.GetCameraPosition() + theCamera.GetCameraDirection() * -10;
+
+								if( !theGame.GetWorld().NavigationFindSafeSpot( playerPos, 0.3, 0.3 , newPlayerPos ) )
+								{
+									theGame.GetWorld().NavigationFindSafeSpot( playerPos, 0.5f, 10 , newPlayerPos );
+									playerPos = newPlayerPos;
+								}
+
+								playerRot = thePlayer.GetWorldRotation();
+
+								adjustedRot = EulerAngles(0,0,0);
+
+								adjustedRot.Yaw = playerRot.Yaw;
+
+								ent_1 = theGame.CreateEntity( ent_1_temp, ACSPlayerFixZAxis(playerPos), adjustedRot );
+
+								((CNewNPC)ent_1).SetAttitude(npc, AIA_Friendly);
+
+								((CNewNPC)ent_1).SetLevel(npc.GetLevel() - 3);
+
+								((CNewNPC)ent_1).SetAttitude(((CActor)(npc.GetTarget())), AIA_Hostile);
+
+
+								((CActor)ent_1).AddBuffImmunity(EET_Confusion , 'ACS_Vendigo_Spawn_Buff', true);
+
+								((CActor)ent_1).AddBuffImmunity(EET_Swarm , 'ACS_Vendigo_Spawn_Buff', true);
+
+								((CActor)ent_1).AddBuffImmunity(EET_AxiiGuardMe , 'ACS_Vendigo_Spawn_Buff', true);
+
+								((CActor)ent_1).AddBuffImmunity(EET_Blindness , 'ACS_Vendigo_Spawn_Buff', true);
+
+								((CActor)ent_1).AddBuffImmunity(EET_Paralyzed , 'ACS_Vendigo_Spawn_Buff', true);
+
+								((CActor)ent_1).AddTag('IsBoss');
+
+								((CActor)ent_1).AddAbility('Boss');
+
+								((CActor)ent_1).AddAbility('InstantKillImmune');
+
+								((CActor)ent_1).AddAbility('DisableFinishers');
+
+								((CActor)ent_1).AddAbility('MonsterMHBoss');
+
+								((CActor)ent_1).AddAbility('BounceBoltsWildhunt');
+
+								ent_1.AddTag('ACS_Vendigo_Spawn');
+
+
+
+
+								ent_2 = theGame.CreateEntity( ent_2_temp, ACSPlayerFixZAxis(playerPos), adjustedRot );
+
+								((CNewNPC)ent_2).SetAttitude(npc, AIA_Friendly);
+
+								((CNewNPC)ent_2).SetLevel( npc.GetLevel() - 3 );
+
+								((CNewNPC)ent_2).SetAttitude(((CActor)(npc.GetTarget())), AIA_Hostile);
+
+
+								((CActor)ent_2).AddBuffImmunity(EET_Confusion , 'ACS_Vendigo_Spawn_Buff', true);
+
+								((CActor)ent_2).AddBuffImmunity(EET_Swarm , 'ACS_Vendigo_Spawn_Buff', true);
+
+								((CActor)ent_2).AddBuffImmunity(EET_AxiiGuardMe , 'ACS_Vendigo_Spawn_Buff', true);
+
+								((CActor)ent_2).AddBuffImmunity(EET_Blindness , 'ACS_Vendigo_Spawn_Buff', true);
+
+								((CActor)ent_2).AddBuffImmunity(EET_Paralyzed , 'ACS_Vendigo_Spawn_Buff', true);
+
+								((CActor)ent_2).AddTag('IsBoss');
+
+								((CActor)ent_2).AddAbility('Boss');
+
+								((CActor)ent_2).AddAbility('InstantKillImmune');
+
+								((CActor)ent_2).AddAbility('DisableFinishers');
+
+								((CActor)ent_2).AddAbility('MonsterMHBoss');
+
+								((CActor)ent_2).AddAbility('BounceBoltsWildhunt');
+
+								ent_2.AddTag('ACS_Vendigo_Spawn');
+
+
+								if (RandF() < 0.5)
+								{
+									ent_3 = theGame.CreateEntity( ent_1_temp, ACSPlayerFixZAxis(playerPos), adjustedRot );
+								}
+								else
+								{
+									ent_3 = theGame.CreateEntity( ent_2_temp, ACSPlayerFixZAxis(playerPos), adjustedRot );
+								}
+								
+								((CNewNPC)ent_3).SetAttitude(npc, AIA_Friendly);
+
+								((CNewNPC)ent_3).SetLevel(npc.GetLevel() - 3);
+
+								((CNewNPC)ent_3).SetAttitude(((CActor)(npc.GetTarget())), AIA_Hostile);
+
+
+								((CActor)ent_3).AddBuffImmunity(EET_Confusion , 'ACS_Vendigo_Spawn_Buff', true);
+
+								((CActor)ent_3).AddBuffImmunity(EET_Swarm , 'ACS_Vendigo_Spawn_Buff', true);
+
+								((CActor)ent_3).AddBuffImmunity(EET_AxiiGuardMe , 'ACS_Vendigo_Spawn_Buff', true);
+
+								((CActor)ent_3).AddBuffImmunity(EET_Blindness , 'ACS_Vendigo_Spawn_Buff', true);
+
+								((CActor)ent_3).AddBuffImmunity(EET_Paralyzed , 'ACS_Vendigo_Spawn_Buff', true);
+
+								((CActor)ent_3).AddTag('IsBoss');
+
+								((CActor)ent_3).AddAbility('Boss');
+
+								((CActor)ent_3).AddAbility('InstantKillImmune');
+
+								((CActor)ent_3).AddAbility('DisableFinishers');
+
+								((CActor)ent_3).AddAbility('MonsterMHBoss');
+
+								((CActor)ent_3).AddAbility('BounceBoltsWildhunt');
+
+								ent_3.AddTag('ACS_Vendigo_Spawn');
+
+
+
+								if (!((CNewNPC)ent_1).HasAbility('IsNotScaredOfMonsters'))
+								{
+									((CNewNPC)ent_1).AddAbility('IsNotScaredOfMonsters');
+								}
+
+								if (!((CNewNPC)ent_2).HasAbility('IsNotScaredOfMonsters'))
+								{
+									((CNewNPC)ent_2).AddAbility('IsNotScaredOfMonsters');
+								}
+
+								if (!((CNewNPC)ent_3).HasAbility('IsNotScaredOfMonsters'))
+								{
+									((CNewNPC)ent_3).AddAbility('IsNotScaredOfMonsters');
+								}
+
+								ent_1.PlayEffect('axii_hipnotize');
+								ent_1.PlayEffect('axii_confusion');
+								ent_1.PlayEffect('axii_guardian');
+								ent_1.PlayEffect('axii_slowdown');
+								ent_1.PlayEffect('demonic_possession');
+								//ent_1.PlayEffect('ice');
+
+								ent_2.PlayEffect('axii_hipnotize');
+								ent_2.PlayEffect('axii_confusion');
+								ent_2.PlayEffect('axii_guardian');
+								ent_2.PlayEffect('axii_slowdown');
+								ent_2.PlayEffect('demonic_possession');
+								//ent_2.PlayEffect('ice');
+
+								ent_3.PlayEffect('axii_hipnotize');
+								ent_3.PlayEffect('axii_confusion');
+								ent_3.PlayEffect('axii_guardian');
+								ent_3.PlayEffect('axii_slowdown');
+								ent_3.PlayEffect('demonic_possession');
+								//ent_3.PlayEffect('ice');
+
+								skull_ent_1 = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( 
+
+								"dlc\dlc_acs\data\models\vendigo\vendigo_spawn_skull.w2ent"
+
+								, true ), playerPos, adjustedRot );
+
+								skull_ent_1.CreateAttachment( ent_1, 'head', Vector( 0, 0.15, 0.4 ), EulerAngles(-45,180,0) );
+
+								skull_ent_1.AddTag('ACS_Vendigo_Spawn_Skull');
+
+
+								skull_ent_2 = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( 
+
+								"dlc\dlc_acs\data\models\vendigo\vendigo_spawn_skull.w2ent"
+
+								, true ), playerPos, adjustedRot );
+
+								skull_ent_2.CreateAttachment( ent_2, 'head', Vector( 0, 0.15, 0.4 ), EulerAngles(-45,180,0) );
+
+								skull_ent_2.AddTag('ACS_Vendigo_Spawn_Skull');
+
+
+								skull_ent_3 = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( 
+
+								"dlc\dlc_acs\data\models\vendigo\vendigo_spawn_skull.w2ent"
+
+								, true ), playerPos, adjustedRot );
+
+								skull_ent_3.CreateAttachment( ent_3, 'head', Vector( 0, 0.15, 0.4 ), EulerAngles(-45,180,0) );
+
+								skull_ent_3.AddTag('ACS_Vendigo_Spawn_Skull');
+							}
+						}
+					}
+				}
 			}
 		}
 	}
@@ -7673,7 +8013,7 @@ state ACS_Wild_Hunt_Riders_Engage in cACS_Wild_Hunt_Riders
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -7776,9 +8116,9 @@ state ACS_Wild_Hunt_Riders_Engage in cACS_Wild_Hunt_Riders
 
 		GetACSWatcher().RemoveTimer('ACS_WildHuntRiders_Destroy');
 
-		GetACSWatcher().AddTimer('ACS_WildHuntRiders_DeactivateFrostEffect', 30, false);
+		GetACSWatcher().AddTimer('ACS_WildHuntRiders_DeactivateFrostEffect', 60, false);
 
-		GetACSWatcher().AddTimer('ACS_WildHuntRiders_Destroy', 60, false);
+		GetACSWatcher().AddTimer('ACS_WildHuntRiders_Destroy', 120, false);
 	}
 }
 
@@ -7836,7 +8176,7 @@ state ACS_Eredin_Spawn_Engage in cACS_Wild_Hunt_Riders
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -7878,7 +8218,7 @@ state ACS_Eredin_Spawn_Engage in cACS_Wild_Hunt_Riders
 
 		GetACSWatcher().RemoveTimer('ACS_Eredin_Kill_Timer');
 
-		GetACSWatcher().AddTimer('ACS_Eredin_Kill_Timer', 45, false);
+		GetACSWatcher().AddTimer('ACS_Eredin_Kill_Timer', 60, false);
 
 
 
@@ -7921,7 +8261,7 @@ state ACS_Dark_Portal_Spawn_Engage in cACS_Wild_Hunt_Riders
 		GetACSDarkPortal().Destroy();
 		GetACSDarkPortalEnt().Destroy();
 
-		temp = (CEntityTemplate)LoadResource( 
+		temp = (CEntityTemplate)LoadResourceAsync( 
 
 		"dlc\dlc_acs\data\entities\other\dark_portal_ent.w2ent"
 			
@@ -7931,7 +8271,7 @@ state ACS_Dark_Portal_Spawn_Engage in cACS_Wild_Hunt_Riders
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -7961,8 +8301,9 @@ state ACS_Wh_Ship_Spawn_Engage in cACS_Wild_Hunt_Riders
 	{
 		var temp, temp_2													: CEntityTemplate;
 		var ent, ent_2														: CEntity;
-		var playerPos, playerPos2, entPos									: Vector;
+		var playerPos, entPos												: Vector;
 		var playerRot, adjustedRot											: EulerAngles;
+		var zPos, shipDist 													: float;
 
 		GetACSNaglfar().Destroy();
 
@@ -7980,21 +8321,21 @@ state ACS_Wh_Ship_Spawn_Engage in cACS_Wild_Hunt_Riders
 			
 		, true );
 
-		playerPos = theCamera.GetCameraPosition() + VecFromHeading(theCamera.GetCameraHeading()) * 200;
+		shipDist = RandRangeF(250, 200);
 
-		playerRot = thePlayer.GetWorldRotation();
+		playerPos = ACSPlayerFixZAxis(theCamera.GetCameraPosition() + VecFromHeading(theCamera.GetCameraHeading()) * shipDist);
 
-		playerRot.Yaw -= 101.25;
+		playerRot = theCamera.GetCameraRotation();
+
+		playerRot.Yaw += RandRangeF(-60, -101);
 
 		adjustedRot = EulerAngles(0,0,0);
 
 		adjustedRot.Yaw = playerRot.Yaw;
 
-		playerPos.Z += 50;
+		zPos = RandRangeF(100, 75);
 
-		playerPos2 = theCamera.GetCameraPosition() + VecFromHeading(theCamera.GetCameraHeading()) * 200;
-
-		playerPos2.Z += 50;
+		playerPos.Z += zPos;
 
 		ent = theGame.CreateEntity( temp, playerPos, adjustedRot );
 
@@ -8004,7 +8345,7 @@ state ACS_Wh_Ship_Spawn_Engage in cACS_Wild_Hunt_Riders
 
 		entPos.Z += 6;
 
-		ent_2 = theGame.CreateEntity( temp_2, entPos + ent.GetWorldRight() * 50, adjustedRot );
+		ent_2 = theGame.CreateEntity( temp_2, entPos + ent.GetWorldRight() * 37.5, adjustedRot );
 
 		ent_2.PlayEffect('test_rift_2');
 
@@ -8025,6 +8366,8 @@ state ACS_Wh_Ship_Spawn_Engage in cACS_Wild_Hunt_Riders
 
 		GetACSWatcher().RemoveTimer('NaglfarStop');
 		GetACSWatcher().AddTimer('NaglfarStop', 35, false);
+
+		GetACSWatcher().Activate_Naglfar_Env();
 	}
 }
 
@@ -8267,7 +8610,7 @@ function ACS_spawneredin()
 
 	playerRot = thePlayer.GetWorldRotation();
 
-	playerRot.Yaw += 180;
+	playerRot.Yaw += RandRangeF(360,0);
 
 	adjustedRot = EulerAngles(0,0,0);
 
@@ -8451,7 +8794,7 @@ state ACS_Night_Stalker_Engage in cACS_Night_Stalker
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -8600,7 +8943,7 @@ state ACS_XenoTyrant_Spawner_Engage in cACS_XenoSwarm_Spawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -9648,7 +9991,7 @@ state ACS_Caranthir_Summon_Engage in cACS_Caranthir_Abilities
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -11167,7 +11510,7 @@ function ACS_ShadowWolfSpawn( npc : CActor, pos : Vector )
 
 	playerRot = thePlayer.GetWorldRotation();
 
-	playerRot.Yaw += 180;
+	playerRot.Yaw += RandRangeF(360,0);
 
 	adjustedRot = EulerAngles(0,0,0);
 
@@ -11268,7 +11611,7 @@ function ACS_FluffyShadowWolfSpawn( npc : CActor, pos : Vector )
 
 	playerRot = thePlayer.GetWorldRotation();
 
-	playerRot.Yaw += 180;
+	playerRot.Yaw += RandRangeF(360,0);
 
 	adjustedRot = EulerAngles(0,0,0);
 
@@ -11311,33 +11654,6 @@ function ACS_FluffyShadowWolfSpawn( npc : CActor, pos : Vector )
 		((CActor)ent).AddAbility('BounceBoltsWildhunt');
 
 		ent.AddTag('NoBestiaryEntry');
-
-		((CActor)ent).AddBuffImmunity(EET_Poison, 'ACS_Shadow_Wolf_Buff', true);
-
-		((CActor)ent).AddBuffImmunity(EET_PoisonCritical , 'ACS_Shadow_Wolf_Buff', true);
-
-		((CActor)ent).AddBuffImmunity(EET_Bleeding , 'ACS_Shadow_Wolf_Buff', true);
-
-		((CActor)ent).AddBuffImmunity(EET_Weaken , 'ACS_Shadow_Wolf_Buff', true);
-
-		((CActor)ent).AddBuffImmunity(EET_WeakeningAura , 'ACS_Shadow_Wolf_Buff', true);
-
-		((CActor)ent).AddBuffImmunity(EET_Confusion , 'ACS_Shadow_Wolf_Buff', true);
-
-		((CActor)ent).AddBuffImmunity(EET_Hypnotized , 'ACS_Shadow_Wolf_Buff', true);
-
-		((CActor)ent).AddBuffImmunity(EET_AxiiGuardMe , 'ACS_Shadow_Wolf_Buff', true);
-
-		((CActor)ent).AddBuffImmunity(EET_Immobilized , 'ACS_Shadow_Wolf_Buff', true);
-
-		((CActor)ent).AddBuffImmunity(EET_Paralyzed , 'ACS_Shadow_Wolf_Buff', true);
-
-		((CActor)ent).AddBuffImmunity(EET_Blindness , 'ACS_Shadow_Wolf_Buff', true);
-
-		((CActor)ent).AddBuffImmunity(EET_Choking , 'ACS_Shadow_Wolf_Buff', true);
-
-		((CActor)ent).AddBuffImmunity(EET_Swarm , 'ACS_Shadow_Wolf_Buff', true);
-
 
 		movementAdjustor = ((CActor)ent).GetMovingAgentComponent().GetMovementAdjustor();
 
@@ -11984,21 +12300,6 @@ function ACS_FogAssassinDopplegangerSmokeScreen( npc : CActor, pos : Vector )
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function ACS_Forest_God_Adds_1_Spawner()
-{
-	var vACS_Forest_God_Spawner : cACS_Forest_God_Spawner;
-	vACS_Forest_God_Spawner = new cACS_Forest_God_Spawner in theGame;
-
-	vACS_Forest_God_Spawner.ACS_Forest_God_Adds_1_Spawner_Engage();
-}
-
-function ACS_Forest_God_Adds_2_Spawner()
-{
-	var vACS_Forest_God_Spawner : cACS_Forest_God_Spawner;
-	vACS_Forest_God_Spawner = new cACS_Forest_God_Spawner in theGame;
-
-	vACS_Forest_God_Spawner.ACS_Forest_God_Adds_2_Spawner_Engage();
-}
 
 function ACS_Forest_God_Shadows_Destroy()
 {	
@@ -12018,6 +12319,25 @@ function ACS_Forest_God_Shadows_Destroy()
 	{
 		shadows[i].Destroy();
 	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+function ACS_Forest_God_Adds_1_Spawner()
+{
+	var vACS_Forest_God_Spawner : cACS_Forest_God_Spawner;
+	vACS_Forest_God_Spawner = new cACS_Forest_God_Spawner in theGame;
+
+	vACS_Forest_God_Spawner.ACS_Forest_God_Adds_1_Spawner_Engage();
+}
+
+function ACS_Forest_God_Adds_2_Spawner()
+{
+	var vACS_Forest_God_Spawner : cACS_Forest_God_Spawner;
+	vACS_Forest_God_Spawner = new cACS_Forest_God_Spawner in theGame;
+
+	vACS_Forest_God_Spawner.ACS_Forest_God_Adds_2_Spawner_Engage();
 }
 
 statemachine class cACS_Forest_God_Spawner
@@ -12075,18 +12395,7 @@ state ACS_Forest_God_Shadows_Spawner_Engage in cACS_Forest_God_Spawner
 
 		playerPos = thePlayer.GetWorldPosition();
 
-		if( thePlayer.GetStat( BCS_Vitality ) <= thePlayer.GetStatMax(BCS_Vitality)/2 ) 
-		{	
-			count = 1;
-		}
-		else if( thePlayer.GetStat( BCS_Vitality ) == thePlayer.GetStatMax(BCS_Vitality) ) 
-		{
-			count = 2;
-		}
-		else
-		{
-			count = 1;
-		}
+		count = 1;
 			
 		for( i = 0; i < count; i += 1 )
 		{
@@ -12101,7 +12410,7 @@ state ACS_Forest_God_Shadows_Spawner_Engage in cACS_Forest_God_Spawner
 
 			playerRot = thePlayer.GetWorldRotation();
 
-			playerRot.Yaw += 180;
+			playerRot.Yaw += RandRangeF(360,0);
 
 			adjustedRot = EulerAngles(0,0,0);
 
@@ -12111,7 +12420,7 @@ state ACS_Forest_God_Shadows_Spawner_Engage in cACS_Forest_God_Spawner
 
 			animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
 			meshcomp = ent.GetComponentByClassName('CMeshComponent');
-			h = 0.65;
+			h = 1;
 			animcomp.SetScale(Vector(h,h,h,1));
 			meshcomp.SetScale(Vector(h,h,h,1));	
 
@@ -12119,11 +12428,9 @@ state ACS_Forest_God_Shadows_Spawner_Engage in cACS_Forest_God_Spawner
 
 			((CActor)ent).GetInventory().AddAnItem( 'Leshy mutagen', 1 );
 
-			((CNewNPC)ent).SetLevel( thePlayer.GetLevel() - 15 );
+			((CNewNPC)ent).SetLevel( thePlayer.GetLevel() /2 );
 
 			((CNewNPC)ent).SetAttitude(thePlayer, AIA_Hostile);
-
-			((CNewNPC)ent).SetTemporaryAttitudeGroup( 'hostile_to_player', AGP_Default );
 
 			((CActor)ent).SetAnimationSpeedMultiplier(1.25);
 
@@ -12131,24 +12438,37 @@ state ACS_Forest_God_Shadows_Spawner_Engage in cACS_Forest_God_Spawner
 
 			((CActor)ent).AddBuffImmunity_AllCritical('ACS_Forest_God_Shadows', true);
 
-			((CActor)ent).EnableCharacterCollisions(false);
+			((CActor)ent).EnableCharacterCollisions(true);
 
 			((CActor)ent).SetUnpushableTarget(thePlayer);
 
+			((CNewNPC)ent).SetUnstoppable(true);
+
+			((CActor)ent).SetCanPlayHitAnim(false);
+
+			((CActor)ent).AddTag( 'ContractTarget' );
+
+			((CActor)ent).AddTag('IsBoss');
+
+			((CActor)ent).AddAbility('Boss');
+
+			((CActor)ent).AddAbility('InstantKillImmune');
+
+			((CActor)ent).AddAbility('ablIgnoreSigns');
+
+			((CActor)ent).AddAbility('DisableFinishers');
+
+			((CActor)ent).AddAbility('MonsterMHBoss');
+
+			((CActor)ent).AddAbility('ForceCriticalEffects');
+
+			((CActor)ent).AddAbility('BounceBoltsWildhunt');
+
 			((CActor)ent).PlayEffectSingle('demonic_possession');
 
-			if (count == 2)
-			{
-				((CActor)ent).DrainEssence(((CActor)ent).GetStatMax(BCS_Essence)/2);
-			}
-
-			((CActor)ent).RemoveBuffImmunity(EET_Slowdown);
-
-			((CActor)ent).RemoveBuffImmunity(EET_Paralyzed);
-
-			((CActor)ent).RemoveBuffImmunity(EET_Stagger);
-
 			ent.AddTag( 'ACS_Forest_God_Shadows' );
+
+			ent.AddTag( 'ACS_Hostile_To_All' );
 
 			ent.AddTag( 'ContractTarget' );
 		}
@@ -12220,7 +12540,7 @@ state ACS_Forest_God_Adds_1_Spawner_Engage in cACS_Forest_God_Spawner
 
 			playerRot = thePlayer.GetWorldRotation();
 
-			playerRot.Yaw += 180;
+			playerRot.Yaw += RandRangeF(360,0);
 
 			adjustedRot = EulerAngles(0,0,0);
 
@@ -12300,7 +12620,7 @@ state ACS_Forest_God_Adds_2_Spawner_Engage in cACS_Forest_God_Spawner
 
 			playerRot = thePlayer.GetWorldRotation();
 
-			playerRot.Yaw += 180;
+			playerRot.Yaw += RandRangeF(360,0);
 
 			adjustedRot = EulerAngles(0,0,0);
 
@@ -12595,7 +12915,7 @@ state ACS_Forest_God_Spawner_Engage in cACS_Forest_God_Spawner
 
 			playerRot = thePlayer.GetWorldRotation();
 
-			playerRot.Yaw += 180;
+			playerRot.Yaw += RandRangeF(360,0);
 
 			adjustedRot = EulerAngles(0,0,0);
 
@@ -12987,7 +13307,7 @@ state ACS_Spawner_Engage in cACS_Spawner
 
 			playerRot = thePlayer.GetWorldRotation();
 
-			playerRot.Yaw += 180;
+			playerRot.Yaw += RandRangeF(360,0);
 
 			adjustedRot = EulerAngles(0,0,0);
 
@@ -13243,7 +13563,7 @@ state ACS_MelusineSpawner_Engage in cACS_MelusineSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -13675,13 +13995,13 @@ state ACS_Cultist_Spawn_Engage in cACS_Cultist_Spawner
 	
 	latent function Cultist_Spawn_Latent()
 	{
-		temp_1 = (CEntityTemplate)LoadResource( 
+		temp_1 = (CEntityTemplate)LoadResourceAsync( 
 
 		"dlc\dlc_acs\data\entities\monsters\cultist\cultist_boss.w2ent"
 			
 		, true );
 
-		temp_2 = (CEntityTemplate)LoadResource( 
+		temp_2 = (CEntityTemplate)LoadResourceAsync( 
 
 		"dlc\dlc_acs\data\entities\monsters\cultist\cultist_boss_blunt.w2ent"
 			
@@ -13721,7 +14041,7 @@ state ACS_Cultist_Spawn_Engage in cACS_Cultist_Spawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -13924,13 +14244,13 @@ state ACS_Cultist_Static_Spawn_Engage in cACS_Cultist_Spawner
 		var bone_vec, pos, attach_vec										: Vector;
 		var bone_rot, rot, attach_rot, playerRot, bossRot, adjustedRot		: EulerAngles;
 
-		temp_1 = (CEntityTemplate)LoadResource( 
+		temp_1 = (CEntityTemplate)LoadResourceAsync( 
 
 		"dlc\dlc_acs\data\entities\monsters\cultist\cultist_boss.w2ent"
 			
 		, true );
 
-		temp_2 = (CEntityTemplate)LoadResource( 
+		temp_2 = (CEntityTemplate)LoadResourceAsync( 
 
 		"dlc\dlc_acs\data\entities\monsters\cultist\cultist_boss_blunt.w2ent"
 			
@@ -13970,7 +14290,7 @@ state ACS_Cultist_Static_Spawn_Engage in cACS_Cultist_Spawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -14140,13 +14460,13 @@ state ACS_Cultist_Static_Spawn_Engage in cACS_Cultist_Spawner
 		var bone_vec, pos, attach_vec										: Vector;
 		var bone_rot, rot, attach_rot, playerRot, bossRot, adjustedRot		: EulerAngles;
 
-		temp_1 = (CEntityTemplate)LoadResource( 
+		temp_1 = (CEntityTemplate)LoadResourceAsync( 
 
 		"dlc\dlc_acs\data\entities\monsters\cultist\cultist_boss.w2ent"
 			
 		, true );
 
-		temp_2 = (CEntityTemplate)LoadResource( 
+		temp_2 = (CEntityTemplate)LoadResourceAsync( 
 
 		"dlc\dlc_acs\data\entities\monsters\cultist\cultist_boss_blunt.w2ent"
 			
@@ -14186,7 +14506,7 @@ state ACS_Cultist_Static_Spawn_Engage in cACS_Cultist_Spawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -14356,13 +14676,13 @@ state ACS_Cultist_Static_Spawn_Engage in cACS_Cultist_Spawner
 		var bone_vec, pos, attach_vec										: Vector;
 		var bone_rot, rot, attach_rot, playerRot, bossRot, adjustedRot					: EulerAngles;
 
-		temp_1 = (CEntityTemplate)LoadResource( 
+		temp_1 = (CEntityTemplate)LoadResourceAsync( 
 
 		"dlc\dlc_acs\data\entities\monsters\cultist\cultist_boss.w2ent"
 			
 		, true );
 
-		temp_2 = (CEntityTemplate)LoadResource( 
+		temp_2 = (CEntityTemplate)LoadResourceAsync( 
 
 		"dlc\dlc_acs\data\entities\monsters\cultist\cultist_boss_blunt.w2ent"
 			
@@ -14402,7 +14722,7 @@ state ACS_Cultist_Static_Spawn_Engage in cACS_Cultist_Spawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -14572,13 +14892,13 @@ state ACS_Cultist_Static_Spawn_Engage in cACS_Cultist_Spawner
 		var bone_vec, pos, attach_vec										: Vector;
 		var bone_rot, rot, attach_rot, playerRot, bossRot, adjustedRot					: EulerAngles;
 
-		temp_1 = (CEntityTemplate)LoadResource( 
+		temp_1 = (CEntityTemplate)LoadResourceAsync( 
 
 		"dlc\dlc_acs\data\entities\monsters\cultist\cultist_boss.w2ent"
 			
 		, true );
 
-		temp_2 = (CEntityTemplate)LoadResource( 
+		temp_2 = (CEntityTemplate)LoadResourceAsync( 
 
 		"dlc\dlc_acs\data\entities\monsters\cultist\cultist_boss_blunt.w2ent"
 			
@@ -14618,7 +14938,7 @@ state ACS_Cultist_Static_Spawn_Engage in cACS_Cultist_Spawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -14788,13 +15108,13 @@ state ACS_Cultist_Static_Spawn_Engage in cACS_Cultist_Spawner
 		var bone_vec, pos, attach_vec										: Vector;
 		var bone_rot, rot, attach_rot, playerRot, bossRot, adjustedRot					: EulerAngles;
 
-		temp_1 = (CEntityTemplate)LoadResource( 
+		temp_1 = (CEntityTemplate)LoadResourceAsync( 
 
 		"dlc\dlc_acs\data\entities\monsters\cultist\cultist_boss.w2ent"
 			
 		, true );
 
-		temp_2 = (CEntityTemplate)LoadResource( 
+		temp_2 = (CEntityTemplate)LoadResourceAsync( 
 
 		"dlc\dlc_acs\data\entities\monsters\cultist\cultist_boss_blunt.w2ent"
 			
@@ -14834,7 +15154,7 @@ state ACS_Cultist_Static_Spawn_Engage in cACS_Cultist_Spawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -15004,13 +15324,13 @@ state ACS_Cultist_Static_Spawn_Engage in cACS_Cultist_Spawner
 		var bone_vec, pos, attach_vec										: Vector;
 		var bone_rot, rot, attach_rot, playerRot, bossRot, adjustedRot					: EulerAngles;
 
-		temp_1 = (CEntityTemplate)LoadResource( 
+		temp_1 = (CEntityTemplate)LoadResourceAsync( 
 
 		"dlc\dlc_acs\data\entities\monsters\cultist\cultist_boss.w2ent"
 			
 		, true );
 
-		temp_2 = (CEntityTemplate)LoadResource( 
+		temp_2 = (CEntityTemplate)LoadResourceAsync( 
 
 		"dlc\dlc_acs\data\entities\monsters\cultist\cultist_boss_blunt.w2ent"
 			
@@ -15050,7 +15370,7 @@ state ACS_Cultist_Static_Spawn_Engage in cACS_Cultist_Spawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -15220,13 +15540,13 @@ state ACS_Cultist_Static_Spawn_Engage in cACS_Cultist_Spawner
 		var bone_vec, pos, attach_vec										: Vector;
 		var bone_rot, rot, attach_rot, playerRot, bossRot, adjustedRot					: EulerAngles;
 		
-		temp_1 = (CEntityTemplate)LoadResource( 
+		temp_1 = (CEntityTemplate)LoadResourceAsync( 
 
 		"dlc\dlc_acs\data\entities\monsters\cultist\cultist_boss.w2ent"
 			
 		, true );
 
-		temp_2 = (CEntityTemplate)LoadResource( 
+		temp_2 = (CEntityTemplate)LoadResourceAsync( 
 
 		"dlc\dlc_acs\data\entities\monsters\cultist\cultist_boss_blunt.w2ent"
 			
@@ -15266,7 +15586,7 @@ state ACS_Cultist_Static_Spawn_Engage in cACS_Cultist_Spawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -15467,7 +15787,7 @@ state ACS_Cultist_Boss_Siren_Spawn_Engage in cACS_Cultist_Spawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -15557,7 +15877,7 @@ state ACS_Cultist_Siren_Spawn_Engage in cACS_Cultist_Spawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -15776,15 +16096,6 @@ function ACS_PirateZombieController()
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-function ACS_Svalblod_Bear_Spawn()
-{
-	var vACS_Svalblod_Spawn : cACS_Svalblod_Spawn;
-	vACS_Svalblod_Spawn = new cACS_Svalblod_Spawn in theGame;
-			
-	vACS_Svalblod_Spawn.ACS_Svalblod_Bear_Spawn_Engage();
-}
-
 statemachine class cACS_Svalblod_Spawn
 {
 	function ACS_Svalblod_Bear_Spawn_Engage()
@@ -15831,7 +16142,7 @@ state ACS_Svalblod_Bear_Spawn_Engage in cACS_Svalblod_Spawn
 
 		GetACSSvalblodBear().Destroy();
 
-		temp = (CEntityTemplate)LoadResource( 
+		temp = (CEntityTemplate)LoadResourceAsync( 
 
 		"dlc\dlc_acs\data\entities\monsters\svalblod.w2ent"
 			
@@ -16001,6 +16312,8 @@ function ACS_Berserker_Bear_Spawn( npc : CActor, pos : Vector )
 	var targetDistance													: float;
 	var attack_anim_names												: array<EAttackType>;
 	var l_aiTree														: CAIExecuteAttackAction;
+	var glyph_names														: array<CName>;
+	var rune_names														: array<CName>;
 
 	temp = (CEntityTemplate)LoadResource( 
 
@@ -16037,6 +16350,41 @@ function ACS_Berserker_Bear_Spawn( npc : CActor, pos : Vector )
 	((CActor)ent).AddAbility('BounceBoltsWildhunt');
 
 	ent.AddTag('NoBestiaryEntry');
+
+	if(RandF() < 0.5)
+	{
+		rune_names.Clear();
+		
+		rune_names.PushBack('Rune stribog greater');
+		rune_names.PushBack('Rune devana greater');
+		rune_names.PushBack('Rune zoria greater');
+		rune_names.PushBack('Rune morana greater');
+		rune_names.PushBack('Rune veles greater');
+		rune_names.PushBack('Rune perun greater');
+		
+		
+		rune_names.PushBack('Rune svarog greater');
+		rune_names.PushBack('Rune triglav greater');
+		rune_names.PushBack('Rune dazhbog greater');
+
+		((CActor)ent).GetInventory().AddAnItem( rune_names[RandRange(rune_names.Size())], 1 );
+	}
+	else
+	{
+		glyph_names.Clear();
+		
+		glyph_names.PushBack('Glyph binding greater');
+		glyph_names.PushBack('Glyph warding greater');
+		glyph_names.PushBack('Glyph aard greater');
+		glyph_names.PushBack('Glyph axii greater');
+		glyph_names.PushBack('Glyph igni greater');
+		glyph_names.PushBack('Glyph quen greater');
+		glyph_names.PushBack('Glyph yrden greater');
+		
+		glyph_names.PushBack('Glyph infusion greater');
+
+		((CActor)ent).GetInventory().AddAnItem( glyph_names[RandRange(glyph_names.Size())], 1 );
+	}
 
 	((CActor)ent).AddBuffImmunity(EET_Poison, 'ACS_Berserkers_Bear_Buff', true);
 
@@ -17556,6 +17904,294 @@ function GetACSHellhoundIdleAction()
 	}
 }
 
+function GetACSDaoIdleAction()
+{	
+	var actors, actors2 								: array<CActor>;
+	var i												: int;
+	var actor											: CActor; 
+	var j												: int;
+	var npc												: CNewNPC;
+
+	actors.Clear();
+
+	theGame.GetActorsByTag( 'ACS_Dao_Attitude', actors );	
+
+	if (actors.Size() <= 0)
+	{
+		return;
+	}
+	
+	for( i = 0; i < actors.Size(); i += 1 )
+	{
+		((CNewNPC)actors[i]).SetAttitude(thePlayer, AIA_Hostile);
+
+		actors2.Clear();
+
+		actors2 = actors[i].GetNPCsAndPlayersInRange( 50, 20, , FLAG_OnlyAliveActors + FLAG_ExcludePlayer  );
+		{
+			if( actors2.Size() > 0 )
+			{
+				for( j = 0; j < actors2.Size(); j += 1 )
+				{
+					npc = (CNewNPC)actors2[j];
+
+					actor = actors2[j];
+
+					if (npc.HasTag('ACS_Dao_Attitude') 
+					|| npc.HasAbility('mon_elemental_dao')
+					|| npc.HasAbility('mon_archespor_turret')
+					)
+					{
+						((CNewNPC)actors[i]).SetAttitude(npc, AIA_Friendly);
+
+						npc.SetAttitude(((CNewNPC)actors[i]), AIA_Friendly);
+					}
+					else
+					{
+						((CNewNPC)actors[i]).SetAttitude(npc, AIA_Hostile);
+
+						npc.SetAttitude(((CNewNPC)actors[i]), AIA_Hostile);
+					}
+				}
+			}
+		}
+	}
+
+	if (GetACS_DaoTurret_3())
+	{
+		if (GetACS_DaoTurret_3().HasAbility('ArchesporTaunt'))
+		{
+			GetACS_DaoTurret_3().RemoveAbility('ArchesporTaunt');
+		}
+	}
+
+	if (GetACS_DaoTurret_2())
+	{
+		if (GetACS_DaoTurret_2().HasAbility('ArchesporTaunt'))
+		{
+			GetACS_DaoTurret_2().RemoveAbility('ArchesporTaunt');
+		}
+	}
+
+	if (GetACS_DaoTurret_1())
+	{
+		if (GetACS_DaoTurret_1().HasAbility('ArchesporTaunt'))
+		{
+			GetACS_DaoTurret_1().RemoveAbility('ArchesporTaunt');
+		}
+	}
+}
+
+function GetACSElderbloodAssassinIdleAction()
+{	
+	var actors, actors2 								: array<CActor>;
+	var i												: int;
+	var actor											: CActor; 
+	var j												: int;
+	var npc												: CNewNPC;
+
+	actors.Clear();
+
+	theGame.GetActorsByTag( 'ACS_Elderblood_Assassin_Attitude', actors );	
+
+	if (actors.Size() <= 0)
+	{
+		return;
+	}
+	
+	for( i = 0; i < actors.Size(); i += 1 )
+	{
+		((CNewNPC)actors[i]).SetAttitude(thePlayer, AIA_Hostile);
+
+		actors2.Clear();
+
+		actors2 = actors[i].GetNPCsAndPlayersInRange( 50, 20, , FLAG_OnlyAliveActors + FLAG_ExcludePlayer  );
+		{
+			if( actors2.Size() > 0 )
+			{
+				for( j = 0; j < actors2.Size(); j += 1 )
+				{
+					npc = (CNewNPC)actors2[j];
+
+					actor = actors2[j];
+
+					if (npc.HasTag('ACS_Elderblood_Assassin_Attitude') 
+					)
+					{
+						((CNewNPC)actors[i]).SetAttitude(npc, AIA_Friendly);
+
+						npc.SetAttitude(((CNewNPC)actors[i]), AIA_Friendly);
+					}
+					else
+					{
+						((CNewNPC)actors[i]).SetAttitude(npc, AIA_Hostile);
+
+						npc.SetAttitude(((CNewNPC)actors[i]), AIA_Hostile);
+					}
+				}
+			}
+		}
+	}
+}
+
+function GetACSWeaponizedRabbitIdleAction()
+{	
+	var actors, actors2 								: array<CActor>;
+	var i												: int;
+	var actor											: CActor; 
+	var j												: int;
+	var npc												: CNewNPC;
+
+	actors.Clear();
+
+	theGame.GetActorsByTag( 'ACS_WeaponizedRabbit', actors );	
+
+	if (actors.Size() <= 0)
+	{
+		return;
+	}
+	
+	for( i = 0; i < actors.Size(); i += 1 )
+	{
+		((CNewNPC)actors[i]).SetAttitude(thePlayer, AIA_Hostile);
+
+		actors2.Clear();
+
+		actors2 = actors[i].GetNPCsAndPlayersInRange( 50, 20, , FLAG_OnlyAliveActors + FLAG_ExcludePlayer  );
+		{
+			if( actors2.Size() > 0 )
+			{
+				for( j = 0; j < actors2.Size(); j += 1 )
+				{
+					npc = (CNewNPC)actors2[j];
+
+					actor = actors2[j];
+
+					if (npc.HasTag('ACS_WeaponizedRabbit') 
+					)
+					{
+						((CNewNPC)actors[i]).SetAttitude(npc, AIA_Friendly);
+
+						npc.SetAttitude(((CNewNPC)actors[i]), AIA_Friendly);
+					}
+					else
+					{
+						((CNewNPC)actors[i]).SetAttitude(npc, AIA_Hostile);
+
+						npc.SetAttitude(((CNewNPC)actors[i]), AIA_Hostile);
+					}
+				}
+			}
+		}
+	}
+}
+
+function GetACSKnockerIdleAction()
+{	
+	var actors, actors2 								: array<CActor>;
+	var i												: int;
+	var actor											: CActor; 
+	var j												: int;
+	var npc												: CNewNPC;
+
+	actors.Clear();
+
+	theGame.GetActorsByTag( 'ACS_Knocker', actors );	
+
+	if (actors.Size() <= 0)
+	{
+		return;
+	}
+	
+	for( i = 0; i < actors.Size(); i += 1 )
+	{
+		((CNewNPC)actors[i]).SetAttitude(thePlayer, AIA_Hostile);
+
+		actors2.Clear();
+
+		actors2 = actors[i].GetNPCsAndPlayersInRange( 50, 20, , FLAG_OnlyAliveActors + FLAG_ExcludePlayer  );
+		{
+			if( actors2.Size() > 0 )
+			{
+				for( j = 0; j < actors2.Size(); j += 1 )
+				{
+					npc = (CNewNPC)actors2[j];
+
+					actor = actors2[j];
+
+					if (npc.HasTag('ACS_Knocker') 
+					)
+					{
+						((CNewNPC)actors[i]).SetAttitude(npc, AIA_Friendly);
+
+						npc.SetAttitude(((CNewNPC)actors[i]), AIA_Friendly);
+					}
+					else
+					{
+						((CNewNPC)actors[i]).SetAttitude(npc, AIA_Hostile);
+
+						npc.SetAttitude(((CNewNPC)actors[i]), AIA_Hostile);
+					}
+				}
+			}
+		}
+	}
+}
+
+function GetACSNekuratIdleAction()
+{	
+	var actors, actors2 								: array<CActor>;
+	var i												: int;
+	var actor											: CActor; 
+	var j												: int;
+	var npc												: CNewNPC;
+
+	actors.Clear();
+
+	theGame.GetActorsByTag( 'ACS_Nekurat', actors );	
+
+	if (actors.Size() <= 0)
+	{
+		return;
+	}
+	
+	for( i = 0; i < actors.Size(); i += 1 )
+	{
+		((CNewNPC)actors[i]).SetAttitude(thePlayer, AIA_Hostile);
+
+		actors2.Clear();
+
+		actors2 = actors[i].GetNPCsAndPlayersInRange( 50, 20, , FLAG_OnlyAliveActors + FLAG_ExcludePlayer  );
+		{
+			if( actors2.Size() > 0 )
+			{
+				for( j = 0; j < actors2.Size(); j += 1 )
+				{
+					npc = (CNewNPC)actors2[j];
+
+					actor = actors2[j];
+
+					if (npc.HasTag('ACS_Nekurat') 
+					|| npc.HasTag('ACS_Blade_Of_The_Unseen')
+					|| npc.HasAbility('mon_vampiress_base')
+					)
+					{
+						((CNewNPC)actors[i]).SetAttitude(npc, AIA_Friendly);
+
+						npc.SetAttitude(((CNewNPC)actors[i]), AIA_Friendly);
+					}
+					else
+					{
+						((CNewNPC)actors[i]).SetAttitude(npc, AIA_Hostile);
+
+						npc.SetAttitude(((CNewNPC)actors[i]), AIA_Hostile);
+					}
+				}
+			}
+		}
+	}
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 statemachine class cACS_Draug_Spawner
@@ -18208,16 +18844,6 @@ function GetACSFireGryphon() : CActor
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function GetACSMula() : CActor
-{
-	var entity 			 : CActor;
-	
-	entity = (CActor)theGame.GetEntityByTag( 'ACS_Mula' );
-	return entity;
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 function ACS_Spawn_Big_Hym( npc : CActor, pos : Vector )
 {
 	var temp															: CEntityTemplate;
@@ -18243,7 +18869,7 @@ function ACS_Spawn_Big_Hym( npc : CActor, pos : Vector )
 
 	playerRot = thePlayer.GetWorldRotation();
 
-	playerRot.Yaw += 180;
+	playerRot.Yaw += RandRangeF(360,0);
 
 	adjustedRot = EulerAngles(0,0,0);
 
@@ -18426,6 +19052,26 @@ function GetACSHarpyQueen() : CActor
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+function ACS_Elderblood_Assassins_Destroy()
+{	
+	var shadows 										: array<CActor>;
+	var i												: int;
+	
+	shadows.Clear();
+
+	theGame.GetActorsByTag( 'ACS_Elderblood_Assassin_Attitude', shadows );	
+
+	if (shadows.Size() <= 0)
+	{
+		return;
+	}
+	
+	for( i = 0; i < shadows.Size(); i += 1 )
+	{
+		shadows[i].Destroy();
+	}
+}
+
 statemachine class cACS_Elderblood_Assassin
 {
     function ACS_Elderblood_Assassin_Engage()
@@ -18469,7 +19115,7 @@ state ACS_Elderblood_Assassin_Engage in cACS_Elderblood_Assassin
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 		
 		count = 1;
 			
@@ -18493,7 +19139,7 @@ state ACS_Elderblood_Assassin_Engage in cACS_Elderblood_Assassin
 			((CNewNPC)ent).SetLevel(thePlayer.GetLevel());
 
 			((CNewNPC)ent).SetAttitude(thePlayer, AIA_Hostile);
-			((CActor)ent).SetAnimationSpeedMultiplier(1);
+			((CActor)ent).SetAnimationSpeedMultiplier(1.25);
 
 			//((CActor)ent).SetCanPlayHitAnim(false);
 
@@ -18510,6 +19156,8 @@ state ACS_Elderblood_Assassin_Engage in cACS_Elderblood_Assassin
 			ent.PlayEffect('demonic_possession');
 
 			ent.AddTag( 'ACS_Elderblood_Assassin' );
+
+			ent.AddTag( 'ACS_Elderblood_Assassin_Attitude' );
 
 			ent.PlayEffect('fury');
 
@@ -18571,7 +19219,7 @@ function ACS_ElderbloodAssassinSmokeScreen( npc : CActor, pos : Vector )
 
 	playerRot = npc.GetWorldRotation();
 	
-	count = RandRange(4,2);
+	count = 1;
 		
 	for( i = 0; i < count; i += 1 )
 	{
@@ -18593,7 +19241,7 @@ function ACS_ElderbloodAssassinSmokeScreen( npc : CActor, pos : Vector )
 		((CNewNPC)ent).SetLevel(thePlayer.GetLevel());
 
 		((CNewNPC)ent).SetAttitude(thePlayer, AIA_Hostile);
-		((CActor)ent).SetAnimationSpeedMultiplier(1);
+		((CActor)ent).SetAnimationSpeedMultiplier(1.125);
 
 		((CActor)ent).AddTag( 'ContractTarget' );
 
@@ -18608,6 +19256,8 @@ function ACS_ElderbloodAssassinSmokeScreen( npc : CActor, pos : Vector )
 		ent.PlayEffect('demonic_possession');
 
 		ent.AddTag( 'ACS_Elderblood_Assassin_Clone' );
+
+		ent.AddTag( 'ACS_Elderblood_Assassin_Attitude' );
 
 		ent.PlayEffect('fury');
 
@@ -18625,7 +19275,6 @@ function ACS_ElderbloodAssassinSmokeScreen( npc : CActor, pos : Vector )
 		}
 	}
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -19014,7 +19663,7 @@ statemachine class CACSHeartMiniboss extends CNewNPC
 
 						playerRot = thePlayer.GetWorldRotation();
 
-						playerRot.Yaw += 180;
+						playerRot.Yaw += RandRangeF(360,0);
 
 						ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(thePlayer.PredictWorldPosition(0.7)), playerRot );
 
@@ -19109,7 +19758,7 @@ statemachine class CACSHeartMiniboss extends CNewNPC
 
 					playerRot = thePlayer.GetWorldRotation();
 
-					playerRot.Yaw += 180;
+					playerRot.Yaw += RandRangeF(360,0);
 
 					ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(thePlayer.PredictWorldPosition(0.7)), playerRot );
 
@@ -19217,7 +19866,7 @@ statemachine class CACSHeartMiniboss extends CNewNPC
 
 						playerRot = thePlayer.GetWorldRotation();
 
-						playerRot.Yaw += 180;
+						playerRot.Yaw += RandRangeF(360,0);
 
 						ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(thePlayer.PredictWorldPosition(0.7)), playerRot );
 
@@ -19320,7 +19969,7 @@ statemachine class CACSHeartMiniboss extends CNewNPC
 
 					playerRot = thePlayer.GetWorldRotation();
 
-					playerRot.Yaw += 180;
+					playerRot.Yaw += RandRangeF(360,0);
 
 					ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(thePlayer.PredictWorldPosition(0.7)), playerRot );
 
@@ -19434,7 +20083,7 @@ statemachine class CACSHeartMiniboss extends CNewNPC
 
 					playerRot = thePlayer.GetWorldRotation();
 
-					playerRot.Yaw += 180;
+					playerRot.Yaw += RandRangeF(360,0);
 
 					ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(thePlayer.PredictWorldPosition(0.7)), playerRot );
 
@@ -19530,7 +20179,7 @@ statemachine class CACSHeartMiniboss extends CNewNPC
 
 					playerRot = thePlayer.GetWorldRotation();
 
-					playerRot.Yaw += 180;
+					playerRot.Yaw += RandRangeF(360,0);
 
 					ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(thePlayer.PredictWorldPosition(0.7)), playerRot );
 
@@ -20362,9 +21011,25 @@ statemachine class CACSMonsterSpawner extends CEntity
 
 	timer function PlayerDistanceCheck ( dt : float, id : int )
 	{
+		if (this.HasTag('ACS_MonsterSpawner_CrowSwarmInstant')
+		&& !this.HasTag('ACS_MonsterSpawner_Activated')
+		)
+		{
+			if ( this.HasTag('ACS_MonsterSpawner_POI_Point'))
+			{
+				this.RemoveTag('ACS_MonsterSpawner_POI_Point');
+			}
+
+			this.PushState('ACS_MonsterSpawner_CrowSwarmInstant');
+			RemoveSpawner();
+			return;
+		}
+
 		if (this.HasTag('ACS_MonsterSpawner_HorseRidersNovigrad')
 		|| this.HasTag('ACS_MonsterSpawner_HorseRidersRedania')
 		|| this.HasTag('ACS_MonsterSpawner_HorseRidersNilfgaard')
+		|| this.HasTag('ACS_MonsterSpawner_CrowSwarm')
+		|| this.HasTag('ACS_MonsterSpawner_Nekurat')
 		)
 		{
 			if ( this.HasTag('ACS_MonsterSpawner_POI_Point'))
@@ -20388,6 +21053,7 @@ statemachine class CACSMonsterSpawner extends CEntity
 		&& !theGame.IsFading()
 		&& !theGame.IsBlackscreen()
 		&& !theGame.IsPaused() 
+		&& !thePlayer.GetIsHorseRacing()
 		)
 		{
 			if (!this.HasTag('ACS_MonsterSpawner_Activated'))
@@ -20812,6 +21478,96 @@ statemachine class CACSMonsterSpawner extends CEntity
 					return;
 				}
 
+				if (this.HasTag('ACS_MonsterSpawner_Iridescent_Sharley'))
+				{
+					this.PushState('ACS_MonsterSpawner_Iridescent_Sharley');
+					RemoveSpawner();
+					return;
+				}
+
+				if (this.HasTag('ACS_MonsterSpawner_Chironex'))
+				{
+					this.PushState('ACS_MonsterSpawner_Chironex');
+					RemoveSpawner();
+					return;
+				}
+
+				if (this.HasTag('ACS_MonsterSpawner_Dao'))
+				{
+					this.PushState('ACS_MonsterSpawner_Dao');
+					RemoveSpawner();
+					return;
+				}
+
+				if (this.HasTag('ACS_MonsterSpawner_WeaponizedRabbits'))
+				{
+					this.PushState('ACS_MonsterSpawner_WeaponizedRabbits');
+					RemoveSpawner();
+					return;
+				}
+
+				if (this.HasTag('ACS_MonsterSpawner_CrowSwarm'))
+				{
+					this.PushState('ACS_MonsterSpawner_CrowSwarm');
+					RemoveSpawner();
+					return;
+				}
+
+				if (this.HasTag('ACS_MonsterSpawner_Knocker'))
+				{
+					this.PushState('ACS_MonsterSpawner_Knocker');
+					RemoveSpawner();
+					return;
+				}
+
+				if (this.HasTag('ACS_MonsterSpawner_Nekurat'))
+				{
+					this.PushState('ACS_MonsterSpawner_Nekurat');
+					RemoveSpawner();
+					return;
+				}
+
+				if (this.HasTag('ACS_MonsterSpawner_Nekurat_No_Restriction'))
+				{
+					this.PushState('ACS_MonsterSpawner_Nekurat_No_Restriction');
+					RemoveSpawner();
+					return;
+				}
+
+				if (this.HasTag('ACS_MonsterSpawner_Botchling'))
+				{
+					this.PushState('ACS_MonsterSpawner_Botchling');
+					RemoveSpawner();
+					return;
+				}
+
+				if (this.HasTag('ACS_MonsterSpawner_Vendigo'))
+				{
+					this.PushState('ACS_MonsterSpawner_Vendigo');
+					RemoveSpawner();
+					return;
+				}
+
+				if (this.HasTag('ACS_MonsterSpawner_SwarmMother'))
+				{
+					this.PushState('ACS_MonsterSpawner_SwarmMother');
+					RemoveSpawner();
+					return;
+				}
+
+				if (this.HasTag('ACS_MonsterSpawner_Rabid_Drowner'))
+				{
+					this.PushState('ACS_MonsterSpawner_Rabid_Drowner');
+					RemoveSpawner();
+					return;
+				}
+
+				if (this.HasTag('ACS_MonsterSpawner_Thunderclast'))
+				{
+					this.PushState('ACS_MonsterSpawner_Thunderclast');
+					RemoveSpawner();
+					return;
+				}
 
 				/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -20864,6 +21620,136 @@ statemachine class CACSMonsterSpawner extends CEntity
 	}
 }
 
+///////////////////////////////////////////////////////////////////////////
+
+statemachine class CNewACSEnemy extends CNewNPC
+{
+	var pos : Vector;
+
+	event OnSpawned( spawnData : SEntitySpawnData )
+	{	
+		pos = this.GetWorldPosition();
+
+		super.OnSpawned( spawnData );
+	}
+
+	event OnDestroyed()
+	{
+		if (this.HasTag('ACS_Thunderclast'))
+		{
+			Thunderclast_Lightning_Strike();
+		}
+	}
+
+	function Thunderclast_Lightning_Strike()
+	{
+		var temp, temp_2, temp_3, temp_4, temp_5									: CEntityTemplate;
+		var ent, ent_1, ent_2, ent_3, ent_4, ent_5									: CEntity;
+		var i, count, count_2, j, k													: int;
+		var playerPos, spawnPos, spawnPos2, posAdjusted, posAdjusted2, entPos		: Vector;
+		var randAngle, randRange, randAngle_2, randRange_2, distance				: float;
+		var adjustedRot, playerRot2													: EulerAngles;
+		var actors    																: array<CActor>;
+		var actor    																: CActor;
+		var dmg																		: W3DamageAction;
+
+		temp = (CEntityTemplate)LoadResource( 
+
+		"dlc\dlc_acs\data\fx\everstorm_lightning_strike.w2ent"
+			
+		, true );
+
+		temp_2 = (CEntityTemplate)LoadResource( 
+
+		"dlc\dlc_acs\data\fx\everstorm_lightning_strike_secondary.w2ent"
+			
+		, true );
+
+		temp_4 = (CEntityTemplate)LoadResource( 
+
+		"dlc\dlc_acs\data\fx\everstorm_ground_fire.w2ent"
+			
+		, true );
+
+		playerPos = ACSPlayerFixZAxis(pos);
+
+		adjustedRot = EulerAngles(0,0,0);
+
+		adjustedRot.Yaw = RandRangeF(360,1);
+		adjustedRot.Pitch = RandRangeF(22.5,-22.5);
+
+		playerRot2 = EulerAngles(0,0,0);
+		playerRot2.Yaw = RandRangeF(360,1);
+			
+		posAdjusted = ACSPlayerFixZAxis(pos);
+
+		ent_1 = theGame.CreateEntity( temp, posAdjusted, adjustedRot );
+
+		ent_1.PlayEffectSingle('pre_lightning');
+		ent_1.PlayEffectSingle('lightning');
+
+		ent_1.DestroyAfter(10);
+
+
+		ent_2 = theGame.CreateEntity( temp_2, posAdjusted, playerRot2 );
+
+		ent_2.PlayEffectSingle('lighgtning');
+
+		ent_2.DestroyAfter(10);
+
+		ent_3 = theGame.CreateEntity( temp_2, posAdjusted, adjustedRot );
+
+		ent_3.PlayEffectSingle('lighgtning');
+
+		ent_3.DestroyAfter(10);
+
+		theGame.GetSurfacePostFX().AddSurfacePostFXGroup( posAdjusted, 0.5f, 10.5f, 0.5f, 7.f, 1);
+
+		count_2 = 12;
+
+		for( j = 0; j < count_2; j += 1 )
+		{
+			randRange_2 = 2 + 2 * RandF();
+			randAngle_2 = 2 * Pi() * RandF();
+			
+			spawnPos2.X = randRange_2 * CosF( randAngle_2 ) + posAdjusted.X;
+			spawnPos2.Y = randRange_2 * SinF( randAngle_2 ) + posAdjusted.Y;
+			//spawnPos2.Z = posAdjusted.Z;
+
+			posAdjusted2 = ACSPlayerFixZAxis(spawnPos2);
+
+			ent_4 = theGame.CreateEntity( temp_4, posAdjusted2, EulerAngles(0,0,0) );
+
+			if (RandF() < 0.5)
+			{
+				ent_4.PlayEffectSingle('explosion');
+				ent_4.StopEffect('explosion');
+			}
+			else
+			{
+				if (RandF() < 0.5)
+				{
+					ent_4.PlayEffectSingle('explosion_big');
+					ent_4.StopEffect('explosion_big');
+				}
+				else
+				{
+					ent_4.PlayEffectSingle('explosion_medium');
+					ent_4.StopEffect('explosion_medium');
+				}
+			}
+
+			ent_4.DestroyAfter(20);
+		}
+		
+		thePlayer.SoundEvent( "fx_amb_thunder_close" );
+
+		thePlayer.SoundEvent( "qu_nml_103_lightning" );
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////
+
 state ACS_MonsterSpawner_Default in CACSMonsterSpawner
 {
 	private var temp, temp_2, temp_3, ent_1_temp, trail_temp					: CEntityTemplate;
@@ -20907,7 +21793,51 @@ state ACS_MonsterSpawner_Default in CACSMonsterSpawner
 
 		//"dlc\dlc_acs_test\data\entities\monsters\hare_aggressive.w2ent"
 
-		"dlc\dlc_acs\data\entities\mages\carduin_of_lan_exeter.w2ent"
+		//"dlc\dlc_acs\data\entities\mages\carduin_of_lan_exeter.w2ent"
+
+		//"dlc\dlc_acs_test\data\entities\monsters\chironex.w2ent"
+
+		//"dlc\dlc_acs\data\entities\monsters\vampire_monster.w2ent"
+
+		//"dlc\dlc_acs_test\data\entities\monsters\harpy_crow.w2ent"
+
+		//"characters\npc_entities\animals\crow.w2ent"
+
+		//"dlc\dlc_acs_test\data\entities\monsters\whale_crow.w2ent"
+
+		//"dlc\bob\data\quests\main_quests\quest_files\q704_truth\entities\q704_dialogue_crow.w2ent"
+
+		//"dlc\bob\data\quests\main_quests\quest_files\q702_hunt\characters\q702_decoration_crow.w2ent"
+
+		//"dlc\dlc_acs_test\data\entities\monsters\custom_crow_circling.w2ent"
+
+		//"dlc\bob\data\quests\main_quests\quest_files\q704_truth\entities\q704_flying_fleder_picking_up_guy.w2ent"
+
+		//"dlc\bob\data\quests\main_quests\quest_files\q704_truth\entities\q704_background_vampire_template.w2ent"
+
+		//"dlc\bob\data\quests\main_quests\quest_files\q704_truth\entities\q704_background_vampire_long_climp_template.w2ent"
+
+		//"dlc\bob\data\quests\main_quests\quest_files\q704_truth\entities\q704_dialogue_crow_2.w2ent"
+
+		//"quests\generic_quests\novigrad\quest_files\mh301_gryphon\entities\mh301_focus_crow_v2.w2ent"
+
+		//"gameplay\community\community_npcs\novigrad\regular\novigrad_thug_dwarf.w2ent"
+
+		//"dlc\ep1\data\characters\npc_entities\monsters\blood_flies_ep1.w2ent"
+
+		//"characters\npc_entities\monsters\blood_flies.w2ent"
+
+		//"dlc\dlc_acs_test\data\entities\monsters\acs_blood_flies.w2ent"
+
+		//"characters\npc_entities\crowd_npc\bandit\cannibal.w2ent"
+
+		//"dlc\dlc_acs\data\entities\monsters\vendigo_spawn_melee_spear.w2ent"
+
+		//"quests\minor_quests\no_mans_land\quest_files\mq1060_devils_pit\characters\mq1060_witcher.w2ent"
+
+		//"dlc\dlc_acs\data\entities\monsters\thunderclast.w2ent"
+
+		"characters\npc_entities\crowd_npc\novigrad_citizen\novigrad_child_boy.w2ent"
 			
 		, true );
 
@@ -20915,9 +21845,11 @@ state ACS_MonsterSpawner_Default in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		//playerRot.Pitch += 90;
+
+		playerRot.Yaw += RandRangeF(360,0);
 		
-		count = 1;
+		count = 5;
 			
 		for( i = 0; i < count; i += 1 )
 		{
@@ -20928,7 +21860,9 @@ state ACS_MonsterSpawner_Default in CACSMonsterSpawner
 			spawnPos.Y = randRange * SinF( randAngle ) + playerPos.Y;
 			spawnPos.Z = playerPos.Z;
 
-			ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(playerPos), playerRot );
+			//spawnPos.Z += 0.5;
+
+			ent = theGame.CreateEntity( temp, spawnPos, playerRot );
 
 			animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
 			meshcomp = ent.GetComponentByClassName('CMeshComponent');
@@ -20941,6 +21875,7 @@ state ACS_MonsterSpawner_Default in CACSMonsterSpawner
 			((CNewNPC)ent).SetAttitude(thePlayer, AIA_Hostile);
 			((CActor)ent).SetAnimationSpeedMultiplier(1);
 
+			/*
 			((CActor)ent).SetCanPlayHitAnim(true);
 
 			((CActor)ent).AddBuffImmunity(EET_Poison, 'ACS_Enemy_Buff', true);
@@ -20995,6 +21930,12 @@ state ACS_MonsterSpawner_Default in CACSMonsterSpawner
 
 			((CActor)ent).AddAbility('BounceBoltsWildhunt');
 
+			//ent.SetTarget(thePlayer);
+
+
+
+			//((W3Bird)ent).RaiseEvent('Fly');
+
 			//((CActor)ent).RemoveAbility('Venom');
 
 			//ent.AddTag('NoBestiaryEntry');
@@ -21010,8 +21951,17 @@ state ACS_MonsterSpawner_Default in CACSMonsterSpawner
 			//((CActor)ent).RemoveBuff(EET_FireAura, true, 'acs_ifrit_fire_aura');
 
 			//((CActor)ent).AddEffectDefault( EET_FireAura, ((CActor)ent), 'acs_ifrit_fire_aura' );
+			*/
 
 			ent.AddTag( 'ACS_enemy' );
+
+			ent.PlayEffect('lightning');
+
+			ent.PlayEffect('him_smoke_red');
+
+			//ent.CreateAttachment(thePlayer);
+
+			//ent.AddTag('ACS_Wisp_Crow');
 
 			//ent.AddTag( 'ACS_Hostile_To_All' );
 		}
@@ -21022,6 +21972,151 @@ state ACS_MonsterSpawner_Default in CACSMonsterSpawner
 		super.OnLeaveState(nextStateName);
 	}
 }
+
+///////////////////////////////////////////////////////////////////////////
+
+state ACS_MonsterSpawner_Thunderclast in CACSMonsterSpawner
+{
+	private var temp, temp_2, temp_3, ent_1_temp, trail_temp					: CEntityTemplate;
+	private var ent, ent_2, ent_3, sword_trail_1, l_anchor, r_blade1, l_blade1	: CEntity;
+	private var i, count														: int;
+	private var playerPos, spawnPos												: Vector;
+	private var randAngle, randRange											: float;
+	private var meshcomp														: CComponent;
+	private var animcomp 														: CAnimatedComponent;
+	private var h 																: float;
+	private var pos										: Vector;
+	private var rot, playerRot							: EulerAngles;
+
+	event OnEnterState(prevStateName : name)
+	{
+		Spawn_Thunderclast_Entry();
+	}
+	
+	entry function Spawn_Thunderclast_Entry()
+	{	
+		Spawn_Thunderclast_Latent();
+	}
+
+	latent function Spawn_Thunderclast_Latent()
+	{
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\dlc_acs\data\entities\monsters\thunderclast.w2ent"
+			
+		, true );
+
+		playerPos = parent.pos;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += 180;
+
+		ent = theGame.CreateEntity( temp, playerPos, playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1.75;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+
+		((CNewNPC)ent).SetLevel(thePlayer.GetLevel());
+
+		((CNewNPC)ent).SetAttitude(thePlayer, AIA_Hostile);
+		((CActor)ent).SetAnimationSpeedMultiplier(1);
+
+		((CActor)ent).SetCanPlayHitAnim(false);
+
+		((CActor)ent).AddBuffImmunity(EET_Poison, 'ACS_Enemy_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_PoisonCritical , 'ACS_Enemy_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_Bleeding , 'ACS_Enemy_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_Weaken , 'ACS_Enemy_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_WeakeningAura , 'ACS_Enemy_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_Confusion , 'ACS_Enemy_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_Hypnotized , 'ACS_Enemy_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_AxiiGuardMe , 'ACS_Enemy_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_Immobilized , 'ACS_Enemy_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_Paralyzed , 'ACS_Enemy_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_Blindness , 'ACS_Enemy_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_Choking , 'ACS_Enemy_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_Swarm , 'ACS_Enemy_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_Knockdown , 'ACS_Enemy_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_HeavyKnockdown , 'ACS_Enemy_Buff', true);
+
+		((CActor)ent).AddTag('IsBoss');
+
+		((CActor)ent).AddAbility('Boss');
+
+		((CActor)ent).AddAbility('InstantKillImmune');
+
+		((CActor)ent).AddAbility('ablIgnoreSigns');
+
+		((CActor)ent).AddAbility('DisableFinishers');
+
+		((CActor)ent).AddAbility('MonsterMHBoss');
+
+		((CActor)ent).AddAbility('ForceCriticalEffects');
+
+		((CActor)ent).AddAbility('BounceBoltsWildhunt');
+
+		((CActor)ent).GetInventory().AddAnItem( 'acs_shield_entity_item', 1 );
+
+		((CNewNPC)ent).EnableCharacterCollisions(true);
+		((CNewNPC)ent).EnableCollisions(true);
+
+		((CNewNPC)ent).SetUnstoppable(true);
+
+		ent.AddTag('NoBestiaryEntry');
+
+		ent.AddTag( 'ACS_Thunderclast' );
+
+		ent.PlayEffect('lightning');
+
+		ent.PlayEffect('lightning_1');
+
+		ent.PlayEffect('lightning_2');
+
+		ent.PlayEffect('lightning_3');
+
+		//ent.PlayEffect('demonic_body');
+
+		ent.PlayEffect('him_smoke_red');
+
+		ent.AddTag( 'ACS_Hostile_To_All' );
+
+		ent.DestroyAfter(RandRangeF(60,30));
+		
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+function GetACSThunderclast() : CActor
+{
+	var entity 			 : CActor;
+	
+	entity = (CActor)theGame.GetEntityByTag( 'ACS_Thunderclast' );
+	return entity;
+}
+
+///////////////////////////////////////////////////////////////////////////
 
 state ACS_MonsterSpawner_ForestGod in CACSMonsterSpawner
 {
@@ -21271,7 +22366,7 @@ state ACS_MonsterSpawner_ForestGod in CACSMonsterSpawner
 		
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -21407,6 +22502,46 @@ state ACS_MonsterSpawner_IceTitan in CACSMonsterSpawner
 		Spawn_Ice_Titan_Latent();
 	}
 
+	function random_glyph() : CName
+	{
+		var glyph_names									: array<CName>;
+
+		glyph_names.Clear();
+		
+		glyph_names.PushBack('Glyph binding greater');
+		glyph_names.PushBack('Glyph warding greater');
+		glyph_names.PushBack('Glyph aard greater');
+		glyph_names.PushBack('Glyph axii greater');
+		glyph_names.PushBack('Glyph igni greater');
+		glyph_names.PushBack('Glyph quen greater');
+		glyph_names.PushBack('Glyph yrden greater');
+		
+		glyph_names.PushBack('Glyph infusion greater');
+
+		return glyph_names[RandRange(glyph_names.Size())];
+	}
+
+	function random_rune() : CName
+	{
+		var rune_names									: array<CName>;
+
+		rune_names.Clear();
+		
+		rune_names.PushBack('Rune stribog greater');
+		rune_names.PushBack('Rune devana greater');
+		rune_names.PushBack('Rune zoria greater');
+		rune_names.PushBack('Rune morana greater');
+		rune_names.PushBack('Rune veles greater');
+		rune_names.PushBack('Rune perun greater');
+		
+		
+		rune_names.PushBack('Rune svarog greater');
+		rune_names.PushBack('Rune triglav greater');
+		rune_names.PushBack('Rune dazhbog greater');
+
+		return rune_names[RandRange(rune_names.Size())];
+	}
+
 	latent function Spawn_Ice_Titan_Latent()
 	{
 		temp_1 = (CEntityTemplate)LoadResourceAsync( 
@@ -21417,7 +22552,7 @@ state ACS_MonsterSpawner_IceTitan in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -21439,6 +22574,10 @@ state ACS_MonsterSpawner_IceTitan in CACSMonsterSpawner
 		((CActor)ent_1).GetInventory().AddAnItem( 'Crowns', 2500 );
 
 		((CActor)ent_1).GetInventory().AddAnItem( 'Diamond flawless', 10 );
+
+		((CActor)ent_1).GetInventory().AddAnItem( random_glyph(), 1 );
+
+		((CActor)ent_1).GetInventory().AddAnItem( random_rune(), 1 );
 
 		((CActor)ent_1).AddTag( 'ACS_Ice_Titan' );
 
@@ -21653,7 +22792,7 @@ state ACS_MonsterSpawner_KnightmareEternum in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -21833,7 +22972,7 @@ state ACS_MonsterSpawner_Loviatar in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -21917,6 +23056,47 @@ state ACS_MonsterSpawner_FireWyrm in CACSMonsterSpawner
 		Spawn_Big_Lizard_Latent();
 	}
 
+	function random_glyph() : CName
+	{
+		var glyph_names									: array<CName>;
+
+		glyph_names.Clear();
+		
+		glyph_names.PushBack('Glyph binding greater');
+		glyph_names.PushBack('Glyph warding greater');
+		glyph_names.PushBack('Glyph aard greater');
+		glyph_names.PushBack('Glyph axii greater');
+		glyph_names.PushBack('Glyph igni greater');
+		glyph_names.PushBack('Glyph quen greater');
+		glyph_names.PushBack('Glyph yrden greater');
+		
+		glyph_names.PushBack('Glyph infusion greater');
+
+		return glyph_names[RandRange(glyph_names.Size())];
+	}
+
+
+	function random_rune() : CName
+	{
+		var rune_names									: array<CName>;
+
+		rune_names.Clear();
+		
+		rune_names.PushBack('Rune stribog greater');
+		rune_names.PushBack('Rune devana greater');
+		rune_names.PushBack('Rune zoria greater');
+		rune_names.PushBack('Rune morana greater');
+		rune_names.PushBack('Rune veles greater');
+		rune_names.PushBack('Rune perun greater');
+		
+		
+		rune_names.PushBack('Rune svarog greater');
+		rune_names.PushBack('Rune triglav greater');
+		rune_names.PushBack('Rune dazhbog greater');
+
+		return rune_names[RandRange(rune_names.Size())];
+	}
+
 	latent function Spawn_Big_Lizard_Latent()
 	{
 		temp = (CEntityTemplate)LoadResourceAsync( 
@@ -21929,7 +23109,7 @@ state ACS_MonsterSpawner_FireWyrm in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -21959,6 +23139,10 @@ state ACS_MonsterSpawner_FireWyrm in CACSMonsterSpawner
 		ent.PlayEffectSingle('embers_red');
 
 		ent.AddTag( 'ACS_Big_Lizard' );
+
+		((CActor)ent).GetInventory().AddAnItem( random_glyph(), 1 );
+
+		((CActor)ent).GetInventory().AddAnItem( random_rune(), 1 );
 
 		((CActor)ent).AddTag( 'ACS_Big_Boi' );
 
@@ -22030,7 +23214,7 @@ state ACS_MonsterSpawner_RatMage in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -22087,6 +23271,11 @@ state ACS_MonsterSpawner_RatMage in CACSMonsterSpawner
 
 		((CActor)ent).AddBuffImmunity(EET_HeavyKnockdown , 'ACS_Rat_Mage', true);
 
+		if (RandF() < 0.125)
+		{
+			((CActor)ent).GetInventory().AddAnItem( 'acs_yrden_skele_item', 1 );
+		}
+
 		ent.AddTag('NoBestiaryEntry');
 
 
@@ -22136,7 +23325,7 @@ state ACS_MonsterSpawner_Mages in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -22159,6 +23348,14 @@ state ACS_MonsterSpawner_Mages in CACSMonsterSpawner
 
 			((CNewNPC)ent).SetAttitude(thePlayer, AIA_Hostile);
 			((CActor)ent).SetAnimationSpeedMultiplier(1);
+
+			((CActor)ent).GetInventory().AddAnItem( 'Sapphire dust', 3 );
+
+			((CActor)ent).GetInventory().AddAnItem( 'Magic gold', 5 );
+
+			((CActor)ent).GetInventory().AddAnItem( 'Magic dust', 1 );
+
+			((CActor)ent).GetInventory().AddAnItem( 'Magic food', 1 );
 
 			ent.AddTag( 'ACS_Mage' );
 
@@ -22194,7 +23391,7 @@ state ACS_MonsterSpawner_CloakedVampiress in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -22242,7 +23439,7 @@ state ACS_MonsterSpawner_Draugir in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -22326,7 +23523,7 @@ state ACS_MonsterSpawner_Draug in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -22461,7 +23658,7 @@ state ACS_MonsterSpawner_NecrofiendNest in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -22497,7 +23694,7 @@ state ACS_MonsterSpawner_HarpyQueenNest in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -22546,7 +23743,7 @@ state ACS_MonsterSpawner_Berserkers in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -22663,7 +23860,7 @@ state ACS_MonsterSpawner_CatAssassin in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -22742,6 +23939,47 @@ state ACS_MonsterSpawner_NamelessDemon in CACSMonsterSpawner
 	{
 		Fire_Gargoyle_Spawn_Latent();
 	}
+
+	function random_glyph() : CName
+	{
+		var glyph_names									: array<CName>;
+
+		glyph_names.Clear();
+		
+		glyph_names.PushBack('Glyph binding greater');
+		glyph_names.PushBack('Glyph warding greater');
+		glyph_names.PushBack('Glyph aard greater');
+		glyph_names.PushBack('Glyph axii greater');
+		glyph_names.PushBack('Glyph igni greater');
+		glyph_names.PushBack('Glyph quen greater');
+		glyph_names.PushBack('Glyph yrden greater');
+		
+		glyph_names.PushBack('Glyph infusion greater');
+
+		return glyph_names[RandRange(glyph_names.Size())];
+	}
+
+
+	function random_rune() : CName
+	{
+		var rune_names									: array<CName>;
+
+		rune_names.Clear();
+		
+		rune_names.PushBack('Rune stribog greater');
+		rune_names.PushBack('Rune devana greater');
+		rune_names.PushBack('Rune zoria greater');
+		rune_names.PushBack('Rune morana greater');
+		rune_names.PushBack('Rune veles greater');
+		rune_names.PushBack('Rune perun greater');
+		
+		
+		rune_names.PushBack('Rune svarog greater');
+		rune_names.PushBack('Rune triglav greater');
+		rune_names.PushBack('Rune dazhbog greater');
+
+		return rune_names[RandRange(rune_names.Size())];
+	}
 	
 	latent function Fire_Gargoyle_Spawn_Latent()
 	{
@@ -22755,7 +23993,7 @@ state ACS_MonsterSpawner_NamelessDemon in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -22794,6 +24032,10 @@ state ACS_MonsterSpawner_NamelessDemon in CACSMonsterSpawner
 		((CActor)ent).AddAbility('BounceBoltsWildhunt');
 
 		ent.AddTag('NoBestiaryEntry');
+
+		((CActor)ent).GetInventory().AddAnItem( random_glyph(), 1 );
+
+		((CActor)ent).GetInventory().AddAnItem( random_rune(), 1 );
 
 		((CActor)ent).AddBuffImmunity(EET_Poison, 'ACS_Fire_Gargoyle_Buff', true);
 
@@ -22850,7 +24092,7 @@ state ACS_MonsterSpawner_Garmr in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -22950,6 +24192,47 @@ state ACS_MonsterSpawner_FataMorgana in CACSMonsterSpawner
 	{
 		Fog_Assassin_Spawn_Latent();
 	}
+
+	function random_glyph() : CName
+	{
+		var glyph_names									: array<CName>;
+
+		glyph_names.Clear();
+		
+		glyph_names.PushBack('Glyph binding greater');
+		glyph_names.PushBack('Glyph warding greater');
+		glyph_names.PushBack('Glyph aard greater');
+		glyph_names.PushBack('Glyph axii greater');
+		glyph_names.PushBack('Glyph igni greater');
+		glyph_names.PushBack('Glyph quen greater');
+		glyph_names.PushBack('Glyph yrden greater');
+		
+		glyph_names.PushBack('Glyph infusion greater');
+
+		return glyph_names[RandRange(glyph_names.Size())];
+	}
+
+
+	function random_rune() : CName
+	{
+		var rune_names									: array<CName>;
+
+		rune_names.Clear();
+		
+		rune_names.PushBack('Rune stribog greater');
+		rune_names.PushBack('Rune devana greater');
+		rune_names.PushBack('Rune zoria greater');
+		rune_names.PushBack('Rune morana greater');
+		rune_names.PushBack('Rune veles greater');
+		rune_names.PushBack('Rune perun greater');
+		
+		
+		rune_names.PushBack('Rune svarog greater');
+		rune_names.PushBack('Rune triglav greater');
+		rune_names.PushBack('Rune dazhbog greater');
+
+		return rune_names[RandRange(rune_names.Size())];
+	}
 	
 	latent function Fog_Assassin_Spawn_Latent()
 	{
@@ -22963,7 +24246,7 @@ state ACS_MonsterSpawner_FataMorgana in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -22990,6 +24273,10 @@ state ACS_MonsterSpawner_FataMorgana in CACSMonsterSpawner
 		((CActor)ent).SetAnimationSpeedMultiplier(1);
 
 		((CActor)ent).SetCanPlayHitAnim(false);
+
+		((CActor)ent).GetInventory().AddAnItem( random_glyph(), 1 );
+
+		((CActor)ent).GetInventory().AddAnItem( random_rune(), 1 );
 
 		((CActor)ent).AddBuffImmunity(EET_Poison, 'ACS_Fog_Assassin_Buff', true);
 
@@ -23178,7 +24465,7 @@ state ACS_MonsterSpawner_CultOfMelusine in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -23402,7 +24689,7 @@ state ACS_MonsterSpawner_Rioghan in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -23586,7 +24873,7 @@ state ACS_MonsterSpawner_Svalblod in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -23726,6 +25013,47 @@ state ACS_MonsterSpawner_Duskwraith in CACSMonsterSpawner
 		Spawn_Duskwraith_Static_Latent();
 	}
 
+	function random_glyph() : CName
+	{
+		var glyph_names									: array<CName>;
+
+		glyph_names.Clear();
+		
+		glyph_names.PushBack('Glyph binding greater');
+		glyph_names.PushBack('Glyph warding greater');
+		glyph_names.PushBack('Glyph aard greater');
+		glyph_names.PushBack('Glyph axii greater');
+		glyph_names.PushBack('Glyph igni greater');
+		glyph_names.PushBack('Glyph quen greater');
+		glyph_names.PushBack('Glyph yrden greater');
+		
+		glyph_names.PushBack('Glyph infusion greater');
+
+		return glyph_names[RandRange(glyph_names.Size())];
+	}
+
+
+	function random_rune() : CName
+	{
+		var rune_names									: array<CName>;
+
+		rune_names.Clear();
+		
+		rune_names.PushBack('Rune stribog greater');
+		rune_names.PushBack('Rune devana greater');
+		rune_names.PushBack('Rune zoria greater');
+		rune_names.PushBack('Rune morana greater');
+		rune_names.PushBack('Rune veles greater');
+		rune_names.PushBack('Rune perun greater');
+		
+		
+		rune_names.PushBack('Rune svarog greater');
+		rune_names.PushBack('Rune triglav greater');
+		rune_names.PushBack('Rune dazhbog greater');
+
+		return rune_names[RandRange(rune_names.Size())];
+	}
+
 	latent function Spawn_Duskwraith_Static_Latent()
 	{
 		ACSDuskwraith().Destroy();
@@ -23740,7 +25068,7 @@ state ACS_MonsterSpawner_Duskwraith in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -23760,6 +25088,12 @@ state ACS_MonsterSpawner_Duskwraith in CACSMonsterSpawner
 		((CActor)ent).SetAnimationSpeedMultiplier(1);
 
 		((CActor)ent).SetCanPlayHitAnim(false);
+
+		((CActor)ent).GetInventory().AddAnItem( random_glyph(), 2 );
+
+		((CActor)ent).GetInventory().AddAnItem( random_rune(), 2 );
+
+		((CActor)ent).GetInventory().AddAnItem( 'acs_wraith_mode_item', 1 );
 
 		((CActor)ent).AddBuffImmunity(EET_Poison, 'ACS_Duskwraith_Buff', true);
 
@@ -23851,6 +25185,47 @@ state ACS_MonsterSpawner_OmnesMoriendus in CACSMonsterSpawner
 		Spawn_MegaWraith_Static_Latent();
 	}
 
+	function random_glyph() : CName
+	{
+		var glyph_names									: array<CName>;
+
+		glyph_names.Clear();
+		
+		glyph_names.PushBack('Glyph binding greater');
+		glyph_names.PushBack('Glyph warding greater');
+		glyph_names.PushBack('Glyph aard greater');
+		glyph_names.PushBack('Glyph axii greater');
+		glyph_names.PushBack('Glyph igni greater');
+		glyph_names.PushBack('Glyph quen greater');
+		glyph_names.PushBack('Glyph yrden greater');
+		
+		glyph_names.PushBack('Glyph infusion greater');
+
+		return glyph_names[RandRange(glyph_names.Size())];
+	}
+
+
+	function random_rune() : CName
+	{
+		var rune_names									: array<CName>;
+
+		rune_names.Clear();
+		
+		rune_names.PushBack('Rune stribog greater');
+		rune_names.PushBack('Rune devana greater');
+		rune_names.PushBack('Rune zoria greater');
+		rune_names.PushBack('Rune morana greater');
+		rune_names.PushBack('Rune veles greater');
+		rune_names.PushBack('Rune perun greater');
+		
+		
+		rune_names.PushBack('Rune svarog greater');
+		rune_names.PushBack('Rune triglav greater');
+		rune_names.PushBack('Rune dazhbog greater');
+
+		return rune_names[RandRange(rune_names.Size())];
+	}
+
 	latent function Spawn_MegaWraith_Static_Latent()
 	{
 		GetACSMegaWraith().Destroy();
@@ -23875,7 +25250,7 @@ state ACS_MonsterSpawner_OmnesMoriendus in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -23894,6 +25269,15 @@ state ACS_MonsterSpawner_OmnesMoriendus in CACSMonsterSpawner
 
 		((CNewNPC)ent).SetAttitude(thePlayer, AIA_Hostile);
 		((CActor)ent).SetAnimationSpeedMultiplier(1);
+
+		((CActor)ent).GetInventory().AddAnItem( random_glyph(), 2 );
+
+		((CActor)ent).GetInventory().AddAnItem( random_rune(), 2 );
+
+		if (RandF() < 0.125)
+		{
+			((CActor)ent).GetInventory().AddAnItem( 'acs_shades_summon_item', 1 );
+		}
 
 		((CActor)ent).SetCanPlayHitAnim(false);
 
@@ -24016,7 +25400,7 @@ state ACS_MonsterSpawner_OpinicusMatriarch in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -24148,7 +25532,7 @@ state ACS_MonsterSpawner_Incubus in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -24165,6 +25549,14 @@ state ACS_MonsterSpawner_Incubus in CACSMonsterSpawner
 		((CNewNPC)ent).SetLevel(thePlayer.GetLevel());
 
 		((CActor)ent).SetAnimationSpeedMultiplier(1);
+
+		((CActor)ent).GetInventory().AddAnItem( 'Mutagen green', 1 );
+
+		((CActor)ent).GetInventory().AddAnItem( 'Mutagen blue', 1 );
+
+		((CActor)ent).GetInventory().AddAnItem( 'Mutagen red', 1 );
+
+		((CActor)ent).GetInventory().AddAnItem( 'Succubus mutagen', 1 );
 
 		ent.AddTag( 'ACS_Incubus' );
 
@@ -24204,7 +25596,7 @@ state ACS_MonsterSpawner_Mula in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -24223,45 +25615,17 @@ state ACS_MonsterSpawner_Mula in CACSMonsterSpawner
 		((CNewNPC)ent).SetAttitude(thePlayer, AIA_Hostile);
 		((CActor)ent).SetAnimationSpeedMultiplier(1);
 
-		((CActor)ent).SetCanPlayHitAnim(false);
+		//((CActor)ent).SetCanPlayHitAnim(false);
 
-		((CActor)ent).AddBuffImmunity(EET_Poison, 'ACS_Mula_Buff', true);
+		((CActor)ent).GetInventory().AddAnItem( 'Greater mutagen red', 3 );
 
-		((CActor)ent).AddBuffImmunity(EET_PoisonCritical , 'ACS_Mula_Buff', true);
+		((CActor)ent).GetInventory().AddAnItem( 'Ruby flawless', 3 );
 
-		((CActor)ent).AddBuffImmunity(EET_Bleeding , 'ACS_Mula_Buff', true);
+		//((CActor)ent).AddTag( 'ContractTarget' );
 
-		((CActor)ent).AddBuffImmunity(EET_Weaken , 'ACS_Mula_Buff', true);
+		//((CActor)ent).AddTag('IsBoss');
 
-		((CActor)ent).AddBuffImmunity(EET_WeakeningAura , 'ACS_Mula_Buff', true);
-
-		((CActor)ent).AddBuffImmunity(EET_Confusion , 'ACS_Mula_Buff', true);
-
-		((CActor)ent).AddBuffImmunity(EET_Hypnotized , 'ACS_Mula_Buff', true);
-
-		((CActor)ent).AddBuffImmunity(EET_AxiiGuardMe , 'ACS_Mula_Buff', true);
-
-		((CActor)ent).AddBuffImmunity(EET_Immobilized , 'ACS_Mula_Buff', true);
-
-		((CActor)ent).AddBuffImmunity(EET_Paralyzed , 'ACS_Mula_Buff', true);
-
-		((CActor)ent).AddBuffImmunity(EET_Blindness , 'ACS_Mula_Buff', true);
-
-		((CActor)ent).AddBuffImmunity(EET_Choking , 'ACS_Mula_Buff', true);
-
-		((CActor)ent).AddBuffImmunity(EET_Swarm , 'ACS_Mula_Buff', true);
-
-		((CActor)ent).AddBuffImmunity(EET_Knockdown , 'ACS_Mula_Buff', true);
-
-		((CActor)ent).AddBuffImmunity(EET_HeavyKnockdown , 'ACS_Mula_Buff', true);
-
-		((CActor)ent).AddBuffImmunity(EET_KnockdownTypeApplicator , 'ACS_Mula_Buff', true);
-
-		((CActor)ent).AddTag( 'ContractTarget' );
-
-		((CActor)ent).AddTag('IsBoss');
-
-		((CActor)ent).AddAbility('Boss');
+		//((CActor)ent).AddAbility('Boss');
 
 		//((CActor)ent).RemoveAbility('Venom');
 
@@ -24288,6 +25652,46 @@ state ACS_MonsterSpawner_BloodHym in CACSMonsterSpawner
 	{	
 		Spawn_Blood_Hym_Latent();
 	}
+
+	function random_glyph() : CName
+	{
+		var glyph_names									: array<CName>;
+
+		glyph_names.Clear();
+		
+		glyph_names.PushBack('Glyph binding greater');
+		glyph_names.PushBack('Glyph warding greater');
+		glyph_names.PushBack('Glyph aard greater');
+		glyph_names.PushBack('Glyph axii greater');
+		glyph_names.PushBack('Glyph igni greater');
+		glyph_names.PushBack('Glyph quen greater');
+		glyph_names.PushBack('Glyph yrden greater');
+		
+		glyph_names.PushBack('Glyph infusion greater');
+
+		return glyph_names[RandRange(glyph_names.Size())];
+	}
+
+	function random_rune() : CName
+	{
+		var rune_names									: array<CName>;
+
+		rune_names.Clear();
+		
+		rune_names.PushBack('Rune stribog greater');
+		rune_names.PushBack('Rune devana greater');
+		rune_names.PushBack('Rune zoria greater');
+		rune_names.PushBack('Rune morana greater');
+		rune_names.PushBack('Rune veles greater');
+		rune_names.PushBack('Rune perun greater');
+		
+		
+		rune_names.PushBack('Rune svarog greater');
+		rune_names.PushBack('Rune triglav greater');
+		rune_names.PushBack('Rune dazhbog greater');
+
+		return rune_names[RandRange(rune_names.Size())];
+	}
 	
 	latent function Spawn_Blood_Hym_Latent()
 	{
@@ -24299,7 +25703,7 @@ state ACS_MonsterSpawner_BloodHym in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -24313,6 +25717,10 @@ state ACS_MonsterSpawner_BloodHym in CACSMonsterSpawner
 		((CActor)ent).SetAnimationSpeedMultiplier(1.5);
 
 		((CActor)ent).SetCanPlayHitAnim(false);
+
+		((CActor)ent).GetInventory().AddAnItem( random_glyph(), 3 );
+
+		((CActor)ent).GetInventory().AddAnItem( random_rune(), 3 );
 
 		((CActor)ent).AddBuffImmunity(EET_Poison, 'ACS_Mini_Hym_Buff', true);
 
@@ -24385,7 +25793,7 @@ state ACS_MonsterSpawner_Orianna in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -24507,6 +25915,46 @@ state ACS_MonsterSpawner_Bumbakvetch in CACSMonsterSpawner
 		Spawn_Bumbakvetch_Static_Latent();
 	}
 
+	function random_glyph() : CName
+	{
+		var glyph_names									: array<CName>;
+
+		glyph_names.Clear();
+		
+		glyph_names.PushBack('Glyph binding greater');
+		glyph_names.PushBack('Glyph warding greater');
+		glyph_names.PushBack('Glyph aard greater');
+		glyph_names.PushBack('Glyph axii greater');
+		glyph_names.PushBack('Glyph igni greater');
+		glyph_names.PushBack('Glyph quen greater');
+		glyph_names.PushBack('Glyph yrden greater');
+		
+		glyph_names.PushBack('Glyph infusion greater');
+
+		return glyph_names[RandRange(glyph_names.Size())];
+	}
+
+	function random_rune() : CName
+	{
+		var rune_names									: array<CName>;
+
+		rune_names.Clear();
+		
+		rune_names.PushBack('Rune stribog greater');
+		rune_names.PushBack('Rune devana greater');
+		rune_names.PushBack('Rune zoria greater');
+		rune_names.PushBack('Rune morana greater');
+		rune_names.PushBack('Rune veles greater');
+		rune_names.PushBack('Rune perun greater');
+		
+		
+		rune_names.PushBack('Rune svarog greater');
+		rune_names.PushBack('Rune triglav greater');
+		rune_names.PushBack('Rune dazhbog greater');
+
+		return rune_names[RandRange(rune_names.Size())];
+	}
+
 	latent function Spawn_Bumbakvetch_Static_Latent()
 	{
 		temp = (CEntityTemplate)LoadResourceAsync( 
@@ -24519,7 +25967,7 @@ state ACS_MonsterSpawner_Bumbakvetch in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -24539,6 +25987,10 @@ state ACS_MonsterSpawner_Bumbakvetch in CACSMonsterSpawner
 		((CActor)ent).SetAnimationSpeedMultiplier(0.75);
 
 		((CActor)ent).SetCanPlayHitAnim(false);
+
+		((CActor)ent).GetInventory().AddAnItem( random_glyph(), 3 );
+
+		((CActor)ent).GetInventory().AddAnItem( random_rune(), 3 );
 
 		((CActor)ent).AddBuffImmunity(EET_Poison, 'ACS_Bumbakvetch_Buff', true);
 
@@ -24612,6 +26064,47 @@ state ACS_MonsterSpawner_IceBoar in CACSMonsterSpawner
 		Spawn_IceBoar_Static_Latent();
 	}
 
+	function random_glyph() : CName
+	{
+		var glyph_names									: array<CName>;
+
+		glyph_names.Clear();
+		
+		glyph_names.PushBack('Glyph binding greater');
+		glyph_names.PushBack('Glyph warding greater');
+		glyph_names.PushBack('Glyph aard greater');
+		glyph_names.PushBack('Glyph axii greater');
+		glyph_names.PushBack('Glyph igni greater');
+		glyph_names.PushBack('Glyph quen greater');
+		glyph_names.PushBack('Glyph yrden greater');
+		
+		glyph_names.PushBack('Glyph infusion greater');
+
+		return glyph_names[RandRange(glyph_names.Size())];
+	}
+
+	function random_rune() : CName
+	{
+		var rune_names									: array<CName>;
+
+		rune_names.Clear();
+		
+		rune_names.PushBack('Rune stribog greater');
+		rune_names.PushBack('Rune devana greater');
+		rune_names.PushBack('Rune zoria greater');
+		rune_names.PushBack('Rune morana greater');
+		rune_names.PushBack('Rune veles greater');
+		rune_names.PushBack('Rune perun greater');
+		
+		
+		rune_names.PushBack('Rune svarog greater');
+		rune_names.PushBack('Rune triglav greater');
+		rune_names.PushBack('Rune dazhbog greater');
+
+		return rune_names[RandRange(rune_names.Size())];
+	}
+
+
 	latent function Spawn_IceBoar_Static_Latent()
 	{
 		temp = (CEntityTemplate)LoadResourceAsync( 
@@ -24624,7 +26117,7 @@ state ACS_MonsterSpawner_IceBoar in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -24644,6 +26137,10 @@ state ACS_MonsterSpawner_IceBoar in CACSMonsterSpawner
 		((CActor)ent).SetAnimationSpeedMultiplier(0.825);
 
 		((CActor)ent).SetCanPlayHitAnim(false);
+
+		((CActor)ent).GetInventory().AddAnItem( random_glyph(), 1 );
+
+		((CActor)ent).GetInventory().AddAnItem( random_rune(), 1 );
 
 		((CActor)ent).AddBuffImmunity(EET_Poison, 'ACS_Ice_Boar_Buff', true);
 
@@ -24731,7 +26228,7 @@ state ACS_MonsterSpawner_NimeanPanther in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -24751,6 +26248,10 @@ state ACS_MonsterSpawner_NimeanPanther in CACSMonsterSpawner
 		((CActor)ent).SetAnimationSpeedMultiplier(0.75);
 
 		((CActor)ent).SetCanPlayHitAnim(false);
+
+		((CActor)ent).GetInventory().AddAnItem( 'Greater mutagen red', 3 );
+
+		((CActor)ent).GetInventory().AddAnItem( 'Ruby flawless', 3 );
 
 		((CActor)ent).AddBuffImmunity(EET_Poison, 'ACS_Nimean_Panther_Buff', true);
 
@@ -24835,18 +26336,7 @@ state ACS_MonsterSpawner_ForestGodShadow in CACSMonsterSpawner
 
 		playerPos = parent.GetWorldPosition();
 
-		if( thePlayer.GetStat( BCS_Vitality ) <= thePlayer.GetStatMax(BCS_Vitality)/2 ) 
-		{	
-			count = 1;
-		}
-		else if( thePlayer.GetStat( BCS_Vitality ) == thePlayer.GetStatMax(BCS_Vitality) ) 
-		{
-			count = 2;
-		}
-		else
-		{
-			count = 1;
-		}
+		count = 1;
 			
 		for( i = 0; i < count; i += 1 )
 		{
@@ -24861,7 +26351,7 @@ state ACS_MonsterSpawner_ForestGodShadow in CACSMonsterSpawner
 
 			playerRot = thePlayer.GetWorldRotation();
 
-			playerRot.Yaw += 180;
+			playerRot.Yaw += RandRangeF(360,0);
 
 			adjustedRot = EulerAngles(0,0,0);
 
@@ -24871,7 +26361,7 @@ state ACS_MonsterSpawner_ForestGodShadow in CACSMonsterSpawner
 
 			animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
 			meshcomp = ent.GetComponentByClassName('CMeshComponent');
-			h = 0.65;
+			h = 1;
 			animcomp.SetScale(Vector(h,h,h,1));
 			meshcomp.SetScale(Vector(h,h,h,1));	
 
@@ -24879,36 +26369,47 @@ state ACS_MonsterSpawner_ForestGodShadow in CACSMonsterSpawner
 
 			((CActor)ent).GetInventory().AddAnItem( 'Leshy mutagen', 1 );
 
-			((CNewNPC)ent).SetLevel( thePlayer.GetLevel() - 15 );
+			((CNewNPC)ent).SetLevel( thePlayer.GetLevel() /2 );
 
 			((CNewNPC)ent).SetAttitude(thePlayer, AIA_Hostile);
 
-			((CNewNPC)ent).SetTemporaryAttitudeGroup( 'hostile_to_player', AGP_Default );
-
 			((CActor)ent).SetAnimationSpeedMultiplier(1.25);
+
+			((CNewNPC)ent).SetUnstoppable(true);
 
 			((CActor)ent).AddBuffImmunity_AllNegative('ACS_Forest_God_Shadows', true);
 
 			((CActor)ent).AddBuffImmunity_AllCritical('ACS_Forest_God_Shadows', true);
 
-			((CActor)ent).EnableCharacterCollisions(false);
+			((CActor)ent).EnableCharacterCollisions(true);
 
 			((CActor)ent).SetUnpushableTarget(thePlayer);
 
+			((CActor)ent).SetCanPlayHitAnim(false);
+
+			((CActor)ent).AddTag( 'ContractTarget' );
+
+			((CActor)ent).AddTag('IsBoss');
+
+			((CActor)ent).AddAbility('Boss');
+
+			((CActor)ent).AddAbility('InstantKillImmune');
+
+			((CActor)ent).AddAbility('ablIgnoreSigns');
+
+			((CActor)ent).AddAbility('DisableFinishers');
+
+			((CActor)ent).AddAbility('MonsterMHBoss');
+
+			((CActor)ent).AddAbility('ForceCriticalEffects');
+
+			((CActor)ent).AddAbility('BounceBoltsWildhunt');
+
 			((CActor)ent).PlayEffectSingle('demonic_possession');
 
-			if (count == 2)
-			{
-				((CActor)ent).DrainEssence(((CActor)ent).GetStatMax(BCS_Essence)/2);
-			}
-
-			((CActor)ent).RemoveBuffImmunity(EET_Slowdown);
-
-			((CActor)ent).RemoveBuffImmunity(EET_Paralyzed);
-
-			((CActor)ent).RemoveBuffImmunity(EET_Stagger);
-
 			ent.AddTag( 'ACS_Forest_God_Shadows' );
+
+			ent.AddTag( 'ACS_Hostile_To_All' );
 
 			ent.AddTag( 'ContractTarget' );
 		}
@@ -24940,13 +26441,52 @@ state ACS_MonsterSpawner_ShadowPixies in CACSMonsterSpawner
 		Spawn_ShadowPixies_Latent();
 	}
 
+	function random_glyph_lesser() : CName
+	{
+		var glyph_names_lesser									: array<CName>;
+
+		glyph_names_lesser.Clear();
+		
+		glyph_names_lesser.PushBack('Glyph binding greater');
+		glyph_names_lesser.PushBack('Glyph warding greater');
+		glyph_names_lesser.PushBack('Glyph aard greater');
+		glyph_names_lesser.PushBack('Glyph axii greater');
+		glyph_names_lesser.PushBack('Glyph igni greater');
+		glyph_names_lesser.PushBack('Glyph quen greater');
+		glyph_names_lesser.PushBack('Glyph yrden greater');
+		
+		glyph_names_lesser.PushBack('Glyph infusion greater');
+
+		return glyph_names_lesser[RandRange(glyph_names_lesser.Size())];
+	}
+
+	function random_rune_lesser() : CName
+	{
+		var rune_names_lesser									: array<CName>;
+
+		rune_names_lesser.Clear();
+		
+		rune_names_lesser.PushBack('Rune stribog greater');
+		rune_names_lesser.PushBack('Rune devana greater');
+		rune_names_lesser.PushBack('Rune zoria greater');
+		rune_names_lesser.PushBack('Rune morana greater');
+		rune_names_lesser.PushBack('Rune veles greater');
+		rune_names_lesser.PushBack('Rune perun greater');
+		
+		
+		rune_names_lesser.PushBack('Rune svarog greater');
+		rune_names_lesser.PushBack('Rune triglav greater');
+
+		return rune_names_lesser[RandRange(rune_names_lesser.Size())];
+	}
+
 	latent function Spawn_ShadowPixies_Latent()
 	{
 		pos = parent.pos;
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -24985,6 +26525,10 @@ state ACS_MonsterSpawner_ShadowPixies in CACSMonsterSpawner
 			((CNewNPC)ent).SetLevel(thePlayer.GetLevel());
 
 			((CNewNPC)ent).SetAttitude(thePlayer, AIA_Hostile);
+
+			((CActor)ent).GetInventory().AddAnItem( random_glyph_lesser(), 1 );
+
+			((CActor)ent).GetInventory().AddAnItem( random_rune_lesser(), 1 );
 
 			((CActor)ent).SetAnimationSpeedMultiplier(1);
 
@@ -25027,7 +26571,7 @@ state ACS_MonsterSpawner_DemonicConstruct in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -25045,6 +26589,15 @@ state ACS_MonsterSpawner_DemonicConstruct in CACSMonsterSpawner
 
 		((CNewNPC)ent).SetAttitude(thePlayer, AIA_Hostile);
 		((CActor)ent).SetAnimationSpeedMultiplier(1);
+
+		((CActor)ent).GetInventory().AddAnItem( 'Greater mutagen blue', 3 );
+
+		((CActor)ent).GetInventory().AddAnItem( 'Sapphire flawless', 3 );
+
+		if (RandF() < 0.05)
+		{
+			((CActor)ent).GetInventory().AddAnItem( 'ACS_Demonic_Construct_Hammer', 1 );
+		}
 
 		((CActor)ent).SetCanPlayHitAnim(false);
 
@@ -25124,7 +26677,7 @@ state ACS_MonsterSpawner_DarkKnight in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 		
 		ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(playerPos), playerRot );
 
@@ -25214,7 +26767,7 @@ state ACS_MonsterSpawner_DarkKnightCalidus in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 		
 		ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(playerPos), playerRot );
 
@@ -25268,6 +26821,11 @@ state ACS_MonsterSpawner_DarkKnightCalidus in CACSMonsterSpawner
 		ent.AddTag( 'ACS_Dark_Knight_Calidus' );
 
 		ent.AddTag( 'ACS_Hostile_To_All' );
+
+		if (RandF() < 0.05)
+		{
+			((CActor)ent).GetInventory().AddAnItem( 'ACS_Calidus_Fire_Sword', 1 );
+		}
 	}
 	
 	event OnLeaveState( nextStateName : name ) 
@@ -25308,7 +26866,7 @@ state ACS_MonsterSpawner_Voref in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 		
 		ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(playerPos), playerRot );
 
@@ -25343,6 +26901,12 @@ state ACS_MonsterSpawner_Voref in CACSMonsterSpawner
 
 		((CActor)ent).AddAbility('BounceBoltsWildhunt');
 
+		((CActor)ent).GetInventory().AddAnItem( 'Greater mutagen green', 3 );
+
+		((CActor)ent).GetInventory().AddAnItem( 'Emerald flawless', 3 );
+
+		((CActor)ent).GetInventory().AddAnItem( 'q111_imlerith_acorn', 1 );
+
 		ent.AddTag('NoBestiaryEntry');
 
 		ent.AddTag( 'ACS_Voref' );
@@ -25376,13 +26940,54 @@ state ACS_MonsterSpawner_Maerolorn in CACSMonsterSpawner
 		Spawn_Maerolorn_Latent();
 	}
 
+	function random_glyph() : CName
+	{
+		var glyph_names									: array<CName>;
+
+		glyph_names.Clear();
+		
+		glyph_names.PushBack('Glyph binding greater');
+		glyph_names.PushBack('Glyph warding greater');
+		glyph_names.PushBack('Glyph aard greater');
+		glyph_names.PushBack('Glyph axii greater');
+		glyph_names.PushBack('Glyph igni greater');
+		glyph_names.PushBack('Glyph quen greater');
+		glyph_names.PushBack('Glyph yrden greater');
+		
+		glyph_names.PushBack('Glyph infusion greater');
+
+		return glyph_names[RandRange(glyph_names.Size())];
+	}
+
+
+	function random_rune() : CName
+	{
+		var rune_names									: array<CName>;
+
+		rune_names.Clear();
+		
+		rune_names.PushBack('Rune stribog greater');
+		rune_names.PushBack('Rune devana greater');
+		rune_names.PushBack('Rune zoria greater');
+		rune_names.PushBack('Rune morana greater');
+		rune_names.PushBack('Rune veles greater');
+		rune_names.PushBack('Rune perun greater');
+		
+		
+		rune_names.PushBack('Rune svarog greater');
+		rune_names.PushBack('Rune triglav greater');
+		rune_names.PushBack('Rune dazhbog greater');
+
+		return rune_names[RandRange(rune_names.Size())];
+	}
+
 	latent function Spawn_Maerolorn_Latent()
 	{
 		pos = parent.pos;
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -25415,11 +27020,32 @@ state ACS_MonsterSpawner_Maerolorn in CACSMonsterSpawner
 
 			//ent.AddTag('NoBestiaryEntry');
 
+			((CActor)ent).AddTag('IsBoss');
+
+			((CActor)ent).AddAbility('Boss');
+
 			((CActor)ent).AddAbility('InstantKillImmune');
+
+			//((CActor)ent).AddAbility('ablIgnoreSigns');
 
 			((CActor)ent).AddAbility('DisableFinishers');
 
+			((CActor)ent).AddAbility('MonsterMHBoss');
+
+			((CActor)ent).AddAbility('ForceCriticalEffects');
+
 			((CActor)ent).AddAbility('BounceBoltsWildhunt');
+
+			if (RandF() < 0.5)
+			{
+				((CActor)ent).GetInventory().AddAnItem( random_glyph(), 1 );
+			}
+			else
+			{
+				((CActor)ent).GetInventory().AddAnItem( random_rune(), 1 );
+			}
+
+			((CActor)ent).GetInventory().AddAnItem( 'Diamond flawles', 2 );
 
 			ent.PlayEffect('shadow_form');
 			
@@ -25471,7 +27097,7 @@ state ACS_MonsterSpawner_Ifrit in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 		
 		ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(playerPos), playerRot );
 
@@ -25507,6 +27133,10 @@ state ACS_MonsterSpawner_Ifrit in CACSMonsterSpawner
 		((CActor)ent).RemoveBuff(EET_FireAura, true, 'acs_ifrit_fire_aura');
 
 		((CActor)ent).AddEffectDefault( EET_FireAura, ((CActor)ent), 'acs_ifrit_fire_aura' );
+
+		((CActor)ent).GetInventory().AddAnItem( 'q111_imlerith_acorn', 3 );
+
+		((CActor)ent).GetInventory().AddAnItem( 'acs_beam_attack_item', 1 );
 
 		ent.PlayEffectSingle('fire');
 
@@ -25554,7 +27184,7 @@ state ACS_MonsterSpawner_Carduin in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 		
 		ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(playerPos), playerRot );
 
@@ -25587,7 +27217,95 @@ state ACS_MonsterSpawner_Carduin in CACSMonsterSpawner
 
 		((CActor)ent).AddAbility('BounceBoltsWildhunt');
 
+		((CActor)ent).GetInventory().AddAnItem( 'q111_imlerith_acorn', 3 );
+
 		ent.AddTag( 'ACS_Carduin' );
+
+		ent.AddTag( 'ACS_Hostile_To_All' );
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+state ACS_MonsterSpawner_Iridescent_Sharley in CACSMonsterSpawner
+{
+	private var temp															: CEntityTemplate;
+	private var ent																: CEntity;
+	private var playerPos														: Vector;
+	private var meshcomp														: CComponent;
+	private var animcomp 														: CAnimatedComponent;
+	private var h 																: float;
+	private var playerRot														: EulerAngles;
+		
+	event OnEnterState(prevStateName : name)
+	{
+		Spawn_Iridescent_Sharley_Entry();
+	}
+	
+	entry function Spawn_Iridescent_Sharley_Entry()
+	{	
+		Spawn_Iridescent_Sharley_Latent();
+	}
+
+	latent function Spawn_Iridescent_Sharley_Latent()
+	{
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\dlc_acs\data\entities\monsters\sharley_advanced.w2ent"
+			
+		, true );
+
+		playerPos = parent.pos;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += RandRangeF(360,0);
+		
+		ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1.5;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+
+		ent.PlayEffect('glow');
+
+		((CNewNPC)ent).SetLevel(thePlayer.GetLevel());
+
+		((CNewNPC)ent).SetAttitude(thePlayer, AIA_Hostile);
+		((CActor)ent).SetAnimationSpeedMultiplier(1.125);
+
+		((CActor)ent).SetCanPlayHitAnim(true);
+
+		((CActor)ent).AddTag( 'ContractTarget' );
+
+		((CActor)ent).AddTag('IsBoss');
+
+		((CActor)ent).AddAbility('Boss');
+
+		((CActor)ent).AddAbility('InstantKillImmune');
+
+		//((CActor)ent).AddAbility('ablIgnoreSigns');
+
+		((CActor)ent).AddAbility('DisableFinishers');
+
+		((CActor)ent).AddAbility('MonsterMHBoss');
+
+		//((CActor)ent).AddAbility('ForceCriticalEffects');
+
+		((CActor)ent).AddAbility('BounceBoltsWildhunt');
+
+		((CActor)ent).GetInventory().AddAnItem( 'acs_sharley_shard', 1 );
+
+		((CActor)ent).GetInventory().AddAnItem( 'q111_imlerith_acorn', 3 );
+
+		ent.AddTag('NoBestiaryEntry');
+
+		ent.AddTag( 'ACS_Iridescent_Sharley' );
 
 		ent.AddTag( 'ACS_Hostile_To_All' );
 	}
@@ -25632,7 +27350,7 @@ state ACS_MonsterSpawner_ViyOfMaribor in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(playerPos), playerRot );
 
@@ -25700,6 +27418,8 @@ state ACS_MonsterSpawner_ViyOfMaribor in CACSMonsterSpawner
 		((CActor)ent).AddAbility('ForceCriticalEffects');
 
 		((CActor)ent).AddAbility('BounceBoltsWildhunt');
+
+		((CActor)ent).GetInventory().AddAnItem( 'q111_imlerith_acorn', 10 );
 
 		ent.AddTag('NoBestiaryEntry');
 
@@ -25795,6 +27515,47 @@ state ACS_MonsterSpawner_Phooca in CACSMonsterSpawner
 		Spawn_Phooca_Latent();
 	}
 
+	function random_glyph() : CName
+	{
+		var glyph_names									: array<CName>;
+
+		glyph_names.Clear();
+		
+		glyph_names.PushBack('Glyph binding greater');
+		glyph_names.PushBack('Glyph warding greater');
+		glyph_names.PushBack('Glyph aard greater');
+		glyph_names.PushBack('Glyph axii greater');
+		glyph_names.PushBack('Glyph igni greater');
+		glyph_names.PushBack('Glyph quen greater');
+		glyph_names.PushBack('Glyph yrden greater');
+		
+		glyph_names.PushBack('Glyph infusion greater');
+
+		return glyph_names[RandRange(glyph_names.Size())];
+	}
+
+
+	function random_rune() : CName
+	{
+		var rune_names									: array<CName>;
+
+		rune_names.Clear();
+		
+		rune_names.PushBack('Rune stribog greater');
+		rune_names.PushBack('Rune devana greater');
+		rune_names.PushBack('Rune zoria greater');
+		rune_names.PushBack('Rune morana greater');
+		rune_names.PushBack('Rune veles greater');
+		rune_names.PushBack('Rune perun greater');
+		
+		
+		rune_names.PushBack('Rune svarog greater');
+		rune_names.PushBack('Rune triglav greater');
+		rune_names.PushBack('Rune dazhbog greater');
+
+		return rune_names[RandRange(rune_names.Size())];
+	}
+
 	latent function Spawn_Phooca_Latent()
 	{
 		temp = (CEntityTemplate)LoadResourceAsync( 
@@ -25807,7 +27568,7 @@ state ACS_MonsterSpawner_Phooca in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(playerPos), playerRot );
 
@@ -25823,6 +27584,10 @@ state ACS_MonsterSpawner_Phooca in CACSMonsterSpawner
 		((CActor)ent).SetAnimationSpeedMultiplier(1.125);
 
 		((CActor)ent).SetCanPlayHitAnim(false);
+
+		((CActor)ent).GetInventory().AddAnItem( random_glyph(), 1 );
+
+		((CActor)ent).GetInventory().AddAnItem( random_rune(), 1 );
 
 		((CActor)ent).AddBuffImmunity(EET_Poison, 'ACS_Enemy_Buff', true);
 
@@ -25924,7 +27689,7 @@ state ACS_MonsterSpawner_Plumard in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 		
 		count = RandRange(9,5);
 			
@@ -25984,6 +27749,47 @@ state ACS_MonsterSpawner_GiantRockTroll in CACSMonsterSpawner
 		Spawn_GiantRockTroll_Latent();
 	}
 
+	function random_glyph() : CName
+	{
+		var glyph_names									: array<CName>;
+
+		glyph_names.Clear();
+		
+		glyph_names.PushBack('Glyph binding greater');
+		glyph_names.PushBack('Glyph warding greater');
+		glyph_names.PushBack('Glyph aard greater');
+		glyph_names.PushBack('Glyph axii greater');
+		glyph_names.PushBack('Glyph igni greater');
+		glyph_names.PushBack('Glyph quen greater');
+		glyph_names.PushBack('Glyph yrden greater');
+		
+		glyph_names.PushBack('Glyph infusion greater');
+
+		return glyph_names[RandRange(glyph_names.Size())];
+	}
+
+
+	function random_rune() : CName
+	{
+		var rune_names									: array<CName>;
+
+		rune_names.Clear();
+		
+		rune_names.PushBack('Rune stribog greater');
+		rune_names.PushBack('Rune devana greater');
+		rune_names.PushBack('Rune zoria greater');
+		rune_names.PushBack('Rune morana greater');
+		rune_names.PushBack('Rune veles greater');
+		rune_names.PushBack('Rune perun greater');
+		
+		
+		rune_names.PushBack('Rune svarog greater');
+		rune_names.PushBack('Rune triglav greater');
+		rune_names.PushBack('Rune dazhbog greater');
+
+		return rune_names[RandRange(rune_names.Size())];
+	}
+
 	latent function Spawn_GiantRockTroll_Latent()
 	{
 		temp = (CEntityTemplate)LoadResourceAsync( 
@@ -25996,7 +27802,7 @@ state ACS_MonsterSpawner_GiantRockTroll in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(playerPos), playerRot );
 
@@ -26012,6 +27818,10 @@ state ACS_MonsterSpawner_GiantRockTroll in CACSMonsterSpawner
 		((CActor)ent).SetAnimationSpeedMultiplier(0.9);
 
 		((CActor)ent).SetCanPlayHitAnim(false);
+
+		((CActor)ent).GetInventory().AddAnItem( random_glyph(), 1 );
+
+		((CActor)ent).GetInventory().AddAnItem( random_rune(), 1 );
 
 		((CActor)ent).AddTag( 'ContractTarget' );
 
@@ -26066,6 +27876,47 @@ state ACS_MonsterSpawner_GiantIceTroll in CACSMonsterSpawner
 		Spawn_GiantIceTroll_Latent();
 	}
 
+	function random_glyph() : CName
+	{
+		var glyph_names									: array<CName>;
+
+		glyph_names.Clear();
+		
+		glyph_names.PushBack('Glyph binding greater');
+		glyph_names.PushBack('Glyph warding greater');
+		glyph_names.PushBack('Glyph aard greater');
+		glyph_names.PushBack('Glyph axii greater');
+		glyph_names.PushBack('Glyph igni greater');
+		glyph_names.PushBack('Glyph quen greater');
+		glyph_names.PushBack('Glyph yrden greater');
+		
+		glyph_names.PushBack('Glyph infusion greater');
+
+		return glyph_names[RandRange(glyph_names.Size())];
+	}
+
+
+	function random_rune() : CName
+	{
+		var rune_names									: array<CName>;
+
+		rune_names.Clear();
+		
+		rune_names.PushBack('Rune stribog greater');
+		rune_names.PushBack('Rune devana greater');
+		rune_names.PushBack('Rune zoria greater');
+		rune_names.PushBack('Rune morana greater');
+		rune_names.PushBack('Rune veles greater');
+		rune_names.PushBack('Rune perun greater');
+		
+		
+		rune_names.PushBack('Rune svarog greater');
+		rune_names.PushBack('Rune triglav greater');
+		rune_names.PushBack('Rune dazhbog greater');
+
+		return rune_names[RandRange(rune_names.Size())];
+	}
+
 	latent function Spawn_GiantIceTroll_Latent()
 	{
 		temp = (CEntityTemplate)LoadResourceAsync( 
@@ -26078,7 +27929,7 @@ state ACS_MonsterSpawner_GiantIceTroll in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(playerPos), playerRot );
 
@@ -26094,6 +27945,10 @@ state ACS_MonsterSpawner_GiantIceTroll in CACSMonsterSpawner
 		((CActor)ent).SetAnimationSpeedMultiplier(0.9);
 
 		((CActor)ent).SetCanPlayHitAnim(false);
+
+		((CActor)ent).GetInventory().AddAnItem( random_glyph(), 1 );
+
+		((CActor)ent).GetInventory().AddAnItem( random_rune(), 1 );
 
 		((CActor)ent).AddTag( 'ContractTarget' );
 
@@ -26148,6 +28003,47 @@ state ACS_MonsterSpawner_GiantMagmaTroll in CACSMonsterSpawner
 		Spawn_GiantMagmaTroll_Latent();
 	}
 
+	function random_glyph() : CName
+	{
+		var glyph_names									: array<CName>;
+
+		glyph_names.Clear();
+		
+		glyph_names.PushBack('Glyph binding greater');
+		glyph_names.PushBack('Glyph warding greater');
+		glyph_names.PushBack('Glyph aard greater');
+		glyph_names.PushBack('Glyph axii greater');
+		glyph_names.PushBack('Glyph igni greater');
+		glyph_names.PushBack('Glyph quen greater');
+		glyph_names.PushBack('Glyph yrden greater');
+		
+		glyph_names.PushBack('Glyph infusion greater');
+
+		return glyph_names[RandRange(glyph_names.Size())];
+	}
+
+
+	function random_rune() : CName
+	{
+		var rune_names									: array<CName>;
+
+		rune_names.Clear();
+		
+		rune_names.PushBack('Rune stribog greater');
+		rune_names.PushBack('Rune devana greater');
+		rune_names.PushBack('Rune zoria greater');
+		rune_names.PushBack('Rune morana greater');
+		rune_names.PushBack('Rune veles greater');
+		rune_names.PushBack('Rune perun greater');
+		
+		
+		rune_names.PushBack('Rune svarog greater');
+		rune_names.PushBack('Rune triglav greater');
+		rune_names.PushBack('Rune dazhbog greater');
+
+		return rune_names[RandRange(rune_names.Size())];
+	}
+
 	latent function Spawn_GiantMagmaTroll_Latent()
 	{
 		temp = (CEntityTemplate)LoadResourceAsync( 
@@ -26160,7 +28056,7 @@ state ACS_MonsterSpawner_GiantMagmaTroll in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(playerPos), playerRot );
 
@@ -26176,6 +28072,10 @@ state ACS_MonsterSpawner_GiantMagmaTroll in CACSMonsterSpawner
 		((CActor)ent).SetAnimationSpeedMultiplier(0.9);
 
 		((CActor)ent).SetCanPlayHitAnim(false);
+
+		((CActor)ent).GetInventory().AddAnItem( random_glyph(), 1 );
+
+		((CActor)ent).GetInventory().AddAnItem( random_rune(), 1 );
 
 		((CActor)ent).AddTag( 'ContractTarget' );
 
@@ -26234,6 +28134,47 @@ state ACS_MonsterSpawner_TheBeast in CACSMonsterSpawner
 		Spawn_TheBeastMinions_Latent();
 	}
 
+	function random_glyph() : CName
+	{
+		var glyph_names									: array<CName>;
+
+		glyph_names.Clear();
+		
+		glyph_names.PushBack('Glyph binding greater');
+		glyph_names.PushBack('Glyph warding greater');
+		glyph_names.PushBack('Glyph aard greater');
+		glyph_names.PushBack('Glyph axii greater');
+		glyph_names.PushBack('Glyph igni greater');
+		glyph_names.PushBack('Glyph quen greater');
+		glyph_names.PushBack('Glyph yrden greater');
+		
+		glyph_names.PushBack('Glyph infusion greater');
+
+		return glyph_names[RandRange(glyph_names.Size())];
+	}
+
+
+	function random_rune() : CName
+	{
+		var rune_names									: array<CName>;
+
+		rune_names.Clear();
+		
+		rune_names.PushBack('Rune stribog greater');
+		rune_names.PushBack('Rune devana greater');
+		rune_names.PushBack('Rune zoria greater');
+		rune_names.PushBack('Rune morana greater');
+		rune_names.PushBack('Rune veles greater');
+		rune_names.PushBack('Rune perun greater');
+		
+		
+		rune_names.PushBack('Rune svarog greater');
+		rune_names.PushBack('Rune triglav greater');
+		rune_names.PushBack('Rune dazhbog greater');
+
+		return rune_names[RandRange(rune_names.Size())];
+	}
+
 	latent function Spawn_TheBeast_Latent()
 	{
 		temp = (CEntityTemplate)LoadResourceAsync( 
@@ -26246,7 +28187,7 @@ state ACS_MonsterSpawner_TheBeast in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(playerPos), playerRot );
 
@@ -26262,6 +28203,10 @@ state ACS_MonsterSpawner_TheBeast in CACSMonsterSpawner
 		((CActor)ent).SetAnimationSpeedMultiplier(1);
 
 		//((CActor)ent).SetCanPlayHitAnim(false);
+
+		((CActor)ent).GetInventory().AddAnItem( random_glyph(), 1 );
+
+		((CActor)ent).GetInventory().AddAnItem( random_rune(), 1 );
 
 		((CActor)ent).AddTag( 'ContractTarget' );
 
@@ -26298,7 +28243,7 @@ state ACS_MonsterSpawner_TheBeast in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 		
 		count = RandRange(4,2);
 			
@@ -26370,7 +28315,7 @@ state ACS_MonsterSpawner_ElementalTitanOfFire in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(playerPos), playerRot );
 
@@ -26416,6 +28361,8 @@ state ACS_MonsterSpawner_ElementalTitanOfFire in CACSMonsterSpawner
 		((CActor)ent).AddAbility('ForceCriticalEffects');
 
 		((CActor)ent).AddAbility('BounceBoltsWildhunt');
+
+		((CActor)ent).GetInventory().AddAnItem( 'q111_imlerith_acorn', 1 );
 
 		((CNewNPC)ent).SetUnstoppable( true );
 
@@ -26464,7 +28411,7 @@ state ACS_MonsterSpawner_ElementalTitanOfTerra in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(playerPos), playerRot );
 
@@ -26510,6 +28457,8 @@ state ACS_MonsterSpawner_ElementalTitanOfTerra in CACSMonsterSpawner
 		((CActor)ent).AddAbility('ForceCriticalEffects');
 
 		((CActor)ent).AddAbility('BounceBoltsWildhunt');
+
+		((CActor)ent).GetInventory().AddAnItem( 'q111_imlerith_acorn', 1 );
 
 		((CNewNPC)ent).SetUnstoppable( true );
 
@@ -26562,7 +28511,7 @@ state ACS_MonsterSpawner_ElementalTitanOfIce in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(playerPos), playerRot );
 
@@ -26609,6 +28558,8 @@ state ACS_MonsterSpawner_ElementalTitanOfIce in CACSMonsterSpawner
 
 		((CActor)ent).AddAbility('BounceBoltsWildhunt');
 
+		((CActor)ent).GetInventory().AddAnItem( 'q111_imlerith_acorn', 1 );
+
 		((CNewNPC)ent).SetUnstoppable( true );
 
 		ent.AddTag('NoBestiaryEntry');
@@ -26621,6 +28572,2177 @@ state ACS_MonsterSpawner_ElementalTitanOfIce in CACSMonsterSpawner
 	event OnLeaveState( nextStateName : name ) 
 	{
 		super.OnLeaveState(nextStateName);
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+state ACS_MonsterSpawner_Chironex in CACSMonsterSpawner
+{
+	private var temp															: CEntityTemplate;
+	private var ent, skull_ent, skull_ent_lower									: CEntity;
+	private var i, count														: int;
+	private var playerPos, spawnPos												: Vector;
+	private var randAngle, randRange											: float;
+	private var meshcomp														: CComponent;
+	private var animcomp														: CAnimatedComponent;
+	private var h 																: float;
+	private var playerRot														: EulerAngles;
+		
+	event OnEnterState(prevStateName : name)
+	{
+		Spawn_Chironex_Entry();
+	}
+	
+	entry function Spawn_Chironex_Entry()
+	{	
+		Spawn_Chironex_Latent();
+	}
+
+	latent function Spawn_Chironex_Latent()
+	{
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\dlc_acs\data\entities\monsters\chironex.w2ent"
+			
+		, true );
+
+		playerPos = parent.pos;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += RandRangeF(360,0);
+		
+		count = 5;
+			
+		for( i = 0; i < count; i += 1 )
+		{
+			randRange = 5 + 5 * RandF();
+			randAngle = 2 * Pi() * RandF();
+			
+			spawnPos.X = randRange * CosF( randAngle ) + playerPos.X;
+			spawnPos.Y = randRange * SinF( randAngle ) + playerPos.Y;
+			spawnPos.Z = playerPos.Z;
+
+			ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(spawnPos), playerRot );
+
+			animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+			meshcomp = ent.GetComponentByClassName('CMeshComponent');
+			h = 1;
+			animcomp.SetScale(Vector(h,h,h,1));
+			meshcomp.SetScale(Vector(h,h,h,1));	
+
+			((CNewNPC)ent).SetLevel(thePlayer.GetLevel());
+
+			((CNewNPC)ent).SetAttitude(thePlayer, AIA_Hostile);
+			((CActor)ent).SetAnimationSpeedMultiplier(1.25);
+
+			//((CActor)ent).AddTag( 'ContractTarget' );
+
+			((CActor)ent).AddTag('IsBoss');
+
+			//((CActor)ent).AddTag('ACS_Big_Boi');
+
+			((CActor)ent).AddAbility('Boss');
+
+			//((CActor)ent).AddAbility('AcidSpit');
+
+			((CActor)ent).AddAbility('InstantKillImmune');
+
+			((CActor)ent).AddAbility('DisableFinishers');
+
+			((CActor)ent).AddAbility('MonsterMHBoss');
+
+			ent.AddTag('NoBestiaryEntry');
+
+			ent.PlayEffect('demonic_cast');
+
+			ent.PlayEffect('demon_horse');
+			
+			ent.DestroyEffect('ghost');
+
+			//ent.PlayEffect('demonic_eye_r');
+
+			//ent.PlayEffect('demonic_eye_l');
+
+			ent.AddTag( 'ACS_Chironex' );
+
+			ent.AddTag( 'ACS_Hostile_To_All' );
+
+			((CActor)ent).GetInventory().AddAnItem( 'Lesser mutagen blue', 1 );
+
+
+
+
+
+
+			skull_ent = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( 
+
+			"dlc\dlc_acs\data\models\chironex\chironex_skull.w2ent"
+
+			, true ), playerPos, playerRot );
+
+			skull_ent.CreateAttachment( ent, 'head', Vector( 0.25, 0.025, 0 ), EulerAngles(0,270,90) );
+
+
+
+
+			skull_ent_lower = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( 
+
+			"dlc\dlc_acs\data\models\chironex\chironex_skull.w2ent"
+
+			, true ), playerPos, playerRot );
+
+			skull_ent_lower.CreateAttachment( ent, 'head', Vector( 0.3, -0.075, 0 ), EulerAngles(180,135,90) );
+		}
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+function ACS_Chironex_Corpse_Spawn( npc : CActor, pos : Vector )
+{
+	var ent, skull_ent, skull_ent_lower       							: CEntity;
+	var rot                        						 				: EulerAngles;
+	var droppeditemID, droppeditemID2									: SItemUniqueId;
+
+	rot = npc.GetWorldRotation();
+
+	ent = theGame.CreateEntity( (CEntityTemplate)LoadResource( 
+
+	"dlc\dlc_acs\data\entities\monsters\chironex_ragdoll.w2ent"
+
+	, true ), pos, rot );
+
+	npc.PlayEffectSingle('disappear');
+
+	ent.PlayEffectSingle('demonic_cast');
+
+	ent.PlayEffectSingle('demon_horse');
+
+	ent.DestroyAfter(30);
+
+	((CActor)ent).GetInventory().AddAnItem( 'Lesser mutagen blue', 1 );
+
+	((CActor)ent).GetInventory().AddAnItem( 'Necrophage skin', 3 );
+
+	((CActor)ent).DrainEssence(((CActor)ent).GetStatMax(BCS_Essence));
+
+	((CNewNPC)ent).EnableCharacterCollisions(false);
+	
+	((CActor)ent).SetInteractionPriority( IP_Prio_0 );
+
+	((CActor)ent).Kill('ACS_Chironex_Dummy_Death', true, thePlayer);
+
+	droppeditemID = ((CActor)ent).GetInventory().GetItemId('Lesser mutagen blue');
+
+	droppeditemID2 = ((CActor)ent).GetInventory().GetItemId('Necrophage skin');
+
+	((CActor)ent).GetInventory().DropItemInBag(droppeditemID, 1);
+
+	((CActor)ent).GetInventory().DropItemInBag(droppeditemID2, 1);
+
+
+	skull_ent = theGame.CreateEntity( (CEntityTemplate)LoadResource( 
+
+	"dlc\dlc_acs\data\models\chironex\chironex_skull.w2ent"
+
+	, true ), pos, rot );
+
+	skull_ent.CreateAttachment( ent, 'head', Vector( 0.25, 0.025, 0 ), EulerAngles(0,270,90) );
+
+	skull_ent.DestroyAfter(30);
+
+
+
+	skull_ent_lower = theGame.CreateEntity( (CEntityTemplate)LoadResource( 
+
+	"dlc\dlc_acs\data\models\chironex\chironex_skull.w2ent"
+
+	, true ), pos, rot );
+
+	skull_ent_lower.CreateAttachment( ent, 'head', Vector( 0.3, -0.075, 0 ), EulerAngles(180,135,90) );
+
+	skull_ent_lower.DestroyAfter(30);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+state ACS_MonsterSpawner_Dao in CACSMonsterSpawner
+{
+	private var temp, temp_2, temp_3, ent_1_temp								: CEntityTemplate;
+	private var ent, ent_1, ent_2, ent_3, anchor								: CEntity;
+	private var i, count														: int;
+	private var playerPos, spawnPos												: Vector;
+	private var randAngle, randRange											: float;
+	private var meshcomp														: CComponent;
+	private var animcomp 														: CAnimatedComponent;
+	private var h 																: float;
+	private var bone_vec, pos, attach_vec										: Vector;
+	private var bone_rot, rot, attach_rot, playerRot							: EulerAngles;
+	private var steelsword, silversword, scabbard_steel, scabbard_silver		: CDrawableComponent;	
+	private var l_aiTree														: CAIMoveToAction;		
+		
+	event OnEnterState(prevStateName : name)
+	{
+		Spawn_Dao_Entry();
+	}
+	
+	entry function Spawn_Dao_Entry()
+	{	
+		Spawn_Dao_Latent();
+	}
+
+	latent function Spawn_Dao_Latent()
+	{
+		GetACS_Dao().Destroy();
+		GetACS_DaoAnchor().Destroy();
+		GetACS_DaoTurret_1().Destroy();
+		GetACS_DaoTurret_2().Destroy();
+		GetACS_DaoTurret_3().Destroy();
+
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\dlc_acs\data\entities\monsters\elemental_dao_earth.w2ent"
+			
+		, true );
+
+		temp_2 = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\dlc_acs\data\entities\monsters\dao_turret.w2ent"
+			
+		, true );
+
+		temp_3 = (CEntityTemplate)LoadResourceAsync( 
+						
+		"dlc\dlc_acs\data\entities\other\fx_ent.w2ent"
+		
+		, true );
+
+		playerPos = parent.pos;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += RandRangeF(360,0);
+		
+		ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1.5;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+
+		((CNewNPC)ent).SetLevel(thePlayer.GetLevel());
+
+		((CNewNPC)ent).SetAttitude(thePlayer, AIA_Hostile);
+		((CActor)ent).SetAnimationSpeedMultiplier(1);
+
+		((CActor)ent).SetCanPlayHitAnim(true);
+
+	
+		((CActor)ent).AddTag('IsBoss');
+
+		((CActor)ent).AddAbility('Boss');
+
+		((CActor)ent).AddAbility('InstantKillImmune');
+
+		((CActor)ent).AddAbility('ablIgnoreSigns');
+
+		((CActor)ent).AddAbility('DisableFinishers');
+
+		((CActor)ent).AddAbility('MonsterMHBoss');
+
+		((CActor)ent).AddAbility('ForceCriticalEffects');
+
+		((CActor)ent).AddAbility('BounceBoltsWildhunt');
+
+		ent.AddTag('NoBestiaryEntry');
+
+		ent.AddTag( 'ACS_Dao' );
+
+		ent.AddTag( 'ACS_Dao_Attitude' );
+
+		((CActor)ent).GetInventory().AddAnItem( 'Greater mutagen red', 1 );
+
+		((CActor)ent).GetInventory().AddAnItem( 'Ruby flawless', 1 );
+
+		((CActor)ent).GetInventory().AddAnItem( 'q111_imlerith_acorn', 2 );
+
+
+
+
+		anchor = (CEntity)theGame.CreateEntity( temp_3, ((CActor)ent).GetWorldPosition() + Vector( 0, 0, -10 ) );
+
+		anchor.AddTag('acs_dao_anchor');
+
+		anchor.CreateAttachment( ent, 'blood_point', Vector( 0, 0, 0 ), EulerAngles(0,0,0) );
+
+
+
+
+		ent_1 = theGame.CreateEntity( temp_2, ent.GetWorldPosition() + ent.GetWorldForward() * 4, ent.GetWorldRotation() );
+
+		ent_1.AddTag('ACS_Dao_Turret_1');
+
+		ent_1.AddTag( 'ACS_Dao_Attitude' );
+
+		//((CNewNPC)ent_1).SetAttitude(thePlayer, AIA_Hostile);
+
+		((CNewNPC)ent_1).SetAttitude((CNewNPC)ent, AIA_Friendly);
+
+		((CNewNPC)ent_1).EnableCharacterCollisions(false);
+		((CNewNPC)ent_1).EnableCollisions(false);
+		((CActor)ent_1).EnableCollisions(false);
+		((CActor)ent_1).EnableCharacterCollisions(false);
+
+		animcomp = (CAnimatedComponent)ent_1.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent_1.GetComponentByClassName('CMeshComponent');
+		h = 1;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+
+		((CActor)ent_1).AddBuffImmunity_AllNegative('ACS_Dao_Turret_Entity', true);
+
+		((CActor)ent_1).AddBuffImmunity_AllCritical('ACS_Dao_Turret_Entity', true);
+
+
+
+		ent_2 = theGame.CreateEntity( temp_2, ent.GetWorldPosition() + ent.GetWorldForward() * 4, ent.GetWorldRotation() );
+
+		ent_2.AddTag('ACS_Dao_Turret_2');
+
+		ent_2.AddTag( 'ACS_Dao_Attitude' );
+
+		//((CNewNPC)ent_2).SetAttitude(thePlayer, AIA_Hostile);
+
+		((CNewNPC)ent_2).SetAttitude((CNewNPC)ent, AIA_Friendly);
+
+		((CNewNPC)ent_2).EnableCharacterCollisions(false);
+		((CNewNPC)ent_2).EnableCollisions(false);
+		((CActor)ent_2).EnableCollisions(false);
+		((CActor)ent_2).EnableCharacterCollisions(false);
+
+		animcomp = (CAnimatedComponent)ent_2.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent_2.GetComponentByClassName('CMeshComponent');
+		h = 1;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+
+
+		((CActor)ent_2).AddBuffImmunity_AllNegative('ACS_Dao_Turret_Entity', true);
+
+		((CActor)ent_2).AddBuffImmunity_AllCritical('ACS_Dao_Turret_Entity', true);
+
+
+		ent_3 = theGame.CreateEntity( temp_2, ent.GetWorldPosition() + ent.GetWorldForward() * 4, ent.GetWorldRotation() );
+
+		ent_3.AddTag('ACS_Dao_Turret_3');
+
+		ent_3.AddTag( 'ACS_Dao_Attitude' );
+
+		//((CNewNPC)ent_3).SetAttitude(thePlayer, AIA_Hostile);
+
+		((CNewNPC)ent_3).SetAttitude((CNewNPC)ent, AIA_Friendly);
+
+		((CNewNPC)ent_3).EnableCharacterCollisions(false);
+		((CNewNPC)ent_3).EnableCollisions(false);
+		((CActor)ent_3).EnableCollisions(false);
+		((CActor)ent_3).EnableCharacterCollisions(false);
+
+		animcomp = (CAnimatedComponent)ent_3.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent_3.GetComponentByClassName('CMeshComponent');
+		h = 1;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+
+		((CActor)ent_3).AddBuffImmunity_AllNegative('ACS_Dao_Turret_Entity', true);
+
+		((CActor)ent_3).AddBuffImmunity_AllCritical('ACS_Dao_Turret_Entity', true);
+
+
+
+		((CNewNPC)ent).SetAttitude((CNewNPC)ent_1, AIA_Friendly);
+
+		((CNewNPC)ent).SetAttitude((CNewNPC)ent_2, AIA_Friendly);
+
+		((CNewNPC)ent).SetAttitude((CNewNPC)ent_3, AIA_Friendly);
+
+
+		((CNewNPC)ent_1).SetAttitude((CNewNPC)ent, AIA_Friendly);
+
+		((CNewNPC)ent_2).SetAttitude((CNewNPC)ent, AIA_Friendly);
+
+		((CNewNPC)ent_3).SetAttitude((CNewNPC)ent, AIA_Friendly);
+
+
+		GetACSWatcher().RemoveTimer('DaoTurretAttachDelay');
+		GetACSWatcher().AddTimer('DaoTurretAttachDelay', 1, false);
+		
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+function GetACS_Dao() : CActor
+{
+	var entity 			 : CActor;
+	
+	entity = (CActor)theGame.GetEntityByTag( 'ACS_Dao' );
+	return entity;
+}
+
+function GetACS_DaoAnchor() : CEntity
+{
+	var entity 			 : CEntity;
+	
+	entity = (CEntity)theGame.GetEntityByTag( 'acs_dao_anchor' );
+	return entity;
+}
+
+function GetACS_DaoTurret_1() : CActor
+{
+	var entity 			 : CActor;
+	
+	entity = (CActor)theGame.GetEntityByTag( 'ACS_Dao_Turret_1' );
+	return entity;
+}
+
+function GetACS_DaoTurret_2() : CActor
+{
+	var entity 			 : CActor;
+	
+	entity = (CActor)theGame.GetEntityByTag( 'ACS_Dao_Turret_2' );
+	return entity;
+}
+
+function GetACS_DaoTurret_3() : CActor
+{
+	var entity 			 : CActor;
+	
+	entity = (CActor)theGame.GetEntityByTag( 'ACS_Dao_Turret_3' );
+	return entity;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+state ACS_MonsterSpawner_WeaponizedRabbits in CACSMonsterSpawner
+{
+	private var temp															: CEntityTemplate;
+	private var ent																: CEntity;
+	private var i, count														: int;
+	private var playerPos, spawnPos												: Vector;
+	private var randAngle, randRange											: float;
+	private var meshcomp														: CComponent;
+	private var animcomp														: CAnimatedComponent;
+	private var h 																: float;
+	private var playerRot														: EulerAngles;
+		
+	event OnEnterState(prevStateName : name)
+	{
+		Spawn_WeaponizedRabbits_Entry();
+	}
+	
+	entry function Spawn_WeaponizedRabbits_Entry()
+	{	
+		Spawn_WeaponizedRabbits_Latent();
+	}
+
+	latent function Spawn_WeaponizedRabbits_Latent()
+	{
+		playerPos = parent.pos;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += RandRangeF(360,0);
+		
+		count = 10;
+			
+		for( i = 0; i < count; i += 1 )
+		{
+			randRange = 5 + 5 * RandF();
+			randAngle = 2 * Pi() * RandF();
+			
+			spawnPos.X = randRange * CosF( randAngle ) + playerPos.X;
+			spawnPos.Y = randRange * SinF( randAngle ) + playerPos.Y;
+			spawnPos.Z = playerPos.Z;
+
+			if ((theGame.GetWorld().GetDepotPath() == "dlc\bob\data\levels\bob\bob.w2w"))
+			{
+				if (RandF() < 0.75)
+				{
+					temp = (CEntityTemplate)LoadResourceAsync( 
+
+					"dlc\dlc_acs\data\entities\monsters\hare_wolpertinger_aggressive.w2ent"
+						
+					, true );
+
+					ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(spawnPos), playerRot );
+
+					ent.AddTag('ACS_Weaponized_Wolpertinger');
+				}
+				else
+				{
+					if (RandF() < 0.25)
+					{
+						temp = (CEntityTemplate)LoadResourceAsync( 
+
+						"dlc\dlc_acs\data\entities\monsters\hare_snow_aggressive.w2ent"
+							
+						, true );
+
+						ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(spawnPos), playerRot );
+
+						ent.AddTag('ACS_Weaponized_Snow_Rabbit');
+					}
+					else
+					{
+						temp = (CEntityTemplate)LoadResourceAsync( 
+
+						"dlc\dlc_acs\data\entities\monsters\hare_aggressive.w2ent"
+							
+						, true );
+
+						ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(spawnPos), playerRot );
+					}
+				}
+			}
+			else if ((theGame.GetWorld().GetDepotPath() == "levels\novigrad\novigrad.w2w")
+			|| theGame.GetWorld().GetDepotPath() == "levels\prolog_village\prolog_village.w2w"
+			)
+			{
+				if (RandF() < 0.75)
+				{
+					temp = (CEntityTemplate)LoadResourceAsync( 
+
+					"dlc\dlc_acs\data\entities\monsters\hare_aggressive.w2ent"
+						
+					, true );
+
+					ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(spawnPos), playerRot );
+				}
+				else
+				{
+					if (RandF() < 0.25)
+					{
+						temp = (CEntityTemplate)LoadResourceAsync( 
+
+						"dlc\dlc_acs\data\entities\monsters\hare_wolpertinger_aggressive.w2ent"
+							
+						, true );
+
+						ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(spawnPos), playerRot );
+
+						ent.AddTag('ACS_Weaponized_Wolpertinger');
+					}
+					else
+					{
+						temp = (CEntityTemplate)LoadResourceAsync( 
+
+						"dlc\dlc_acs\data\entities\monsters\hare_snow_aggressive.w2ent"
+							
+						, true );
+
+						ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(spawnPos), playerRot );
+
+						ent.AddTag('ACS_Weaponized_Snow_Rabbit');
+					}
+				}
+			}
+			else if ((theGame.GetWorld().GetDepotPath() == "levels\skellige\skellige.w2w")
+			|| theGame.GetWorld().GetDepotPath() == "levels\prolog_village_winter\prolog_village.w2w"
+			)
+			{
+				if (RandF() < 0.75)
+				{
+					temp = (CEntityTemplate)LoadResourceAsync( 
+
+					"dlc\dlc_acs\data\entities\monsters\hare_snow_aggressive.w2ent"
+						
+					, true );
+
+					ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(spawnPos), playerRot );
+
+					ent.AddTag('ACS_Weaponized_Snow_Rabbit');
+				}
+				else
+				{
+					if (RandF() < 0.25)
+					{
+						temp = (CEntityTemplate)LoadResourceAsync( 
+
+						"dlc\dlc_acs\data\entities\monsters\hare_wolpertinger_aggressive.w2ent"
+							
+						, true );
+
+						ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(spawnPos), playerRot );
+
+						ent.AddTag('ACS_Weaponized_Wolpertinger');
+					}
+					else
+					{
+						temp = (CEntityTemplate)LoadResourceAsync( 
+
+						"dlc\dlc_acs\data\entities\monsters\hare_aggressive.w2ent"
+							
+						, true );
+
+						ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(spawnPos), playerRot );
+					}
+				}
+			}
+			else
+			{
+				if (RandF() < 0.5)
+				{
+					temp = (CEntityTemplate)LoadResourceAsync( 
+
+					"dlc\dlc_acs\data\entities\monsters\hare_wolpertinger_aggressive.w2ent"
+						
+					, true );
+
+					ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(spawnPos), playerRot );
+
+					ent.AddTag('ACS_Weaponized_Wolpertinger');
+				}
+				else
+				{
+					if (RandF() < 0.5)
+					{
+						temp = (CEntityTemplate)LoadResourceAsync( 
+
+						"dlc\dlc_acs\data\entities\monsters\hare_snow_aggressive.w2ent"
+							
+						, true );
+
+						ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(spawnPos), playerRot );
+
+						ent.AddTag('ACS_Weaponized_Snow_Rabbit');
+					}
+					else
+					{
+						temp = (CEntityTemplate)LoadResourceAsync( 
+
+						"dlc\dlc_acs\data\entities\monsters\hare_aggressive.w2ent"
+							
+						, true );
+
+						ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(spawnPos), playerRot );
+					}
+				}
+			}
+
+			animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+			meshcomp = ent.GetComponentByClassName('CMeshComponent');
+			h = 1;
+			animcomp.SetScale(Vector(h,h,h,1));
+			meshcomp.SetScale(Vector(h,h,h,1));	
+
+			((CNewNPC)ent).SetLevel(thePlayer.GetLevel());
+
+			((CNewNPC)ent).SetAttitude(thePlayer, AIA_Hostile);
+			((CActor)ent).SetAnimationSpeedMultiplier(1.25);
+
+			//((CActor)ent).AddTag( 'ContractTarget' );
+
+			((CActor)ent).AddTag('IsBoss');
+
+			//((CActor)ent).AddTag('ACS_Big_Boi');
+
+			((CActor)ent).AddAbility('Boss');
+
+			//((CActor)ent).AddAbility('AcidSpit');
+
+			((CActor)ent).AddAbility('InstantKillImmune');
+
+			((CActor)ent).AddAbility('DisableFinishers');
+
+			((CActor)ent).AddAbility('MonsterMHBoss');
+
+			ent.AddTag('NoBestiaryEntry');
+
+			
+			//ent.PlayEffect('shadow_form_head');
+
+			//ent.PlayEffect('demonic_eye_r');
+
+			//ent.PlayEffect('demonic_eye_l');
+
+			ent.AddTag( 'ACS_WeaponizedRabbit' );
+
+			//ent.AddTag( 'ACS_Hostile_To_All' );
+		}
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+function ACS_Weaponized_Rabbit_Corpse_Spawn( npc : CActor, pos : Vector )
+{
+	var ent, skull_ent, skull_ent_lower       							: CEntity;
+	var rot                        						 				: EulerAngles;
+
+	rot = npc.GetWorldRotation();
+
+	if (npc.HasTag('ACS_Weaponized_Wolpertinger'))
+	{
+		ent = theGame.CreateEntity( (CEntityTemplate)LoadResource( 
+
+		"dlc\bob\data\characters\npc_entities\animals\wolpertinger.w2ent"
+
+		, true ), pos, rot );
+	}
+	else if (npc.HasTag('ACS_Weaponized_Snow_Rabbit'))
+	{
+		ent = theGame.CreateEntity( (CEntityTemplate)LoadResource( 
+
+		"characters\npc_entities\animals\snow_rabbit.w2ent"
+
+		, true ), pos, rot );
+	}
+	else
+	{
+		ent = theGame.CreateEntity( (CEntityTemplate)LoadResource( 
+
+		"characters\npc_entities\animals\hare.w2ent"
+
+		, true ), pos, rot );
+	}
+
+	ent.DestroyAfter(30);
+
+	((CActor)ent).DrainEssence(((CActor)ent).GetStatMax(BCS_Essence));
+
+	((CNewNPC)ent).EnableCharacterCollisions(false);
+	
+	((CActor)ent).SetInteractionPriority( IP_Prio_0 );
+	
+	((CActor)ent).Kill('ACS_Rabbit_Dummy_Death', true, thePlayer);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+state ACS_MonsterSpawner_Knocker in CACSMonsterSpawner
+{
+	private var temp															: CEntityTemplate;
+	private var ent																: CEntity;
+	private var i, count														: int;
+	private var playerPos, spawnPos												: Vector;
+	private var randAngle, randRange											: float;
+	private var meshcomp														: CComponent;
+	private var animcomp														: CAnimatedComponent;
+	private var h 																: float;
+	private var playerRot														: EulerAngles;
+
+	event OnEnterState(prevStateName : name)
+	{
+		Spawn_Knocker_Entry();
+	}
+	
+	entry function Spawn_Knocker_Entry()
+	{	
+		Spawn_Knocker_Fist_Latent();
+
+		Spawn_Knocker_Chain_Latent();
+	}
+
+	latent function Spawn_Knocker_Fist_Latent()
+	{
+		playerPos = parent.pos;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += RandRangeF(360,0);
+		
+		count = 3;
+			
+		for( i = 0; i < count; i += 1 )
+		{
+			randRange = 5 + 5 * RandF();
+			randAngle = 2 * Pi() * RandF();
+			
+			spawnPos.X = randRange * CosF( randAngle ) + playerPos.X;
+			spawnPos.Y = randRange * SinF( randAngle ) + playerPos.Y;
+			spawnPos.Z = playerPos.Z;
+
+			temp = (CEntityTemplate)LoadResourceAsync( 
+
+			"dlc\dlc_acs\data\entities\monsters\knocker.w2ent"
+				
+			, true );
+
+			ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(spawnPos), playerRot );
+
+			animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+			meshcomp = ent.GetComponentByClassName('CMeshComponent');
+			h = 1;
+			animcomp.SetScale(Vector(h,h,h,1));
+			meshcomp.SetScale(Vector(h,h,h,1));	
+
+			((CNewNPC)ent).SetLevel(thePlayer.GetLevel());
+
+			((CNewNPC)ent).SetAttitude(thePlayer, AIA_Hostile);
+			((CActor)ent).SetAnimationSpeedMultiplier(1);
+
+			((CActor)ent).AddAbility('DisableFinishers');
+
+			ent.AddTag('NoBestiaryEntry');
+
+			ent.AddTag( 'ACS_Knocker' );
+
+			ent.AddTag('ACS_Knocker_Fist');
+		}
+	}
+
+	latent function Spawn_Knocker_Chain_Latent()
+	{
+		playerPos = parent.pos;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += RandRangeF(360,0);
+		
+		count = 2;
+			
+		for( i = 0; i < count; i += 1 )
+		{
+			randRange = 5 + 5 * RandF();
+			randAngle = 2 * Pi() * RandF();
+			
+			spawnPos.X = randRange * CosF( randAngle ) + playerPos.X;
+			spawnPos.Y = randRange * SinF( randAngle ) + playerPos.Y;
+			spawnPos.Z = playerPos.Z;
+
+			temp = (CEntityTemplate)LoadResourceAsync( 
+
+			"dlc\dlc_acs\data\entities\monsters\knocker_chain.w2ent"
+				
+			, true );
+
+			ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(spawnPos), playerRot );
+
+			animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+			meshcomp = ent.GetComponentByClassName('CMeshComponent');
+			h = 1;
+			animcomp.SetScale(Vector(h,h,h,1));
+			meshcomp.SetScale(Vector(h,h,h,1));	
+
+			((CNewNPC)ent).SetLevel(thePlayer.GetLevel());
+
+			((CNewNPC)ent).SetAttitude(thePlayer, AIA_Hostile);
+			((CActor)ent).SetAnimationSpeedMultiplier(1);
+
+			((CActor)ent).AddAbility('DisableFinishers');
+
+			((CNewNPC)ent).ChangeFightStage( NFS_Stage2 );
+
+			((CNewNPC)ent).SetAppearance( 'ice_giant_anchor' );
+
+			ent.AddTag('NoBestiaryEntry');
+
+			ent.AddTag( 'ACS_Knocker' );
+
+			ent.AddTag('ACS_Knocker_Chain');
+		}
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+state ACS_MonsterSpawner_Nekurat in CACSMonsterSpawner
+{
+	private var temp															: CEntityTemplate;
+	private var ent																: CEntity;
+	private var i, count														: int;
+	private var playerPos, spawnPos												: Vector;
+	private var randAngle, randRange											: float;
+	private var meshcomp														: CComponent;
+	private var animcomp														: CAnimatedComponent;
+	private var h 																: float;
+	private var playerRot														: EulerAngles;
+
+	event OnEnterState(prevStateName : name)
+	{
+		if (ACS_IsNight())
+		{
+			Spawn_Nekurat_Entry();
+		}
+	}
+	
+	entry function Spawn_Nekurat_Entry()
+	{	
+		Spawn_Nekurat_Latent();
+	}
+
+	latent function Spawn_Nekurat_Latent()
+	{
+		playerPos = parent.pos;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += RandRangeF(360,0);
+		
+		count = 1;
+			
+		for( i = 0; i < count; i += 1 )
+		{
+			randRange = 5 + 5 * RandF();
+			randAngle = 2 * Pi() * RandF();
+			
+			spawnPos.X = randRange * CosF( randAngle ) + playerPos.X;
+			spawnPos.Y = randRange * SinF( randAngle ) + playerPos.Y;
+			spawnPos.Z = playerPos.Z;
+
+			temp = (CEntityTemplate)LoadResourceAsync( 
+
+			"dlc\dlc_acs\data\entities\monsters\nekurat.w2ent"
+				
+			, true );
+
+			ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(spawnPos), playerRot );
+
+			animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+			meshcomp = ent.GetComponentByClassName('CMeshComponent');
+			h = 0.9;
+			animcomp.SetScale(Vector(h,h,h,1));
+			meshcomp.SetScale(Vector(h,h,h,1));	
+
+			((CNewNPC)ent).SetLevel(thePlayer.GetLevel());
+
+			((CNewNPC)ent).SetAttitude(thePlayer, AIA_Hostile);
+			((CActor)ent).SetAnimationSpeedMultiplier(1);
+
+			((CActor)ent).AddAbility('DisableFinishers');
+
+			((CActor)ent).RemoveAbility('Hypnosis');
+
+			ent.AddTag('NoBestiaryEntry');
+
+			ent.AddTag( 'ACS_Nekurat' );
+
+			((CActor)ent).GetInventory().AddAnItem( 'Greater mutagen red', 1 );
+
+			((CActor)ent).GetInventory().AddAnItem( 'Ruby flawless', 1 );
+
+			((CActor)ent).GetInventory().AddAnItem( 'q111_imlerith_acorn', 1 );
+		}
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+state ACS_MonsterSpawner_Nekurat_No_Restriction in CACSMonsterSpawner
+{
+	private var temp															: CEntityTemplate;
+	private var ent																: CEntity;
+	private var i, count														: int;
+	private var playerPos, spawnPos												: Vector;
+	private var randAngle, randRange											: float;
+	private var meshcomp														: CComponent;
+	private var animcomp														: CAnimatedComponent;
+	private var h 																: float;
+	private var playerRot														: EulerAngles;
+
+	event OnEnterState(prevStateName : name)
+	{
+		Spawn_Nekurat_No_Restriction_Entry();
+	}
+	
+	entry function Spawn_Nekurat_No_Restriction_Entry()
+	{	
+		Spawn_Nekurat_No_Restriction_Latent();
+	}
+
+	latent function Spawn_Nekurat_No_Restriction_Latent()
+	{
+		playerPos = parent.pos;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += RandRangeF(360,0);
+		
+		count = 1;
+			
+		for( i = 0; i < count; i += 1 )
+		{
+			randRange = 5 + 5 * RandF();
+			randAngle = 2 * Pi() * RandF();
+			
+			spawnPos.X = randRange * CosF( randAngle ) + playerPos.X;
+			spawnPos.Y = randRange * SinF( randAngle ) + playerPos.Y;
+			spawnPos.Z = playerPos.Z;
+
+			temp = (CEntityTemplate)LoadResourceAsync( 
+
+			"dlc\dlc_acs\data\entities\monsters\nekurat.w2ent"
+				
+			, true );
+
+			ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(spawnPos), playerRot );
+
+			animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+			meshcomp = ent.GetComponentByClassName('CMeshComponent');
+			h = 0.9;
+			animcomp.SetScale(Vector(h,h,h,1));
+			meshcomp.SetScale(Vector(h,h,h,1));	
+
+			((CNewNPC)ent).SetLevel(thePlayer.GetLevel());
+
+			((CNewNPC)ent).SetAttitude(thePlayer, AIA_Hostile);
+			((CActor)ent).SetAnimationSpeedMultiplier(1);
+
+			((CActor)ent).AddAbility('DisableFinishers');
+
+			((CActor)ent).RemoveAbility('Hypnosis');
+
+			ent.AddTag('NoBestiaryEntry');
+
+			ent.AddTag( 'ACS_Nekurat' );
+
+			((CActor)ent).GetInventory().AddAnItem( 'Greater mutagen red', 1 );
+
+			((CActor)ent).GetInventory().AddAnItem( 'Ruby flawless', 1 );
+
+			((CActor)ent).GetInventory().AddAnItem( 'q111_imlerith_acorn', 1 );
+		}
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+state ACS_MonsterSpawner_Botchling in CACSMonsterSpawner
+{
+	private var temp															: CEntityTemplate;
+	private var ent																: CEntity;
+	private var i, count														: int;
+	private var playerPos, spawnPos												: Vector;
+	private var randAngle, randRange											: float;
+	private var meshcomp														: CComponent;
+	private var animcomp														: CAnimatedComponent;
+	private var h 																: float;
+	private var playerRot														: EulerAngles;
+
+	event OnEnterState(prevStateName : name)
+	{
+		Spawn_Botchling_Entry();
+	}
+	
+	entry function Spawn_Botchling_Entry()
+	{	
+		Spawn_Botchling_Latent();
+
+		Spawn_CrowSwarmBotchling_Latent();
+	}
+
+	latent function Spawn_Botchling_Latent()
+	{
+		playerPos = parent.pos;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Pitch += 90;
+
+		playerRot.Yaw += RandRangeF(360,0);
+		
+		count = 1;
+			
+		for( i = 0; i < count; i += 1 )
+		{
+			randRange = 5 + 5 * RandF();
+			randAngle = 2 * Pi() * RandF();
+			
+			spawnPos.X = randRange * CosF( randAngle ) + playerPos.X;
+			spawnPos.Y = randRange * SinF( randAngle ) + playerPos.Y;
+			spawnPos.Z = playerPos.Z;
+
+			temp = (CEntityTemplate)LoadResourceAsync( 
+
+			//"dlc\dlc_acs\data\entities\monsters\big_daddy_botch.w2ent"
+
+			"dlc\dlc_acs\data\entities\monsters\botchling_small_new.w2ent"
+				
+			, true );
+
+			ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(playerPos), playerRot );
+
+			animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+			meshcomp = ent.GetComponentByClassName('CMeshComponent');
+			h = 2;
+			animcomp.SetScale(Vector(h,h,h,1));
+			meshcomp.SetScale(Vector(h,h,h,1));	
+
+			((CNewNPC)ent).SetLevel(thePlayer.GetLevel());
+
+			((CNewNPC)ent).SetAttitude(thePlayer, AIA_Neutral);
+			((CActor)ent).SetAnimationSpeedMultiplier(2);
+
+			((CActor)ent).AddTag('IsBoss');
+
+			((CActor)ent).AddAbility('Boss');
+
+			((CActor)ent).AddAbility('InstantKillImmune');
+
+			((CActor)ent).AddAbility('ablIgnoreSigns');
+
+			((CActor)ent).AddAbility('DisableFinishers');
+
+			((CActor)ent).AddAbility('MonsterMHBoss');
+
+			((CActor)ent).AddAbility('BounceBoltsWildhunt');
+
+			ent.AddTag('NoBestiaryEntry');
+
+			((CNewNPC)ent).SetUnstoppable( true );
+
+			ent.AddTag( 'ACS_Botchling_Small' );
+		}
+	}
+
+	latent function Spawn_CrowSwarmBotchling_Latent()
+	{
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\dlc_acs\data\entities\other\custom_crow_circling.w2ent"
+			
+		, true );
+
+		playerPos = parent.pos;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += RandRangeF(360,0);
+		
+		count = RandRange(30,20);
+			
+		for( i = 0; i < count; i += 1 )
+		{
+			randRange = 10 + 10 * RandF();
+			randAngle = 5 * Pi() * RandF();
+			
+			spawnPos.X = randRange * CosF( randAngle ) + playerPos.X;
+			spawnPos.Y = randRange * SinF( randAngle ) + playerPos.Y;
+			spawnPos.Z = playerPos.Z;
+
+			spawnPos.Z += RandRangeF(10, 5);
+
+			ent = theGame.CreateEntity( temp, spawnPos, playerRot );
+
+			animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+			meshcomp = ent.GetComponentByClassName('CMeshComponent');
+			h = RandRangeF(2,1);
+			animcomp.SetScale(Vector(h,h,h,1));
+			meshcomp.SetScale(Vector(h,h,h,1));	
+
+			ent.AddTag( 'ACS_Crow_Ent_Lasting' );
+
+			GetACSWatcher().RemoveTimer('CrowSwarmsReset');
+			GetACSWatcher().AddTimer('CrowSwarmsReset', 1500, false);
+
+			Sleep(0.5);
+		}
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+function GetACSBotchling() : CActor
+{
+	var entity 			 : CActor;
+	
+	entity = (CActor)theGame.GetEntityByTag( 'ACS_Botchling' );
+	return entity;
+}
+
+statemachine class CACSBotchlingSmall extends CNewNPC
+{
+	var pos : Vector;
+
+	event OnSpawned( spawnData : SEntitySpawnData )
+	{	
+		super.OnSpawned( spawnData );
+
+		//CreateBlood();
+
+		pos = this.GetWorldPosition();
+
+		//this.PlayEffect('crow_trail');
+
+		this.EnableCharacterCollisions(false);
+
+		AddTimer('PlayDistCheck', 0.00001, true);
+
+		//AddTimer('DestructionTimer', 30, false);
+	}
+
+	function CreateBlood()
+	{
+		var ent_1									: CEntity;
+
+		ent_1 = theGame.CreateEntity( (CEntityTemplate)LoadResource( 
+
+		"dlc\dlc_acs\data\entities\other\fx_dummy_entity.w2ent"
+			
+		, true ), this.GetWorldPosition(), this.GetWorldRotation() );
+
+		ent_1.PlayEffect('shadowdash_body_blood_construct');
+		ent_1.PlayEffect('shadowdash_ground_blood_construct');
+		ent_1.PlayEffect('shadowdash_construct');
+
+		ent_1.DestroyAfter(2);
+	}
+
+	timer function PlayDistCheck(deltaTime : float, id : int) 
+	{
+		var targetDistance									: float;
+
+		targetDistance = VecDistanceSquared2D( this.GetWorldPosition(), GetWitcherPlayer().GetWorldPosition() );
+
+		if (targetDistance <= 2.5 * 2.5)
+		{
+			if (!this.HasTag('ACS_Has_Spawned_Big_Daddy_Botch'))
+			{
+				thePlayer.PlayLine( 0477707, true );
+
+				this.PushState('Spawn_BigBotchling');
+
+				CreateBlood();
+
+				this.SetVisibility(false);
+
+				this.DestroyAfter(0.5);
+
+				this.AddTag('ACS_Has_Spawned_Big_Daddy_Botch');
+			}
+		}
+		else if (targetDistance > 2.5 * 2.5 && targetDistance <= 7.5 * 7.5)
+		{
+			if (!this.HasTag('ACS_Player_Is_Nearby_ACS_Botchling'))
+			{
+				thePlayer.PlayLine( 0367748, true );
+
+				this.AddTag('ACS_Player_Is_Nearby_ACS_Botchling');
+			}
+		}
+
+    }
+
+	event OnDestroyed()
+	{
+		
+	}
+}
+
+state Spawn_BigBotchling in CACSBotchlingSmall
+{
+	private var temp															: CEntityTemplate;
+	private var ent																: CEntity;
+	private var i, count														: int;
+	private var playerPos, spawnPos												: Vector;
+	private var randAngle, randRange											: float;
+	private var meshcomp														: CComponent;
+	private var animcomp														: CAnimatedComponent;
+	private var h 																: float;
+	private var playerRot														: EulerAngles;
+
+	event OnEnterState(prevStateName : name)
+	{
+		Spawn_Botchling_Entry();
+	}
+	
+	entry function Spawn_Botchling_Entry()
+	{	
+		Spawn_Botchling_Latent();
+	}
+
+	latent function Spawn_Botchling_Latent()
+	{
+		playerPos = parent.pos;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += 180;
+		
+		count = 1;
+			
+		for( i = 0; i < count; i += 1 )
+		{
+			randRange = 5 + 5 * RandF();
+			randAngle = 2 * Pi() * RandF();
+			
+			spawnPos.X = randRange * CosF( randAngle ) + playerPos.X;
+			spawnPos.Y = randRange * SinF( randAngle ) + playerPos.Y;
+			spawnPos.Z = playerPos.Z;
+
+			temp = (CEntityTemplate)LoadResourceAsync( 
+
+			"dlc\dlc_acs\data\entities\monsters\big_daddy_botch_wild.w2ent"
+				
+			, true );
+
+			ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(playerPos), playerRot );
+
+			((CNewNPC)ent).SetLevel(thePlayer.GetLevel());
+
+			((CNewNPC)ent).SetAttitude(thePlayer, AIA_Hostile);
+			((CActor)ent).SetAnimationSpeedMultiplier(1.125);
+
+			((CActor)ent).AddTag('IsBoss');
+
+			((CActor)ent).AddAbility('Boss');
+
+			((CActor)ent).AddAbility('InstantKillImmune');
+
+			((CActor)ent).AddAbility('ablIgnoreSigns');
+
+			((CActor)ent).AddAbility('DisableFinishers');
+
+			((CActor)ent).AddAbility('MonsterMHBoss');
+
+			((CActor)ent).AddAbility('BounceBoltsWildhunt');
+
+			ent.AddTag('NoBestiaryEntry');
+
+			((CNewNPC)ent).SetUnstoppable( true );
+
+			ent.AddTag( 'ACS_Botchling' );
+
+			ent.AddTag('ACS_Botchling_Wild');
+
+			((CActor)ent).GetInventory().AddAnItem( 'Greater mutagen red', 3 );
+
+			((CActor)ent).GetInventory().AddAnItem( 'Emerald flawless', 3 );
+
+			((CActor)ent).GetInventory().AddAnItem( 'q111_imlerith_acorn', 1 );
+		}
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+function ACS_BotchlingWraithSpawn( npc : CActor, pos : Vector )
+{
+	var temp															: CEntityTemplate;
+	var ent																: CEntity;
+	var i, count														: int;
+	var spawnPos														: Vector;
+	var randAngle, randRange											: float;
+	var meshcomp														: CComponent;
+	var animcomp 														: CAnimatedComponent;
+	var h 																: float;		
+	var playerRot, adjustedRot											: EulerAngles;
+	var ticket															: SMovementAdjustmentRequestTicket;	
+	var p_comp															: CComponent;
+	var movementAdjustor												: CMovementAdjustor;
+
+	thePlayer.PlayLine( 0411181, true );
+
+	temp = (CEntityTemplate)LoadResource( 
+
+	"characters\npc_entities\monsters\wraith_lvl4.w2ent"
+		
+	, true );
+
+	playerRot = thePlayer.GetWorldRotation();
+
+	playerRot.Yaw += RandRangeF(360,0);
+
+	adjustedRot = EulerAngles(0,0,0);
+
+	adjustedRot.Yaw = playerRot.Yaw;
+	
+	count = 2;
+		
+	for( i = 0; i < count; i += 1 )
+	{
+		randRange = 5 + 5 * RandF();
+		randAngle = 2 * Pi() * RandF();
+		
+		spawnPos.X = randRange * CosF( randAngle ) + pos.X;
+		spawnPos.Y = randRange * SinF( randAngle ) + pos.Y;
+		spawnPos.Z = pos.Z;
+
+		ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(pos), adjustedRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+
+		((CNewNPC)ent).SetLevel(npc.GetLevel());
+
+		((CNewNPC)ent).SetAttitude(thePlayer, AIA_Hostile);
+		((CActor)ent).SetAnimationSpeedMultiplier(1);
+
+		movementAdjustor = ((CActor)ent).GetMovingAgentComponent().GetMovementAdjustor();
+
+		ticket = movementAdjustor.GetRequest( 'ACS_Botchling_Wraith_Rotate');
+		movementAdjustor.CancelByName( 'ACS_Botchling_Wraith_Rotate' );
+		movementAdjustor.CancelAll();
+
+		ticket = movementAdjustor.CreateNewRequest( 'ACS_Botchling_Wraith_Rotate' );
+		movementAdjustor.AdjustmentDuration( ticket, 0.00001 );
+		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 500000 );
+		//movementAdjustor.Continuous(ticket);
+
+		movementAdjustor.RotateTowards(ticket, GetWitcherPlayer());
+
+		ent.AddTag( 'ACS_Botchling_Wraiths' );
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+state ACS_MonsterSpawner_Vendigo in CACSMonsterSpawner
+{
+	private var temp															: CEntityTemplate;
+	private var ent																: CEntity;
+	private var i, count														: int;
+	private var playerPos, spawnPos												: Vector;
+	private var randAngle, randRange											: float;
+	private var meshcomp														: CComponent;
+	private var animcomp														: CAnimatedComponent;
+	private var h 																: float;
+	private var playerRot														: EulerAngles;
+
+	private var skull_ent, skull_ent_lower       								: CEntity;
+	private var rot                        						 				: EulerAngles;
+
+	event OnEnterState(prevStateName : name)
+	{
+		Spawn_Vendigo_Entry();
+	}
+	
+	entry function Spawn_Vendigo_Entry()
+	{	
+		Spawn_Vendigo_Latent();
+	}
+
+	latent function Spawn_Vendigo_Latent()
+	{
+		playerPos = parent.pos;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += RandRangeF(360,0);
+		
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\dlc_acs\data\entities\monsters\vendigo.w2ent"
+			
+		, true );
+
+		ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+
+		((CNewNPC)ent).SetLevel(thePlayer.GetLevel());
+
+		((CNewNPC)ent).SetAttitude(thePlayer, AIA_Hostile);
+		((CActor)ent).SetAnimationSpeedMultiplier(1.125);
+
+		((CActor)ent).AddAbility('DisableFinishers');
+
+		ent.AddTag('NoBestiaryEntry');
+
+		ent.AddTag( 'ACS_Vendigo' );
+
+		((CActor)ent).GetInventory().AddAnItem( 'Greater mutagen red', 1 );
+
+		((CActor)ent).GetInventory().AddAnItem( 'Ruby flawless', 1 );
+
+		((CActor)ent).AddTag('IsBoss');
+
+		((CActor)ent).AddAbility('Boss');
+
+		((CActor)ent).AddAbility('InstantKillImmune');
+
+		//((CActor)ent).AddAbility('ablIgnoreSigns');
+
+		((CActor)ent).AddAbility('DisableFinishers');
+
+		((CActor)ent).AddAbility('MonsterMHBoss');
+
+		((CActor)ent).AddAbility('BounceBoltsWildhunt');
+
+		((CActor)ent).AddBuffImmunity(EET_Confusion , 'ACS_Vendigo_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_Swarm , 'ACS_Vendigo_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_AxiiGuardMe , 'ACS_Vendigo_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_Blindness , 'ACS_Vendigo_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_Paralyzed , 'ACS_Vendigo_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_Frozen , 'ACS_Vendigo_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_SlowdownFrost , 'ACS_Vendigo_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_Slowdown , 'ACS_Vendigo_Buff', true);
+
+		ent.PlayEffect('demonic_possession_constant');
+
+		ent.PlayEffect('critical_frozen_constant');
+
+		skull_ent = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\dlc_acs\data\models\vendigo\vendigo_skull.w2ent"
+
+		, true ), playerPos, rot );
+
+		skull_ent.CreateAttachment( ent, 'head', Vector( 0, 0.55, 0 ), EulerAngles(0,165,90) );
+
+
+
+		//skull_ent_lower = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( 
+
+		//"dlc\dlc_acs\data\models\chironex\chironex_skull.w2ent"
+
+		//, true ), playerPos, rot );
+
+		//skull_ent_lower.CreateAttachment( ent, 'head', Vector( 0, -0.25, 0 ), EulerAngles(180,135,90) );
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+function ACS_Vendigo_Release_Thralls()
+{
+	var item 											: array<CActor>;
+	var i												: int;
+	
+	item.Clear();
+
+	theGame.GetActorsByTag( 'ACS_Vendigo_Spawn', item );	
+
+	if (item.Size()<=0)
+	{
+		return;
+	}
+	
+	for( i = 0; i < item.Size(); i += 1 )
+	{
+		item[i].StopAllEffects();
+
+		item[i].RemoveBuffImmunity(EET_Confusion);
+
+		item[i].RemoveBuffImmunity(EET_Swarm);
+
+		item[i].RemoveBuffImmunity(EET_Blindness);
+
+		item[i].RemoveBuffImmunity(EET_AxiiGuardMe);
+
+		item[i].RemoveBuffImmunity(EET_Paralyzed);
+		
+		item[i].AddTag('ACS_Scared_On_Ground');
+		item[i].AddTag('ACS_Final_Fear_Stack');
+
+		item[i].RemoveTag('ACS_Vendigo_Spawn');
+	}
+
+	ACS_Vendigo_DestroySpawnSkulls();
+}
+
+function ACS_Vendigo_DestroySpawnSkulls()
+{
+	var item 											: array<CEntity>;
+	var i												: int;
+	
+	item.Clear();
+
+	theGame.GetEntitiesByTag( 'ACS_Vendigo_Spawn_Skull', item );	
+
+	if (item.Size()<=0)
+	{
+		return;
+	}
+	
+	for( i = 0; i < item.Size(); i += 1 )
+	{
+		item[i].Destroy();
+		item[i].RemoveTag('ACS_Vendigo_Spawn_Skull');
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+state ACS_MonsterSpawner_SwarmMother in CACSMonsterSpawner
+{
+	private var temp															: CEntityTemplate;
+	private var ent																: CEntity;
+	private var i, count														: int;
+	private var playerPos, spawnPos												: Vector;
+	private var randAngle, randRange											: float;
+	private var meshcomp														: CComponent;
+	private var animcomp														: CAnimatedComponent;
+	private var h 																: float;
+	private var playerRot														: EulerAngles;
+	private var hive_ent					       								: CEntity;
+
+	event OnEnterState(prevStateName : name)
+	{
+		Spawn_SwarmMother_Entry();
+	}
+	
+	entry function Spawn_SwarmMother_Entry()
+	{	
+		Spawn_SwarmMother_Latent();
+	}
+
+	latent function Spawn_SwarmMother_Latent()
+	{
+		ACS_SwarmMotherDestroyAll();
+		ACS_SwarmMotherDestroyHives();
+
+		playerPos = parent.pos;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += RandRangeF(360,0);
+		
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\dlc_acs\data\entities\monsters\swarm_mother.w2ent"
+			
+		, true );
+
+		ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1.25;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+
+		((CNewNPC)ent).SetLevel(thePlayer.GetLevel());
+
+		((CNewNPC)ent).SetAttitude(thePlayer, AIA_Hostile);
+		((CActor)ent).SetAnimationSpeedMultiplier(1.125);
+
+		((CActor)ent).AddAbility('DisableFinishers');
+
+		ent.AddTag('NoBestiaryEntry');
+
+		ent.AddTag( 'ACS_Swarm_Mother' );
+
+		ent.AddTag( 'ACS_Hostile_To_All' );
+
+		((CActor)ent).GetInventory().AddAnItem( 'Greater mutagen blue', 2 );
+
+		((CActor)ent).GetInventory().AddAnItem( 'Sapphire flawless', 2 );
+
+		((CActor)ent).GetInventory().AddAnItem( 'Honeycomb', 10 );
+
+		((CActor)ent).AddTag('IsBoss');
+
+		((CActor)ent).AddAbility('Boss');
+
+		((CActor)ent).AddAbility('InstantKillImmune');
+
+		((CActor)ent).AddAbility('ablIgnoreSigns');
+
+		((CActor)ent).AddAbility('DisableFinishers');
+
+		((CActor)ent).AddAbility('MonsterMHBoss');
+
+		((CActor)ent).AddAbility('BounceBoltsWildhunt');
+
+		((CActor)ent).AddBuffImmunity(EET_Confusion , 'ACS_Swarm_Mother_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_Swarm , 'ACS_Swarm_Mother_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_AxiiGuardMe , 'ACS_Swarm_Mother_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_Blindness , 'ACS_Swarm_Mother_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_Paralyzed , 'ACS_Swarm_Mother_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_Frozen , 'ACS_Swarm_Mother_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_SlowdownFrost , 'ACS_Swarm_Mother_Buff', true);
+
+		((CActor)ent).AddBuffImmunity(EET_Slowdown , 'ACS_Swarm_Mother_Buff', true);
+
+		//ent.PlayEffect('demonic_possession_constant');
+
+		//ent.PlayEffect('critical_frozen_constant');
+
+		hive_ent = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\dlc_acs\data\models\swarm_mother\swarm_mother_hive.w2ent"
+
+		, true ), playerPos );
+
+		hive_ent.CreateAttachment( ent, 'attach_slot', Vector( -0.4, 0.125, 0 ), EulerAngles(0,0,90) );
+
+		hive_ent.AddTag('ACS_Swarm_Mother_Hive');
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+function ACS_SwarmMotherDestroyAll()
+{
+	var item 											: array<CActor>;
+	var i												: int;
+	
+	item.Clear();
+
+	theGame.GetActorsByTag( 'ACS_Swarm_Mother', item );	
+
+	if (item.Size()<=0)
+	{
+		return;
+	}
+	
+	for( i = 0; i < item.Size(); i += 1 )
+	{
+		item[i].Destroy();
+		item[i].RemoveTag('ACS_Swarm_Mother');
+	}
+}
+
+function ACS_SwarmMotherDestroyHives()
+{
+	var item 											: array<CEntity>;
+	var i												: int;
+	
+	item.Clear();
+
+	theGame.GetEntitiesByTag( 'ACS_Swarm_Mother_Hive', item );	
+
+	if (item.Size()<=0)
+	{
+		return;
+	}
+	
+	for( i = 0; i < item.Size(); i += 1 )
+	{
+		item[i].Destroy();
+		item[i].RemoveTag('ACS_Swarm_Mother_Hive');
+	}
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+state ACS_MonsterSpawner_Rabid_Drowner in CACSMonsterSpawner
+{
+	private var temp															: CEntityTemplate;
+	private var ent																: CEntity;
+	private var i, count														: int;
+	private var playerPos, spawnPos												: Vector;
+	private var randAngle, randRange											: float;
+	private var meshcomp														: CComponent;
+	private var animcomp														: CAnimatedComponent;
+	private var h 																: float;
+	private var playerRot														: EulerAngles;
+
+	event OnEnterState(prevStateName : name)
+	{
+		Spawn_Rabid_Drowner_Entry();
+	}
+	
+	entry function Spawn_Rabid_Drowner_Entry()
+	{	
+		Spawn_Rabid_Drowner_Latent();
+	}
+
+	latent function Spawn_Rabid_Drowner_Latent()
+	{
+		playerPos = parent.pos;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += RandRangeF(360,0);
+		
+		count = 5;
+			
+		for( i = 0; i < count; i += 1 )
+		{
+			randRange = 5 + 5 * RandF();
+			randAngle = 2 * Pi() * RandF();
+			
+			spawnPos.X = randRange * CosF( randAngle ) + playerPos.X;
+			spawnPos.Y = randRange * SinF( randAngle ) + playerPos.Y;
+			spawnPos.Z = playerPos.Z;
+
+			temp = (CEntityTemplate)LoadResourceAsync( 
+
+			"dlc\dlc_acs\data\entities\monsters\rabid_drowner.w2ent"
+				
+			, true );
+
+			ent = theGame.CreateEntity( temp, ACSPlayerFixZAxis(spawnPos), playerRot );
+
+			animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+			meshcomp = ent.GetComponentByClassName('CMeshComponent');
+			h = 1;
+			animcomp.SetScale(Vector(h,h,h,1));
+			meshcomp.SetScale(Vector(h,h,h,1));	
+
+			((CNewNPC)ent).SetLevel(thePlayer.GetLevel());
+
+			((CNewNPC)ent).SetAttitude(thePlayer, AIA_Hostile);
+			((CActor)ent).SetAnimationSpeedMultiplier(1);
+
+			((CActor)ent).AddAbility('DisableFinishers');
+
+			ent.AddTag('NoBestiaryEntry');
+
+			ent.AddTag( 'ACS_Rabid_Drowner' );
+		}
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+state ACS_MonsterSpawner_CrowSwarmInstant in CACSMonsterSpawner
+{
+	private var temp															: CEntityTemplate;
+	private var ent																: CEntity;
+	private var i, count														: int;
+	private var playerPos, spawnPos												: Vector;
+	private var randAngle, randRange											: float;
+	private var meshcomp														: CComponent;
+	private var animcomp 														: CAnimatedComponent;
+	private var h 																: float;
+	private var pos																: Vector;
+	private var rot, playerRot													: EulerAngles;
+		
+	event OnEnterState(prevStateName : name)
+	{
+		Spawn_CrowSwarmInstant_Entry();
+	}
+	
+	entry function Spawn_CrowSwarmInstant_Entry()
+	{	
+		Spawn_CrowSwarmInstant_Latent();
+	}
+
+	latent function Spawn_CrowSwarmInstant_Latent()
+	{
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\dlc_acs\data\entities\other\custom_crow_circling.w2ent"
+			
+		, true );
+
+		playerPos = parent.pos;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += RandRangeF(360,0);
+		
+		count = RandRange(5,1);
+			
+		for( i = 0; i < count; i += 1 )
+		{
+			randRange = 5 + 5 * RandF();
+			randAngle = 5 * Pi() * RandF();
+			
+			spawnPos.X = randRange * CosF( randAngle ) + playerPos.X;
+			spawnPos.Y = randRange * SinF( randAngle ) + playerPos.Y;
+			spawnPos.Z = playerPos.Z;
+
+			spawnPos.Z += RandRangeF(15, 1);
+
+			ent = theGame.CreateEntity( temp, spawnPos, playerRot );
+
+			animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+			meshcomp = ent.GetComponentByClassName('CMeshComponent');
+			h = RandRangeF(2,1);
+			animcomp.SetScale(Vector(h,h,h,1));
+			meshcomp.SetScale(Vector(h,h,h,1));	
+
+			ent.AddTag( 'ACS_Crow_Ent_Swarm' );
+
+			ent.PlayEffect('summoning_burst');
+
+			ent.PlayEffect('summoning_burst_2');
+
+			ent.PlayEffect('feathers_fx');
+
+			if (i == (count -= 1))
+			{
+				ent.AddTag('ACS_Last_Crow_Ent_Swarm');
+			}
+
+			//ent.DestroyAfter(30);
+
+			//((CActor)ent).SoundEvent("animals_crow_swarm");
+
+			//GetACSWatcher().RemoveTimer('StopCrowSwarmSound');
+			//GetACSWatcher().AddTimer('StopCrowSwarmSound', 30, false);
+
+			Sleep(0.5);
+		}
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+state ACS_MonsterSpawner_CrowSwarm in CACSMonsterSpawner
+{
+	private var temp															: CEntityTemplate;
+	private var ent																: CEntity;
+	private var i, count														: int;
+	private var playerPos, spawnPos												: Vector;
+	private var randAngle, randRange											: float;
+	private var meshcomp														: CComponent;
+	private var animcomp 														: CAnimatedComponent;
+	private var h 																: float;
+	private var pos																: Vector;
+	private var rot, playerRot													: EulerAngles;
+		
+	event OnEnterState(prevStateName : name)
+	{
+		Spawn_CrowSwarm_Entry();
+	}
+	
+	entry function Spawn_CrowSwarm_Entry()
+	{	
+		Spawn_CrowSwarm_Latent();
+	}
+
+	latent function Spawn_CrowSwarm_Latent()
+	{
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\dlc_acs\data\entities\other\custom_crow_circling.w2ent"
+			
+		, true );
+
+		playerPos = parent.pos;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += RandRangeF(360,0);
+		
+		count = RandRange(30,20);
+			
+		for( i = 0; i < count; i += 1 )
+		{
+			randRange = 5 + 5 * RandF();
+			randAngle = 5 * Pi() * RandF();
+			
+			spawnPos.X = randRange * CosF( randAngle ) + playerPos.X;
+			spawnPos.Y = randRange * SinF( randAngle ) + playerPos.Y;
+			spawnPos.Z = playerPos.Z;
+
+			spawnPos.Z += RandRangeF(20, 7);
+
+			ent = theGame.CreateEntity( temp, spawnPos, playerRot );
+
+			animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+			meshcomp = ent.GetComponentByClassName('CMeshComponent');
+			h = RandRangeF(2,1);
+			animcomp.SetScale(Vector(h,h,h,1));
+			meshcomp.SetScale(Vector(h,h,h,1));	
+
+			ent.AddTag( 'ACS_Crow_Ent_Lasting' );
+
+			GetACSWatcher().RemoveTimer('CrowSwarmsReset');
+			GetACSWatcher().AddTimer('CrowSwarmsReset', 1500, false);
+
+			Sleep(0.5);
+		}
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+class W3ACSCustomCrow extends CGameplayEntity
+{
+	event OnSpawned( spawnData : SEntitySpawnData )
+	{	
+		//super.OnSpawned( spawnData );
+
+		//this.PlayEffect('crow_trail');
+
+		//this.EnableCharacterCollisions(false);
+
+		AddTimer('CrowDistCheck', 0.00001, true);
+
+		AddTimer('DestructionTimer', 30, false);
+	}
+
+	timer function CrowDistCheck(deltaTime : float, id : int) 
+	{
+		var targetDistance									: float;
+
+		targetDistance = VecDistanceSquared2D( this.GetWorldPosition(), GetWitcherPlayer().GetWorldPosition() );
+
+		if (targetDistance <= 25 * 25)
+		{
+			if (!this.HasTag('ACS_Crow_Has_Played_Sound') && !thePlayer.IsInInterior())
+			{
+				thePlayer.SoundEvent("animals_crow_swarm");
+
+				this.AddTag('ACS_Crow_Has_Played_Sound');
+			}
+		}
+		else
+		{
+			if (this.HasTag('ACS_Crow_Has_Played_Sound') || thePlayer.IsInInterior())
+			{
+				thePlayer.SoundEvent("animals_crow_swarm_end");
+
+				this.RemoveTag('ACS_Crow_Has_Played_Sound');
+			}
+		}
+
+		if (this.HasTag('ACS_Crow_Ent_Swarm'))
+		{
+			if (!this.IsEffectActive('crow_trail', false))
+			{
+				//this.PlayEffectSingle('crow_trail');
+			}
+		}
+    }
+
+	timer function DestructionTimer(deltaTime : float, id : int) 
+	{
+		if (this.HasTag('ACS_Crow_Ent_Swarm'))
+		{
+			if (!this.HasTag('ACS_Crow_Ent_Swarm_End'))
+			{
+				this.DestroyEffect('summoning_burst');
+
+				this.DestroyEffect('summoning_burst_2');
+
+				this.PlayEffect('summoning_burst');
+
+				this.PlayEffect('summoning_burst_2');
+
+				this.PlayEffect('crow_destruction');
+
+				this.DestroyAfter(2);
+
+				this.AddTag('ACS_Crow_Ent_Swarm_End');
+			}
+		}
+		else
+		{
+			//AddTimer('CrowDestructionCheck', 0.00001, true);
+		}
+    }
+
+	timer function CrowDestructionCheck(deltaTime : float, id : int) 
+	{
+		if (IsCrowOutsideOfCameraFrame())
+		{
+			if (!this.HasTag('ACS_Crow_Ent_End'))
+			{
+				this.DestroyEffect('summoning_burst');
+
+				this.DestroyEffect('summoning_burst_2');
+
+				this.PlayEffect('summoning_burst');
+
+				this.PlayEffect('summoning_burst_2');
+
+				this.PlayEffect('crow_destruction');
+
+				this.DestroyAfter(2);
+
+				this.AddTag('ACS_Crow_Ent_End');
+			}
+		}
+	}
+
+	function IsCrowOutsideOfCameraFrame() : bool
+	{
+		if ( thePlayer.WasVisibleInScaledFrame( this, 1.f, 1.f ) )
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+	event OnDestroyed()
+	{
+		if (this.HasTag('ACS_Last_Crow_Ent')
+		|| this.HasTag('ACS_Last_Crow_Ent_Lasting')
+		)
+		{
+			thePlayer.SoundEvent("animals_crow_swarm_end");
+		}
+	}
+}
+
+function ACS_DestroyCrowSwarms()
+{	
+	var item 											: array<CEntity>;
+	var i												: int;
+	
+	item.Clear();
+
+	theGame.GetEntitiesByTag( 'ACS_Crow_Ent_Lasting', item );	
+
+	if (item.Size()<=0)
+	{
+		return;
+	}
+	
+	for( i = 0; i < item.Size(); i += 1 )
+	{
+		item[i].BreakAttachment();
+		item[i].Teleport(thePlayer.GetWorldPosition() + Vector (0,0, -200));
+		item[i].DestroyAfter(0.01);
+		item[i].RemoveTag('ACS_Crow_Ent_Lasting');
 	}
 }
 
@@ -26683,7 +30805,7 @@ state ACS_MonsterSpawner_HorseRidersNovigrad in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -26843,7 +30965,7 @@ state ACS_MonsterSpawner_HorseRidersNilfgaard in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -27003,7 +31125,7 @@ state ACS_MonsterSpawner_HorseRidersRedania in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -27158,7 +31280,7 @@ state ACS_MonsterSpawner_ShadesCrusaders in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -27254,6 +31376,7 @@ state ACS_MonsterSpawner_ShadesCrusaders in CACSMonsterSpawner
 
 			ent.AddTag( 'ACS_Hostile_To_All' );
 
+			ent.AddTag('mq1060_witcher');
 
 
 
@@ -27304,7 +31427,7 @@ state ACS_MonsterSpawner_ShadesHunters in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -27517,7 +31640,7 @@ state ACS_MonsterSpawner_ShadesHunters in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -27589,7 +31712,7 @@ state ACS_MonsterSpawner_ShadesRogues in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -27655,7 +31778,7 @@ state ACS_MonsterSpawner_ShadesRogues in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -27867,7 +31990,7 @@ state ACS_MonsterSpawner_ShadesShowdown in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -27955,7 +32078,7 @@ state ACS_MonsterSpawner_ShadesShowdown in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -28051,6 +32174,8 @@ state ACS_MonsterSpawner_ShadesShowdown in CACSMonsterSpawner
 
 			ent.AddTag( 'ACS_Hostile_To_All' );
 
+			ent.AddTag('mq1060_witcher');
+
 
 
 
@@ -28078,7 +32203,7 @@ state ACS_MonsterSpawner_ShadesShowdown in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -28141,7 +32266,6 @@ state ACS_MonsterSpawner_ShadesShowdown in CACSMonsterSpawner
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
 state ACS_MonsterSpawner_ShadesDancerWaning in CACSMonsterSpawner
 {
 	private var temp															: CEntityTemplate;
@@ -28191,7 +32315,7 @@ state ACS_MonsterSpawner_ShadesDancerWaning in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -28208,7 +32332,7 @@ state ACS_MonsterSpawner_ShadesDancerWaning in CACSMonsterSpawner
 		((CNewNPC)ent).SetLevel(thePlayer.GetLevel());
 
 		((CNewNPC)ent).SetAttitude(thePlayer, AIA_Hostile);
-		((CActor)ent).SetAnimationSpeedMultiplier(1.125);
+		((CActor)ent).SetAnimationSpeedMultiplier(1.25);
 
 		((CActor)ent).SetCanPlayHitAnim(false);
 
@@ -28239,6 +32363,8 @@ state ACS_MonsterSpawner_ShadesDancerWaning in CACSMonsterSpawner
 		((CActor)ent).AddBuffImmunity(EET_Swarm , 'ACS_Dancer_Buff', true);
 
 		((CActor)ent).AddBuffImmunity(EET_Burning , 'ACS_Dancer_Buff', true);
+
+		((CActor)ent).GetInventory().AddAnItem( 'q111_imlerith_acorn', 1 );
 
 		((CActor)ent).AddTag( 'ContractTarget' );
 
@@ -28347,7 +32473,6 @@ function GetACS_ShadesDancerWaning_L_Anchor() : CEntity
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
 state ACS_MonsterSpawner_ShadesDancerWaxing in CACSMonsterSpawner
 {
 	private var temp															: CEntityTemplate;
@@ -28397,7 +32522,7 @@ state ACS_MonsterSpawner_ShadesDancerWaxing in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -28414,7 +32539,7 @@ state ACS_MonsterSpawner_ShadesDancerWaxing in CACSMonsterSpawner
 		((CNewNPC)ent).SetLevel(thePlayer.GetLevel());
 
 		((CNewNPC)ent).SetAttitude(thePlayer, AIA_Hostile);
-		((CActor)ent).SetAnimationSpeedMultiplier(1);
+		((CActor)ent).SetAnimationSpeedMultiplier(1.25);
 
 		((CActor)ent).SetCanPlayHitAnim(false);
 
@@ -28464,7 +32589,7 @@ state ACS_MonsterSpawner_ShadesDancerWaxing in CACSMonsterSpawner
 
 		ent.AddTag( 'ACS_Hostile_To_All' );
 
-
+		((CActor)ent).GetInventory().AddAnItem( 'q111_imlerith_acorn', 1 );
 
 
 		((CActor)ent).GetBoneWorldPositionAndRotationByIndex( ((CActor)ent).GetBoneIndex( 'r_hand' ), bone_vec, bone_rot );
@@ -28553,7 +32678,6 @@ function GetACS_ShadesDancerWaxing_L_Anchor() : CEntity
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
 state ACS_MonsterSpawner_ShadesKara in CACSMonsterSpawner
 {
 	private var temp															: CEntityTemplate;
@@ -28586,7 +32710,7 @@ state ACS_MonsterSpawner_ShadesKara in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -28603,7 +32727,7 @@ state ACS_MonsterSpawner_ShadesKara in CACSMonsterSpawner
 		((CNewNPC)ent).SetLevel(thePlayer.GetLevel());
 
 		((CNewNPC)ent).SetAttitude(thePlayer, AIA_Hostile);
-		((CActor)ent).SetAnimationSpeedMultiplier(1);
+		((CActor)ent).SetAnimationSpeedMultiplier(1.25);
 
 		((CActor)ent).SetCanPlayHitAnim(false);
 
@@ -28640,6 +32764,8 @@ state ACS_MonsterSpawner_ShadesKara in CACSMonsterSpawner
 		((CActor)ent).AddBuffImmunity(EET_HeavyKnockdown , 'ACS_Kara_Buff', true);
 
 		((CActor)ent).AddBuffImmunity(EET_KnockdownTypeApplicator , 'ACS_Kara_Buff', true);
+
+		((CActor)ent).GetInventory().AddAnItem( 'q111_imlerith_acorn', 2 );
 
 		((CActor)ent).AddTag( 'ContractTarget' );
 
@@ -28899,7 +33025,7 @@ state ACS_MonsterSpawner_ShadesNightmareIncarnate in CACSMonsterSpawner
 
 		playerRot = thePlayer.GetWorldRotation();
 
-		playerRot.Yaw += 180;
+		playerRot.Yaw += RandRangeF(360,0);
 
 		adjustedRot = EulerAngles(0,0,0);
 
@@ -28947,6 +33073,8 @@ state ACS_MonsterSpawner_ShadesNightmareIncarnate in CACSMonsterSpawner
 		((CActor)ent).AddBuffImmunity(EET_Swarm , 'ACS_Nightmare_Incarnate_Buff', true);
 
 		((CActor)ent).AddBuffImmunity(EET_Burning , 'ACS_Nightmare_Incarnate_Buff', true);
+
+		((CActor)ent).GetInventory().AddAnItem( 'q111_imlerith_acorn', 3 );
 
 		((CActor)ent).AddTag( 'ContractTarget' );
 
@@ -29091,6 +33219,24 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 
 		Carduin_Static_Spawn_Latent();
 
+		Iridescent_Sharley_Static_Spawn_Latent();
+
+		Chironex_Static_Spawn_Latent();
+
+		Dao_Static_Spawn_Latent();
+
+		Weaponized_Rabbit_Static_Spawn_Latent();
+
+		Knocker_Static_Spawn_Latent();
+
+		Nekurat_Static_Spawn_Latent();
+
+		Botchling_Static_Spawn_Latent();
+
+		Vendigo_Static_Spawn_Latent();
+
+		Swarm_Mother_Static_Spawn_Latent();
+
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
 		Horse_Riders_Novigrad_Static_Spawn_Latent();
@@ -29098,6 +33244,10 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		Horse_Riders_Nilfgaard_Static_Spawn_Latent();
 
 		Horse_Riders_Redania_Static_Spawn_Latent();
+
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		
+		Crow_Swarm_Static_Spawn_Latent();
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -29123,7 +33273,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_Forest_God_Enabled())
+		if (ACS_Forest_God_Enabled() == 0)
 		{
 			return;
 		}
@@ -29180,7 +33330,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_Ice_Titans_Enabled())
+		if (ACS_Ice_Titans_Enabled() == 0)
 		{
 			return;
 		}
@@ -29225,7 +33375,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_Fire_Bear_Altar_Enabled())
+		if (ACS_Fire_Bear_Altar_Enabled() == 0)
 		{
 			return;
 		}
@@ -29270,7 +33420,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_Knightmare_Enabled())
+		if (ACS_Knightmare_Enabled() == 0)
 		{
 			return;
 		}
@@ -29307,7 +33457,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_SheWhoKnows_Enabled())
+		if (ACS_SheWhoKnows_Enabled() == 0)
 		{
 			return;
 		}
@@ -29344,7 +33494,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_BigLizard_Enabled())
+		if (ACS_BigLizard_Enabled() == 0)
 		{
 			return;
 		}
@@ -29389,7 +33539,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_RatMage_Enabled())
+		if (ACS_RatMage_Enabled() == 0)
 		{
 			return;
 		}
@@ -29427,7 +33577,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_Mages_Enabled())
+		if (ACS_Mages_Enabled() == 0)
 		{
 			return;
 		}
@@ -29467,9 +33617,12 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 
 		for(idx = 0; idx < sizeArray; idx += 1)
 		{
-			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+			if (RandF() < ACS_Mages_Enabled())
+			{
+				ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
 
-			ent.AddTag( 'ACS_MonsterSpawner_Mages' );
+				ent.AddTag( 'ACS_MonsterSpawner_Mages' );
+			}
 		}
 	}
 
@@ -29479,7 +33632,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_CloakedVamp_Enabled())
+		if (ACS_CloakedVamp_Enabled() == 0)
 		{
 			return;
 		}
@@ -29521,9 +33674,12 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 
 		for(idx = 0; idx < sizeArray; idx += 1)
 		{
-			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+			if (RandF() < ACS_CloakedVamp_Enabled())
+			{
+				ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
 
-			ent.AddTag( 'ACS_MonsterSpawner_CloakedVampiress' );
+				ent.AddTag( 'ACS_MonsterSpawner_CloakedVampiress' );
+			}
 		}
 	}
 
@@ -29533,7 +33689,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_DraugirEncounters_Enabled())
+		if (ACS_DraugirEncounters_Enabled() == 0)
 		{
 			return;
 		}
@@ -29572,9 +33728,12 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 
 		for(idx = 0; idx < sizeArray; idx += 1)
 		{
-			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+			if (RandF() < ACS_DraugirEncounters_Enabled())
+			{
+				ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
 
-			ent.AddTag( 'ACS_MonsterSpawner_Draugir' );
+				ent.AddTag( 'ACS_MonsterSpawner_Draugir' );
+			}
 		}
 	}
 
@@ -29584,7 +33743,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_Draug_Enabled())
+		if (ACS_Draug_Enabled() == 0)
 		{
 			return;
 		}
@@ -29626,7 +33785,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_Necrofiend_Nest_Enabled())
+		if (ACS_Necrofiend_Nest_Enabled() == 0)
 		{
 			return;
 		}
@@ -29659,9 +33818,12 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 
 		for(idx = 0; idx < sizeArray; idx += 1)
 		{
-			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+			if (RandF() < ACS_Necrofiend_Nest_Enabled())
+			{
+				ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
 
-			ent.AddTag( 'ACS_MonsterSpawner_NecrofiendNest' );
+				ent.AddTag( 'ACS_MonsterSpawner_NecrofiendNest' );
+			}
 		}
 	}
 
@@ -29671,7 +33833,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_HarpyQueen_Nest_Enabled())
+		if (ACS_HarpyQueen_Nest_Enabled() == 0)
 		{
 			return;
 		}
@@ -29704,9 +33866,12 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 
 		for(idx = 0; idx < sizeArray; idx += 1)
 		{
-			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+			if (RandF() < ACS_HarpyQueen_Nest_Enabled())
+			{
+				ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
 
-			ent.AddTag( 'ACS_MonsterSpawner_HarpyQueenNest' );
+				ent.AddTag( 'ACS_MonsterSpawner_HarpyQueenNest' );
+			}
 		}
 	}
 
@@ -29716,7 +33881,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_Berserkers_Enabled())
+		if (ACS_Berserkers_Enabled() == 0)
 		{
 			return;
 		}
@@ -29753,9 +33918,12 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 
 		for(idx = 0; idx < sizeArray; idx += 1)
 		{
-			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+			if (RandF() < ACS_Berserkers_Enabled())
+			{
+				ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
 
-			ent.AddTag( 'ACS_MonsterSpawner_Berserkers' );
+				ent.AddTag( 'ACS_MonsterSpawner_Berserkers' );
+			}
 		}
 	}
 
@@ -29765,7 +33933,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_LynxWitchers_Enabled())
+		if (ACS_LynxWitchers_Enabled() == 0)
 		{
 			return;
 		}
@@ -29797,9 +33965,12 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 
 		for(idx = 0; idx < sizeArray; idx += 1)
 		{
-			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+			if (RandF() < ACS_LynxWitchers_Enabled())
+			{
+				ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
 
-			ent.AddTag( 'ACS_MonsterSpawner_CatAssassin' );
+				ent.AddTag( 'ACS_MonsterSpawner_CatAssassin' );
+			}
 		}
 	}
 
@@ -29809,7 +33980,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_FireGargoyle_Enabled())
+		if (ACS_FireGargoyle_Enabled() == 0)
 		{
 			return;
 		}
@@ -29854,7 +34025,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_Fluffy_Enabled())
+		if (ACS_Fluffy_Enabled() == 0)
 		{
 			return;
 		}
@@ -29909,7 +34080,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_FogAssassin_Enabled())
+		if (ACS_FogAssassin_Enabled() == 0)
 		{
 			return;
 		}
@@ -29954,7 +34125,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_XenoTyrantEgg_Enabled())
+		if (ACS_XenoTyrantEgg_Enabled() == 0)
 		{
 			return;
 		}
@@ -30023,7 +34194,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_Cultists_Enabled())
+		if (ACS_Cultists_Enabled() == 0)
 		{
 			return;
 		}
@@ -30054,9 +34225,12 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 
 		for(idx = 0; idx < sizeArray; idx += 1)
 		{
-			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+			if (RandF() < ACS_Cultists_Enabled())
+			{
+				ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
 
-			ent.AddTag( 'ACS_MonsterSpawner_CultOfMelusine' );
+				ent.AddTag( 'ACS_MonsterSpawner_CultOfMelusine' );
+			}
 		}
 	}
 
@@ -30066,7 +34240,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_PirateZombie_Enabled())
+		if (ACS_PirateZombie_Enabled() == 0)
 		{
 			return;
 		}
@@ -30103,7 +34277,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_Svalblod_Enabled())
+		if (ACS_Svalblod_Enabled() == 0)
 		{
 			return;
 		}
@@ -30140,7 +34314,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_Duskwraith_Enabled())
+		if (ACS_Duskwraith_Enabled() == 0)
 		{
 			return;
 		}
@@ -30185,7 +34359,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_MegaWraith_Enabled())
+		if (ACS_MegaWraith_Enabled() == 0)
 		{
 			return;
 		}
@@ -30234,7 +34408,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_FireGryphon_Enabled())
+		if (ACS_FireGryphon_Enabled() == 0)
 		{
 			return;
 		}
@@ -30271,7 +34445,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_Incubus_Enabled())
+		if (ACS_Incubus_Enabled() == 0)
 		{
 			return;
 		}
@@ -30313,9 +34487,12 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 
 		for(idx = 0; idx < sizeArray; idx += 1)
 		{
-			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+			if (RandF() < ACS_Incubus_Enabled())
+			{
+				ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
 
-			ent.AddTag( 'ACS_MonsterSpawner_Incubus' );
+				ent.AddTag( 'ACS_MonsterSpawner_Incubus' );
+			}
 		}
 	}
 
@@ -30325,7 +34502,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_Mula_Enabled())
+		if (ACS_Mula_Enabled() == 0)
 		{
 			return;
 		}
@@ -30337,11 +34514,11 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 			locationArray.PushBack(Vector(2097.906250,-877.609863,2.176330,1));
 			locationArray.PushBack(Vector(-119.368332, -200.208389, 9.711581, 1));
 			locationArray.PushBack(Vector(1412.445923, -516.720642, -0.376114, 1));
-			locationArray.PushBack(Vector(1812.816895, -151.270233, 35.216846, 1));
 			locationArray.PushBack(Vector(1961.057617, 183.068954, -0.167544, 1));
 			locationArray.PushBack(Vector(1539.826416, -116.563423, 30.740000, 1));
 			locationArray.PushBack(Vector(1455.942871, -608.051086, -0.023946, 1));
 			locationArray.PushBack(Vector(772.609863, 817.236694, 8.522795, 1));
+			locationArray.PushBack(Vector(1458.906372, 2035.430054, 3.149824, 1));
 		}
 		else if ((theGame.GetWorld().GetDepotPath() == "dlc\bob\data\levels\bob\bob.w2w"))
 		{
@@ -30361,9 +34538,12 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 
 		for(idx = 0; idx < sizeArray; idx += 1)
 		{
-			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+			if (RandF() < ACS_Mula_Enabled())
+			{
+				ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
 
-			ent.AddTag( 'ACS_MonsterSpawner_Mula' );
+				ent.AddTag( 'ACS_MonsterSpawner_Mula' );
+			}
 		}
 	}
 
@@ -30373,7 +34553,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_BloodHym_Enabled())
+		if (ACS_BloodHym_Enabled() == 0)
 		{
 			return;
 		}
@@ -30416,9 +34596,12 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 
 		for(idx = 0; idx < sizeArray; idx += 1)
 		{
-			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+			if (RandF() < ACS_BloodHym_Enabled())
+			{
+				ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
 
-			ent.AddTag( 'ACS_MonsterSpawner_BloodHym' );
+				ent.AddTag( 'ACS_MonsterSpawner_BloodHym' );
+			}
 		}
 	}
 
@@ -30467,7 +34650,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_Heart_Of_Darkness_Enabled())
+		if (ACS_Heart_Of_Darkness_Enabled() == 0)
 		{
 			return;
 		}
@@ -30504,7 +34687,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_Bumbakvetch_Enabled())
+		if (ACS_Bumbakvetch_Enabled() == 0)
 		{
 			return;
 		}
@@ -30549,7 +34732,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_Frost_Boar_Enabled())
+		if (ACS_Frost_Boar_Enabled() == 0)
 		{
 			return;
 		}
@@ -30594,7 +34777,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_Nimean_Panther_Enabled())
+		if (ACS_Nimean_Panther_Enabled() == 0)
 		{
 			return;
 		}
@@ -30639,7 +34822,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_Shadow_Pixies_Enabled())
+		if (ACS_Shadow_Pixies_Enabled() == 0)
 		{
 			return;
 		}
@@ -30687,9 +34870,12 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 
 		for(idx = 0; idx < sizeArray; idx += 1)
 		{
-			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
-			
-			ent.AddTag( 'ACS_MonsterSpawner_ShadowPixies' );
+			if (RandF() < ACS_Shadow_Pixies_Enabled())
+			{
+				ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+
+				ent.AddTag( 'ACS_MonsterSpawner_ShadowPixies' );
+			}
 		}
 	}
 
@@ -30699,7 +34885,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_Maerolorn_Enabled())
+		if (ACS_Maerolorn_Enabled() == 0)
 		{
 			return;
 		}
@@ -30732,7 +34918,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 			locationArray.PushBack(Vector(704.376648, 2545.877686, 27.123940, 1));
 			locationArray.PushBack(Vector(1936.959473, 2041.495605, 64.342918, 1));
 			locationArray.PushBack(Vector(2443.289551, 2007.770874, 16.714565, 1));
-			locationArray.PushBack(Vector(1458.906372, 2035.430054, 3.149824, 1));
+			locationArray.PushBack(Vector(1812.816895, -151.270233, 35.216846, 1));
 		}
 		else if ((theGame.GetWorld().GetDepotPath() == "levels\skellige\skellige.w2w"))
 		{
@@ -30777,9 +34963,12 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 
 		for(idx = 0; idx < sizeArray; idx += 1)
 		{
-			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
-			
-			ent.AddTag( 'ACS_MonsterSpawner_Maerolorn' );
+			if (RandF() < ACS_Maerolorn_Enabled())
+			{
+				ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+
+				ent.AddTag( 'ACS_MonsterSpawner_Maerolorn' );
+			}
 		}
 	}
 
@@ -30789,7 +34978,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_Demonic_Construct_Enabled())
+		if (ACS_Demonic_Construct_Enabled() == 0)
 		{
 			return;
 		}
@@ -30833,9 +35022,12 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 
 		for(idx = 0; idx < sizeArray; idx += 1)
 		{
-			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+			if (RandF() < ACS_Demonic_Construct_Enabled())
+			{
+				ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
 
-			ent.AddTag( 'ACS_MonsterSpawner_DemonicConstruct' );
+				ent.AddTag( 'ACS_MonsterSpawner_DemonicConstruct' );
+			}
 		}
 	}
 
@@ -30845,7 +35037,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_Viy_Enabled())
+		if (ACS_Viy_Enabled() == 0)
 		{
 			return;
 		}
@@ -30886,7 +35078,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_Phooca_Enabled())
+		if (ACS_Phooca_Enabled() == 0)
 		{
 			return;
 		}
@@ -30960,9 +35152,12 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 
 		for(idx = 0; idx < sizeArray; idx += 1)
 		{
-			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+			if (RandF() < ACS_Phooca_Enabled())
+			{
+				ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
 
-			ent.AddTag( 'ACS_MonsterSpawner_Phooca' );
+				ent.AddTag( 'ACS_MonsterSpawner_Phooca' );
+			}
 		}
 	}
 
@@ -30972,7 +35167,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_Plumard_Enabled())
+		if (ACS_Plumard_Enabled() == 0)
 		{
 			return;
 		}
@@ -31044,9 +35239,12 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 
 		for(idx = 0; idx < sizeArray; idx += 1)
 		{
-			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+			if (RandF() < ACS_Plumard_Enabled())
+			{
+				ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
 
-			ent.AddTag( 'ACS_MonsterSpawner_Plumard' );
+				ent.AddTag( 'ACS_MonsterSpawner_Plumard' );
+			}
 		}
 	}
 
@@ -31056,7 +35254,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_The_Beast_Enabled())
+		if (ACS_The_Beast_Enabled() == 0)
 		{
 			return;
 		}
@@ -31131,9 +35329,12 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 
 		for(idx = 0; idx < sizeArray; idx += 1)
 		{
-			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+			if (RandF() < ACS_The_Beast_Enabled())
+			{
+				ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
 
-			ent.AddTag( 'ACS_MonsterSpawner_TheBeast' );
+				ent.AddTag( 'ACS_MonsterSpawner_TheBeast' );
+			}
 		}
 	}
 
@@ -31143,7 +35344,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_Giant_Trolls_Enabled())
+		if (ACS_Giant_Trolls_Enabled() == 0)
 		{
 			return;
 		}
@@ -31197,9 +35398,12 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 
 		for(idx = 0; idx < sizeArray; idx += 1)
 		{
-			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+			if (RandF() < ACS_Giant_Trolls_Enabled())
+			{
+				ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
 
-			ent.AddTag( 'ACS_MonsterSpawner_GiantRockTroll' );
+				ent.AddTag( 'ACS_MonsterSpawner_GiantRockTroll' );
+			}
 		}
 	}
 
@@ -31209,7 +35413,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_Giant_Trolls_Enabled())
+		if (ACS_Giant_Trolls_Enabled() == 0)
 		{
 			return;
 		}
@@ -31267,9 +35471,12 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 
 		for(idx = 0; idx < sizeArray; idx += 1)
 		{
-			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+			if (RandF() < ACS_Giant_Trolls_Enabled())
+			{
+				ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
 
-			ent.AddTag( 'ACS_MonsterSpawner_GiantIceTroll' );
+				ent.AddTag( 'ACS_MonsterSpawner_GiantIceTroll' );
+			}
 		}
 	}
 
@@ -31279,7 +35486,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_Giant_Trolls_Enabled())
+		if (ACS_Giant_Trolls_Enabled() == 0)
 		{
 			return;
 		}
@@ -31328,9 +35535,12 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 
 		for(idx = 0; idx < sizeArray; idx += 1)
 		{
-			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+			if (RandF() < ACS_Giant_Trolls_Enabled())
+			{
+				ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
 
-			ent.AddTag( 'ACS_MonsterSpawner_GiantMagmaTroll' );
+				ent.AddTag( 'ACS_MonsterSpawner_GiantMagmaTroll' );
+			}
 		}
 	}
 
@@ -31340,7 +35550,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_Elemental_Titans_Enabled())
+		if (ACS_Elemental_Titans_Enabled() == 0)
 		{
 			return;
 		}
@@ -31370,9 +35580,12 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 
 		for(idx = 0; idx < sizeArray; idx += 1)
 		{
-			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+			if (RandF() < ACS_Elemental_Titans_Enabled())
+			{
+				ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
 
-			ent.AddTag( 'ACS_MonsterSpawner_ElementalTitanOfTerra' );
+				ent.AddTag( 'ACS_MonsterSpawner_ElementalTitanOfTerra' );
+			}
 		}
 	}
 
@@ -31382,7 +35595,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_Elemental_Titans_Enabled())
+		if (ACS_Elemental_Titans_Enabled() == 0)
 		{
 			return;
 		}
@@ -31410,9 +35623,12 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 
 		for(idx = 0; idx < sizeArray; idx += 1)
 		{
-			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+			if (RandF() < ACS_Elemental_Titans_Enabled())
+			{
+				ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
 
-			ent.AddTag( 'ACS_MonsterSpawner_ElementalTitanOfIce' );
+				ent.AddTag( 'ACS_MonsterSpawner_ElementalTitanOfIce' );
+			}
 		}
 	}
 
@@ -31422,7 +35638,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_Elemental_Titans_Enabled())
+		if (ACS_Elemental_Titans_Enabled() == 0)
 		{
 			return;
 		}
@@ -31450,9 +35666,12 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 
 		for(idx = 0; idx < sizeArray; idx += 1)
 		{
-			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+			if (RandF() < ACS_Elemental_Titans_Enabled())
+			{
+				ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
 
-			ent.AddTag( 'ACS_MonsterSpawner_ElementalTitanOfFire' );
+				ent.AddTag( 'ACS_MonsterSpawner_ElementalTitanOfFire' );
+			}
 		}
 	}
 
@@ -31462,7 +35681,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_Dark_Knight_Enabled())
+		if (ACS_Dark_Knight_Enabled() == 0)
 		{
 			return;
 		}
@@ -31511,9 +35730,12 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 
 		for(idx = 0; idx < sizeArray; idx += 1)
 		{
-			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+			if (RandF() < ACS_Dark_Knight_Enabled())
+			{
+				ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
 
-			ent.AddTag( 'ACS_MonsterSpawner_DarkKnight' );
+				ent.AddTag( 'ACS_MonsterSpawner_DarkKnight' );
+			}
 		}
 	}
 
@@ -31523,7 +35745,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_Dark_Knight_Enabled())
+		if (ACS_Dark_Knight_Enabled() == 0)
 		{
 			return;
 		}
@@ -31561,9 +35783,12 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 
 		for(idx = 0; idx < sizeArray; idx += 1)
 		{
-			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+			if (RandF() < ACS_Dark_Knight_Enabled())
+			{
+				ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
 
-			ent.AddTag( 'ACS_MonsterSpawner_DarkKnightCalidus' );
+				ent.AddTag( 'ACS_MonsterSpawner_DarkKnightCalidus' );
+			}
 		}
 	}
 
@@ -31573,7 +35798,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_Voref_Enabled())
+		if (ACS_Voref_Enabled() == 0)
 		{
 			return;
 		}
@@ -31607,9 +35832,12 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 
 		for(idx = 0; idx < sizeArray; idx += 1)
 		{
-			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+			if (RandF() < ACS_Voref_Enabled())
+			{
+				ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
 
-			ent.AddTag( 'ACS_MonsterSpawner_Voref' );
+				ent.AddTag( 'ACS_MonsterSpawner_Voref' );
+			}
 		}
 	}
 
@@ -31619,7 +35847,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_Ifrit_Enabled())
+		if (ACS_Ifrit_Enabled() == 0)
 		{
 			return;
 		}
@@ -31685,6 +35913,620 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
 
 			ent.AddTag( 'ACS_MonsterSpawner_Carduin' );
+		}
+	}
+
+	latent function Iridescent_Sharley_Static_Spawn_Latent()
+	{
+		var locationArray 													: array<Vector>;
+		var sizeArray , idx 												: int;
+		var ent																: CEntity;
+
+		if (ACS_Iridescent_Sharley_Enabled() == 0)
+		{
+			return;
+		}
+
+		locationArray.Clear();
+
+		if ((theGame.GetWorld().GetDepotPath() == "levels\novigrad\novigrad.w2w"))
+		{
+			locationArray.PushBack(Vector(1973.825195, 2635.016113, 26.265465, 1));
+		}
+		else if ((theGame.GetWorld().GetDepotPath() == "dlc\bob\data\levels\bob\bob.w2w"))
+		{
+			locationArray.PushBack(Vector(-820.335632, 197.944107, 13.634598, 1));
+		}
+		else
+		{
+			locationArray.Clear();
+		}
+
+		sizeArray = locationArray.Size();
+
+		if (sizeArray <= 0)
+		{
+			return;
+		}
+
+		for(idx = 0; idx < sizeArray; idx += 1)
+		{
+			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+
+			ent.AddTag( 'ACS_MonsterSpawner_Iridescent_Sharley' );
+		}
+	}
+
+	latent function Chironex_Static_Spawn_Latent()
+	{
+		var locationArray 													: array<Vector>;
+		var sizeArray , idx 												: int;
+		var ent																: CEntity;
+
+		if (ACS_Chironex_Enabled() == 0)
+		{
+			return;
+		}
+
+		locationArray.Clear();
+
+		if ((theGame.GetWorld().GetDepotPath() == "levels\novigrad\novigrad.w2w"))
+		{
+			locationArray.PushBack(Vector(-127.933487, 318.979431, 2.588908, 1));
+			locationArray.PushBack(Vector(-185.505981, 44.230885, 8.837795, 1));
+			locationArray.PushBack(Vector(180.787445, -229.473816, 14.980000, 1));
+			locationArray.PushBack(Vector(-399.039124, -822.364258, 21.826786, 1));
+			locationArray.PushBack(Vector(-526.147888, -334.768097, 7.727998, 1));
+			locationArray.PushBack(Vector(-431.054626, -180.988266, 7.709204, 1));
+			locationArray.PushBack(Vector(-403.752136, 4.562419, 8.170379, 1));
+			locationArray.PushBack(Vector(436.996429, 76.654785, 9.061400, 1));
+			locationArray.PushBack(Vector(220.033707, -315.876892, 13.537287, 1));
+			locationArray.PushBack(Vector(394.040283, 277.170807, 11.644054, 1));
+			locationArray.PushBack(Vector(1117.887695, 731.122620, 44.494503, 1));
+			locationArray.PushBack(Vector(1205.858765, 455.697571, 15.199924, 1));
+			locationArray.PushBack(Vector(1387.114624, 641.137024, 29.180508, 1));
+			locationArray.PushBack(Vector(1796.057007, 579.787903, 4.317701, 1));
+			locationArray.PushBack(Vector(1866.816772, 508.943604, 5.341821, 1));
+			locationArray.PushBack(Vector(1808.407349, 198.479416, 15.683992, 1));
+			locationArray.PushBack(Vector(1644.926270, 9.473434, 14.484936, 1));
+			locationArray.PushBack(Vector(1469.540649, -23.541531, 21.972576, 1));
+			locationArray.PushBack(Vector(2245.329834, 437.844727, 15.099745, 1));
+			locationArray.PushBack(Vector(2460.351318, 477.584015, 18.845043, 1));
+			locationArray.PushBack(Vector(1355.377808, 649.796692, 35.095554, 1));
+			locationArray.PushBack(Vector(1320.449707, 835.338074, 26.578259, 1));
+			locationArray.PushBack(Vector(1340.733276, 964.530884, 4.597246, 1));
+			locationArray.PushBack(Vector(963.552795, 955.148682, 11.122111, 1));
+			locationArray.PushBack(Vector(613.540588, 1236.804321, 8.277969, 1));
+			locationArray.PushBack(Vector(348.924957, 1404.103882, 33.695793, 1));
+			locationArray.PushBack(Vector(370.267792, 1319.240234, 24.615942, 1));
+			locationArray.PushBack(Vector(867.661682, 1295.248413, 2.233160, 1));
+			locationArray.PushBack(Vector(1679.940796, -204.277512, 8.467505, 1));
+		}
+		else if ((theGame.GetWorld().GetDepotPath() == "levels\skellige\skellige.w2w"))
+		{
+
+			
+		}
+		else if ((theGame.GetWorld().GetDepotPath() == "dlc\bob\data\levels\bob\bob.w2w"))
+		{
+
+		}
+		else
+		{
+			locationArray.Clear();
+		}
+
+		sizeArray = locationArray.Size();
+
+		if (sizeArray <= 0)
+		{
+			return;
+		}
+
+		for(idx = 0; idx < sizeArray; idx += 1)
+		{
+			if (RandF() < ACS_Chironex_Enabled())
+			{
+				ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+
+				ent.AddTag( 'ACS_MonsterSpawner_Chironex' );
+			}
+		}
+	}
+
+	latent function Dao_Static_Spawn_Latent()
+	{
+		var locationArray 													: array<Vector>;
+		var sizeArray , idx 												: int;
+		var ent																: CEntity;
+
+		if (ACS_Dao_Enabled() == 0)
+		{
+			return;
+		}
+
+		locationArray.Clear();
+
+		if ((theGame.GetWorld().GetDepotPath() == "levels\novigrad\novigrad.w2w"))
+		{
+			locationArray.PushBack(Vector(57.888062, 671.848999, 21.165339, 1));
+			locationArray.PushBack(Vector(234.363815, 1400.150757, 20.867727, 1));
+			locationArray.PushBack(Vector(195.356552, 2551.388428, 6.179585, 1));
+			locationArray.PushBack(Vector(489.765472, 2718.574463, 7.905222, 1));
+
+		}
+		else if ((theGame.GetWorld().GetDepotPath() == "levels\skellige\skellige.w2w"))
+		{
+
+			
+		}
+		else if ((theGame.GetWorld().GetDepotPath() == "dlc\bob\data\levels\bob\bob.w2w"))
+		{
+			locationArray.PushBack(Vector(1373.128296, -1378.406494, 7.608229, 1));
+			locationArray.PushBack(Vector(1049.211792, -1464.121704, 58.719864, 1));
+			locationArray.PushBack(Vector(-1223.040527, -1471.102417, 152.213516, 1));
+			locationArray.PushBack(Vector(-661.852417, -2222.791260, 147.627808, 1));
+			locationArray.PushBack(Vector(-135.334427, -2521.485596, 128.094269, 1));
+			locationArray.PushBack(Vector(409.520142, -2556.954102, 53.193287, 1));
+			locationArray.PushBack(Vector(848.942566, -2338.021240, 10.939277, 1));
+			locationArray.PushBack(Vector(765.242615, -1898.529663, 5.803509, 1));
+		}
+		else
+		{
+			locationArray.Clear();
+		}
+
+		sizeArray = locationArray.Size();
+
+		if (sizeArray <= 0)
+		{
+			return;
+		}
+
+		for(idx = 0; idx < sizeArray; idx += 1)
+		{
+			if (RandF() < ACS_Dao_Enabled())
+			{
+				ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+
+				ent.AddTag( 'ACS_MonsterSpawner_Dao' );
+			}
+		}
+	}
+
+	latent function Weaponized_Rabbit_Static_Spawn_Latent()
+	{
+		var locationArray 													: array<Vector>;
+		var sizeArray , idx 												: int;
+		var ent																: CEntity;
+
+		locationArray.Clear();
+
+		if ((theGame.GetWorld().GetDepotPath() == "levels\novigrad\novigrad.w2w"))
+		{
+			locationArray.PushBack(Vector(2041.102051, -293.754395, 14.232196, 1));
+		}
+		else if ((theGame.GetWorld().GetDepotPath() == "levels\skellige\skellige.w2w"))
+		{
+			locationArray.PushBack(Vector(-241.923813, -875.922791, 85.455811, 1));
+		}
+		else if ((theGame.GetWorld().GetDepotPath() == "dlc\bob\data\levels\bob\bob.w2w"))
+		{
+			locationArray.PushBack(Vector(2438.953613, 1415.505127, 166.481964, 1));
+		}
+		else if (theGame.GetWorld().GetDepotPath() == "levels\prolog_village\prolog_village.w2w")
+		{
+			locationArray.PushBack(Vector(-217.538025, 41.740040, 8.469698, 1));
+		}
+		else if (theGame.GetWorld().GetDepotPath() == "levels\prolog_village_winter\prolog_village.w2w")
+		{
+			locationArray.PushBack(Vector(-102.334206, -136.546509, 9.462294, 1));
+		}
+		else
+		{
+			locationArray.Clear();
+		}
+
+		sizeArray = locationArray.Size();
+
+		if (sizeArray <= 0)
+		{
+			return;
+		}
+
+		for(idx = 0; idx < sizeArray; idx += 1)
+		{
+			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+
+			ent.AddTag( 'ACS_MonsterSpawner_WeaponizedRabbits' );
+		}
+	}
+
+	latent function Knocker_Static_Spawn_Latent()
+	{
+		var locationArray 													: array<Vector>;
+		var sizeArray , idx 												: int;
+		var ent																: CEntity;
+
+		if (ACS_Knocker_Enabled() == 0)
+		{
+			return;
+		}
+
+		locationArray.Clear();
+
+		if ((theGame.GetWorld().GetDepotPath() == "levels\novigrad\novigrad.w2w"))
+		{
+			locationArray.PushBack(Vector(75.980576, 346.776886, 7.514729, 1));
+			locationArray.PushBack(Vector(-29.339466, -461.866241, 15.719827, 1));
+			locationArray.PushBack(Vector(-124.310570, -516.829895, 12.086525, 1));
+			locationArray.PushBack(Vector(-5.407378, -333.485168, 10.344109, 1));
+			locationArray.PushBack(Vector(61.964142, -406.849457, 14.196715, 1));
+			locationArray.PushBack(Vector(1768.791504, -1002.911926, 27.262772, 1));
+			locationArray.PushBack(Vector(1668.075806, -804.110596, 22.236187, 1));
+			locationArray.PushBack(Vector(1815.066162, -980.386902, 21.290962, 1));
+			locationArray.PushBack(Vector(-171.195633, -27.247509, 8.821074, 1));
+			locationArray.PushBack(Vector(-398.672607, -383.112244, 9.949582, 1));
+			locationArray.PushBack(Vector(-541.114319, -393.205139, 6.424941, 1));
+			locationArray.PushBack(Vector(-1.741154, -4.628460, -0.216953, 1));
+			locationArray.PushBack(Vector(-377.900238, 404.007874, 4.362785, 1));
+			locationArray.PushBack(Vector(-357.932007, 309.436951, 5.094192, 1));
+			locationArray.PushBack(Vector(-136.836975, 696.355530, 19.349018, 1));
+			locationArray.PushBack(Vector(290.997162, 433.619110, 1.027932, 1));
+			locationArray.PushBack(Vector(362.760071, 530.620056, 1.505985, 1));
+			locationArray.PushBack(Vector(710.242126, 379.160675, 6.648459, 1));
+			locationArray.PushBack(Vector(282.634918, 1567.648071, 13.005967, 1));
+			locationArray.PushBack(Vector(198.824844, 1586.325439, 10.160736, 1));
+			locationArray.PushBack(Vector(2263.741943, 1191.153687, 12.537614, 1));
+			locationArray.PushBack(Vector(2501.605713, 1167.389648, 46.514973, 1));
+			locationArray.PushBack(Vector(2243.025146, 712.567078, 8.576035, 1));
+			locationArray.PushBack(Vector(2124.108154, 615.744873, 2.717222, 1));
+			locationArray.PushBack(Vector(1680.284180, 256.629639, 4.492259, 1));
+			locationArray.PushBack(Vector(1891.591675, -26.072388, 53.436123, 1));
+			locationArray.PushBack(Vector(1964.518555, -345.694244, 29.249344, 1));
+			locationArray.PushBack(Vector(2143.092285, -506.654510, 9.559161, 1));
+			locationArray.PushBack(Vector(1820.151978, 1735.814575, 40.628113, 1));
+			locationArray.PushBack(Vector(1347.442627, 1748.032593, 6.909648, 1));
+			locationArray.PushBack(Vector(1227.149414, 1738.163696, 11.638286, 1));
+			locationArray.PushBack(Vector(2197.357910, 1934.507812, 46.018265, 1));
+		}
+		else if ((theGame.GetWorld().GetDepotPath() == "levels\skellige\skellige.w2w"))
+		{
+
+			
+		}
+		else if ((theGame.GetWorld().GetDepotPath() == "dlc\bob\data\levels\bob\bob.w2w"))
+		{
+			
+		}
+		else
+		{
+			locationArray.Clear();
+		}
+
+		sizeArray = locationArray.Size();
+
+		if (sizeArray <= 0)
+		{
+			return;
+		}
+
+		for(idx = 0; idx < sizeArray; idx += 1)
+		{
+			if (RandF() < ACS_Knocker_Enabled())
+			{
+				ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+
+				ent.AddTag( 'ACS_MonsterSpawner_Knocker' );
+			}
+		}
+	}
+
+	latent function Nekurat_Static_Spawn_Latent()
+	{
+		var locationArray 													: array<Vector>;
+		var sizeArray , idx 												: int;
+		var ent																: CEntity;
+
+		if (ACS_Nekurat_Enabled() == 0)
+		{
+			return;
+		}
+
+		locationArray.Clear();
+
+		if ((theGame.GetWorld().GetDepotPath() == "levels\novigrad\novigrad.w2w"))
+		{
+			locationArray.PushBack(Vector(838.334045, 1648.518311, 5.531692, 1));
+			locationArray.PushBack(Vector(682.674438, 1521.231689, 4.664205, 1));
+			locationArray.PushBack(Vector(554.490845, 1495.259644, 15.711880, 1));
+			locationArray.PushBack(Vector(1042.254028, 1782.237915, 3.753942, 1));
+			locationArray.PushBack(Vector(947.704956, 1995.274658, 2.058386, 1));
+			locationArray.PushBack(Vector(878.026611, 2019.242798, 2.241455, 1));
+			locationArray.PushBack(Vector(1528.189209, 782.651794, 11.262437, 1));
+			locationArray.PushBack(Vector(1414.966675, 910.947571, 2.930681, 1));
+			locationArray.PushBack(Vector(339.378845, 1796.447998, 1.537261, 1));
+			locationArray.PushBack(Vector(1195.298950, 2405.213623, 5.152399, 1));
+			locationArray.PushBack(Vector(2206.651367, -821.366943, 12.808120, 1));
+			locationArray.PushBack(Vector(1828.540894, 1040.103027, 6.580463, 1));
+		}
+		else if ((theGame.GetWorld().GetDepotPath() == "levels\skellige\skellige.w2w"))
+		{
+
+			
+		}
+		else if ((theGame.GetWorld().GetDepotPath() == "dlc\bob\data\levels\bob\bob.w2w"))
+		{
+			
+		}
+		else
+		{
+			locationArray.Clear();
+		}
+
+		sizeArray = locationArray.Size();
+
+		if (sizeArray <= 0)
+		{
+			return;
+		}
+
+		for(idx = 0; idx < sizeArray; idx += 1)
+		{
+			if (RandF() < ACS_Nekurat_Enabled())
+			{
+				ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+
+				ent.AddTag( 'ACS_MonsterSpawner_Nekurat' );
+			}
+		}
+	}
+
+	latent function Botchling_Static_Spawn_Latent()
+	{
+		var locationArray 													: array<Vector>;
+		var sizeArray , idx 												: int;
+		var ent																: CEntity;
+
+		if (ACS_Botchling_Enabled() == 0)
+		{
+			return;
+		}
+
+		locationArray.Clear();
+
+		if ((theGame.GetWorld().GetDepotPath() == "levels\novigrad\novigrad.w2w"))
+		{
+			locationArray.PushBack(Vector(-299.658905, -979.638367, 8.817822, 1));
+			locationArray.PushBack(Vector(251.181580, -1226.173096, 8.036114, 1));
+			locationArray.PushBack(Vector(645.983765, -610.182739, 1.698249, 1));
+			locationArray.PushBack(Vector(214.889786, -472.686310, 4.183829, 1));
+			locationArray.PushBack(Vector(-186.619888, 145.035309, 9.483307, 1));
+			locationArray.PushBack(Vector(761.424500, 152.220825, 4.918258, 1));
+			locationArray.PushBack(Vector(1214.601074, 117.806068, 27.023594, 1));
+			locationArray.PushBack(Vector(1498.565918, -304.908783, 11.695789, 1));
+			locationArray.PushBack(Vector(2203.809814, -901.465820, 7.421257, 1));
+			locationArray.PushBack(Vector(1987.033936, -636.519592, 0.068115, 1));
+			locationArray.PushBack(Vector(1858.886841, -170.496262, 46.314392, 1));
+			locationArray.PushBack(Vector(1744.505737, 109.602280, 13.227612, 1));
+			locationArray.PushBack(Vector(-681.421265, -507.927521, 11.738481, 1));
+			locationArray.PushBack(Vector(-441.528625, -510.168579, 11.922072, 1));
+			locationArray.PushBack(Vector(-439.156647, -269.521423, 6.433950, 1));
+			locationArray.PushBack(Vector(-572.080139, -168.218918, 10.443089, 1));
+			locationArray.PushBack(Vector(475.214050, 1254.271240, 16.908714, 1));
+			locationArray.PushBack(Vector(929.454712, 642.494080, 33.101135, 1));
+			locationArray.PushBack(Vector(1345.199585, 679.413635, 29.182278, 1));
+			locationArray.PushBack(Vector(948.119324, 1397.697998, 2.681794, 1));
+			locationArray.PushBack(Vector(1582.538574, 1459.165405, 8.541274, 1));
+			locationArray.PushBack(Vector(2462.510254, 1502.460693, 57.999092, 1));
+			locationArray.PushBack(Vector(2482.031494, 1879.133179, 17.694622, 1));
+			locationArray.PushBack(Vector(1504.291260, 1836.836426, 4.034498, 1));
+			locationArray.PushBack(Vector(1161.665039, 2414.208984, 4.371724, 1));
+			locationArray.PushBack(Vector(1540.351074, 2617.727783, 27.070755, 1));
+			locationArray.PushBack(Vector(2303.146973, 2357.048584, 7.357886, 1));
+			locationArray.PushBack(Vector(2564.640381, 2454.476074, 2.887055, 1));
+
+		}
+		else if ((theGame.GetWorld().GetDepotPath() == "levels\skellige\skellige.w2w"))
+		{
+
+		}
+		else if ((theGame.GetWorld().GetDepotPath() == "dlc\bob\data\levels\bob\bob.w2w"))
+		{
+			
+		}
+		else
+		{
+			locationArray.Clear();
+		}
+
+		sizeArray = locationArray.Size();
+
+		if (sizeArray <= 0)
+		{
+			return;
+		}
+
+		for(idx = 0; idx < sizeArray; idx += 1)
+		{
+			if (RandF() < ACS_Botchling_Enabled())
+			{
+				ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+
+				ent.AddTag( 'ACS_MonsterSpawner_Botchling' );
+			}
+		}
+	}
+
+	latent function Vendigo_Static_Spawn_Latent()
+	{
+		var locationArray 													: array<Vector>;
+		var sizeArray , idx 												: int;
+		var ent																: CEntity;
+
+		if (ACS_Vendigo_Enabled() == 0)
+		{
+			return;
+		}
+
+		locationArray.Clear();
+
+		if ((theGame.GetWorld().GetDepotPath() == "levels\skellige\skellige.w2w"))
+		{
+			locationArray.PushBack(Vector(160.704926, 353.802216, 82.486282, 1));
+			locationArray.PushBack(Vector(121.280556, 689.732361, 183.174927, 1));
+			locationArray.PushBack(Vector(-49.052902, 775.183350, 213.367188, 1));
+			locationArray.PushBack(Vector(722.379883, 596.488953, 161.323730, 1));
+			locationArray.PushBack(Vector(802.804382, 556.845215, 161.777420, 1));
+			locationArray.PushBack(Vector(777.016602, 302.729614, 145.672058, 1));
+			locationArray.PushBack(Vector(1273.272705, 221.997101, 122.934906, 1));
+			locationArray.PushBack(Vector(1120.120361, 54.835159, 96.575798, 1));
+			locationArray.PushBack(Vector(1005.322388, -589.926636, 149.506287, 1));
+			locationArray.PushBack(Vector(817.178101, -661.941406, 124.741966, 1));
+			locationArray.PushBack(Vector(-34.115517, -853.616821, 254.782745, 1));
+			locationArray.PushBack(Vector(20.288914, -956.903137, 182.815613, 1));
+			locationArray.PushBack(Vector(1596.218262, -1246.552368, 17.438868, 1));
+			locationArray.PushBack(Vector(2035.564087, -1922.408936, 48.316437, 1));
+			locationArray.PushBack(Vector(-112.633789, -826.978516, 226.589401, 1));
+			locationArray.PushBack(Vector(-77.346924, -768.603210, 278.191895, 1));
+			locationArray.PushBack(Vector(-1713.202026, -1027.788574, 230.514618, 1));
+			locationArray.PushBack(Vector(-1599.617920, -891.045166, 126.300995, 1));
+			locationArray.PushBack(Vector(-1975.487061, -922.399475, 69.681808, 1));
+			locationArray.PushBack(Vector(-2119.564941, -888.800171, 48.282715, 1));
+			locationArray.PushBack(Vector(-1882.965454, -741.140381, 43.481903, 1));
+			locationArray.PushBack(Vector(-2173.062500, 309.340576, 42.376892, 1));
+			locationArray.PushBack(Vector(-2166.057861, 360.566986, 20.429081, 1));
+			locationArray.PushBack(Vector(-1803.733154, 1319.229980, 82.327408, 1));
+			locationArray.PushBack(Vector(-1736.843506, 1157.165894, 54.456779, 1));
+			locationArray.PushBack(Vector(-1610.216553, 1244.932007, 22.434244, 1));
+			locationArray.PushBack(Vector(-1811.084595, 1455.516479, 111.737663, 1));
+			locationArray.PushBack(Vector(1596.989502, 1803.468018, 2.870142, 1));
+			locationArray.PushBack(Vector(2648.074707, 63.745987, 28.629913, 1));
+			locationArray.PushBack(Vector(1598.977783, -1897.271973, 46.073391, 1));
+			locationArray.PushBack(Vector(1732.290161, -1796.868652, 28.796648, 1));
+			locationArray.PushBack(Vector(89.330391, 459.293701, 46.666382, 1));
+			locationArray.PushBack(Vector(-355.238892, -503.546478, 73.033333, 1));
+			locationArray.PushBack(Vector(-312.558441, -433.482727, 50.269642, 1));
+			locationArray.PushBack(Vector(-211.291748, -255.206604, 53.916653, 1));
+			
+			if ( !ACS_SOI_Installed() && !ACS_SOI_Enabled() )
+			{
+				locationArray.PushBack(Vector(967.194702, -622.598022, 160.551834, 1));
+			}
+		}
+		else if ((theGame.GetWorld().GetDepotPath() == "dlc\bob\data\levels\bob\bob.w2w"))
+		{
+			locationArray.PushBack(Vector(-1360.702515, -2200.845703, 361.808777, 1));
+			locationArray.PushBack(Vector(-1329.841431, -2458.447754, 383.836121, 1));
+			locationArray.PushBack(Vector(-1192.822876, -2697.768555, 515.154602, 1));
+		}
+		else if ((theGame.GetWorld().GetDepotPath() == "levels\prolog_village_winter\prolog_village.w2w"))
+		{
+			locationArray.PushBack(Vector(-165.022980, -1.084716, 6.038921, 1));
+			locationArray.PushBack(Vector(-203.151291, -202.054749, 12.631413, 1));
+			locationArray.PushBack(Vector(-180.423492, 20.427778, 8.125694, 1));
+		}
+		else if ((theGame.GetWorld().GetDepotPath() == "levels\kaer_morhen\kaer_morhen.w2w"))
+		{
+			locationArray.PushBack(Vector(-417.320740, -312.425507, 315.025696, 1));
+			locationArray.PushBack(Vector(-293.511230, 29.513636, 206.603836, 1));
+			locationArray.PushBack(Vector(-257.272736, 157.333771, 189.083694, 1));
+			locationArray.PushBack(Vector(-262.142090, -136.506638, 187.731735, 1));
+			locationArray.PushBack(Vector(208.574326, -386.351837, 207.143433, 1));
+			locationArray.PushBack(Vector(89.650764, -535.432739, 190.719681, 1));
+		}
+		else
+		{
+			locationArray.Clear();
+		}
+
+		sizeArray = locationArray.Size();
+
+		if (sizeArray <= 0)
+		{
+			return;
+		}
+
+		for(idx = 0; idx < sizeArray; idx += 1)
+		{
+			if (RandF() < ACS_Vendigo_Enabled())
+			{
+				ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+
+				ent.AddTag( 'ACS_MonsterSpawner_Vendigo' );
+			}
+		}
+	}
+
+	latent function Swarm_Mother_Static_Spawn_Latent()
+	{
+		var locationArray 													: array<Vector>;
+		var sizeArray , idx 												: int;
+		var ent																: CEntity;
+
+		if (ACS_SwarmMother_Enabled() == 0)
+		{
+			return;
+		}
+
+		locationArray.Clear();
+
+		if ((theGame.GetWorld().GetDepotPath() == "levels\novigrad\novigrad.w2w"))
+		{
+
+		}
+		else if ((theGame.GetWorld().GetDepotPath() == "dlc\bob\data\levels\bob\bob.w2w"))
+		{
+			locationArray.PushBack(Vector(-66.596321, -117.801056, 24.706989, 1));
+			locationArray.PushBack(Vector(-223.805450, 77.190765, 12.850013, 1));
+			locationArray.PushBack(Vector(53.002449, 290.947113, 8.069172, 1));
+			locationArray.PushBack(Vector(461.452881, 154.612732, 0.286504, 1));
+			locationArray.PushBack(Vector(518.400452, 274.537933, 14.116829, 1));
+			locationArray.PushBack(Vector(232.108643, -659.723999, 3.566469, 1));
+			locationArray.PushBack(Vector(200.972794, -797.085510, 1.174108, 1));
+			locationArray.PushBack(Vector(131.421860, -785.775696, 6.024622, 1));
+			locationArray.PushBack(Vector(550.930359, -635.159790, 3.027140, 1));
+			locationArray.PushBack(Vector(763.867188, -518.866150, 36.398903, 1));
+			locationArray.PushBack(Vector(-145.961105, -534.930359, 1.932656, 1));
+			locationArray.PushBack(Vector(-239.709137, -395.687683, 10.117401, 1));
+			locationArray.PushBack(Vector(-338.398926, -210.772842, 2.134635, 1));
+			locationArray.PushBack(Vector(-321.465942, -243.532990, 4.712848, 1));
+			locationArray.PushBack(Vector(-122.339790, -176.537796, 22.568403, 1));
+			locationArray.PushBack(Vector(-969.545288, -401.795776, 50.165413, 1));
+			locationArray.PushBack(Vector(-945.551636, -600.763733, 49.604034, 1));
+			locationArray.PushBack(Vector(-1063.268677, -651.362000, 62.956139, 1));
+			locationArray.PushBack(Vector(-1169.271118, -762.451233, 103.828117, 1));
+			locationArray.PushBack(Vector(-1274.626587, -1117.761841, 148.370834, 1));
+			locationArray.PushBack(Vector(-1233.526123, -1199.619751, 164.981140, 1));
+			locationArray.PushBack(Vector(-1022.383667, -1241.160034, 143.524033, 1));
+			locationArray.PushBack(Vector(-895.600403, -1528.546875, 90.722122, 1));
+			locationArray.PushBack(Vector(-679.283447, -1914.247681, 102.171417, 1));
+			locationArray.PushBack(Vector(-468.360809, -1859.993164, 86.845657, 1));
+			locationArray.PushBack(Vector(-236.931381, -2238.513184, 93.552856, 1));
+			locationArray.PushBack(Vector(68.075218, -1454.605469, 0.441141, 1));
+			locationArray.PushBack(Vector(490.554718, -1663.023682, 28.138948, 1));
+
+		}
+		else
+		{
+			locationArray.Clear();
+		}
+
+		sizeArray = locationArray.Size();
+
+		if (sizeArray <= 0)
+		{
+			return;
+		}
+
+		for(idx = 0; idx < sizeArray; idx += 1)
+		{
+			if (RandF() < ACS_SwarmMother_Enabled())
+			{
+				ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+
+				ent.AddTag( 'ACS_MonsterSpawner_SwarmMother' );
+			}
 		}
 	}
 
@@ -31937,6 +36779,175 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		}
 	}
 
+	latent function Crow_Swarm_Static_Spawn_Latent()
+	{
+		var locationArray 													: array<Vector>;
+		var sizeArray , idx 												: int;
+		var ent																: CEntity;
+
+		if (!ACS_CrowSwarm_Enabled())
+		{
+			return;
+		}
+
+		locationArray.Clear();
+
+		if (theGame.GetWorld().GetDepotPath() == "levels\skellige\skellige.w2w")
+		{
+			locationArray.PushBack(Vector(56.297958, -141.426300, 47.911198, 1));
+			locationArray.PushBack(Vector(-780.255798, 403.778259, 43.452183, 1));
+			locationArray.PushBack(Vector(862.430786, 165.932220, 65.601715, 1));
+			locationArray.PushBack(Vector(1198.561279, 424.176117, 2.365286, 1));
+			locationArray.PushBack(Vector(-560.656860, -641.273438, 4.777617, 1));
+			locationArray.PushBack(Vector(74.409622, 250.020676, 19.336475, 1));
+			locationArray.PushBack(Vector(234.439148, 904.565796, 0.311934, 1));
+			locationArray.PushBack(Vector(-2106.328125, -675.839355, 24.309450, 1));
+			locationArray.PushBack(Vector(-1592.404053, -565.498596, 0.238398, 1));
+			locationArray.PushBack(Vector(-1812.827271, -943.530945, 80.134476, 1));
+			locationArray.PushBack(Vector(-1816.472290, -620.912903, 18.520880, 1));
+			locationArray.PushBack(Vector(-1835.123657, 1177.757324, 50.261662, 1));
+			locationArray.PushBack(Vector(1658.915039, 1993.455811, 12.817731, 1));
+			locationArray.PushBack(Vector(2488.313232, 262.064270, 25.525276, 1));
+			locationArray.PushBack(Vector(2407.479736, 66.325760, 8.356035, 1));
+			locationArray.PushBack(Vector(2147.761475, -1931.843994, 1.024954, 1));
+		}
+		else if (theGame.GetWorld().GetDepotPath() == "levels\novigrad\novigrad.w2w")
+		{
+			locationArray.PushBack(Vector(54.118954, -5.892632, 11.036287, 1));
+			locationArray.PushBack(Vector(987.671143, 701.922180, 47.239346, 1));
+			locationArray.PushBack(Vector(1163.711426, 602.466858, 40.113605, 1));
+			locationArray.PushBack(Vector(180.175385, 15.935755, 14.371552, 1));
+			locationArray.PushBack(Vector(-396.313171, 142.470490, 1.759722, 1));
+			locationArray.PushBack(Vector(-271.427124, -955.317200, 9.261408, 1));
+			locationArray.PushBack(Vector(1605.739380, -640.061157, 15.796585, 1));
+			locationArray.PushBack(Vector(1513.923950, -495.620117, 3.698330, 1));
+			locationArray.PushBack(Vector(1441.393311, -171.725662, 34.935627, 1));
+			locationArray.PushBack(Vector(240.549606, -777.253784, -0.174128, 1));
+			locationArray.PushBack(Vector(260.997162, -724.534424, 43.078259, 1));
+			locationArray.PushBack(Vector(58.756786, -730.094971, 0.782958, 1));
+			locationArray.PushBack(Vector(-196.948853, 812.248474, 35.293819, 1));
+			locationArray.PushBack(Vector(-388.759216, 574.090576, 19.026440, 1));
+			locationArray.PushBack(Vector(-83.885162, 524.424377, 1.184291, 1));
+			locationArray.PushBack(Vector(75.397751, 382.609497, 15.007099, 1));
+			locationArray.PushBack(Vector(358.671021, 171.421127, 15.524452, 1));
+			locationArray.PushBack(Vector(964.772339, -1067.002686, 1.819167, 1));
+			locationArray.PushBack(Vector(2389.733643, 1000.109985, 43.396809, 1));
+			locationArray.PushBack(Vector(1549.667725, 334.511414, 2.572866, 1));
+			locationArray.PushBack(Vector(1443.642578, -1190.159180, 106.566475, 1));
+			locationArray.PushBack(Vector(1905.954224, 1852.610596, 57.160686, 1));
+			locationArray.PushBack(Vector(2659.040527, 1967.018555, 31.972380, 1));
+			locationArray.PushBack(Vector(2296.440430, 1208.740845, 16.542881, 1));
+			locationArray.PushBack(Vector(2436.601562, 1837.287231, 26.585518, 1));
+			locationArray.PushBack(Vector(2723.820068, 1703.416870, 32.394199, 1));
+			locationArray.PushBack(Vector(553.010376, 986.906555, 0.712736, 1));
+			locationArray.PushBack(Vector(352.418915, 991.389160, 2.201591, 1));
+			locationArray.PushBack(Vector(1864.458374,-689.706726,0.015041,1));
+			locationArray.PushBack(Vector(1302.472168,1493.241333,-0.220483,1));
+			locationArray.PushBack(Vector(312.184479,891.360840,-0.025470,1));
+			locationArray.PushBack(Vector(363.551514,978.802185,1.373179,1));
+			locationArray.PushBack(Vector(613.871643,884.598389,1.036278,1));
+			locationArray.PushBack(Vector(569.490195,978.070190,-0.108501,1));
+			locationArray.PushBack(Vector(405.802002,1068.651611,0.608021,1));
+			locationArray.PushBack(Vector(521.863770,1081.006836,1.518828,1));
+			locationArray.PushBack(Vector(381.410614,1027.466553,-0.259066,1));
+			locationArray.PushBack(Vector(1864.458374,-689.706726,0.015041,1));
+			locationArray.PushBack(Vector(1302.472168,1493.241333,-0.220483,1));
+			locationArray.PushBack(Vector(312.184479,891.360840,-0.025470,1));
+			locationArray.PushBack(Vector(363.551514, 978.802185, 1.373179, 1));
+			locationArray.PushBack(Vector(613.871643,884.598389,1.036278,1));
+			locationArray.PushBack(Vector(569.490195,978.070190,-0.108501,1));
+			locationArray.PushBack(Vector(405.802002,1068.651611,0.608021,1));
+			locationArray.PushBack(Vector(521.863770,1081.006836,1.518828,1));
+			locationArray.PushBack(Vector(381.410614,1027.466553,-0.259066,1));
+			locationArray.PushBack(Vector(1461.869141, 1121.341797, 0.007444, 1));
+			locationArray.PushBack(Vector(917.797424, 915.553467, 11.310884, 1));
+			locationArray.PushBack(Vector(899.050049, 993.041687, 0.236208, 1));
+			locationArray.PushBack(Vector(814.379395, 759.632629, 16.101336, 1));
+			locationArray.PushBack(Vector(1567.507568, 1266.352539, 0.209946, 1));
+			locationArray.PushBack(Vector(1507.250366, 1212.312256, -0.029652, 1));
+			locationArray.PushBack(Vector(321.086975, 73.107445, 14.927893, 1));
+			locationArray.PushBack(Vector(176.650589, 187.350540, 51.425541, 1));
+			locationArray.PushBack(Vector(153.581985, 133.375076, 46.653595, 1));
+			locationArray.PushBack(Vector(209.356216, 130.602661, 55.542404, 1));
+			locationArray.PushBack(Vector(252.206863, 132.700531, 48.553120, 1));
+			locationArray.PushBack(Vector(1113.212891, -964.232056, 93.079575, 1));
+			locationArray.PushBack(Vector(1365.417603, -589.948364, 17.685955, 1));
+			locationArray.PushBack(Vector(1335.715332, -569.375732, 6.963230, 1));
+			locationArray.PushBack(Vector(1337.781494, -610.124512, 7.094337, 1));
+			locationArray.PushBack(Vector(1691.732910, -462.786713, -0.101477, 1));
+			locationArray.PushBack(Vector(1114.776855, -981.992126, 92.265900, 1));
+			locationArray.PushBack(Vector(1154.781006, -1040.283691, 76.001732, 1));
+			locationArray.PushBack(Vector(-217.672989, 547.031067, 51.490685, 1));
+			locationArray.PushBack(Vector(116.040031, 2409.561279, -0.118927, 1));
+			locationArray.PushBack(Vector(1255.432373, 69.038841, 32.631573, 1));
+
+			if (FactsQuerySum("q105_evil_spirit_released") > 0)
+			{
+				locationArray.PushBack(Vector(1411.365234, -322.790802, 19.204542, 1));
+			}
+		}
+		else if (theGame.GetWorld().GetDepotPath() == "dlc\bob\data\levels\bob\bob.w2w")
+		{
+			locationArray.PushBack(Vector(80.631645, -53.815086, -0.000169, 1));
+			locationArray.PushBack(Vector(-5.261278, -20.056370, 18.220730, 1));
+			locationArray.PushBack(Vector(-1171.677979, -558.541443, 80.643822, 1));
+			locationArray.PushBack(Vector(-811.115234, -1615.031616, 87.476921, 1));
+			locationArray.PushBack(Vector(56.205704, -2135.840088, 124.785744, 1));
+			locationArray.PushBack(Vector(-64.201218, -1505.934204, 16.926260, 1));
+			locationArray.PushBack(Vector(607.748901, -1545.443115, 21.796745, 1));
+			locationArray.PushBack(Vector(277.279236, -2146.822510, 63.101440, 1));
+			locationArray.PushBack(Vector(634.159363, -1117.552979, 7.008023, 1));
+			locationArray.PushBack(Vector(1104.539551, -786.259155, 37.609081, 1));
+			locationArray.PushBack(Vector(330.520233, -99.678085, 10.563730, 1));
+			locationArray.PushBack(Vector(178.737259, -421.370239, 54.021957, 1));
+			locationArray.PushBack(Vector(-158.778107, -310.544861, 23.996521, 1));
+			locationArray.PushBack(Vector(-168.194977, 556.353088, 5.520636, 1));
+			locationArray.PushBack(Vector(-290.559204, -990.022827, 41.654037, 1));
+			locationArray.PushBack(Vector(-236.931381, -2238.513184, 93.552856, 1));
+
+		}
+		else if (theGame.GetWorld().GetDepotPath() == "levels\prolog_village\prolog_village.w2w")
+		{
+			locationArray.PushBack(Vector(284.563049, 32.948151, -0.133527, 1));
+			locationArray.PushBack(Vector(408.455505, -79.643272, 17.107710, 1));
+			locationArray.PushBack(Vector(320.101013, -189.905823, 2.474813, 1));
+			locationArray.PushBack(Vector(463.318298, -62.431156, 10.139042, 1));
+			locationArray.PushBack(Vector(543.695374, -39.204559, 7.392457, 1));
+			locationArray.PushBack(Vector(575.545044, 215.725143, 20.650637, 1));
+			locationArray.PushBack(Vector(529.783569, 174.880859, 20.914429, 1));
+			locationArray.PushBack(Vector(561.661682, 121.477722, 28.120539, 1));
+			locationArray.PushBack(Vector(547.277832, 243.082352, 19.892113, 1));
+			locationArray.PushBack(Vector(31.136196, -261.878998, 19.340881, 1));
+			locationArray.PushBack(Vector(483.146698, -122.690964, 6.824598, 1));
+			locationArray.PushBack(Vector(497.104004, -82.520920, 8.074019, 1));
+			locationArray.PushBack(Vector(-88.410400, -287.862183, 37.565292, 1));
+			locationArray.PushBack(Vector(-102.191498, -194.393036, 14.189664, 1));
+			locationArray.PushBack(Vector(-100.201591, 354.547455, 5.589199, 1));
+			locationArray.PushBack(Vector(57.399204, 234.859848, 11.745893, 1));
+			locationArray.PushBack(Vector(487.511841, 209.433746, 20.014961, 1));
+			locationArray.PushBack(Vector(549.944214, 32.729618, 14.134274, 1));
+
+		}
+		else
+		{
+			locationArray.Clear();
+		}
+
+		sizeArray = locationArray.Size();
+
+		if (sizeArray <= 0)
+		{
+			return;
+		}
+
+		for(idx = 0; idx < sizeArray; idx += 1)
+		{
+			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+
+			ent.AddTag( 'ACS_MonsterSpawner_CrowSwarm' );
+		}
+	}
+
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	latent function Shades_Static_Spawns()
@@ -31971,7 +36982,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_ShadesCrusadersEncounters_Enabled())
+		if (ACS_ShadesCrusadersEncounters_Enabled() == 0)
 		{
 			return;
 		}
@@ -32024,9 +37035,12 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 
 		for(idx = 0; idx < sizeArray; idx += 1)
 		{
-			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+			if (RandF() < ACS_ShadesCrusadersEncounters_Enabled())
+			{
+				ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
 
-			ent.AddTag( 'ACS_MonsterSpawner_ShadesCrusaders' );
+				ent.AddTag( 'ACS_MonsterSpawner_ShadesCrusaders' );
+			}
 		}
 	}
 
@@ -32036,7 +37050,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_ShadesHuntersEncounters_Enabled())
+		if (ACS_ShadesHuntersEncounters_Enabled() == 0)
 		{
 			return;
 		}
@@ -32090,9 +37104,12 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 
 		for(idx = 0; idx < sizeArray; idx += 1)
 		{
-			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+			if (RandF() < ACS_ShadesHuntersEncounters_Enabled())
+			{
+				ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
 
-			ent.AddTag( 'ACS_MonsterSpawner_ShadesHunters' );
+				ent.AddTag( 'ACS_MonsterSpawner_ShadesHunters' );
+			}
 		}
 	}
 
@@ -32102,7 +37119,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_ShadesRoguesEncounters_Enabled())
+		if (ACS_ShadesRoguesEncounters_Enabled() == 0)
 		{
 			return;
 		}
@@ -32171,9 +37188,12 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 
 		for(idx = 0; idx < sizeArray; idx += 1)
 		{
-			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+			if (RandF() < ACS_ShadesRoguesEncounters_Enabled())
+			{
+				ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
 
-			ent.AddTag( 'ACS_MonsterSpawner_ShadesRogues' );
+				ent.AddTag( 'ACS_MonsterSpawner_ShadesRogues' );
+			}
 		}
 	}
 
@@ -32183,7 +37203,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_ShadesShowdownEncounters_Enabled())
+		if (ACS_ShadesShowdownEncounters_Enabled() == 0)
 		{
 			return;
 		}
@@ -32249,9 +37269,12 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 
 		for(idx = 0; idx < sizeArray; idx += 1)
 		{
-			ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
+			if (RandF() < ACS_ShadesShowdownEncounters_Enabled())
+			{
+				ent = theGame.CreateEntity(LoadTemp(), locationArray[idx]);	
 
-			ent.AddTag( 'ACS_MonsterSpawner_ShadesShowdown' );
+				ent.AddTag( 'ACS_MonsterSpawner_ShadesShowdown' );
+			}
 		}
 	}
 
@@ -32261,7 +37284,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_ShadesDancerWaxing_Enabled())
+		if (ACS_ShadesDancerWaxing_Enabled() == 0)
 		{
 			return;
 		}
@@ -32306,7 +37329,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_ShadesDancerWaning_Enabled())
+		if (ACS_ShadesDancerWaning_Enabled() == 0)
 		{
 			return;
 		}
@@ -32351,7 +37374,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_Kara_Enabled())
+		if (ACS_Kara_Enabled() == 0)
 		{
 			return;
 		}
@@ -32396,7 +37419,7 @@ state ACS_Monster_Static_Spawner in W3ACSWatcher
 		var sizeArray , idx 												: int;
 		var ent																: CEntity;
 
-		if (!ACS_ShadesNightmareIncarnate_Enabled())
+		if (ACS_ShadesNightmareIncarnate_Enabled() == 0)
 		{
 			return;
 		}

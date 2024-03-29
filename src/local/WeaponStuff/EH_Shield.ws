@@ -41,10 +41,14 @@ statemachine class cACS_Shield_Summon
 	{
 		if ( GetWitcherPlayer().GetStat( BCS_Vitality ) <= GetWitcherPlayer().GetStatMax( BCS_Vitality )/2 )
 		{
+			GetWitcherPlayer().DrainVitality((GetWitcherPlayer().GetStat(BCS_Vitality) * 0.15) );
+
 			this.PushState('Quen_Centipede_Summon');
 		}
 		else
 		{
+			GetWitcherPlayer().DrainVitality((GetWitcherPlayer().GetStat(BCS_Vitality) * 0.2) );
+
 			this.PushState('Quen_Wolf_Summon');
 		}
 	}
@@ -188,7 +192,6 @@ state Aard_Pull in cACS_Shield_Summon
 
 state BruxaCamoDecoy in cACS_Shield_Summon
 {
-	private var environment 								: CEnvironmentDefinition;	
 	private var envID 										: int;
 	private var i 											: int;
 	private var npc     									: CNewNPC;
@@ -269,12 +272,7 @@ state BruxaCamoDecoy in cACS_Shield_Summon
 
 		GetWitcherPlayer().AddTag('ACS_Camo_Active');
 
-		environment = (CEnvironmentDefinition)LoadResource(
-			"dlc\dlc_acs\data\env\env_bies_hypnotize.env", true
-			);
-
-    	envID = ActivateEnvironmentDefinition( environment, 1000, 1, 0 );
-    	theGame.SetEnvironmentID(envID);
+		GetACSWatcher().Activate_Bruxa_Camo_Env();
 
 		NPC_Fear_Start();
 
@@ -1277,33 +1275,37 @@ state Axii_Shield_Entity in cACS_Shield_Summon
 
 		, true );
 
-		if (GetWitcherPlayer().HasTag('axii_sword_equipped'))
-		{
-			shield_entity = (CEntity)theGame.CreateEntity( shield_entity_temp, GetWitcherPlayer().GetWorldPosition() + Vector( 0, 0, -20 ), GetWitcherPlayer().GetWorldRotation() );
-			animcomp = (CAnimatedComponent)shield_entity.GetComponentByClassName('CAnimatedComponent');
-			meshcomp = shield_entity.GetComponentByClassName('CMeshComponent');
-			h = 2.5;
-			animcomp.SetScale(Vector(h,h,h,1));
-			meshcomp.SetScale(Vector(h,h,h,1));	
+		shield_entity = (CEntity)theGame.CreateEntity( shield_entity_temp, GetWitcherPlayer().GetWorldPosition() + Vector( 0, 0, -20 ), GetWitcherPlayer().GetWorldRotation() );
+		animcomp = (CAnimatedComponent)shield_entity.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = shield_entity.GetComponentByClassName('CMeshComponent');
+		h = 2.5;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
 
-			shield_entity.PlayEffectSingle('hym_summon');
+		shield_entity.PlayEffectSingle('hym_summon');
 
-			((CNewNPC)shield_entity).SetTemporaryAttitudeGroup( 'friendly_to_player', AGP_Default );	
-			((CNewNPC)shield_entity).EnableCollisions(false);
-			((CNewNPC)shield_entity).SetImmortalityMode( AIM_Invulnerable, AIC_Default, true );
-			((CActor)shield_entity).SetAnimationTimeMultiplier(1.5);
-			((CActor)shield_entity).SetTemporaryAttitudeGroup( 'neutral_to_all', AGP_Default );
-			((CActor)shield_entity).EnableCollisions(false);
-			((CActor)shield_entity).SetImmortalityMode( AIM_Invulnerable, AIC_Default, true );
+		((CNewNPC)shield_entity).SetTemporaryAttitudeGroup( 'friendly_to_player', AGP_Default );	
+		((CNewNPC)shield_entity).EnableCollisions(false);
+		((CNewNPC)shield_entity).SetImmortalityMode( AIM_Invulnerable, AIC_Default, true );
+		((CActor)shield_entity).SetAnimationTimeMultiplier(1.5);
+		((CActor)shield_entity).SetTemporaryAttitudeGroup( 'neutral_to_all', AGP_Default );
+		((CActor)shield_entity).EnableCollisions(false);
+		((CActor)shield_entity).SetImmortalityMode( AIM_Invulnerable, AIC_Default, true );
 
-			shield_entity.CreateAttachment( GetWitcherPlayer(), , Vector( 0, 0, -4 ), GetWitcherPlayer().GetWorldRotation() );
+		shield_entity.CreateAttachment( GetWitcherPlayer(), , Vector( 0, 0, -4 ), GetWitcherPlayer().GetWorldRotation() );
 
-			shield_entity.AddTag('ACS_Shield_Entity');
+		shield_entity.AddTag('ACS_Shield_Entity');
 
-			GetWitcherPlayer().AddTag('ACS_Shielded_Entity');
+		GetWitcherPlayer().AddTag('ACS_Shielded_Entity');
 
-			shield_entity_spawn_anim();
-		}	
+		shield_entity_spawn_anim();
+
+		GetWitcherPlayer().AddBuffImmunity	( EET_Stagger,					'acs_shield_entity', false);
+		GetWitcherPlayer().AddBuffImmunity	( EET_LongStagger,				'acs_shield_entity', false);
+		GetWitcherPlayer().AddBuffImmunity	( EET_Knockdown,				'acs_shield_entity', false);
+		GetWitcherPlayer().AddBuffImmunity	( EET_HeavyKnockdown,			'acs_shield_entity', false);
+		GetWitcherPlayer().AddBuffImmunity	( EET_KnockdownTypeApplicator,	'acs_shield_entity', false);
+
 	}
 
 	latent function shield_entity_spawn_anim()
@@ -1332,6 +1334,12 @@ state Axii_Shield_Entity in cACS_Shield_Summon
 		actors.Clear();
 
 		theGame.GetActorsByTag( 'ACS_Shield_Entity', actors );
+
+		if (actors.Size() <= 0)
+		{
+			return;
+		}
+
 		actor = (CActor)actors[i];
 			
 		for( i=0; i<actors.Size(); i+=1 )
@@ -1353,6 +1361,20 @@ function ACS_Shield() : CEntity
 	
 	shield = (CEntity)theGame.GetEntityByTag( 'ACS_Shield' );
 	return shield;
+}
+
+function ACS_Axii_Shield_Entity_Destroy()
+{
+	GetWitcherPlayer().RemoveBuffImmunity( EET_Stagger,					'acs_shield_entity');
+	GetWitcherPlayer().RemoveBuffImmunity( EET_LongStagger,				'acs_shield_entity');
+	GetWitcherPlayer().RemoveBuffImmunity( EET_Knockdown,				'acs_shield_entity');
+	GetWitcherPlayer().RemoveBuffImmunity( EET_HeavyKnockdown,			'acs_shield_entity');
+	GetWitcherPlayer().RemoveBuffImmunity( EET_KnockdownTypeApplicator,	'acs_shield_entity');
+
+	shield_entity_despawn_anim();
+	ACS_Shield_Entity().DestroyAfter(2);
+
+	GetWitcherPlayer().RemoveTag('ACS_Shielded_Entity');
 }
 
 function ACS_Axii_Shield_Destroy()
@@ -1479,6 +1501,11 @@ function Quen_Monsters_Despawn()
 {
 	ACS_Centipede_Destroy();
 	ACS_Wolf_Destroy();
+
+	if (thePlayer.HasTag('ACS_Quen_Monster_Summoned'))
+	{
+		thePlayer.RemoveTag('ACS_Quen_Monster_Summoned');
+	}
 }
 
 function AardPull_Deactivate()
@@ -1491,9 +1518,7 @@ function AardPull_Deactivate()
 function Bruxa_Camo_Decoy_Deactivate()
 {
 	var vBruxa_Camo_Decoy_DeactivateClawEquip																											: cBruxa_Camo_Decoy_DeactivateClawEquip;
-	var environment 																																	: CEnvironmentDefinition;	
-	var i 																																				: int;
-
+	
 	vBruxa_Camo_Decoy_DeactivateClawEquip = new cBruxa_Camo_Decoy_DeactivateClawEquip in theGame;
 
 	if (GetWitcherPlayer().HasTag('ACS_Camo_Active'))
@@ -1528,10 +1553,7 @@ function Bruxa_Camo_Decoy_Deactivate()
 
 		DisableCatViewFx( 0 );
 		
-		for (i = 0; i < 10000; i+=1) 
-		{
-       		DeactivateEnvironment(i, 0.25f);
-    	}
+		GetACSWatcher().Deactivate_Bruxa_Camo_Env();
 
 		GetACSWatcher().RemoveTimer('ACS_npc_fear_reaction');
 
@@ -1803,7 +1825,7 @@ state Bruxa_Camo_Decoy_Deactivate_Claw_Equip_Standalone_Engage in cBruxa_Camo_De
 
 		vampire_claw_anchor.CreateAttachmentAtBoneWS( GetWitcherPlayer(), 'torso3', bone_vec, bone_rot );
 
-		vampire_claw_anchor.AddTag('vampire_claw_anchor');
+		vampire_claw_anchor.AddTag('acs_vampire_claw_anchor');
 
 		back_claw_temp = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\entities\other\vampire_back_claws.w2ent", true);	
 
@@ -1824,7 +1846,11 @@ state Bruxa_Camo_Decoy_Deactivate_Claw_Equip_Standalone_Engage in cBruxa_Camo_De
 		
 		back_claw.CreateAttachment( vampire_claw_anchor, , attach_vec, attach_rot );
 
-		back_claw.AddTag('back_claw');
+		back_claw.StopEffect('blood_color');
+
+		back_claw.PlayEffectSingle('blood_color');
+
+		back_claw.AddTag('acs_vampire_back_claw');
 	}
 }
 
@@ -1874,6 +1900,11 @@ function ACS_Revenant_Destroy()
 	revenant.Clear();
 
 	theGame.GetActorsByTag( 'ACS_Revenant', revenant );	
+
+	if (revenant.Size() <= 0)
+	{
+		return;
+	}
 	
 	for( i = 0; i < revenant.Size(); i += 1 )
 	{
@@ -1916,6 +1947,11 @@ function ACS_Skele_Destroy()
 	skeleton.Clear();
 
 	theGame.GetActorsByTag( 'ACS_Summoned_Skeleton', skeleton );	
+
+	if (skeleton.Size() <= 0)
+	{
+		return;
+	}
 	
 	for( i = 0; i < skeleton.Size(); i += 1 )
 	{
@@ -1955,7 +1991,14 @@ function ACS_Centipede_Destroy()
 	centipedes.Clear();
 
 	theGame.GetActorsByTag( 'ACS_Summoned_Centipede', centipedes );	
-	
+
+	if (centipedes.Size() <= 0)
+	{
+		return;
+	}
+
+	GetWitcherPlayer().GainStat( BCS_Vitality, (GetWitcherPlayer().GetStat(BCS_Vitality) * 0.0125) );
+
 	for( i = 0; i < centipedes.Size(); i += 1 )
 	{
 		centipedeAnimatedComponent = (CAnimatedComponent)centipedes[i].GetComponentByClassName( 'CAnimatedComponent' );	
@@ -1989,6 +2032,13 @@ function ACS_Wolf_Destroy()
 	wolves.Clear();
 
 	theGame.GetActorsByTag( 'ACS_Summoned_Wolf', wolves );	
+
+	if (wolves.Size() <= 0)
+	{
+		return;
+	}
+
+	GetWitcherPlayer().GainStat( BCS_Vitality, (GetWitcherPlayer().GetStat(BCS_Vitality) * 0.025) );
 	
 	for( i = 0; i < wolves.Size(); i += 1 )
 	{

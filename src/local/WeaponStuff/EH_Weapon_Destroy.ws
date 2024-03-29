@@ -555,6 +555,10 @@ state ClawEquip_OnDodge_Engage in cACS_ClawEquip_OnDodge
 			
 			if (ACS_Armor_Equipped_Check())
 			{
+				claw_temp = (CEntityTemplate)LoadResource(	"dlc\dlc_acs\data\entities\swords\vamp_claws_blood.w2ent", true);	
+
+				((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(claw_temp);
+
 				claw_temp = (CEntityTemplate)LoadResource(	"dlc\dlc_acs\data\entities\swords\vamp_claws.w2ent", true);	
 
 				((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(claw_temp);
@@ -571,9 +575,26 @@ state ClawEquip_OnDodge_Engage in cACS_ClawEquip_OnDodge
 
 				if (!ACS_HideVampireClaws_Enabled())
 				{
-					claw_temp = (CEntityTemplate)LoadResource(	"dlc\dlc_acs\data\entities\swords\vamp_claws.w2ent", true);	
+					if (ACS_GetItem_VampClaw_Blood())
+					{
+						claw_temp = (CEntityTemplate)LoadResource(	"dlc\dlc_acs\data\entities\swords\vamp_claws.w2ent", true);	
 
-					((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(claw_temp);
+						((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(claw_temp);
+
+						claw_temp = (CEntityTemplate)LoadResource(	"dlc\dlc_acs\data\entities\swords\vamp_claws_blood.w2ent", true);	
+
+						((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(claw_temp);
+					}
+					else
+					{
+						claw_temp = (CEntityTemplate)LoadResource(	"dlc\dlc_acs\data\entities\swords\vamp_claws_blood.w2ent", true);	
+
+						((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(claw_temp);
+						
+						claw_temp = (CEntityTemplate)LoadResource(	"dlc\dlc_acs\data\entities\swords\vamp_claws.w2ent", true);	
+
+						((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(claw_temp);
+					}
 				}
 			}
 		}
@@ -640,12 +661,13 @@ state ClawDestroy_NOTAG_Engage in cClawDestroy_NOTAG
 
 			((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(claw_temp);
 
-			if (!ACS_HideVampireClaws_Enabled())
-			{
-				claw_temp = (CEntityTemplate)LoadResource(	"dlc\dlc_acs\data\entities\swords\vamp_claws.w2ent", true);	
+			claw_temp = (CEntityTemplate)LoadResource(	"dlc\dlc_acs\data\entities\swords\vamp_claws.w2ent", true);	
 
-				((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(claw_temp);
-			}
+			((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(claw_temp);
+
+			claw_temp = (CEntityTemplate)LoadResource(	"dlc\dlc_acs\data\entities\swords\vamp_claws_blood.w2ent", true);	
+
+			((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(claw_temp);
 
 			//GetWitcherPlayer().PlayEffectSingle('claws_effect');
 			//GetWitcherPlayer().StopEffect('claws_effect');
@@ -713,8 +735,11 @@ state ClawDestroy_Engage in cClawDestroy
 
 		if (!ACS_GetItem_VampClaw_Shades())
 		{
-			GetWitcherPlayer().PlayEffectSingle('claws_effect');
-			GetWitcherPlayer().StopEffect('claws_effect');
+			if (!ACS_HideVampireClaws_Enabled())
+			{
+				thePlayer.PlayEffectSingle('claws_effect');
+				thePlayer.StopEffect('claws_effect');
+			}
 
 			p_actor = GetWitcherPlayer();
 			p_comp = p_actor.GetComponentByClassName( 'CAppearanceComponent' );
@@ -726,18 +751,13 @@ state ClawDestroy_Engage in cClawDestroy
 			claw_temp = (CEntityTemplate)LoadResource(	"dlc\dlc_acs\data\entities\swords\vamp_claws.w2ent", true);	
 
 			((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(claw_temp);
+
+			claw_temp = (CEntityTemplate)LoadResource(	"dlc\dlc_acs\data\entities\swords\vamp_claws_blood.w2ent", true);	
+
+			((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(claw_temp);
 		}
 			
 		GetWitcherPlayer().RemoveTag('vampire_claws_equipped');	
-
-		if (ACS_Manual_Sword_Drawing_Check_Actual() == 0)
-		{
-			theGame.GetInGameConfigWrapper().SetVarValue('Gameplay', 'DisableAutomaticSwordSheathe', false);
-		}
-		else if (ACS_Manual_Sword_Drawing_Check_Actual() == 1)
-		{
-			theGame.GetInGameConfigWrapper().SetVarValue('Gameplay', 'DisableAutomaticSwordSheathe', true);
-		}
 			
 		GetWitcherPlayer().RemoveTag('ACS_blood_armor');
 
@@ -1161,20 +1181,18 @@ state ClawDestroy_WITH_EFFECT_Engage in cClawDestroy_WITH_EFFECT
 
 			((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(claw_temp);
 
-			GetWitcherPlayer().PlayEffectSingle('claws_effect');
-			GetWitcherPlayer().StopEffect('claws_effect');
+			claw_temp = (CEntityTemplate)LoadResource(	"dlc\dlc_acs\data\entities\swords\vamp_claws_blood.w2ent", true);	
+
+			((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(claw_temp);
+
+			if (!ACS_HideVampireClaws_Enabled())
+			{
+				thePlayer.PlayEffectSingle('claws_effect');
+				thePlayer.StopEffect('claws_effect');
+			}
 		}
 			
 		GetWitcherPlayer().RemoveTag('vampire_claws_equipped');	
-
-		if (ACS_Manual_Sword_Drawing_Check_Actual() == 0)
-		{
-			theGame.GetInGameConfigWrapper().SetVarValue('Gameplay', 'DisableAutomaticSwordSheathe', false);
-		}
-		else if (ACS_Manual_Sword_Drawing_Check_Actual() == 1)
-		{
-			theGame.GetInGameConfigWrapper().SetVarValue('Gameplay', 'DisableAutomaticSwordSheathe', true);
-		}
 
 		components.Clear();
 

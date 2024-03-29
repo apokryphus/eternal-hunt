@@ -1224,13 +1224,6 @@ class W3ACSPetard extends CThrowable
 				
 				if (!GetWitcherPlayer().IsAnyQuenActive())
 				{
-					if (GetWitcherPlayer().HasTag('ACS_Size_Adjusted'))
-					{
-						GetACSWatcher().Grow_Geralt_Immediate_Fast();
-
-						GetWitcherPlayer().RemoveTag('ACS_Size_Adjusted');
-					}
-
 					GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
 
 					GetWitcherPlayer().GetMovingAgentComponent().GetMovementAdjustor().CancelAll();
@@ -1250,7 +1243,7 @@ class W3ACSPetard extends CThrowable
 						damageMax = maxTargetEssence * RandRangeF(0.075, 0.05); 
 					} 
 
-					action.AddDamage( theGame.params.DAMAGE_NAME_DIRECT, damageMax );
+					action.AddDamage( theGame.params.DAMAGE_NAME_PHYSICAL, damageMax );
 					
 					/*
 					if( !GetWitcherPlayer().HasBuff( EET_Knockdown ) ) 

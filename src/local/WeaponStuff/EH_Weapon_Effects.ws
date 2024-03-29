@@ -885,7 +885,7 @@ function ACS_Vampire_Arms_1_Get() : CEntity
 {
 	var arms 			 : CEntity;
 	
-	arms = (CEntity)theGame.GetEntityByTag( 'vampire_extra_arms_1' );
+	arms = (CEntity)theGame.GetEntityByTag( 'acs_vampire_extra_arms_1' );
 	return arms;
 }
 
@@ -893,7 +893,7 @@ function ACS_Vampire_Arms_2_Get() : CEntity
 {
 	var arms 			 : CEntity;
 	
-	arms = (CEntity)theGame.GetEntityByTag( 'vampire_extra_arms_2' );
+	arms = (CEntity)theGame.GetEntityByTag( 'acs_vampire_extra_arms_2' );
 	return arms;
 }
 
@@ -901,7 +901,7 @@ function ACS_Vampire_Arms_3_Get() : CEntity
 {
 	var arms 			 : CEntity;
 	
-	arms = (CEntity)theGame.GetEntityByTag( 'vampire_extra_arms_3' );
+	arms = (CEntity)theGame.GetEntityByTag( 'acs_vampire_extra_arms_3' );
 	return arms;
 }
 
@@ -909,7 +909,7 @@ function ACS_Vampire_Arms_4_Get() : CEntity
 {
 	var arms 			 : CEntity;
 	
-	arms = (CEntity)theGame.GetEntityByTag( 'vampire_extra_arms_4' );
+	arms = (CEntity)theGame.GetEntityByTag( 'acs_vampire_extra_arms_4' );
 	return arms;
 }
 
@@ -917,7 +917,7 @@ function ACS_Vampire_Arms_Anchor_R_Get() : CEntity
 {
 	var anchor 			 : CEntity;
 	
-	anchor = (CEntity)theGame.GetEntityByTag( 'extra_arms_anchor_r' );
+	anchor = (CEntity)theGame.GetEntityByTag( 'acs_extra_arms_anchor_r' );
 	return anchor;
 }
 
@@ -925,7 +925,7 @@ function ACS_Vampire_Arms_Anchor_L_Get() : CEntity
 {
 	var anchor 			 : CEntity;
 	
-	anchor = (CEntity)theGame.GetEntityByTag( 'extra_arms_anchor_l' );
+	anchor = (CEntity)theGame.GetEntityByTag( 'acs_extra_arms_anchor_l' );
 	return anchor;
 }
 
@@ -933,7 +933,7 @@ function ACS_Vampire_Head_Anchor_Get() : CEntity
 {
 	var anchor 			 : CEntity;
 	
-	anchor = (CEntity)theGame.GetEntityByTag( 'vampire_head_anchor' );
+	anchor = (CEntity)theGame.GetEntityByTag( 'acs_vampire_head_anchor' );
 	return anchor;
 }
 
@@ -941,7 +941,7 @@ function ACS_Vampire_Head_Get() : CEntity
 {
 	var head 			 : CEntity;
 	
-	head = (CEntity)theGame.GetEntityByTag( 'vampire_head' );
+	head = (CEntity)theGame.GetEntityByTag( 'acs_vampire_head' );
 	return head;
 }
 
@@ -949,7 +949,7 @@ function ACS_Vampire_Claw_Anchor_Get() : CEntity
 {
 	var anchor 			 : CEntity;
 	
-	anchor = (CEntity)theGame.GetEntityByTag( 'vampire_claw_anchor' );
+	anchor = (CEntity)theGame.GetEntityByTag( 'acs_vampire_claw_anchor' );
 	return anchor;
 }
 
@@ -957,7 +957,7 @@ function ACS_Vampire_Back_Claw_Get() : CEntity
 {
 	var claws 			 : CEntity;
 	
-	claws = (CEntity)theGame.GetEntityByTag( 'back_claw' );
+	claws = (CEntity)theGame.GetEntityByTag( 'acs_vampire_back_claw' );
 	return claws;
 }
 
@@ -1600,41 +1600,11 @@ function quen_sword_stop_effects()
 
 	ACSQuenSwordUpdateEnhancements();
 
-	if (quen_sword_1().HasTag('quen_sword_upgraded_1'))
+	if (quen_sword_1().HasTag('quen_sword_upgraded_2'))
 	{
-		quen_sword_1().PlayEffectSingle('special_attack');
-		quen_sword_2().PlayEffectSingle('special_attack');
-		quen_sword_3().PlayEffectSingle('special_attack');
-
-		quen_sword_1().PlayEffectSingle('special_attack_ready');
-		quen_sword_2().PlayEffectSingle('special_attack_ready');
-		quen_sword_3().PlayEffectSingle('special_attack_ready');
-	}
-	else if (quen_sword_1().HasTag('quen_sword_upgraded_2'))
-	{
-		quen_sword_1().PlayEffectSingle('special_attack');
-		quen_sword_2().PlayEffectSingle('special_attack');
-		quen_sword_3().PlayEffectSingle('special_attack');
-
-		quen_sword_1().PlayEffectSingle('special_attack_charged');
-		quen_sword_2().PlayEffectSingle('special_attack_charged');
-		quen_sword_3().PlayEffectSingle('special_attack_charged');
-
-		quen_sword_1().PlayEffectSingle('special_attack_charged');
-		quen_sword_2().PlayEffectSingle('special_attack_charged');
-		quen_sword_3().PlayEffectSingle('special_attack_charged');
-
-		quen_sword_1().PlayEffectSingle('special_attack_charged');
-		quen_sword_2().PlayEffectSingle('special_attack_charged');
-		quen_sword_3().PlayEffectSingle('special_attack_charged');
-
-		quen_sword_1().PlayEffectSingle('special_attack_charged');
-		quen_sword_2().PlayEffectSingle('special_attack_charged');
-		quen_sword_3().PlayEffectSingle('special_attack_charged');
-
-		quen_sword_1().PlayEffectSingle('special_attack_charged');
-		quen_sword_2().PlayEffectSingle('special_attack_charged');
-		quen_sword_3().PlayEffectSingle('special_attack_charged');
+		quen_sword_1().PlayEffectSingle('special_attack_charged_no_overlay');
+		quen_sword_2().PlayEffectSingle('special_attack_charged_no_overlay');
+		quen_sword_3().PlayEffectSingle('special_attack_charged_no_overlay');
 	}
 }
 
@@ -1658,10 +1628,6 @@ function quen_sword_glow()
 			ACSGetEquippedSword().PlayEffectSingle('special_attack');
 			ACSGetEquippedSword().StopEffect('special_attack');
 
-			ACSGetEquippedSword().PlayEffectSingle('special_attack_charged');
-			ACSGetEquippedSword().PlayEffectSingle('special_attack_charged');
-			ACSGetEquippedSword().PlayEffectSingle('special_attack_charged');
-			ACSGetEquippedSword().PlayEffectSingle('special_attack_charged');
 			ACSGetEquippedSword().PlayEffectSingle('special_attack_charged');
 			ACSGetEquippedSword().StopEffect('special_attack_charged');
 
@@ -1690,6 +1656,14 @@ function quen_sword_glow()
 		quen_sword_2().PlayEffectSingle('special_attack_trail');
 		quen_sword_3().PlayEffectSingle('special_attack_trail');
 
+		quen_sword_1().StopEffect('pre_special_attack_loop');
+		quen_sword_2().StopEffect('pre_special_attack_loop');
+		quen_sword_3().StopEffect('pre_special_attack_loop');
+		
+		quen_sword_1().StopEffect('special_attack_trail');
+		quen_sword_2().StopEffect('special_attack_trail');
+		quen_sword_3().StopEffect('special_attack_trail');
+
 		if (quen_sword_1().HasTag('quen_sword_upgraded_1'))
 		{
 			quen_sword_1().StopEffect('special_attack');
@@ -1707,6 +1681,14 @@ function quen_sword_glow()
 			quen_sword_1().PlayEffectSingle('special_attack_ready');
 			quen_sword_2().PlayEffectSingle('special_attack_ready');
 			quen_sword_3().PlayEffectSingle('special_attack_ready');
+
+			quen_sword_1().StopEffect('special_attack');
+			quen_sword_2().StopEffect('special_attack');
+			quen_sword_3().StopEffect('special_attack');
+
+			quen_sword_1().StopEffect('special_attack_charged');
+			quen_sword_2().StopEffect('special_attack_charged');
+			quen_sword_3().StopEffect('special_attack_charged');
 		}
 		else if (quen_sword_1().HasTag('quen_sword_upgraded_2'))
 		{
@@ -1726,21 +1708,13 @@ function quen_sword_glow()
 			quen_sword_2().PlayEffectSingle('special_attack_charged');
 			quen_sword_3().PlayEffectSingle('special_attack_charged');
 
-			quen_sword_1().PlayEffectSingle('special_attack_charged');
-			quen_sword_2().PlayEffectSingle('special_attack_charged');
-			quen_sword_3().PlayEffectSingle('special_attack_charged');
+			quen_sword_1().StopEffect('special_attack');
+			quen_sword_2().StopEffect('special_attack');
+			quen_sword_3().StopEffect('special_attack');
 
-			quen_sword_1().PlayEffectSingle('special_attack_charged');
-			quen_sword_2().PlayEffectSingle('special_attack_charged');
-			quen_sword_3().PlayEffectSingle('special_attack_charged');
-
-			quen_sword_1().PlayEffectSingle('special_attack_charged');
-			quen_sword_2().PlayEffectSingle('special_attack_charged');
-			quen_sword_3().PlayEffectSingle('special_attack_charged');
-
-			quen_sword_1().PlayEffectSingle('special_attack_charged');
-			quen_sword_2().PlayEffectSingle('special_attack_charged');
-			quen_sword_3().PlayEffectSingle('special_attack_charged');
+			quen_sword_1().StopEffect('special_attack_charged');
+			quen_sword_2().StopEffect('special_attack_charged');
+			quen_sword_3().StopEffect('special_attack_charged');
 		}
 	}
 }
@@ -1826,41 +1800,22 @@ function quen_sword_summon()
 
 	ACSQuenSwordUpdateEnhancements();
 
-	if (quen_sword_1().HasTag('quen_sword_upgraded_1'))
+	if (quen_sword_1().HasTag('quen_sword_upgraded_2'))
 	{
-		quen_sword_1().PlayEffectSingle('special_attack');
-		quen_sword_2().PlayEffectSingle('special_attack');
-		quen_sword_3().PlayEffectSingle('special_attack');
+		if (!quen_sword_1().IsEffectActive('special_attack_charged_no_overlay', false))
+		{
+			quen_sword_1().PlayEffectSingle('special_attack_charged_no_overlay');
+		}
 
-		quen_sword_1().PlayEffectSingle('special_attack_ready');
-		quen_sword_2().PlayEffectSingle('special_attack_ready');
-		quen_sword_3().PlayEffectSingle('special_attack_ready');
-	}
-	else if (quen_sword_1().HasTag('quen_sword_upgraded_2'))
-	{
-		quen_sword_1().PlayEffectSingle('special_attack');
-		quen_sword_2().PlayEffectSingle('special_attack');
-		quen_sword_3().PlayEffectSingle('special_attack');
+		if (!quen_sword_2().IsEffectActive('special_attack_charged_no_overlay', false))
+		{
+			quen_sword_2().PlayEffectSingle('special_attack_charged_no_overlay');
+		}
 
-		quen_sword_1().PlayEffectSingle('special_attack_charged');
-		quen_sword_2().PlayEffectSingle('special_attack_charged');
-		quen_sword_3().PlayEffectSingle('special_attack_charged');
-
-		quen_sword_1().PlayEffectSingle('special_attack_charged');
-		quen_sword_2().PlayEffectSingle('special_attack_charged');
-		quen_sword_3().PlayEffectSingle('special_attack_charged');
-
-		quen_sword_1().PlayEffectSingle('special_attack_charged');
-		quen_sword_2().PlayEffectSingle('special_attack_charged');
-		quen_sword_3().PlayEffectSingle('special_attack_charged');
-
-		quen_sword_1().PlayEffectSingle('special_attack_charged');
-		quen_sword_2().PlayEffectSingle('special_attack_charged');
-		quen_sword_3().PlayEffectSingle('special_attack_charged');
-
-		quen_sword_1().PlayEffectSingle('special_attack_charged');
-		quen_sword_2().PlayEffectSingle('special_attack_charged');
-		quen_sword_3().PlayEffectSingle('special_attack_charged');
+		if (!quen_sword_3().IsEffectActive('special_attack_charged_no_overlay', false))
+		{
+			quen_sword_3().PlayEffectSingle('special_attack_charged_no_overlay');
+		}
 	}
 }
 

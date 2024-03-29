@@ -63,12 +63,12 @@ state DefaultSwitch_Engage in cACS_DefaultSwitch
 		
 		if ( weapontype == PW_None )
 		{
-			//weapontype = PW_Fists;
+			weapontype = PW_Fists;
 		}
 		
 		GetWitcherPlayer().SetBehaviorVariable( 'WeaponType', 0);
 		
-		if ( !GetWitcherPlayer() && weapontype == PW_Fists && GetWitcherPlayer().IsInCombat()  )
+		if ( GetWitcherPlayer().HasTag('vampire_claws_equipped') && GetWitcherPlayer().IsInCombat() )
 		{
 			GetWitcherPlayer().SetBehaviorVariable( 'playerWeapon', (int) PW_Steel );
 			GetWitcherPlayer().SetBehaviorVariable( 'playerWeaponForOverlay', (int) PW_Steel );
@@ -200,7 +200,7 @@ state DefaultSwitch_Engage in cACS_DefaultSwitch
 			GetWitcherPlayer().AddTag('igni_sword_equipped_TAG');
 			GetWitcherPlayer().AddTag('igni_secondary_sword_equipped_TAG');
 
-			if (ACS_GetItem_Aerondight() && !ACS_Armor_Equipped_Check())
+			if (ACS_GetItem_Aerondight() && !ACS_Armor_Equipped_Check() && !ACS_IconicSwordVFXOff_Enabled())
 			{
 				//ACS_Sword_Trail_1().StopEffect('aerondight_glow_sword');
 
@@ -222,7 +222,7 @@ state DefaultSwitch_Engage in cACS_DefaultSwitch
 				ACS_Sword_Trail_2().PlayEffectSingle('aerondight_special_trail');
 			}
 
-			if (ACS_GetItem_Iris() && !ACS_Armor_Equipped_Check())
+			if (ACS_GetItem_Iris() && !ACS_Armor_Equipped_Check() && !ACS_IconicSwordVFXOff_Enabled())
 			{
 				ACS_Sword_Trail_2().StopEffect('red_charge_10');
 				ACS_Sword_Trail_2().PlayEffectSingle('red_charge_10');
@@ -468,12 +468,12 @@ state DefaultSwitch_2_Engage in cACS_DefaultSwitch_2
 		
 		if ( weapontype == PW_None )
 		{
-			//weapontype = PW_Fists;
+			weapontype = PW_Fists;
 		}
 		
 		GetWitcherPlayer().SetBehaviorVariable( 'WeaponType', 0);
 		
-		if ( !GetWitcherPlayer() && weapontype == PW_Fists && GetWitcherPlayer().IsInCombat()  )
+		if ( GetWitcherPlayer().HasTag('vampire_claws_equipped') && GetWitcherPlayer().IsInCombat() )
 		{
 			GetWitcherPlayer().SetBehaviorVariable( 'playerWeapon', (int) PW_Steel );
 			GetWitcherPlayer().SetBehaviorVariable( 'playerWeaponForOverlay', (int) PW_Steel );
@@ -617,7 +617,7 @@ state DefaultSwitch_2_Engage in cACS_DefaultSwitch_2
 		sword_trail_3.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 		sword_trail_3.AddTag('acs_sword_trail_3');
 
-		if (ACS_GetItem_Aerondight() && !ACS_Armor_Equipped_Check())
+		if (ACS_GetItem_Aerondight() && !ACS_Armor_Equipped_Check() && !ACS_IconicSwordVFXOff_Enabled() )
 		{
 			//ACS_Sword_Trail_1().StopEffect('aerondight_glow_sword');
 
@@ -639,7 +639,7 @@ state DefaultSwitch_2_Engage in cACS_DefaultSwitch_2
 			ACS_Sword_Trail_2().PlayEffectSingle('aerondight_special_trail');
 		}
 
-		if (ACS_GetItem_Iris() && !ACS_Armor_Equipped_Check())
+		if (ACS_GetItem_Iris() && !ACS_Armor_Equipped_Check() && !ACS_IconicSwordVFXOff_Enabled())
 		{
 			ACS_Sword_Trail_2().StopEffect('red_charge_10');
 			ACS_Sword_Trail_2().PlayEffectSingle('red_charge_10');

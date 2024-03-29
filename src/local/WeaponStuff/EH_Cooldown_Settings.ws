@@ -31,7 +31,6 @@ struct ACS_Cooldown_Manager
 	var last_shoot_crossbow_time						: float;
 
 	var last_forest_god_shadow_spawn_time 				: float;
-	var forest_god_shadow_cooldown						: float;
 
 	var last_rage_marker_spawn_time 					: float;
 
@@ -44,8 +43,8 @@ struct ACS_Cooldown_Manager
 	var last_nekker_guardian_time 						: float;
 	var nekker_guardian_cooldown						: float;
 
-	var last_katakan_time 								: float;
-	var katakan_cooldown								: float;
+	var last_nekker_guardian_heal_time					: float;
+	var nekker_guardian_heal_cooldown					: float;
 
 	var last_bat_projectile_time 						: float;
 	var bat_projectile_cooldown							: float;
@@ -87,7 +86,6 @@ struct ACS_Cooldown_Manager
 	var rat_mage_ability_cooldown						: float;
 
 	var last_wild_hunt_warriors_spawn_time				: float;
-	var wild_hunt_warriors_spawn_cooldown				: float;
 
 	var last_idle_action_time							: float;
 	var idle_action_cooldown							: float;
@@ -136,16 +134,11 @@ struct ACS_Cooldown_Manager
 	var last_fluffy_ability_time						: float;
 	var fluffy_ability_cooldown							: float;
 
-	var last_fluffy_idle_action_time					: float;
-	var fluffy_idle_action_cooldown						: float;
-
 	var last_blood_decal_time							: float;
 	var blood_decal_cooldown							: float;
 
 	var last_fogling_spawn_time							: float;
 	var fogling_spawn_cooldown							: float;
-
-	var last_event_hack_time							: float;
 
 	var last_melusine_cloud_attack_time					: float;
 	var melusine_cloud_attack_cooldown					: float;
@@ -180,23 +173,9 @@ struct ACS_Cooldown_Manager
 
 	var last_rend_time									: float;
 
-	var last_eye_search_time							: float;
-
-	var last_quest_marker_distance_refresh_time			: float;
-
-	var last_quest_marker_distance_remove_refresh_time	: float;
-
-	var last_starfall_time								: float;
-
 	var last_guardian_blood_hym_spawn_time				: float;
 
-	var last_wearable_pocket_item_refresh_time			: float;
-
-	var last_horse_follow_target_novigrad_teleport_time	: float;
-
-	var last_horse_follow_target_nilfgaard_teleport_time: float;
-
-	var last_horse_follow_target_redania_teleport_time	: float;
+	var last_sign_combo_system_activation_time			: float;
 
 	// Change the values below to adjust the cooldowns of specific attacks or skills.
 	
@@ -214,7 +193,7 @@ struct ACS_Cooldown_Manager
 	
 	default special_dodge_cooldown = 2;	
 	
-	default beam_attack_cooldown = 0.5;	
+	default beam_attack_cooldown = 0.25;	
 
 	default bow_stationary_cooldown = 1.75;
 
@@ -229,29 +208,19 @@ struct ACS_Cooldown_Manager
 
 	default transformation_special_attack_cooldown = 0.8;
 
-	default transformation_dodge_cooldown = 1;
-
+	default transformation_dodge_cooldown = 0.5;
 
 
 	// Forest God Shadow Cooldown Default
 
-	default forest_god_shadow_cooldown = 420;
-
-
 	// Nekker Guardian Cooldown Default
 
-	default nekker_guardian_cooldown = 2;
-
-	
-	// Novigrad Underground Katakan Spawn Cooldown Default
-
-	default katakan_cooldown = 20;
+	default nekker_guardian_heal_cooldown = 2;
 
 
 	// Vampire Bat Projectile Cooldown Default
 
 	default bat_projectile_cooldown = 10;
-
 
 	// Fire Bear Abilities Cooldown Default
 
@@ -261,13 +230,11 @@ struct ACS_Cooldown_Manager
 
 	default bear_fireline_cooldown = 7;
 
-	
 	// Knightmare Abilities Cooldown Default
 
 	default knightmare_shout_cooldown = 10;
 
 	default knightmare_igni_cooldown = 7;
-
 
 	// She Who Knows Abilities Cooldown Default
 
@@ -284,12 +251,6 @@ struct ACS_Cooldown_Manager
 	// Rat Mage Abilities Cooldown Default
 
 	default rat_mage_ability_cooldown	= 3;
-
-	// Wild Hunt Warriors Spawn Cooldown
-	default wild_hunt_warriors_spawn_cooldown	= 840;
-
-	// Mage Idle Action Cooldown
-	default idle_action_cooldown	= 1;
 
 	// Blade Projectile Cooldown
 	default blade_projectile_cooldown	= 0.5;
@@ -322,9 +283,6 @@ struct ACS_Cooldown_Manager
 
 	// Fluffy Cooldown
 	default fluffy_ability_cooldown		= 1;
-
-	// Fluffy Idle Cooldown
-	default fluffy_idle_action_cooldown = 3;
 
 	// Blood Decal Cooldown
 	default blood_decal_cooldown = 25;
@@ -677,7 +635,7 @@ function ACS_can_spawn_forest_god_shadows(): bool
 
 	property = GetACSWatcher().vACS_Cooldown_Manager;
 
-	return theGame.GetEngineTimeAsSeconds() - property.last_forest_god_shadow_spawn_time > property.forest_god_shadow_cooldown;
+	return theGame.GetEngineTimeAsSeconds() - property.last_forest_god_shadow_spawn_time > ACS_ShadowsSpawnDelayTimeInSeconds();
 }
 
 function ACS_refresh_forest_god_shadows_cooldown() 
@@ -761,40 +719,22 @@ function ACS_refresh_necrofiend_proj_cooldown()
 	watcher.vACS_Cooldown_Manager.last_necrofiend_proj_spawn_time = theGame.GetEngineTimeAsSeconds();
 }
 
-function ACS_can_summon_nekker_guardian(): bool 
+function ACS_nekker_guardian_heal(): bool 
 {
 	var property: ACS_Cooldown_Manager;
 
 	property = GetACSWatcher().vACS_Cooldown_Manager;
 
-	return theGame.GetEngineTimeAsSeconds() - property.last_nekker_guardian_time > property.nekker_guardian_cooldown;
+	return theGame.GetEngineTimeAsSeconds() - property.last_nekker_guardian_heal_time > property.nekker_guardian_heal_cooldown;
 }
 
-function ACS_refresh_nekker_guardian_cooldown() 
+function ACS_refresh_nekker_guardian_heal_cooldown() 
 {
 	var watcher: W3ACSWatcher;
 
 	watcher = (W3ACSWatcher)theGame.GetEntityByTag( 'acswatcher' );
 
-	watcher.vACS_Cooldown_Manager.last_nekker_guardian_time = theGame.GetEngineTimeAsSeconds();
-}
-
-function ACS_can_summon_katakan(): bool 
-{
-	var property: ACS_Cooldown_Manager;
-
-	property = GetACSWatcher().vACS_Cooldown_Manager;
-
-	return theGame.GetEngineTimeAsSeconds() - property.last_katakan_time > property.katakan_cooldown;
-}
-
-function ACS_refresh_katakan_cooldown() 
-{
-	var watcher: W3ACSWatcher;
-
-	watcher = (W3ACSWatcher)theGame.GetEntityByTag( 'acswatcher' );
-
-	watcher.vACS_Cooldown_Manager.last_katakan_time = theGame.GetEngineTimeAsSeconds();
+	watcher.vACS_Cooldown_Manager.last_nekker_guardian_heal_time = theGame.GetEngineTimeAsSeconds();
 }
 
 function ACS_can_shoot_bat_projectile(): bool 
@@ -1071,7 +1011,7 @@ function ACS_can_spawn_wild_hunt_warriors(): bool
 
 	property = GetACSWatcher().vACS_Cooldown_Manager;
 
-	return theGame.GetEngineTimeAsSeconds() - property.last_wild_hunt_warriors_spawn_time > property.wild_hunt_warriors_spawn_cooldown;
+	return theGame.GetEngineTimeAsSeconds() - property.last_wild_hunt_warriors_spawn_time > ACS_WildhuntSpawnDelayTimeInSeconds();
 }
 
 function ACS_refresh_wild_hunt_warriors_spawn_cooldown() 
@@ -1081,24 +1021,6 @@ function ACS_refresh_wild_hunt_warriors_spawn_cooldown()
 	watcher = (W3ACSWatcher)theGame.GetEntityByTag( 'acswatcher' );
 
 	watcher.vACS_Cooldown_Manager.last_wild_hunt_warriors_spawn_time = theGame.GetEngineTimeAsSeconds();
-}
-
-function ACS_can_play_idle_action(): bool 
-{
-	var property: ACS_Cooldown_Manager;
-
-	property = GetACSWatcher().vACS_Cooldown_Manager;
-
-	return theGame.GetEngineTimeAsSeconds() - property.last_idle_action_time > property.idle_action_cooldown;
-}
-
-function ACS_refresh_idle_action_cooldown() 
-{
-	var watcher: W3ACSWatcher;
-
-	watcher = (W3ACSWatcher)theGame.GetEntityByTag( 'acswatcher' );
-
-	watcher.vACS_Cooldown_Manager.last_idle_action_time = theGame.GetEngineTimeAsSeconds();
 }
 
 function ACS_can_spawn_blade_projectile(): bool 
@@ -1161,7 +1083,7 @@ function ACS_can_spawn_nightstalker(): bool
 
 	property = GetACSWatcher().vACS_Cooldown_Manager;
 
-	return theGame.GetEngineTimeAsSeconds() - property.last_nightstalker_spawn_time > 840;
+	return theGame.GetEngineTimeAsSeconds() - property.last_nightstalker_spawn_time > ACS_NightStalkerSpawnDelayTimeInSeconds();
 }
 
 function ACS_refresh_nightstalker_spawn_cooldown() 
@@ -1385,24 +1307,6 @@ function ACS_refresh_fluffy_ability_cooldown()
 	watcher.vACS_Cooldown_Manager.last_fluffy_ability_time = theGame.GetEngineTimeAsSeconds();
 }
 
-function ACS_can_play_fluffy_idle_action(): bool 
-{
-	var property: ACS_Cooldown_Manager;
-
-	property = GetACSWatcher().vACS_Cooldown_Manager;
-
-	return theGame.GetEngineTimeAsSeconds() - property.last_fluffy_idle_action_time > property.fluffy_idle_action_cooldown;
-}
-
-function ACS_refresh_fluffy_idle_action_cooldown() 
-{
-	var watcher: W3ACSWatcher;
-
-	watcher = (W3ACSWatcher)theGame.GetEntityByTag( 'acswatcher' );
-
-	watcher.vACS_Cooldown_Manager.last_fluffy_idle_action_time = theGame.GetEngineTimeAsSeconds();
-}
-
 function ACS_can_play_blood_decal(): bool 
 {
 	var property: ACS_Cooldown_Manager;
@@ -1437,24 +1341,6 @@ function ACS_refresh_fogling_cooldown()
 	watcher = (W3ACSWatcher)theGame.GetEntityByTag( 'acswatcher' );
 
 	watcher.vACS_Cooldown_Manager.last_fogling_spawn_time = theGame.GetEngineTimeAsSeconds();
-}
-
-function ACS_can_use_event_hack(): bool 
-{
-	var property: ACS_Cooldown_Manager;
-
-	property = GetACSWatcher().vACS_Cooldown_Manager;
-
-	return theGame.GetEngineTimeAsSeconds() - property.last_event_hack_time > 1;
-}
-
-function ACS_refresh_event_hack_cooldown() 
-{
-	var watcher: W3ACSWatcher;
-
-	watcher = (W3ACSWatcher)theGame.GetEntityByTag( 'acswatcher' );
-
-	watcher.vACS_Cooldown_Manager.last_event_hack_time = theGame.GetEngineTimeAsSeconds();
 }
 
 function ACS_melusine_cloud_can_attack(): bool 
@@ -1717,31 +1603,13 @@ function ACS_refresh_rend_cooldown()
 	watcher.vACS_Cooldown_Manager.last_rend_time = theGame.GetEngineTimeAsSeconds();
 }
 
-function ACS_eye_can_search_for_ents(): bool 
-{
-	var property: ACS_Cooldown_Manager;
-
-	property = GetACSWatcher().vACS_Cooldown_Manager;
-
-	return theGame.GetEngineTimeAsSeconds() - property.last_eye_search_time > 0.1;
-}
-
-function ACS_refresh_eye_cooldown() 
-{
-	var watcher: W3ACSWatcher;
-
-	watcher = (W3ACSWatcher)theGame.GetEntityByTag( 'acswatcher' );
-
-	watcher.vACS_Cooldown_Manager.last_eye_search_time = theGame.GetEngineTimeAsSeconds();
-}
-
 function ACS_can_spawn_elderblood_assassin(): bool 
 {
 	var property: ACS_Cooldown_Manager;
 
 	property = GetACSWatcher().vACS_Cooldown_Manager;
 
-	return theGame.GetEngineTimeAsSeconds() - property.last_elderblood_assassin_spawn_time > 220;
+	return theGame.GetEngineTimeAsSeconds() - property.last_elderblood_assassin_spawn_time > ACS_ElderbloodAssassinSpawnDelayTimeInSeconds();
 }
 
 function ACS_refresh_elderblood_assassin_spawn_cooldown() 
@@ -1771,60 +1639,6 @@ function ACS_refresh_blood_spatter_spawn_cooldown()
 	watcher.vACS_Cooldown_Manager.last_blood_spatter_spawn_time = theGame.GetEngineTimeAsSeconds();
 }
 
-function ACS_can_refresh_quest_marker_distance(): bool 
-{
-	var property: ACS_Cooldown_Manager;
-
-	property = GetACSWatcher().vACS_Cooldown_Manager;
-
-	return theGame.GetEngineTimeAsSeconds() - property.last_quest_marker_distance_refresh_time > 0.25;
-}
-
-function ACS_refresh_quest_marker_distance_cooldown() 
-{
-	var watcher: W3ACSWatcher;
-
-	watcher = (W3ACSWatcher)theGame.GetEntityByTag( 'acswatcher' );
-
-	watcher.vACS_Cooldown_Manager.last_quest_marker_distance_refresh_time = theGame.GetEngineTimeAsSeconds();
-}
-
-function ACS_can_refresh_quest_marker_distance_remove(): bool 
-{
-	var property: ACS_Cooldown_Manager;
-
-	property = GetACSWatcher().vACS_Cooldown_Manager;
-
-	return theGame.GetEngineTimeAsSeconds() - property.last_quest_marker_distance_remove_refresh_time > 0.25;
-}
-
-function ACS_refresh_quest_marker_distance_remove_cooldown() 
-{
-	var watcher: W3ACSWatcher;
-
-	watcher = (W3ACSWatcher)theGame.GetEntityByTag( 'acswatcher' );
-
-	watcher.vACS_Cooldown_Manager.last_quest_marker_distance_remove_refresh_time = theGame.GetEngineTimeAsSeconds();
-}
-
-function ACS_can_refresh_starfall(): bool 
-{
-	var property: ACS_Cooldown_Manager;
-
-	property = GetACSWatcher().vACS_Cooldown_Manager;
-
-	return theGame.GetEngineTimeAsSeconds() - property.last_starfall_time > RandRangeF(60,36);
-}
-
-function ACS_refresh_starfall_cooldown() 
-{
-	var watcher: W3ACSWatcher;
-
-	watcher = (W3ACSWatcher)theGame.GetEntityByTag( 'acswatcher' );
-
-	watcher.vACS_Cooldown_Manager.last_starfall_time = theGame.GetEngineTimeAsSeconds();
-}
-
 function ACS_can_spawn_guardian_blood_hym(): bool 
 {
 	var property: ACS_Cooldown_Manager;
@@ -1843,74 +1657,20 @@ function ACS_refresh_guardian_blood_hym_cooldown()
 	watcher.vACS_Cooldown_Manager.last_guardian_blood_hym_spawn_time = theGame.GetEngineTimeAsSeconds();
 }
 
-function ACS_wearable_pocket_items_cooldown(): bool 
+function ACS_can_activate_sign_combo_system(): bool 
 {
 	var property: ACS_Cooldown_Manager;
 
 	property = GetACSWatcher().vACS_Cooldown_Manager;
 
-	return theGame.GetEngineTimeAsSeconds() - property.last_wearable_pocket_item_refresh_time > 0.5;
+	return theGame.GetEngineTimeAsSeconds() - property.last_sign_combo_system_activation_time > ACS_SignComboSystemCooldown();
 }
 
-function ACS_refresh_wearable_pocket_items_cooldown() 
+function ACS_refresh_sign_combo_system_cooldown() 
 {
 	var watcher: W3ACSWatcher;
 
 	watcher = (W3ACSWatcher)theGame.GetEntityByTag( 'acswatcher' );
 
-	watcher.vACS_Cooldown_Manager.last_wearable_pocket_item_refresh_time = theGame.GetEngineTimeAsSeconds();
-}
-
-function ACS_horse_follow_target_novigrad_can_teleport(): bool 
-{
-	var property: ACS_Cooldown_Manager;
-
-	property = GetACSWatcher().vACS_Cooldown_Manager;
-
-	return theGame.GetEngineTimeAsSeconds() - property.last_horse_follow_target_novigrad_teleport_time > 120;
-}
-
-function ACS_refresh_horse_follow_target_novigrad_teleport_cooldown() 
-{
-	var watcher: W3ACSWatcher;
-
-	watcher = (W3ACSWatcher)theGame.GetEntityByTag( 'acswatcher' );
-
-	watcher.vACS_Cooldown_Manager.last_horse_follow_target_novigrad_teleport_time = theGame.GetEngineTimeAsSeconds();
-}
-
-function ACS_horse_follow_target_nilfgaard_can_teleport(): bool 
-{
-	var property: ACS_Cooldown_Manager;
-
-	property = GetACSWatcher().vACS_Cooldown_Manager;
-
-	return theGame.GetEngineTimeAsSeconds() - property.last_horse_follow_target_nilfgaard_teleport_time > 30;
-}
-
-function ACS_refresh_horse_follow_target_nilfgaard_teleport_cooldown() 
-{
-	var watcher: W3ACSWatcher;
-
-	watcher = (W3ACSWatcher)theGame.GetEntityByTag( 'acswatcher' );
-
-	watcher.vACS_Cooldown_Manager.last_horse_follow_target_nilfgaard_teleport_time = theGame.GetEngineTimeAsSeconds();
-}
-
-function ACS_horse_follow_target_redania_can_teleport(): bool 
-{
-	var property: ACS_Cooldown_Manager;
-
-	property = GetACSWatcher().vACS_Cooldown_Manager;
-
-	return theGame.GetEngineTimeAsSeconds() - property.last_horse_follow_target_redania_teleport_time > 60;
-}
-
-function ACS_refresh_horse_follow_target_redania_teleport_cooldown() 
-{
-	var watcher: W3ACSWatcher;
-
-	watcher = (W3ACSWatcher)theGame.GetEntityByTag( 'acswatcher' );
-
-	watcher.vACS_Cooldown_Manager.last_horse_follow_target_redania_teleport_time = theGame.GetEngineTimeAsSeconds();
+	watcher.vACS_Cooldown_Manager.last_sign_combo_system_activation_time = theGame.GetEngineTimeAsSeconds();
 }

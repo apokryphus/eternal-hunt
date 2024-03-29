@@ -760,6 +760,54 @@ state WildHuntBlink_Engage in cWildHuntBlink
 			//GetWitcherPlayer().PlayEffectSingle('teleport_out');
 			//GetWitcherPlayer().StopEffect('teleport_out');
 
+			if (ACS_GetItem_MageStaff_Water())
+			{
+				thePlayer.StopEffect( 'hand_sand_fx_water_ACS' );
+				thePlayer.PlayEffectSingle( 'hand_sand_fx_water_ACS' );
+				thePlayer.StopEffect( 'hand_sand_fx_water_ACS' );
+
+				thePlayer.StopEffect( 'hand_sand_fx_water_l_ACS' );
+				thePlayer.PlayEffectSingle( 'hand_sand_fx_water_l_ACS' );
+				thePlayer.StopEffect( 'hand_sand_fx_water_l_ACS' );
+
+				thePlayer.PlayEffect('teleport_out_water_ACS');
+				thePlayer.StopEffect('teleport_out_water_ACS');
+			}
+			else if (ACS_GetItem_MageStaff_Sand())
+			{
+				thePlayer.StopEffect( 'hand_sand_fx_sand_ACS' );
+				thePlayer.PlayEffectSingle( 'hand_sand_fx_sand_ACS' );
+				thePlayer.StopEffect( 'hand_sand_fx_sand_ACS' );
+
+				thePlayer.StopEffect( 'hand_sand_fx_sand_l_ACS' );
+				thePlayer.PlayEffectSingle( 'hand_sand_fx_sand_l_ACS' );
+				thePlayer.StopEffect( 'hand_sand_fx_sand_l_ACS' );
+
+				thePlayer.PlayEffect('teleport_out_sand_ACS');
+				thePlayer.StopEffect('teleport_out_sand_ACS');
+			}
+			else if (ACS_GetItem_MageStaff_Fire())
+			{
+				thePlayer.StopEffect( 'hand_sand_fx_fire_ACS' );
+				thePlayer.PlayEffectSingle( 'hand_sand_fx_fire_ACS' );
+				thePlayer.StopEffect( 'hand_sand_fx_fire_ACS' );
+
+				thePlayer.StopEffect( 'hand_sand_fx_fire_l_ACS' );
+				thePlayer.PlayEffectSingle( 'hand_sand_fx_fire_l_ACS' );
+				thePlayer.StopEffect( 'hand_sand_fx_fire_l_ACS' );
+				
+				thePlayer.PlayEffect('teleport_out_fire_ACS');
+				thePlayer.StopEffect('teleport_out_fire_ACS');
+			}
+
+			ACSGetEquippedSword().DestroyEffect( 'fx_staff_cast' );
+			ACSGetEquippedSword().PlayEffectSingle( 'fx_staff_cast' );
+			ACSGetEquippedSword().StopEffect( 'fx_staff_cast' );
+
+			ACSGetEquippedSword().DestroyEffect( 'fx_staff_gameplay' );
+			ACSGetEquippedSword().PlayEffectSingle( 'fx_staff_gameplay' );
+			ACSGetEquippedSword().StopEffect( 'fx_staff_gameplay' );
+
 			TeleportBlockAction();
 			
 			GetACSWatcher().AddTimer('ACS_dodge_timer_mage', 0.65  , false);
@@ -1668,7 +1716,6 @@ statemachine class cACS_RollInit
 	}
 }
  
-
 state ACS_RollInit_Engage in cACS_RollInit
 {
 	private var pActor, actor 							: CActor;
@@ -1789,7 +1836,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 			}
 			else
 			{
-				if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() ) 
+				if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
 				{
 					if (theInput.GetActionValue('GI_AxisLeftY') > 0.5)
 					{
@@ -2288,7 +2335,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat()) 
+					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
 					{
 						front_dodge_skate();
 					}
@@ -2335,7 +2382,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat()) 
+					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
 					{
 						right_dodge_skate();
 					}
@@ -2375,7 +2422,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 					
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat()) 
+					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
 					{
 						left_dodge_skate();
 					}
@@ -2496,7 +2543,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat()) 
+					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
 					{
 						front_dodge_skate();
 					}
@@ -2536,7 +2583,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat()) 
+					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
 					{
 						right_dodge_skate();
 					}
@@ -2576,7 +2623,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat()) 
+					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
 					{
 						left_dodge_skate();
 					}
@@ -2697,7 +2744,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat()) 
+					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
 					{
 						front_dodge_skate();
 					}
@@ -2744,7 +2791,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat()) 
+					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
 					{
 						right_dodge_skate();
 					}
@@ -2784,7 +2831,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat()) 
+					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
 					{
 						left_dodge_skate();
 					}
@@ -2905,7 +2952,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat()) 
+					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
 					{
 						front_dodge_skate();
 					}
@@ -2952,7 +2999,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat()) 
+					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
 					{
 						right_dodge_skate();
 					}
@@ -2992,7 +3039,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat()) 
+					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
 					{
 						left_dodge_skate();
 					}
@@ -3113,7 +3160,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat()) 
+					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
 					{
 						front_dodge_skate();
 					}
@@ -3153,7 +3200,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat()) 
+					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
 					{
 						right_dodge_skate();
 					}
@@ -3193,7 +3240,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat()) 
+					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
 					{
 						left_dodge_skate();
 					}
@@ -3290,7 +3337,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 			}
 			else
 			{
-				if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() ) 
+				if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
 				{
 					if (theInput.GetActionValue('GI_AxisLeftY') > 0.5)
 					{
@@ -3564,7 +3611,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat()) 
+					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
 					{
 						front_dodge_skate();
 					}
@@ -3627,7 +3674,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat()) 
+					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
 					{
 						right_dodge_skate();
 					}
@@ -3682,7 +3729,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat()) 
+					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
 					{
 						left_dodge_skate();
 					}
@@ -4975,7 +5022,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat()) 
+					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
 					{
 						front_dodge_skate();
 					}
@@ -5022,7 +5069,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat()) 
+					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
 					{
 						right_dodge_skate();
 					}
@@ -5062,7 +5109,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat()) 
+					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
 					{
 						left_dodge_skate();
 					}
@@ -5172,7 +5219,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat()) 
+					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
 					{
 						front_dodge_skate();
 					}
@@ -5219,7 +5266,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat()) 
+					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
 					{
 						right_dodge_skate();
 					}
@@ -5259,7 +5306,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat()) 
+					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
 					{
 						left_dodge_skate();
 					}
@@ -5369,7 +5416,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat()) 
+					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
 					{
 						front_dodge_skate();
 					}
@@ -5409,7 +5456,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat()) 
+					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
 					{
 						right_dodge_skate();
 					}
@@ -5449,7 +5496,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat()) 
+					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
 					{
 						left_dodge_skate();
 					}
@@ -5559,7 +5606,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat()) 
+					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
 					{
 						front_dodge_skate();
 					}
@@ -5606,7 +5653,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat()) 
+					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
 					{
 						right_dodge_skate();
 					}
@@ -5646,7 +5693,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat()) 
+					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
 					{
 						left_dodge_skate();
 					}
@@ -5756,7 +5803,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat()) 
+					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
 					{
 						front_dodge_skate();
 					}
@@ -5803,7 +5850,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat()) 
+					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
 					{
 						right_dodge_skate();
 					}
@@ -5843,7 +5890,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat()) 
+					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
 					{
 						left_dodge_skate();
 					}
@@ -5953,7 +6000,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat()) 
+					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
 					{
 						front_dodge_skate();
 					}
@@ -6000,7 +6047,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat()) 
+					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
 					{
 						right_dodge_skate();
 					}
@@ -6040,7 +6087,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat()) 
+					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
 					{
 						left_dodge_skate();
 					}
@@ -6150,7 +6197,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat()) 
+					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
 					{
 						front_dodge_skate();
 					}
@@ -6190,7 +6237,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat()) 
+					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
 					{
 						right_dodge_skate();
 					}
@@ -6230,7 +6277,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat()) 
+					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
 					{
 						left_dodge_skate();
 					}
@@ -6341,7 +6388,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 					GetACSWatcher().CiriSpectreDodgeFront();
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat()) 
+					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
 					{
 						front_dodge_skate();
 					}
@@ -6381,7 +6428,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 					GetACSWatcher().CiriSpectreDodgeRight();
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat()) 
+					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
 					{
 						right_dodge_skate();
 					}
@@ -8826,11 +8873,6 @@ state ACS_RollInit_Engage in cACS_RollInit
 	}
 }
 
-
-
-
-
-
 function ACS_Blink_Hit_Reaction()
 {
 	var vACS_BlinkHitReaction : cACS_BlinkHitReaction;
@@ -8847,7 +8889,6 @@ statemachine class cACS_BlinkHitReaction
 	}
 }
  
-
 state BlinkHitReaction_Engage in cACS_BlinkHitReaction
 {
 	private var actor 									: CActor;

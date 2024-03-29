@@ -303,8 +303,7 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 	{
 		if (theInput.GetActionValue('GI_AxisLeftY') < -0.5 )
 		{
-			if (ACS_can_special_dodge()
-			&& ACS_BruxaDodgeSlideBack_Enabled())
+			if (ACS_can_special_dodge())
 			{
 				ACS_refresh_special_dodge_cooldown();
 		
@@ -370,99 +369,15 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftX') > 0.5)
 		{
-			if ( ACS_BruxaDodgeRight_Enabled() )
-			{
-				ACS_BruxaDodgeBackRightInit();
-			}
-			else if (ACS_can_dodge())
-			{
-				ACS_refresh_dodge_cooldown();
-						
-				DodgeEffects();
-
-				if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
-				{
-					GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
-					GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
-
-					GetWitcherPlayer().PlayEffectSingle( 'magic_step_r_new' );
-					GetWitcherPlayer().StopEffect( 'magic_step_r_new' );	
-
-					GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails' );
-					GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
-
-					GetWitcherPlayer().PlayEffectSingle( 'shadowdash_short' );
-					GetWitcherPlayer().StopEffect( 'shadowdash_short' );
-				}
-
-				bruxa_right_dodge();
-				
-				GetACSWatcher().ACS_StaminaDrain(4);
-			}
+			ACS_BruxaDodgeBackRightInit();
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftX') < -0.5) 
 		{
-			if ( ACS_BruxaDodgeLeft_Enabled() )
-			{
-				ACS_BruxaDodgeBackLeftInit();
-			}
-			else if (ACS_can_dodge())
-			{
-				ACS_refresh_dodge_cooldown();
-						
-				DodgeEffects();
-
-				if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
-				{
-					GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
-					GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
-
-					GetWitcherPlayer().PlayEffectSingle( 'magic_step_r_new' );
-					GetWitcherPlayer().StopEffect( 'magic_step_r_new' );	
-
-					GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails' );
-					GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
-
-					GetWitcherPlayer().PlayEffectSingle( 'shadowdash_short' );
-					GetWitcherPlayer().StopEffect( 'shadowdash_short' );
-				}
-
-				bruxa_left_dodge();
-				
-				GetACSWatcher().ACS_StaminaDrain(4);
-			}	
+			ACS_BruxaDodgeBackLeftInit();	
 		}
 		else
 		{
-			if ( ACS_BruxaDodgeCenter_Enabled() )
-			{
-				ACS_BruxaDodgeBackCenterInit();
-			}
-			else if (ACS_can_dodge())
-			{
-				ACS_refresh_dodge_cooldown();
-
-				DodgeEffects();
-
-				if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
-				{
-					GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
-					GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
-
-					GetWitcherPlayer().PlayEffectSingle( 'magic_step_r_new' );
-					GetWitcherPlayer().StopEffect( 'magic_step_r_new' );	
-
-					GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails' );
-					GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
-
-					GetWitcherPlayer().PlayEffectSingle( 'shadowdash_short' );
-					GetWitcherPlayer().StopEffect( 'shadowdash_short' );
-				}
-
-				bruxa_regular_dodge();
-				
-				GetACSWatcher().ACS_StaminaDrain(4);
-			}
+			ACS_BruxaDodgeBackCenterInit();
 		}
 	}
 
@@ -3539,34 +3454,7 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 			
 			if( targetDistance <= 2*2 ) 
 			{
-				if ( ACS_BruxaDodgeCenter_Enabled() )
-				{
-					ACS_BruxaDodgeBackCenterInit();
-				}
-				else
-				{
-					GetACSWatcher().dodge_timer_actual();
-
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active')
-					&& ACS_DodgeEffects_Enabled())
-					{
-						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
-						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
-
-						GetWitcherPlayer().PlayEffectSingle( 'magic_step_r_new' );
-						GetWitcherPlayer().StopEffect( 'magic_step_r_new' );	
-
-						GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails' );
-						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
-
-						GetWitcherPlayer().PlayEffectSingle( 'shadowdash_short' );
-						GetWitcherPlayer().StopEffect( 'shadowdash_short' );
-					}
-
-					GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'utility_dodge_attack_ACS', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
-					
-					movementAdjustor.SlideTo( ticket, ACSPlayerFixZAxis(GetWitcherPlayer().GetWorldPosition() + theCamera.GetCameraDirection() * -2) );
-				}
+				ACS_BruxaDodgeBackCenterInit();
 			}
 			else
 			{
@@ -3836,11 +3724,6 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'full_hit_reaction_with_taunt_001_ACS', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
 			
 			movementAdjustor.SlideTo( ticket, ACSPlayerFixZAxis(( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * -3 ) + theCamera.GetCameraDirection() * -3) );
-		}
-
-		if (!GetWitcherPlayer().HasTag('ACS_Special_Dodge'))
-		{
-			GetWitcherPlayer().AddTag('ACS_Special_Dodge');
 		}
 	}
 
@@ -5916,6 +5799,11 @@ function ACS_BruxaDodgeSlideBackInitForWeaponSwitching()
 		&& ACS_BuffCheck()
 		&& GetWitcherPlayer().IsActionAllowed(EIAB_Dodge)
 		&& !GetWitcherPlayer().IsInAir()
+		&& GetWitcherPlayer().IsActionAllowed(EIAB_Movement)
+		&& GetWitcherPlayer().IsActionAllowed(EIAB_LightAttacks)
+		&& !ACS_Transformation_Activated_Check()
+		&& !GetWitcherPlayer().IsCrossbowHeld() 
+		&& !GetWitcherPlayer().IsInHitAnim() 
 		)
 		{
 			vBruxaDodgeSlideBackInitForWeaponSwitching.BruxaDodgeSlideBackInitForWeaponSwitching_Engage();
@@ -7477,7 +7365,7 @@ function ACS_BruxaDodgeBackCenterInit()
 
 	vBruxaDodgeBackCenter = new cBruxaDodgeBackCenter in theGame;
 	
-	if ( ACS_Enabled() && ACS_BruxaDodgeCenter_Enabled() )
+	if ( ACS_Enabled() )
 	{
 		if (!GetWitcherPlayer().IsCiri()
 		&& !GetWitcherPlayer().IsPerformingFinisher()
@@ -7922,7 +7810,7 @@ function ACS_BruxaDodgeBackLeftInit()
 		return;
 	}
 	
-	if ( ACS_Enabled() && ACS_BruxaDodgeLeft_Enabled() )
+	if ( ACS_Enabled() )
 	{
 		if (!GetWitcherPlayer().IsCiri()
 		&& !GetWitcherPlayer().IsPerformingFinisher()
@@ -8466,7 +8354,7 @@ function ACS_BruxaDodgeBackRightInit()
 		return;
 	}
 	
-	if ( ACS_Enabled() && ACS_BruxaDodgeRight_Enabled() )
+	if ( ACS_Enabled() )
 	{
 		if (!GetWitcherPlayer().IsCiri()
 		&& !GetWitcherPlayer().IsPerformingFinisher()

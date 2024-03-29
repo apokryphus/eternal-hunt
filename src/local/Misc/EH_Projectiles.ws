@@ -1,4 +1,4 @@
-class SwordProjectile extends W3AdvancedProjectile
+class W3ACSSwordProjectile extends W3AdvancedProjectile
 {
 	private var bone 									: name;
 	private var actor, actortarget						: CActor;
@@ -1223,7 +1223,7 @@ class ACSBowProjectile extends W3AdvancedProjectile
 	private var rotMat																																						: Matrix;
 	private var effType																																						: EEffectType;
 	private var crit																																						: bool;
-	private var giant_sword	 																																				: SwordProjectileGiant;
+	private var giant_sword	 																																				: W3ACSSwordProjectileGiant;
 	private var split_arrow																																					: ACSBowProjectileSplit;
 	private var meshcomp 																																					: CComponent;
 	private var h 																																							: float;
@@ -1494,7 +1494,7 @@ class ACSBowProjectile extends W3AdvancedProjectile
 					spawnPos.Y = randRange * SinF( randAngle ) + initpos.Y;
 					spawnPos.Z = initpos.Z;
 					
-					giant_sword = (SwordProjectileGiant)theGame.CreateEntity( 
+					giant_sword = (W3ACSSwordProjectileGiant)theGame.CreateEntity( 
 					(CEntityTemplate)LoadResource( "dlc\dlc_acs\data\entities\projectiles\sword_projectile_giant.w2ent", true ), initpos );
 
 					meshcomp = giant_sword.GetComponentByClassName('CMeshComponent');
@@ -3588,7 +3588,7 @@ class ACSCrossbowProjectileMoving extends W3AdvancedProjectile
 	}
 }
 
-class SwordProjectileGiant extends W3AdvancedProjectile
+class W3ACSSwordProjectileGiant extends W3AdvancedProjectile
 {
 	private var bone 														: name;
 	private var actor, actortarget											: CActor;
@@ -7509,11 +7509,7 @@ class W3ACSCaranthirIceSpike extends W3DurationObstacle
 		for( i = 0; i < entitiesInRange.Size(); i += 1 )
 		{
 			actor = (CActor)entitiesInRange[i];
-			if( actor 
-			&& actor != GetACSCanaris()
-			&& actor != GetACSCanarisMinion()
-			&& actor != GetACSCanarisGolem()
-			&& actor != GetACSIceBoar()
+			if( actor == thePlayer
 			)
 			{
 				damage = new W3DamageAction in this;
@@ -7546,8 +7542,7 @@ class W3ACSCaranthirIceSpike extends W3DurationObstacle
 		for( i = 0; i < entitiesInRange.Size(); i += 1 )
 		{
 			actor = (CActor)entitiesInRange[i];
-			if( actor 
-			&& actor != GetACSIceBoar()
+			if( actor == thePlayer
 			)
 			{
 				damage = new W3DamageAction in this;
@@ -7580,17 +7575,13 @@ class W3ACSCaranthirIceSpike extends W3DurationObstacle
 		for( i = 0; i < entitiesInRange.Size(); i += 1 )
 		{
 			actor = (CActor)entitiesInRange[i];
-			if( actor 
-			&& actor != GetACSCanaris()
-			&& actor != GetACSCanarisMinion()
-			&& actor != GetACSCanarisGolem()
+			if( actor == thePlayer
 			)
 			{
 				damage = new W3DamageAction in this;
 				damage.Initialize( this, entitiesInRange[i], NULL, this, EHRT_Heavy, CPS_Undefined, false, false, false, true );
 				damage.AddDamage( theGame.params.DAMAGE_NAME_FROST, damageVal );
-				damage.AddEffectInfo( EET_Snowstorm, effectDuration );
-				damage.AddEffectInfo( EET_Stagger, effectDuration );
+				damage.AddEffectInfo( EET_SlowdownFrost, effectDuration );
 				theGame.damageMgr.ProcessAction( damage );
 				
 				delete damage;
@@ -7617,17 +7608,13 @@ class W3ACSCaranthirIceSpike extends W3DurationObstacle
 		for( i = 0; i < entitiesInRange.Size(); i += 1 )
 		{
 			actor = (CActor)entitiesInRange[i];
-			if( actor 
-			&& actor != GetACSCanaris()
-			&& actor != GetACSCanarisMinion()
-			&& actor != GetACSCanarisGolem()
+			if( actor == thePlayer
 			)
 			{
 				damage = new W3DamageAction in this;
 				damage.Initialize( this, entitiesInRange[i], NULL, this, EHRT_Heavy, CPS_Undefined, false, false, false, true );
 				damage.AddDamage( theGame.params.DAMAGE_NAME_FROST, damageVal );
-				damage.AddEffectInfo( EET_Snowstorm, effectDuration );
-				damage.AddEffectInfo( EET_Stagger, effectDuration );
+				damage.AddEffectInfo( EET_SlowdownFrost, effectDuration );
 				theGame.damageMgr.ProcessAction( damage );
 				
 				delete damage;
@@ -7654,17 +7641,13 @@ class W3ACSCaranthirIceSpike extends W3DurationObstacle
 		for( i = 0; i < entitiesInRange.Size(); i += 1 )
 		{
 			actor = (CActor)entitiesInRange[i];
-			if( actor 
-			&& actor != GetACSCanaris()
-			&& actor != GetACSCanarisMinion()
-			&& actor != GetACSCanarisGolem()
+			if( actor == thePlayer
 			)
 			{
 				damage = new W3DamageAction in this;
 				damage.Initialize( this, entitiesInRange[i], NULL, this, EHRT_Heavy, CPS_Undefined, false, false, false, true );
 				damage.AddDamage( theGame.params.DAMAGE_NAME_FROST, damageVal );
-				damage.AddEffectInfo( EET_Snowstorm, effectDuration );
-				damage.AddEffectInfo( EET_Stagger, effectDuration );
+				damage.AddEffectInfo( EET_SlowdownFrost, effectDuration );
 				theGame.damageMgr.ProcessAction( damage );
 				
 				delete damage;
@@ -8173,25 +8156,11 @@ class W3ACSIceSpearProjectile extends W3AdvancedProjectile
 
 			if (((CActor)victim).UsesEssence())
 			{
-				if (((CActor)victim).GetCurrentHealth() <= ((CActor)victim).GetMaxHealth() * 0.01)
-				{
-					damage = ((CActor)victim).GetStatMax( BCS_Essence );
-				}
-				else
-				{
-					damage = ((CActor)victim).GetStat( BCS_Essence ) * 0.0125;
-				}
+				damage = ((CActor)victim).GetStat( BCS_Essence ) * 0.0125;
 			}
 			else if (((CActor)victim).UsesVitality())
 			{
-				if (((CActor)victim).GetCurrentHealth() <= ((CActor)victim).GetMaxHealth() * 0.01)
-				{
-					damage = ((CActor)victim).GetStatMax( BCS_Vitality );
-				}
-				else
-				{
-					damage = ((CActor)victim).GetStat( BCS_Vitality ) * 0.0125;
-				}
+				damage = ((CActor)victim).GetStat( BCS_Vitality ) * 0.0125;
 			}
 
 			GetACSWatcher().Wisp_Hit_Counter_Increment();
@@ -8620,25 +8589,11 @@ class W3ACSBoulderProjectile extends W3AdvancedProjectile
 
 			if (((CActor)victim).UsesEssence())
 			{
-				if (((CActor)victim).GetCurrentHealth() <= ((CActor)victim).GetMaxHealth() * 0.01)
-				{
-					damage = ((CActor)victim).GetStatMax( BCS_Essence );
-				}
-				else
-				{
-					damage = ((CActor)victim).GetStat( BCS_Essence ) * 0.0125;
-				}
+				damage = ((CActor)victim).GetStat( BCS_Essence ) * 0.0125;
 			}
 			else if (((CActor)victim).UsesVitality())
 			{
-				if (((CActor)victim).GetCurrentHealth() <= ((CActor)victim).GetMaxHealth() * 0.01)
-				{
-					damage = ((CActor)victim).GetStatMax( BCS_Vitality );
-				}
-				else
-				{
-					damage = ((CActor)victim).GetStat( BCS_Vitality ) * 0.0125;
-				}
+				damage = ((CActor)victim).GetStat( BCS_Vitality ) * 0.0125;
 			}
 
 			//GetACSWatcher().Wisp_Hit_Counter_Increment();
@@ -10954,5 +10909,4164 @@ class CACSTransformationToadDebuffProjectile extends W3AdvancedProjectile
 		isActive = false;
 		this.StopEffect( initFxName );
 		this.DestroyAfter(1.f);
+	}
+}
+
+statemachine class CACSEverstormLightning extends CGameplayEntity
+{
+	var pos : Vector;
+
+	event OnSpawned( spawnData : SEntitySpawnData )
+	{
+		pos = this.GetWorldPosition();
+
+		PlayEffect('lightning_area');
+		PlayEffect('pre_lightning');
+
+		AddTimer('lightning_strike', 3.f);
+	}
+
+	timer function lightning_strike ( dt : float, optional id : int)
+	{
+		var entities	 		: array<CGameplayEntity>;
+		var i					: int;
+
+		StopEffect('lightning_area');
+		StopEffect('pre_lightning');
+
+		this.PushState('Lightning_Strike_Engage');
+		
+		FindGameplayEntitiesInSphere( entities, GetWorldPosition(), 5, 100 );
+		for( i = 0; i < entities.Size(); i += 1 )
+		{
+			deal_damage( (CActor)entities[i] );
+		}
+	}
+	
+	function deal_damage( victimtarget : CActor )
+	{
+		var action 			: W3DamageAction;
+		var damage 			: float;
+		
+		if ( victimtarget && victimtarget.IsAlive() ) 
+		{
+			if (((CActor)victimtarget).UsesEssence())
+			{
+				damage = ((CActor)victimtarget).GetStat( BCS_Essence ) * 0.125;
+			}
+			else if (((CActor)victimtarget).UsesVitality())
+			{
+				damage = ((CActor)victimtarget).GetStat( BCS_Vitality ) * 0.125;
+			}
+
+			if ( VecDistance2D( this.GetWorldPosition(), victimtarget.GetWorldPosition() ) > 0.5 )
+			{
+				damage -= damage * VecDistance2D( this.GetWorldPosition(), victimtarget.GetWorldPosition() ) * 0.1;
+			}
+			
+			action = new W3DamageAction in theGame.damageMgr;
+			action.Initialize((CGameplayEntity)this,victimtarget,this,this.GetName(),EHRT_Heavy,CPS_Undefined,false,false,true,false);
+			action.SetProcessBuffsIfNoDamage(true);
+			action.SetCanPlayHitParticle( true );
+
+			action.AddDamage( theGame.params.DAMAGE_NAME_ELEMENTAL, damage  );
+			
+			theGame.damageMgr.ProcessAction( action );
+			delete action;
+		}
+	}
+}
+
+state Lightning_Strike_Engage in CACSEverstormLightning
+{
+	var temp, temp_2, temp_3, temp_4, temp_5									: CEntityTemplate;
+	var ent, ent_1, ent_2, ent_3, ent_4, ent_5									: CEntity;
+	var i, count, count_2, j, k													: int;
+	var playerPos, spawnPos, spawnPos2, posAdjusted, posAdjusted2, entPos		: Vector;
+	var randAngle, randRange, randAngle_2, randRange_2, distance				: float;
+	var adjustedRot, playerRot2													: EulerAngles;
+	var actors    																: array<CActor>;
+	var actor    																: CActor;
+	var dmg																		: W3DamageAction;
+	var world																	: CWorld;
+	var l_groundZ																: float;
+
+	event OnEnterState(prevStateName : name)
+	{
+		super.OnEnterState(prevStateName);
+		Lightning_Strike_Entry();
+	}
+	
+	entry function Lightning_Strike_Entry()
+	{
+		var currentGameTime : GameTime;
+		var hours : int;
+
+		Lightning_Strike_Latent();
+
+		if (RandF() < 0.125)
+		{
+			currentGameTime = theGame.CalculateTimePlayed();
+			hours = GameTimeDays(currentGameTime) * 24 + GameTimeHours(currentGameTime);
+
+			if( !theGame.IsDialogOrCutscenePlaying() 
+			&& !thePlayer.IsInNonGameplayCutscene() 
+			&& !thePlayer.IsInGameplayScene()
+			&& !ACS_PlayerSettlementCheck(50)
+			&& thePlayer.IsOnGround()
+			&& !thePlayer.IsInInterior()
+			&& !ACS_GetHostilesCheck()
+			&& !thePlayer.IsCiri()
+			&& !thePlayer.GetIsHorseRacing()
+			&& hours >= 10
+			)
+			{
+				spawn_thunderclast();
+			}
+		}
+	}
+	
+	latent function Lightning_Strike_Latent()
+	{
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\dlc_acs\data\fx\everstorm_lightning_strike.w2ent"
+			
+		, true );
+
+		temp_2 = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\dlc_acs\data\fx\everstorm_lightning_strike_secondary.w2ent"
+			
+		, true );
+
+		if (parent.HasTag('ACS_Active_Lightning'))
+		{
+			temp_3 = (CEntityTemplate)LoadResourceAsync( 
+
+			"dlc\dlc_acs\data\fx\everstorm_lightning_lights.w2ent"
+				
+			, true );
+		}
+
+		temp_4 = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\dlc_acs\data\fx\everstorm_ground_fire.w2ent"
+			
+		, true );
+
+		playerPos = ACSPlayerFixZAxis(parent.pos);
+
+		adjustedRot = EulerAngles(0,0,0);
+
+		adjustedRot.Yaw = RandRangeF(360,1);
+		adjustedRot.Pitch = RandRangeF(22.5,-22.5);
+
+		playerRot2 = EulerAngles(0,0,0);
+		playerRot2.Yaw = RandRangeF(360,1);
+
+		if (parent.HasTag('ACS_Active_Lightning'))
+		{
+			ent = theGame.CreateEntity( temp_3, playerPos, EulerAngles(0,0,0) );
+
+			ent.PlayEffectSingle('lights');
+
+			ent.DestroyAfter(1);
+		}
+			
+		posAdjusted = ACSPlayerFixZAxis(parent.pos);
+
+		ent_1 = theGame.CreateEntity( temp, posAdjusted, adjustedRot );
+
+		ent_1.PlayEffectSingle('pre_lightning');
+		ent_1.PlayEffectSingle('lightning');
+
+		ent_1.DestroyAfter(10);
+
+
+		ent_2 = theGame.CreateEntity( temp_2, posAdjusted, playerRot2 );
+
+		ent_2.PlayEffectSingle('lighgtning');
+
+		ent_2.DestroyAfter(10);
+
+		if (parent.HasTag('ACS_Active_Lightning'))
+		{
+			ent_3 = theGame.CreateEntity( temp_2, posAdjusted, adjustedRot );
+
+			ent_3.PlayEffectSingle('lighgtning');
+
+			ent_3.DestroyAfter(10);
+		}
+
+
+		theGame.GetSurfacePostFX().AddSurfacePostFXGroup( posAdjusted, 0.5f, 10.5f, 0.5f, 7.f, 1);
+
+
+		count_2 = 12;
+
+		for( j = 0; j < count_2; j += 1 )
+		{
+			randRange_2 = 2 + 2 * RandF();
+			randAngle_2 = 2 * Pi() * RandF();
+			
+			spawnPos2.X = randRange_2 * CosF( randAngle_2 ) + posAdjusted.X;
+			spawnPos2.Y = randRange_2 * SinF( randAngle_2 ) + posAdjusted.Y;
+			//spawnPos2.Z = posAdjusted.Z;
+
+			posAdjusted2 = ACSPlayerFixZAxis(spawnPos2);
+
+			ent_4 = theGame.CreateEntity( temp_4, posAdjusted2, EulerAngles(0,0,0) );
+
+			if (RandF() < 0.5)
+			{
+				ent_4.PlayEffectSingle('explosion');
+				ent_4.StopEffect('explosion');
+			}
+			else
+			{
+				if (RandF() < 0.5)
+				{
+					ent_4.PlayEffectSingle('explosion_big');
+					ent_4.StopEffect('explosion_big');
+				}
+				else
+				{
+					ent_4.PlayEffectSingle('explosion_medium');
+					ent_4.StopEffect('explosion_medium');
+				}
+			}
+
+			ent_4.DestroyAfter(20);
+		}
+		
+		if (parent.HasTag('ACS_Active_Lightning'))
+		{
+			thePlayer.SoundEvent( "fx_amb_thunder_close" );
+
+			thePlayer.SoundEvent( "qu_nml_103_lightning" );
+		}
+	}
+
+	latent function spawn_thunderclast()
+	{
+		var ent	: CACSMonsterSpawner;
+
+		ent = (CACSMonsterSpawner)theGame.CreateEntity( 
+
+		(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\other\acs_monster_spawner.w2ent", true ), 
+		
+		parent.pos, 
+
+		thePlayer.GetWorldRotation() );
+
+		ent.AddTag('ACS_MonsterSpawner_Thunderclast');
+
+		ent.AddTag('ACS_MonsterSpawner_Spawn_In_Frame');
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+statemachine class W3ACSMageAttacks extends CGameplayEntity
+{
+	var pos : Vector;
+	var rot : EulerAngles;
+
+	event OnSpawned( spawnData : SEntitySpawnData )
+	{
+		pos = this.GetWorldPosition();
+		rot = this.GetWorldRotation();
+
+		ACSGetEquippedSword().DestroyEffect( 'fx_staff_gameplay' );
+		ACSGetEquippedSword().PlayEffectSingle( 'fx_staff_gameplay' );
+		ACSGetEquippedSword().StopEffect( 'fx_staff_gameplay' );
+
+		AddTimer('tag_check', 0.0001, true);
+	}
+
+	timer function tag_check( dt : float , optional id : int)
+	{
+		if (!this.HasTag('ACS_Mage_Attack_Activated'))
+		{
+			if (this.HasTag('ACS_Mage_Attack_Cone'))
+			{
+				this.PushState('ACS_Mage_Attack_Cone');
+				stop_tag_check();
+				return;
+			}
+
+			if (this.HasTag('ACS_Mage_Attack_Coil'))
+			{
+				this.PushState('ACS_Mage_Attack_Coil');
+				stop_tag_check();
+				return;
+			}
+
+			if (this.HasTag('ACS_Mage_Attack_Coil_With_Cone'))
+			{
+				this.PushState('ACS_Mage_Attack_Coil_With_Cone');
+				stop_tag_check();
+				return;
+			}
+
+			if (this.HasTag('ACS_Mage_Attack_Blast_1'))
+			{
+				this.PushState('ACS_Mage_Attack_Blast_1');
+				stop_tag_check();
+				return;
+			}
+
+			if (this.HasTag('ACS_Mage_Attack_Blast_2'))
+			{
+				if (ACS_GetItem_MageStaff_Water())
+				{
+					thePlayer.StopEffect( 'hand_sand_fx_water_l_ACS' );
+					thePlayer.PlayEffectSingle( 'hand_sand_fx_water_l_ACS' );
+					thePlayer.StopEffect( 'hand_sand_fx_water_l_ACS' );
+				}
+				else if (ACS_GetItem_MageStaff_Sand())
+				{
+					thePlayer.StopEffect( 'hand_sand_fx_sand_l_ACS' );
+					thePlayer.PlayEffectSingle( 'hand_sand_fx_sand_l_ACS' );
+					thePlayer.StopEffect( 'hand_sand_fx_sand_l_ACS' );
+				}
+				else if (ACS_GetItem_MageStaff_Fire())
+				{
+					thePlayer.StopEffect( 'hand_sand_fx_fire_l_ACS' );
+					thePlayer.PlayEffectSingle( 'hand_sand_fx_fire_l_ACS' );
+					thePlayer.StopEffect( 'hand_sand_fx_fire_l_ACS' );
+				}
+
+				this.PushState('ACS_Mage_Attack_Blast_2');
+				stop_tag_check();
+				return;
+			}
+
+			if (this.HasTag('ACS_Mage_Attack_Blast_3'))
+			{
+				this.PushState('ACS_Mage_Attack_Blast_3');
+				stop_tag_check();
+				return;
+			}
+
+			if (this.HasTag('ACS_Mage_Attack_Gust_Left'))
+			{
+				if (ACS_GetItem_MageStaff_Water())
+				{
+					thePlayer.StopEffect( 'hand_sand_fx_water_ACS' );
+					thePlayer.PlayEffectSingle( 'hand_sand_fx_water_ACS' );
+					thePlayer.StopEffect( 'hand_sand_fx_water_ACS' );
+				}
+				else if (ACS_GetItem_MageStaff_Sand())
+				{
+					thePlayer.StopEffect( 'hand_sand_fx_sand_ACS' );
+					thePlayer.PlayEffectSingle( 'hand_sand_fx_sand_ACS' );
+					thePlayer.StopEffect( 'hand_sand_fx_sand_ACS' );
+				}
+				else if (ACS_GetItem_MageStaff_Fire())
+				{
+					thePlayer.StopEffect( 'hand_sand_fx_fire_ACS' );
+					thePlayer.PlayEffectSingle( 'hand_sand_fx_fire_ACS' );
+					thePlayer.StopEffect( 'hand_sand_fx_fire_ACS' );
+				}
+
+				this.PushState('ACS_Mage_Attack_Gust_Left');
+				stop_tag_check();
+				return;
+			}
+
+			if (this.HasTag('ACS_Mage_Attack_Gust_Right'))
+			{
+				if (ACS_GetItem_MageStaff_Water())
+				{
+					thePlayer.StopEffect( 'hand_sand_fx_water_ACS' );
+					thePlayer.PlayEffectSingle( 'hand_sand_fx_water_ACS' );
+					thePlayer.StopEffect( 'hand_sand_fx_water_ACS' );
+				}
+				else if (ACS_GetItem_MageStaff_Sand())
+				{
+					thePlayer.StopEffect( 'hand_sand_fx_sand_ACS' );
+					thePlayer.PlayEffectSingle( 'hand_sand_fx_sand_ACS' );
+					thePlayer.StopEffect( 'hand_sand_fx_sand_ACS' );
+				}
+				else if (ACS_GetItem_MageStaff_Fire())
+				{
+					thePlayer.StopEffect( 'hand_sand_fx_fire_ACS' );
+					thePlayer.PlayEffectSingle( 'hand_sand_fx_fire_ACS' );
+					thePlayer.StopEffect( 'hand_sand_fx_fire_ACS' );
+				}
+
+				this.PushState('ACS_Mage_Attack_Gust_Right');
+				stop_tag_check();
+				return;
+			}
+
+			if (this.HasTag('ACS_Mage_Attack_Gust_Up'))
+			{
+				if (ACS_GetItem_MageStaff_Water())
+				{
+					thePlayer.StopEffect( 'hand_sand_fx_water_ACS' );
+					thePlayer.PlayEffectSingle( 'hand_sand_fx_water_ACS' );
+					thePlayer.StopEffect( 'hand_sand_fx_water_ACS' );
+				}
+				else if (ACS_GetItem_MageStaff_Sand())
+				{
+					thePlayer.StopEffect( 'hand_sand_fx_sand_ACS' );
+					thePlayer.PlayEffectSingle( 'hand_sand_fx_sand_ACS' );
+					thePlayer.StopEffect( 'hand_sand_fx_sand_ACS' );
+				}
+				else if (ACS_GetItem_MageStaff_Fire())
+				{
+					thePlayer.StopEffect( 'hand_sand_fx_fire_ACS' );
+					thePlayer.PlayEffectSingle( 'hand_sand_fx_fire_ACS' );
+					thePlayer.StopEffect( 'hand_sand_fx_fire_ACS' );
+				}
+
+				this.PushState('ACS_Mage_Attack_Gust_Up');
+				stop_tag_check();
+				return;
+			}
+
+			if (this.HasTag('ACS_Mage_Attack_Mega_Gust'))
+			{
+				if (ACS_GetItem_MageStaff_Water())
+				{
+					thePlayer.StopEffect( 'hand_sand_fx_water_ACS' );
+					thePlayer.PlayEffectSingle( 'hand_sand_fx_water_ACS' );
+					thePlayer.StopEffect( 'hand_sand_fx_water_ACS' );
+				}
+				else if (ACS_GetItem_MageStaff_Sand())
+				{
+					thePlayer.StopEffect( 'hand_sand_fx_sand_ACS' );
+					thePlayer.PlayEffectSingle( 'hand_sand_fx_sand_ACS' );
+					thePlayer.StopEffect( 'hand_sand_fx_sand_ACS' );
+				}
+				else if (ACS_GetItem_MageStaff_Fire())
+				{
+					thePlayer.StopEffect( 'hand_sand_fx_fire_ACS' );
+					thePlayer.PlayEffectSingle( 'hand_sand_fx_fire_ACS' );
+					thePlayer.StopEffect( 'hand_sand_fx_fire_ACS' );
+				}
+
+				this.PushState('ACS_Mage_Attack_Mega_Gust');
+				stop_tag_check();
+				return;
+			}
+
+			if (this.HasTag('ACS_Mage_Attack_Quicksand'))
+			{
+				if (ACS_GetItem_MageStaff_Water())
+				{
+					thePlayer.StopEffect( 'hand_sand_fx_water_ACS' );
+					thePlayer.PlayEffectSingle( 'hand_sand_fx_water_ACS' );
+					thePlayer.StopEffect( 'hand_sand_fx_water_ACS' );
+
+					thePlayer.StopEffect( 'hand_sand_fx_water_l_ACS' );
+					thePlayer.PlayEffectSingle( 'hand_sand_fx_water_l_ACS' );
+					thePlayer.StopEffect( 'hand_sand_fx_water_l_ACS' );
+				}
+				else if (ACS_GetItem_MageStaff_Sand())
+				{
+					thePlayer.StopEffect( 'hand_sand_fx_sand_ACS' );
+					thePlayer.PlayEffectSingle( 'hand_sand_fx_sand_ACS' );
+					thePlayer.StopEffect( 'hand_sand_fx_sand_ACS' );
+
+					thePlayer.StopEffect( 'hand_sand_fx_sand_l_ACS' );
+					thePlayer.PlayEffectSingle( 'hand_sand_fx_sand_l_ACS' );
+					thePlayer.StopEffect( 'hand_sand_fx_sand_l_ACS' );
+				}
+				else if (ACS_GetItem_MageStaff_Fire())
+				{
+					thePlayer.StopEffect( 'hand_sand_fx_fire_ACS' );
+					thePlayer.PlayEffectSingle( 'hand_sand_fx_fire_ACS' );
+					thePlayer.StopEffect( 'hand_sand_fx_fire_ACS' );
+
+					thePlayer.StopEffect( 'hand_sand_fx_fire_l_ACS' );
+					thePlayer.PlayEffectSingle( 'hand_sand_fx_fire_l_ACS' );
+					thePlayer.StopEffect( 'hand_sand_fx_fire_l_ACS' );
+				}
+
+				this.PushState('ACS_Mage_Attack_Quicksand');
+				stop_tag_check();
+				return;
+			}
+
+			if (this.HasTag('ACS_Mage_Attack_SandCage'))
+			{
+				if (ACS_GetItem_MageStaff_Water())
+				{
+					thePlayer.StopEffect( 'hand_sand_fx_water_ACS' );
+					thePlayer.PlayEffectSingle( 'hand_sand_fx_water_ACS' );
+					thePlayer.StopEffect( 'hand_sand_fx_water_ACS' );
+				}
+				else if (ACS_GetItem_MageStaff_Sand())
+				{
+					thePlayer.StopEffect( 'hand_sand_fx_sand_ACS' );
+					thePlayer.PlayEffectSingle( 'hand_sand_fx_sand_ACS' );
+					thePlayer.StopEffect( 'hand_sand_fx_sand_ACS' );
+				}
+				else if (ACS_GetItem_MageStaff_Fire())
+				{
+					thePlayer.StopEffect( 'hand_sand_fx_fire_ACS' );
+					thePlayer.PlayEffectSingle( 'hand_sand_fx_fire_ACS' );
+					thePlayer.StopEffect( 'hand_sand_fx_fire_ACS' );
+				}
+
+				this.PushState('ACS_Mage_Attack_SandCage');
+				stop_tag_check();
+				return;
+			}
+
+			if (this.HasTag('ACS_Mage_Attack_Tornado'))
+			{
+				if (ACS_GetItem_MageStaff_Water())
+				{
+					thePlayer.StopEffect( 'hand_sand_fx_water_ACS' );
+					thePlayer.PlayEffectSingle( 'hand_sand_fx_water_ACS' );
+					thePlayer.StopEffect( 'hand_sand_fx_water_ACS' );
+				}
+				else if (ACS_GetItem_MageStaff_Sand())
+				{
+					thePlayer.StopEffect( 'hand_sand_fx_sand_ACS' );
+					thePlayer.PlayEffectSingle( 'hand_sand_fx_sand_ACS' );
+					thePlayer.StopEffect( 'hand_sand_fx_sand_ACS' );
+				}
+				else if (ACS_GetItem_MageStaff_Fire())
+				{
+					thePlayer.StopEffect( 'hand_sand_fx_fire_ACS' );
+					thePlayer.PlayEffectSingle( 'hand_sand_fx_fire_ACS' );
+					thePlayer.StopEffect( 'hand_sand_fx_fire_ACS' );
+				}
+
+				this.PushState('ACS_Mage_Attack_Tornado');
+				stop_tag_check();
+				return;
+			}
+
+		}
+	}
+
+	function MageAttackGetNPCsAndPlayersInRange(range : float, optional maxResults : int, optional tag : name, optional queryFlags : int) : array <CActor>
+	{
+		var i : int;
+		var actors : array<CActor>;
+		var entities : array<CGameplayEntity>;
+		var actorEnt : CActor;
+	
+		
+		if((queryFlags & FLAG_Attitude_Neutral) == 0 && (queryFlags & FLAG_Attitude_Hostile) == 0 && (queryFlags & FLAG_Attitude_Friendly) == 0)
+			queryFlags = queryFlags | FLAG_Attitude_Neutral | FLAG_Attitude_Hostile | FLAG_Attitude_Friendly;
+
+		
+		if(maxResults <= 0)
+			maxResults = 1000000;
+			
+		
+		FindGameplayEntitiesInSphere(entities, GetWorldPosition(), range, maxResults, tag, FLAG_ExcludePlayer + queryFlags);
+		entities.Remove( this );
+		entities.Remove( thePlayer );
+		
+		for(i=0; i<entities.Size(); i+=1)
+		{
+			actorEnt = (CActor)entities[i];
+
+			if(!actorEnt)
+			{
+				entities.Remove( actorEnt );
+			}
+			else
+			{
+				actors.PushBack(actorEnt);
+			}	
+		}
+		
+		return actors;
+	}
+
+	timer function tornado_target_check(deltaTime : float, id : int) 
+	{
+		var i 																		: int;
+		var victims 																: array< CActor >;
+		var fxEntities                                                              : array< CEntity >;
+		var aard_hit_ents															: array< CEntity >;
+		var damage_action 															: W3DamageAction;
+		var ticket 																	: SMovementAdjustmentRequestTicket;
+		var movementAdjustor														: CMovementAdjustor;
+		var movingAgent																: CMovingAgentComponent;
+		var damage_value															: float;
+		var entities_trap															: array< CGameplayEntity >;
+		var victim 																	: CActor;
+		var actors																	: array< CActor >;
+		var actor																	: CActor;
+		var projDMG																	: float;
+
+		entities_trap.Clear();
+
+		FindGameplayEntitiesInRange(entities_trap, this, 20, 200 );
+		entities_trap.Remove( this );
+		entities_trap.Remove( thePlayer );
+		
+		if( entities_trap.Size()>0 )
+		{
+			for ( i = 0; i <= entities_trap.Size(); i+=1 )
+			{
+				if ( VecDistanceSquared2D( entities_trap[i].GetWorldPosition(), this.GetWorldPosition() ) <= 15 * 15 )
+				{
+					if ( !aard_hit_ents.Contains( entities_trap[i] ) )
+					{
+						entities_trap[i].OnAardHit( NULL );
+						aard_hit_ents.PushBack( entities_trap[i] );
+					}
+				
+					victim = (CActor)entities_trap[i];
+
+					if ( ACS_AttitudeCheck_NoDistance( victim )  )
+					{
+						if ( victim == thePlayer
+						)
+						{
+							projDMG = 0;
+
+							return;
+						}
+
+						movingAgent = ((CActor)victim).GetMovingAgentComponent();
+
+						movementAdjustor = ((CActor)victim).GetMovingAgentComponent().GetMovementAdjustor();
+
+						ticket = movementAdjustor.CreateNewRequest( 'ACS_Mage_Tornado_Pull');
+
+						movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 3 );
+						
+						movementAdjustor.MaxLocationAdjustmentSpeed( ticket, 3 );
+
+						movementAdjustor.Continuous( ticket );
+
+						movementAdjustor.KeepActiveFor( ticket, deltaTime );
+
+						movementAdjustor.SlideTowards( ticket, this );
+
+						if( VecDistance( ((CActor)victim).GetWorldPosition(), this.GetWorldPosition() ) <= 1 )
+						{	
+							movementAdjustor.Cancel( ticket ); 	
+						}
+
+
+						damage_action =  new W3DamageAction in this;
+
+						damage_action.Initialize(GetWitcherPlayer(), victim, GetWitcherPlayer(), GetWitcherPlayer().GetName(), EHRT_None, CPS_Undefined, false, false, true, false);
+
+						damage_action.SetHitAnimationPlayType(EAHA_ForceNo);
+
+						damage_action.SetSuppressHitSounds(true);
+
+						if (ACS_GetItem_MageStaff_Water())
+						{
+							if (!((CActor)victim).HasBuff( EET_Confusion ))
+							{
+								damage_action.AddEffectInfo( EET_Confusion, 3 );
+							}
+						}
+						else if (ACS_GetItem_MageStaff_Sand())
+						{
+							if (!((CActor)victim).HasBuff( EET_Bleeding )  )
+							{
+								damage_action.AddEffectInfo( EET_Bleeding, 3 );
+							}
+						}
+						else if (ACS_GetItem_MageStaff_Fire())
+						{
+							if (!((CActor)victim).HasBuff( EET_Burning ) )
+							{
+								damage_action.AddEffectInfo( EET_Burning, 3 );
+							}
+						}
+						
+						damage_action.SetForceExplosionDismemberment();
+						
+						theGame.damageMgr.ProcessAction( damage_action );
+						
+						delete damage_action;
+					}
+				}
+			}
+		}
+	}
+
+	function stop_tag_check()
+	{
+		RemoveTimer('tag_check');
+		this.AddTag('ACS_Mage_Attack_Activated');
+	}
+}
+
+state ACS_Mage_Attack_Cone in W3ACSMageAttacks
+{
+	private var dmg																																								: W3DamageAction;
+	private var actortarget																																						: CActor;
+	private var actors    																																						: array<CActor>;
+	private var i         																																						: int;
+	private var damageMax																																						: float;
+	private var ent 																																							: CEntity;
+
+	event OnEnterState(prevStateName : name)
+	{
+		ACS_Mage_Attack_Cone_Entry();
+	}
+	
+	entry function ACS_Mage_Attack_Cone_Entry()
+	{	
+		ACS_Mage_Attack_Cone_Latent();
+	}
+
+	latent function ACS_Mage_Attack_Cone_Latent()
+	{
+		if (ACS_GetItem_MageStaff_Water())
+		{
+			parent.PlayEffect('cone_water_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Sand())
+		{
+			parent.PlayEffect('cone_sand_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Fire())
+		{
+			parent.PlayEffect('cone_fire_ACS');
+		}
+
+		actors.Clear();
+
+		actors = GetWitcherPlayer().GetNPCsAndPlayersInCone(7.5, VecHeading(GetWitcherPlayer().GetHeadingVector()), 90, 50, , FLAG_ExcludePlayer + FLAG_Attitude_Hostile + FLAG_OnlyAliveActors );
+
+		if( actors.Size() > 0 )
+		{
+			for( i = 0; i < actors.Size(); i += 1 )
+			{
+				actortarget = (CActor)actors[i];
+
+				if (actortarget.HasTag('acs_snow_entity')
+				|| actortarget.HasTag('smokeman') 
+				|| actortarget.HasTag('ACS_Tentacle_1') 
+				|| actortarget.HasTag('ACS_Tentacle_2') 
+				|| actortarget.HasTag('ACS_Tentacle_3') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_1') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_2') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_3') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_6')
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_5')
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_4')
+				|| actortarget.HasTag('ACS_Vampire_Monster_Boss_Bar') 
+				|| actortarget.HasTag('ACS_Chaos_Cloud') 
+				|| actortarget.HasTag('ACS_Transformation_Vampire_Monster_Camera_Dummy') 
+				|| actortarget.HasTag('ACS_Mage_Staff_Dolphin') 
+				|| actortarget == thePlayer
+				)
+				continue;
+
+				dmg = new W3DamageAction in theGame.damageMgr;
+				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Mage_Cone_Damage', EHRT_Heavy, CPS_Undefined, false, false, true, false);
+
+				dmg.SetProcessBuffsIfNoDamage(true);
+				dmg.SetCanPlayHitParticle(true);
+
+				if (actortarget.UsesVitality()) 
+				{ 
+					damageMax = actortarget.GetStat( BCS_Vitality ) * 0.025; 
+				} 
+				else if (actortarget.UsesEssence()) 
+				{ 
+					damageMax = actortarget.GetStat( BCS_Essence ) * 0.025; 
+				} 
+
+				dmg.SetForceExplosionDismemberment();
+
+				thePlayer.GainStat( BCS_Focus, thePlayer.GetStatMax( BCS_Focus) * 0.025 );
+
+				ent = theGame.CreateEntity( 
+			
+				(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\fx\acs_ice_breathe_old.w2ent", true ), 
+				
+				actortarget.GetWorldPosition(), thePlayer.GetWorldRotation() );
+
+				if (ACS_GetItem_MageStaff_Water())
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_ELEMENTAL, damageMax );
+
+					ent.PlayEffect('warning_up_water_ACS');
+				}
+				else if (ACS_GetItem_MageStaff_Sand())
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_ELEMENTAL, damageMax );
+
+					ent.PlayEffect('warning_up_sand_ACS');
+				}
+				else if (ACS_GetItem_MageStaff_Fire())
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_FIRE, damageMax );
+
+					ent.PlayEffect('warning_up_fire_ACS');
+				}
+
+				ent.DestroyAfter(10);
+					
+				theGame.damageMgr.ProcessAction( dmg );
+										
+				delete dmg;
+			}
+		}
+
+		parent.DestroyAfter(10);
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+state ACS_Mage_Attack_Coil in W3ACSMageAttacks
+{
+	private var dmg																																								: W3DamageAction;
+	private var actortarget																																						: CActor;
+	private var actors    																																						: array<CActor>;
+	private var i         																																						: int;
+	private var damageMax																																						: float;
+	private var ent 																																							: CEntity;
+
+	event OnEnterState(prevStateName : name)
+	{
+		ACS_Mage_Attack_Coil_Entry();
+	}
+	
+	entry function ACS_Mage_Attack_Coil_Entry()
+	{	
+		ACS_Mage_Attack_Coil_Latent();
+	}
+
+	latent function ACS_Mage_Attack_Coil_Latent()
+	{
+		if (ACS_GetItem_MageStaff_Water())
+		{
+			parent.PlayEffect('san_fx1_water_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Sand())
+		{
+			parent.PlayEffect('san_fx1_sand_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Fire())
+		{
+			parent.PlayEffect('san_fx1_fire_ACS');
+		}
+
+		actors.Clear();
+
+		actors = GetWitcherPlayer().GetNPCsAndPlayersInCone(12.5, VecHeading(GetWitcherPlayer().GetHeadingVector()), 30, 50, , FLAG_ExcludePlayer + FLAG_Attitude_Hostile + FLAG_OnlyAliveActors );
+
+		if( actors.Size() > 0 )
+		{
+			for( i = 0; i < actors.Size(); i += 1 )
+			{
+				actortarget = (CActor)actors[i];
+
+				if (actortarget.HasTag('acs_snow_entity')
+				|| actortarget.HasTag('smokeman') 
+				|| actortarget.HasTag('ACS_Tentacle_1') 
+				|| actortarget.HasTag('ACS_Tentacle_2') 
+				|| actortarget.HasTag('ACS_Tentacle_3') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_1') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_2') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_3') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_6')
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_5')
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_4')
+				|| actortarget.HasTag('ACS_Vampire_Monster_Boss_Bar') 
+				|| actortarget.HasTag('ACS_Chaos_Cloud') 
+				|| actortarget.HasTag('ACS_Transformation_Vampire_Monster_Camera_Dummy') 
+				|| actortarget.HasTag('ACS_Mage_Staff_Dolphin') 
+				|| actortarget == thePlayer
+				)
+				continue;
+
+				dmg = new W3DamageAction in theGame.damageMgr;
+				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Mage_Coil_Damage', EHRT_Heavy, CPS_Undefined, false, false, true, false);
+
+				dmg.SetProcessBuffsIfNoDamage(true);
+				dmg.SetCanPlayHitParticle(true);
+
+				if (actortarget.UsesVitality()) 
+				{ 
+					damageMax = actortarget.GetStat( BCS_Vitality ) * 0.05; 
+				} 
+				else if (actortarget.UsesEssence()) 
+				{ 
+					damageMax = actortarget.GetStat( BCS_Essence ) * 0.05; 
+				} 
+
+				dmg.SetForceExplosionDismemberment();
+
+				thePlayer.GainStat( BCS_Focus, thePlayer.GetStatMax( BCS_Focus) * 0.025 );
+
+				ent = theGame.CreateEntity( 
+			
+				(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\fx\acs_ice_breathe_old.w2ent", true ), 
+				
+				actortarget.GetWorldPosition(), thePlayer.GetWorldRotation() );
+
+				if (ACS_GetItem_MageStaff_Water())
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_ELEMENTAL, damageMax );
+
+					ent.PlayEffect('warning_up_water_ACS');
+
+					if (!actortarget.HasBuff(EET_Confusion))
+					{
+						dmg.AddEffectInfo( EET_Confusion, 0.5 );
+					}
+				}
+				else if (ACS_GetItem_MageStaff_Sand())
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_ELEMENTAL, damageMax );
+
+					ent.PlayEffect('warning_up_sand_ACS');
+
+					if (!actortarget.HasBuff(EET_Bleeding))
+					{
+						dmg.AddEffectInfo( EET_Bleeding, 0.5 );
+					}
+				}
+				else if (ACS_GetItem_MageStaff_Fire())
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_FIRE, damageMax );
+
+					ent.PlayEffect('warning_up_fire_ACS');
+
+					if (!actortarget.HasBuff(EET_Burning))
+					{
+						dmg.AddEffectInfo( EET_Burning, 0.5 );
+					}
+				}
+
+				ent.DestroyAfter(10);
+					
+				theGame.damageMgr.ProcessAction( dmg );
+										
+				delete dmg;
+			}
+		}
+
+		parent.DestroyAfter(10);
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+state ACS_Mage_Attack_Coil_With_Cone in W3ACSMageAttacks
+{
+	private var dmg																																								: W3DamageAction;
+	private var actortarget																																						: CActor;
+	private var actors    																																						: array<CActor>;
+	private var i         																																						: int;
+	private var damageMax																																						: float;
+	private var ent 																																							: CEntity;
+
+	event OnEnterState(prevStateName : name)
+	{
+		ACS_Mage_Attack_Coil_With_Cone_Entry();
+	}
+	
+	entry function ACS_Mage_Attack_Coil_With_Cone_Entry()
+	{	
+		ACS_Mage_Attack_Coil_With_Cone_Latent();
+	}
+
+	latent function ACS_Mage_Attack_Coil_With_Cone_Latent()
+	{
+		if (ACS_GetItem_MageStaff_Water())
+		{
+			parent.PlayEffect('san_fx1_water_ACS');
+			parent.PlayEffect('cone_water_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Sand())
+		{
+			parent.PlayEffect('san_fx1_sand_ACS');
+			parent.PlayEffect('cone_sand_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Fire())
+		{
+			parent.PlayEffect('san_fx1_fire_ACS');
+			parent.PlayEffect('cone_fire_ACS');
+		}
+
+		actors.Clear();
+
+		actors = GetWitcherPlayer().GetNPCsAndPlayersInCone(12.5, VecHeading(GetWitcherPlayer().GetHeadingVector()), 30, 50, , FLAG_ExcludePlayer + FLAG_Attitude_Hostile + FLAG_OnlyAliveActors );
+
+		if( actors.Size() > 0 )
+		{
+			for( i = 0; i < actors.Size(); i += 1 )
+			{
+				actortarget = (CActor)actors[i];
+
+				if (actortarget.HasTag('acs_snow_entity')
+				|| actortarget.HasTag('smokeman') 
+				|| actortarget.HasTag('ACS_Tentacle_1') 
+				|| actortarget.HasTag('ACS_Tentacle_2') 
+				|| actortarget.HasTag('ACS_Tentacle_3') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_1') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_2') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_3') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_6')
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_5')
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_4')
+				|| actortarget.HasTag('ACS_Vampire_Monster_Boss_Bar') 
+				|| actortarget.HasTag('ACS_Chaos_Cloud') 
+				|| actortarget.HasTag('ACS_Transformation_Vampire_Monster_Camera_Dummy') 
+				|| actortarget.HasTag('ACS_Mage_Staff_Dolphin') 
+				|| actortarget == thePlayer
+				)
+				continue;
+
+				dmg = new W3DamageAction in theGame.damageMgr;
+				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Mage_Coil_With_Cone_Damage', EHRT_Heavy, CPS_Undefined, false, false, true, false);
+
+				dmg.SetProcessBuffsIfNoDamage(true);
+				dmg.SetCanPlayHitParticle(true);
+
+				if (actortarget.UsesVitality()) 
+				{ 
+					damageMax = actortarget.GetStat( BCS_Vitality ) * 0.055; 
+				} 
+				else if (actortarget.UsesEssence()) 
+				{ 
+					damageMax = actortarget.GetStat( BCS_Essence ) * 0.055; 
+				} 
+
+				dmg.SetForceExplosionDismemberment();
+
+				thePlayer.GainStat( BCS_Focus, thePlayer.GetStatMax( BCS_Focus) * 0.025 );
+
+				ent = theGame.CreateEntity( 
+			
+				(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\fx\acs_ice_breathe_old.w2ent", true ), 
+				
+				actortarget.GetWorldPosition(), thePlayer.GetWorldRotation() );
+
+				if (ACS_GetItem_MageStaff_Water())
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_ELEMENTAL, damageMax );
+
+					ent.PlayEffect('warning_up_water_ACS');
+
+					if (!actortarget.HasBuff(EET_Confusion))
+					{
+						dmg.AddEffectInfo( EET_Confusion, 0.5 );
+					}
+				}
+				else if (ACS_GetItem_MageStaff_Sand())
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_ELEMENTAL, damageMax );
+
+					ent.PlayEffect('warning_up_sand_ACS');
+
+					if (!actortarget.HasBuff(EET_Bleeding))
+					{
+						dmg.AddEffectInfo( EET_Bleeding, 0.5 );
+					}
+				}
+				else if (ACS_GetItem_MageStaff_Fire())
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_FIRE, damageMax );
+
+					ent.PlayEffect('warning_up_fire_ACS');
+
+					if (!actortarget.HasBuff(EET_Burning))
+					{
+						dmg.AddEffectInfo( EET_Burning, 0.5 );
+					}
+				}
+
+				ent.DestroyAfter(10);
+					
+				theGame.damageMgr.ProcessAction( dmg );
+										
+				delete dmg;
+			}
+		}
+
+		parent.DestroyAfter(10);
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+state ACS_Mage_Attack_Blast_1 in W3ACSMageAttacks
+{
+	private var dmg																																								: W3DamageAction;
+	private var actortarget																																						: CActor;
+	private var actors    																																						: array<CActor>;
+	private var i         																																						: int;
+	private var damageMax																																						: float;
+	private var ent 																																							: CEntity;
+
+
+	event OnEnterState(prevStateName : name)
+	{
+		ACS_Mage_Attack_Blast_1_Entry();
+	}
+	
+	entry function ACS_Mage_Attack_Blast_1_Entry()
+	{	
+		ACS_Mage_Attack_Blast_1_Latent();
+	}
+
+	latent function dolphin_spawn_blast_v1_1()
+	{
+		var actor															: CActor; 
+		var temp															: CEntityTemplate;
+		var ent																: CEntity;
+		var playerPos														: Vector;
+		var meshcomp														: CComponent;
+		var animcomp 														: CAnimatedComponent;
+		var h 																: float;
+		var pos																: Vector;
+		var playerRot														: EulerAngles;
+
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\bob\data\characters\npc_entities\animals\dolphin.w2ent"
+			
+		, true );
+
+		playerPos = parent.GetWorldPosition() + parent.GetWorldRight() * 5 + parent.GetWorldForward() * 5;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw -= 45;
+		
+		ent = theGame.CreateEntity( temp, TraceFloor(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+		
+		animcomp.PlaySlotAnimationAsync( 'q703_sorcerer_water_show_magic_to_dolphins_up', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
+
+		ent.AddTag('ACS_Mage_Staff_Dolphin');
+
+		ent.DestroyAfter(10);
+	}
+
+	latent function dolphin_spawn_blast_v1_2()
+	{
+		var actor															: CActor; 
+		var temp															: CEntityTemplate;
+		var ent																: CEntity;
+		var playerPos														: Vector;
+		var meshcomp														: CComponent;
+		var animcomp 														: CAnimatedComponent;
+		var h 																: float;
+		var pos																: Vector;
+		var playerRot														: EulerAngles;
+
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\bob\data\characters\npc_entities\animals\dolphin.w2ent"
+			
+		, true );
+
+		playerPos = parent.GetWorldPosition() + parent.GetWorldRight() * -5 + parent.GetWorldForward() * 5;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += 45;
+		
+		ent = theGame.CreateEntity( temp, TraceFloor(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+		
+		animcomp.PlaySlotAnimationAsync( 'q703_sorcerer_water_show_magic_to_dolphins_up', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
+
+		ent.AddTag('ACS_Mage_Staff_Dolphin');
+
+		ent.DestroyAfter(10);
+	}
+
+	latent function dolphin_spawn_blast_v1_3()
+	{
+		var actor															: CActor; 
+		var temp															: CEntityTemplate;
+		var ent																: CEntity;
+		var playerPos														: Vector;
+		var meshcomp														: CComponent;
+		var animcomp 														: CAnimatedComponent;
+		var h 																: float;
+		var pos																: Vector;
+		var playerRot														: EulerAngles;
+
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\bob\data\characters\npc_entities\animals\dolphin.w2ent"
+			
+		, true );
+
+		playerPos = parent.GetWorldPosition() + parent.GetWorldRight() * 5 + parent.GetWorldForward() * -5;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += 225;
+		
+		ent = theGame.CreateEntity( temp, TraceFloor(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+		
+		animcomp.PlaySlotAnimationAsync( 'q703_sorcerer_water_show_magic_to_dolphins_up', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
+
+		ent.AddTag('ACS_Mage_Staff_Dolphin');
+
+		ent.DestroyAfter(10);
+	}
+
+	latent function dolphin_spawn_blast_v1_4()
+	{
+		var actor															: CActor; 
+		var temp															: CEntityTemplate;
+		var ent																: CEntity;
+		var playerPos														: Vector;
+		var meshcomp														: CComponent;
+		var animcomp 														: CAnimatedComponent;
+		var h 																: float;
+		var pos																: Vector;
+		var playerRot														: EulerAngles;
+
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\bob\data\characters\npc_entities\animals\dolphin.w2ent"
+			
+		, true );
+
+		playerPos = parent.GetWorldPosition() + parent.GetWorldRight() * -5 + parent.GetWorldForward() * -5;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw -= 225;
+		
+		ent = theGame.CreateEntity( temp, TraceFloor(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+		
+		animcomp.PlaySlotAnimationAsync( 'q703_sorcerer_water_show_magic_to_dolphins_up', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
+
+		ent.AddTag('ACS_Mage_Staff_Dolphin');
+
+		ent.DestroyAfter(10);
+	}
+
+	latent function ACS_Mage_Attack_Blast_1_Latent()
+	{
+		if (ACS_GetItem_MageStaff_Water())
+		{
+			dolphin_spawn_blast_v1_1();
+			dolphin_spawn_blast_v1_2();
+			dolphin_spawn_blast_v1_3();
+			dolphin_spawn_blast_v1_4();
+
+			parent.PlayEffect('attack_fx1_water_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Sand())
+		{
+			parent.PlayEffect('attack_fx1_sand_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Fire())
+		{
+			parent.PlayEffect('attack_fx1_fire_ACS');
+		}
+
+		actors.Clear();
+
+		actors = parent.MageAttackGetNPCsAndPlayersInRange( 5, 20, , FLAG_ExcludePlayer + FLAG_OnlyAliveActors);
+
+		actors.Remove(thePlayer);
+
+		if( actors.Size() > 0 )
+		{
+			thePlayer.DrainFocus( thePlayer.GetStatMax( BCS_Focus) * 0.05 );
+
+			for( i = 0; i < actors.Size(); i += 1 )
+			{
+				actortarget = (CActor)actors[i];
+
+				if (actortarget.HasTag('acs_snow_entity')
+				|| actortarget.HasTag('smokeman') 
+				|| actortarget.HasTag('ACS_Tentacle_1') 
+				|| actortarget.HasTag('ACS_Tentacle_2') 
+				|| actortarget.HasTag('ACS_Tentacle_3') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_1') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_2') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_3') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_6')
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_5')
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_4')
+				|| actortarget.HasTag('ACS_Vampire_Monster_Boss_Bar') 
+				|| actortarget.HasTag('ACS_Chaos_Cloud') 
+				|| actortarget.HasTag('ACS_Transformation_Vampire_Monster_Camera_Dummy') 
+				|| actortarget.HasTag('ACS_Mage_Staff_Dolphin') 
+				|| actortarget == thePlayer
+				)
+				continue;
+
+				dmg = new W3DamageAction in theGame.damageMgr;
+				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Mage_Blast_1_Damage', EHRT_Heavy, CPS_Undefined, false, false, true, false);
+
+				dmg.SetProcessBuffsIfNoDamage(true);
+				dmg.SetCanPlayHitParticle(true);
+
+				if (actortarget.UsesVitality()) 
+				{ 
+					damageMax = (actortarget.GetStatMax( BCS_Vitality ) - actortarget.GetStat( BCS_Vitality )) * 0.05; 
+				} 
+				else if (actortarget.UsesEssence()) 
+				{ 
+					damageMax = (actortarget.GetStatMax( BCS_Essence ) - actortarget.GetStat( BCS_Essence )) * 0.05; 
+				} 
+
+				dmg.SetForceExplosionDismemberment();
+
+				ent = theGame.CreateEntity( 
+			
+				(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\fx\acs_ice_breathe_old.w2ent", true ), 
+				
+				actortarget.GetWorldPosition(), thePlayer.GetWorldRotation() );
+
+				if (ACS_GetItem_MageStaff_Water())
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_ELEMENTAL, damageMax );
+
+					ent.PlayEffect('warning_up_water_ACS');
+
+					ent.PlayEffect('blood_up_water_ACS');
+
+					if (!actortarget.HasBuff(EET_Confusion))
+					{
+						dmg.AddEffectInfo( EET_Confusion, 0.5 );
+					}
+				}
+				else if (ACS_GetItem_MageStaff_Sand())
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_ELEMENTAL, damageMax );
+
+					ent.PlayEffect('warning_up_sand_ACS');
+
+					ent.PlayEffect('blood_up_sand_ACS');
+
+					if (!actortarget.HasBuff(EET_Bleeding))
+					{
+						dmg.AddEffectInfo( EET_Bleeding, 0.5 );
+					}
+				}
+				else if (ACS_GetItem_MageStaff_Fire())
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_FIRE, damageMax );
+
+					ent.PlayEffect('warning_up_fire_ACS');
+
+					ent.PlayEffect('blood_up_fire_ACS');
+
+					if (!actortarget.HasBuff(EET_Burning))
+					{
+						dmg.AddEffectInfo( EET_Burning, 0.5 );
+					}
+				}
+
+				ent.DestroyAfter(10);
+
+
+					
+				theGame.damageMgr.ProcessAction( dmg );
+										
+				delete dmg;
+			}
+		}
+
+		parent.DestroyAfter(10);
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+state ACS_Mage_Attack_Blast_2 in W3ACSMageAttacks
+{
+	private var dmg																																								: W3DamageAction;
+	private var actortarget																																						: CActor;
+	private var actors    																																						: array<CActor>;
+	private var i         																																						: int;
+	private var damageMax																																						: float;
+	private var ent 																																							: CEntity;
+
+	event OnEnterState(prevStateName : name)
+	{
+		ACS_Mage_Attack_Blast_2_Entry();
+	}
+	
+	entry function ACS_Mage_Attack_Blast_2_Entry()
+	{	
+		ACS_Mage_Attack_Blast_2_Latent();
+	}
+
+	latent function dolphin_spawn_blast_v2_1()
+	{
+		var actor															: CActor; 
+		var temp															: CEntityTemplate;
+		var ent																: CEntity;
+		var playerPos														: Vector;
+		var meshcomp														: CComponent;
+		var animcomp 														: CAnimatedComponent;
+		var h 																: float;
+		var pos																: Vector;
+		var playerRot														: EulerAngles;
+
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\bob\data\characters\npc_entities\animals\dolphin.w2ent"
+			
+		, true );
+
+		playerPos = parent.GetWorldPosition();
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw -= 45;
+		
+		ent = theGame.CreateEntity( temp, TraceFloor(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+		
+		animcomp.PlaySlotAnimationAsync( 'q703_sorcerer_water_show_magic_to_dolphins_up', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
+
+		ent.AddTag('ACS_Mage_Staff_Dolphin');
+
+		ent.DestroyAfter(10);
+	}
+
+	latent function dolphin_spawn_blast_v2_2()
+	{
+		var actor															: CActor; 
+		var temp															: CEntityTemplate;
+		var ent																: CEntity;
+		var playerPos														: Vector;
+		var meshcomp														: CComponent;
+		var animcomp 														: CAnimatedComponent;
+		var h 																: float;
+		var pos																: Vector;
+		var playerRot														: EulerAngles;
+
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\bob\data\characters\npc_entities\animals\dolphin.w2ent"
+			
+		, true );
+
+		playerPos = parent.GetWorldPosition();
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += 45;
+		
+		ent = theGame.CreateEntity( temp, TraceFloor(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+		
+		animcomp.PlaySlotAnimationAsync( 'q703_sorcerer_water_show_magic_to_dolphins_up', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
+
+		ent.AddTag('ACS_Mage_Staff_Dolphin');
+
+		ent.DestroyAfter(10);
+	}
+
+	latent function dolphin_spawn_blast_v2_3()
+	{
+		var actor															: CActor; 
+		var temp															: CEntityTemplate;
+		var ent																: CEntity;
+		var playerPos														: Vector;
+		var meshcomp														: CComponent;
+		var animcomp 														: CAnimatedComponent;
+		var h 																: float;
+		var pos																: Vector;
+		var playerRot														: EulerAngles;
+
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\bob\data\characters\npc_entities\animals\dolphin.w2ent"
+			
+		, true );
+
+		playerPos = parent.GetWorldPosition();
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += 225;
+		
+		ent = theGame.CreateEntity( temp, TraceFloor(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+		
+		animcomp.PlaySlotAnimationAsync( 'q703_sorcerer_water_show_magic_to_dolphins_up', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
+
+		ent.AddTag('ACS_Mage_Staff_Dolphin');
+
+		ent.DestroyAfter(10);
+	}
+
+	latent function dolphin_spawn_blast_v2_4()
+	{
+		var actor															: CActor; 
+		var temp															: CEntityTemplate;
+		var ent																: CEntity;
+		var playerPos														: Vector;
+		var meshcomp														: CComponent;
+		var animcomp 														: CAnimatedComponent;
+		var h 																: float;
+		var pos																: Vector;
+		var playerRot														: EulerAngles;
+
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\bob\data\characters\npc_entities\animals\dolphin.w2ent"
+			
+		, true );
+
+		playerPos = parent.GetWorldPosition();
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw -= 225;
+		
+		ent = theGame.CreateEntity( temp, TraceFloor(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+		
+		animcomp.PlaySlotAnimationAsync( 'q703_sorcerer_water_show_magic_to_dolphins_up', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
+
+		ent.AddTag('ACS_Mage_Staff_Dolphin');
+
+		ent.DestroyAfter(10);
+	}
+
+	latent function ACS_Mage_Attack_Blast_2_Latent()
+	{
+		if (ACS_GetItem_MageStaff_Water())
+		{
+			dolphin_spawn_blast_v2_1();
+			dolphin_spawn_blast_v2_2();
+			dolphin_spawn_blast_v2_3();
+			dolphin_spawn_blast_v2_4();
+
+			parent.PlayEffect('attack_special_water_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Sand())
+		{
+			parent.PlayEffect('attack_special_sand_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Fire())
+		{
+			parent.PlayEffect('attack_special_fire_ACS');
+		}
+
+		actors.Clear();
+
+		actors = parent.MageAttackGetNPCsAndPlayersInRange( 6, 20, , FLAG_ExcludePlayer + FLAG_OnlyAliveActors);
+		actors.Remove(thePlayer);
+
+		if( actors.Size() > 0 )
+		{
+			thePlayer.DrainFocus( thePlayer.GetStatMax( BCS_Focus) * 0.05 );
+
+			for( i = 0; i < actors.Size(); i += 1 )
+			{
+				actortarget = (CActor)actors[i];
+
+				if (actortarget.HasTag('acs_snow_entity')
+				|| actortarget.HasTag('smokeman') 
+				|| actortarget.HasTag('ACS_Tentacle_1') 
+				|| actortarget.HasTag('ACS_Tentacle_2') 
+				|| actortarget.HasTag('ACS_Tentacle_3') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_1') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_2') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_3') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_6')
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_5')
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_4')
+				|| actortarget.HasTag('ACS_Vampire_Monster_Boss_Bar') 
+				|| actortarget.HasTag('ACS_Chaos_Cloud') 
+				|| actortarget.HasTag('ACS_Transformation_Vampire_Monster_Camera_Dummy') 
+				|| actortarget.HasTag('ACS_Mage_Staff_Dolphin') 
+				|| actortarget == thePlayer
+				)
+				continue;
+
+				dmg = new W3DamageAction in theGame.damageMgr;
+				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Mage_Blast_2_Damage', EHRT_Heavy, CPS_Undefined, false, false, true, false);
+
+				dmg.SetProcessBuffsIfNoDamage(true);
+				dmg.SetCanPlayHitParticle(true);
+
+				if (actortarget.UsesVitality()) 
+				{ 
+					damageMax = (actortarget.GetStatMax( BCS_Vitality ) - actortarget.GetStat( BCS_Vitality )) * 0.07; 
+				} 
+				else if (actortarget.UsesEssence()) 
+				{ 
+					damageMax = (actortarget.GetStatMax( BCS_Essence ) - actortarget.GetStat( BCS_Essence )) * 0.07; 
+				} 
+
+				dmg.SetForceExplosionDismemberment();
+
+				ent = theGame.CreateEntity( 
+			
+				(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\fx\acs_ice_breathe_old.w2ent", true ), 
+				
+				actortarget.GetWorldPosition(), thePlayer.GetWorldRotation() );
+
+				if (ACS_GetItem_MageStaff_Water())
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_ELEMENTAL, damageMax );
+
+					ent.PlayEffect('warning_up_water_ACS');
+
+					ent.PlayEffect('blood_up_water_ACS');
+
+					if (!actortarget.HasBuff(EET_Confusion))
+					{
+						dmg.AddEffectInfo( EET_Confusion, 0.5 );
+					}
+				}
+				else if (ACS_GetItem_MageStaff_Sand())
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_ELEMENTAL, damageMax );
+
+					ent.PlayEffect('warning_up_sand_ACS');
+
+					ent.PlayEffect('blood_up_sand_ACS');
+
+					if (!actortarget.HasBuff(EET_Bleeding))
+					{
+						dmg.AddEffectInfo( EET_Bleeding, 0.5 );
+					}
+				}
+				else if (ACS_GetItem_MageStaff_Fire())
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_FIRE, damageMax );
+
+					ent.PlayEffect('warning_up_fire_ACS');
+
+					ent.PlayEffect('blood_up_fire_ACS');
+
+					if (!actortarget.HasBuff(EET_Burning))
+					{
+						dmg.AddEffectInfo( EET_Burning, 0.5 );
+					}
+				}
+
+				ent.DestroyAfter(10);
+
+
+
+					
+				theGame.damageMgr.ProcessAction( dmg );
+										
+				delete dmg;
+			}
+		}
+
+		parent.DestroyAfter(10);
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+state ACS_Mage_Attack_Blast_3 in W3ACSMageAttacks
+{
+	private var dmg																																								: W3DamageAction;
+	private var actortarget																																						: CActor;
+	private var actors    																																						: array<CActor>;
+	private var i         																																						: int;
+	private var damageMax																																						: float;
+	private var ent 																																							: CEntity;
+
+	event OnEnterState(prevStateName : name)
+	{
+		ACS_Mage_Attack_Blast_3_Entry();
+	}
+	
+	entry function ACS_Mage_Attack_Blast_3_Entry()
+	{	
+		ACS_Mage_Attack_Blast_3_Latent();
+	}
+
+	latent function dolphin_spawn_blast_v3_1()
+	{
+		var actor															: CActor; 
+		var temp															: CEntityTemplate;
+		var ent																: CEntity;
+		var playerPos														: Vector;
+		var meshcomp														: CComponent;
+		var animcomp 														: CAnimatedComponent;
+		var h 																: float;
+		var pos																: Vector;
+		var playerRot														: EulerAngles;
+
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\bob\data\characters\npc_entities\animals\dolphin.w2ent"
+			
+		, true );
+
+		playerPos = parent.GetWorldPosition() + parent.GetWorldRight() * 5 + parent.GetWorldForward() * 5;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw -= 45;
+		
+		ent = theGame.CreateEntity( temp, TraceFloor(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+		
+		animcomp.PlaySlotAnimationAsync( 'q703_sorcerer_water_show_magic_to_dolphins_up', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
+
+		ent.AddTag('ACS_Mage_Staff_Dolphin');
+
+		ent.DestroyAfter(10);
+	}
+
+	latent function dolphin_spawn_blast_v3_2()
+	{
+		var actor															: CActor; 
+		var temp															: CEntityTemplate;
+		var ent																: CEntity;
+		var playerPos														: Vector;
+		var meshcomp														: CComponent;
+		var animcomp 														: CAnimatedComponent;
+		var h 																: float;
+		var pos																: Vector;
+		var playerRot														: EulerAngles;
+
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\bob\data\characters\npc_entities\animals\dolphin.w2ent"
+			
+		, true );
+
+		playerPos = parent.GetWorldPosition() + parent.GetWorldRight() * -5 + parent.GetWorldForward() * 5;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += 45;
+		
+		ent = theGame.CreateEntity( temp, TraceFloor(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+		
+		animcomp.PlaySlotAnimationAsync( 'q703_sorcerer_water_show_magic_to_dolphins_up', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
+
+		ent.AddTag('ACS_Mage_Staff_Dolphin');
+
+		ent.DestroyAfter(10);
+	}
+
+	latent function dolphin_spawn_blast_v3_3()
+	{
+		var actor															: CActor; 
+		var temp															: CEntityTemplate;
+		var ent																: CEntity;
+		var playerPos														: Vector;
+		var meshcomp														: CComponent;
+		var animcomp 														: CAnimatedComponent;
+		var h 																: float;
+		var pos																: Vector;
+		var playerRot														: EulerAngles;
+
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\bob\data\characters\npc_entities\animals\dolphin.w2ent"
+			
+		, true );
+
+		playerPos = parent.GetWorldPosition() + parent.GetWorldRight() * 5 + parent.GetWorldForward() * -5;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += 225;
+		
+		ent = theGame.CreateEntity( temp, TraceFloor(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+		
+		animcomp.PlaySlotAnimationAsync( 'q703_sorcerer_water_show_magic_to_dolphins_up', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
+
+		ent.AddTag('ACS_Mage_Staff_Dolphin');
+
+		ent.DestroyAfter(10);
+	}
+
+	latent function dolphin_spawn_blast_v3_4()
+	{
+		var actor															: CActor; 
+		var temp															: CEntityTemplate;
+		var ent																: CEntity;
+		var playerPos														: Vector;
+		var meshcomp														: CComponent;
+		var animcomp 														: CAnimatedComponent;
+		var h 																: float;
+		var pos																: Vector;
+		var playerRot														: EulerAngles;
+
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\bob\data\characters\npc_entities\animals\dolphin.w2ent"
+			
+		, true );
+
+		playerPos = parent.GetWorldPosition() + parent.GetWorldRight() * -5 + parent.GetWorldForward() * -5;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw -= 225;
+		
+		ent = theGame.CreateEntity( temp, TraceFloor(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+		
+		animcomp.PlaySlotAnimationAsync( 'q703_sorcerer_water_show_magic_to_dolphins_up', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
+
+		ent.AddTag('ACS_Mage_Staff_Dolphin');
+
+		ent.DestroyAfter(10);
+	}
+
+	latent function ACS_Mage_Attack_Blast_3_Latent()
+	{
+		if (ACS_GetItem_MageStaff_Water())
+		{
+			dolphin_spawn_blast_v3_1();
+			dolphin_spawn_blast_v3_2();
+			dolphin_spawn_blast_v3_3();
+			dolphin_spawn_blast_v3_4();
+
+			parent.PlayEffect('teleport_in_water_ACS');
+			parent.PlayEffect('teleport_out_water_ACS');
+			parent.PlayEffect('blast_water_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Sand())
+		{
+			parent.PlayEffect('teleport_in_sand_ACS');
+			parent.PlayEffect('teleport_out_sand_ACS');
+			parent.PlayEffect('blast_sand_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Fire())
+		{
+			parent.PlayEffect('teleport_in_fire_ACS');
+			parent.PlayEffect('teleport_out_fire_ACS');
+			parent.PlayEffect('blast_fire_ACS');
+		}
+
+		actors.Clear();
+
+		actors = parent.MageAttackGetNPCsAndPlayersInRange( 7, 20, , FLAG_ExcludePlayer + FLAG_OnlyAliveActors);
+
+		actors.Remove(thePlayer);
+
+		if( actors.Size() > 0 )
+		{
+			thePlayer.DrainFocus( thePlayer.GetStatMax( BCS_Focus) * 0.05 );
+
+			for( i = 0; i < actors.Size(); i += 1 )
+			{
+				actortarget = (CActor)actors[i];
+
+				if (actortarget.HasTag('acs_snow_entity')
+				|| actortarget.HasTag('smokeman') 
+				|| actortarget.HasTag('ACS_Tentacle_1') 
+				|| actortarget.HasTag('ACS_Tentacle_2') 
+				|| actortarget.HasTag('ACS_Tentacle_3') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_1') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_2') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_3') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_6')
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_5')
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_4')
+				|| actortarget.HasTag('ACS_Vampire_Monster_Boss_Bar') 
+				|| actortarget.HasTag('ACS_Chaos_Cloud') 
+				|| actortarget.HasTag('ACS_Transformation_Vampire_Monster_Camera_Dummy') 
+				|| actortarget.HasTag('ACS_Mage_Staff_Dolphin') 
+				|| actortarget == thePlayer
+				)
+				continue;
+
+				dmg = new W3DamageAction in theGame.damageMgr;
+				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Mage_Blast_3_Damage', EHRT_Heavy, CPS_Undefined, false, false, true, false);
+
+				dmg.SetProcessBuffsIfNoDamage(true);
+				dmg.SetCanPlayHitParticle(true);
+
+				if (actortarget.UsesVitality()) 
+				{ 
+					damageMax = (actortarget.GetStatMax( BCS_Vitality ) - actortarget.GetStat( BCS_Vitality )) * 0.1; 
+				} 
+				else if (actortarget.UsesEssence()) 
+				{ 
+					damageMax = (actortarget.GetStatMax( BCS_Essence ) - actortarget.GetStat( BCS_Essence )) * 0.1; 
+				} 
+
+				dmg.SetForceExplosionDismemberment();
+
+				ent = theGame.CreateEntity( 
+			
+				(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\fx\acs_ice_breathe_old.w2ent", true ), 
+				
+				actortarget.GetWorldPosition(), thePlayer.GetWorldRotation() );
+
+				if (ACS_GetItem_MageStaff_Water())
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_ELEMENTAL, damageMax );
+
+					ent.PlayEffect('warning_up_water_ACS');
+
+					ent.PlayEffect('blood_up_water_ACS');
+
+					ent.PlayEffect('teleport_in_water_ACS');
+
+					ent.PlayEffect('teleport_out_water_ACS');
+
+					if (!actortarget.HasBuff(EET_Confusion))
+					{
+						dmg.AddEffectInfo( EET_Confusion, 0.5 );
+					}
+				}
+				else if (ACS_GetItem_MageStaff_Sand())
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_ELEMENTAL, damageMax );
+
+					ent.PlayEffect('warning_up_sand_ACS');
+
+					ent.PlayEffect('blood_up_sand_ACS');
+
+					ent.PlayEffect('teleport_in_sand_ACS');
+					
+					ent.PlayEffect('teleport_out_sand_ACS');
+
+					if (!actortarget.HasBuff(EET_Bleeding))
+					{
+						dmg.AddEffectInfo( EET_Bleeding, 0.5 );
+					}
+				}
+				else if (ACS_GetItem_MageStaff_Fire())
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_FIRE, damageMax );
+
+					ent.PlayEffect('warning_up_fire_ACS');
+
+					ent.PlayEffect('blood_up_fire_ACS');
+
+					ent.PlayEffect('teleport_in_fire_ACS');
+					
+					ent.PlayEffect('teleport_out_fire_ACS');
+
+					if (!actortarget.HasBuff(EET_Burning))
+					{
+						dmg.AddEffectInfo( EET_Burning, 0.5 );
+					}
+				}
+
+				ent.DestroyAfter(10);
+
+
+					
+				theGame.damageMgr.ProcessAction( dmg );
+										
+				delete dmg;
+			}
+		}
+
+		parent.DestroyAfter(10);
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+state ACS_Mage_Attack_Gust_Left in W3ACSMageAttacks
+{
+	private var dmg																																								: W3DamageAction;
+	private var actortarget																																						: CActor;
+	private var actors    																																						: array<CActor>;
+	private var i         																																						: int;
+	private var damageMax																																						: float;
+	private var ent 																																							: CEntity;
+
+
+	event OnEnterState(prevStateName : name)
+	{
+		ACS_Mage_Attack_Gust_Left_Entry();
+	}
+	
+	entry function ACS_Mage_Attack_Gust_Left_Entry()
+	{	
+		ACS_Mage_Attack_Gust_Left_Latent();
+	}
+
+	latent function dolphin_spawn_left()
+	{
+		var actor															: CActor; 
+		var temp															: CEntityTemplate;
+		var ent																: CEntity;
+		var playerPos														: Vector;
+		var meshcomp														: CComponent;
+		var animcomp 														: CAnimatedComponent;
+		var h 																: float;
+		var pos																: Vector;
+		var playerRot														: EulerAngles;
+
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\bob\data\characters\npc_entities\animals\dolphin.w2ent"
+			
+		, true );
+
+		playerPos = parent.GetWorldPosition() + parent.GetWorldRight() * 5;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw -= 90;
+		
+		ent = theGame.CreateEntity( temp, TraceFloor(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+		
+		animcomp.PlaySlotAnimationAsync( 'q703_sorcerer_water_show_magic_to_dolphins_up', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
+
+		ent.AddTag('ACS_Mage_Staff_Dolphin');
+
+		ent.DestroyAfter(10);
+	}
+
+	latent function ACS_Mage_Attack_Gust_Left_Latent()
+	{
+		if (ACS_GetItem_MageStaff_Water())
+		{
+			dolphin_spawn_left();
+			parent.PlayEffect('warning_up_left_water_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Sand())
+		{
+			parent.PlayEffect('warning_up_left_sand_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Fire())
+		{
+			parent.PlayEffect('warning_up_left_fire_ACS');
+		}
+
+		Sleep(0.5);
+
+		ACSGetEquippedSword().DestroyEffect( 'fx_staff_gameplay' );
+		ACSGetEquippedSword().PlayEffectSingle( 'fx_staff_gameplay' );
+		ACSGetEquippedSword().StopEffect( 'fx_staff_gameplay' );
+
+		if (ACS_GetItem_MageStaff_Water())
+		{
+			thePlayer.StopEffect( 'hand_sand_fx_water_ACS' );
+			thePlayer.PlayEffectSingle( 'hand_sand_fx_water_ACS' );
+			thePlayer.StopEffect( 'hand_sand_fx_water_ACS' );
+
+			parent.PlayEffect('diagonal_up_left_water_ACS');
+			parent.PlayEffect('blood_diagonal_up_left_water_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Sand())
+		{
+			thePlayer.StopEffect( 'hand_sand_fx_sand_ACS' );
+			thePlayer.PlayEffectSingle( 'hand_sand_fx_sand_ACS' );
+			thePlayer.StopEffect( 'hand_sand_fx_sand_ACS' );
+
+			parent.PlayEffect('diagonal_up_left_sand_ACS');
+			parent.PlayEffect('blood_diagonal_up_left_sand_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Fire())
+		{
+			thePlayer.StopEffect( 'hand_sand_fx_fire_ACS' );
+			thePlayer.PlayEffectSingle( 'hand_sand_fx_fire_ACS' );
+			thePlayer.StopEffect( 'hand_sand_fx_fire_ACS' );
+
+			parent.PlayEffect('diagonal_up_left_fire_ACS');
+			parent.PlayEffect('blood_diagonal_up_left_fire_ACS');
+		}
+
+		actors.Clear();
+
+		actors = parent.MageAttackGetNPCsAndPlayersInRange( 7.5, 20, , FLAG_ExcludePlayer + FLAG_OnlyAliveActors);
+
+		actors.Remove(thePlayer);
+
+		//actors.Clear();
+
+		//actors = GetWitcherPlayer().GetNPCsAndPlayersInCone(12.5, VecHeading(GetWitcherPlayer().GetHeadingVector()), 60, 50, , FLAG_ExcludePlayer + FLAG_Attitude_Hostile + FLAG_OnlyAliveActors );
+
+		if( actors.Size() > 0 )
+		{
+			for( i = 0; i < actors.Size(); i += 1 )
+			{
+				actortarget = (CActor)actors[i];
+
+				if (actortarget.HasTag('acs_snow_entity')
+				|| actortarget.HasTag('smokeman') 
+				|| actortarget.HasTag('ACS_Tentacle_1') 
+				|| actortarget.HasTag('ACS_Tentacle_2') 
+				|| actortarget.HasTag('ACS_Tentacle_3') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_1') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_2') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_3') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_6')
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_5')
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_4')
+				|| actortarget.HasTag('ACS_Vampire_Monster_Boss_Bar') 
+				|| actortarget.HasTag('ACS_Chaos_Cloud') 
+				|| actortarget.HasTag('ACS_Transformation_Vampire_Monster_Camera_Dummy') 
+				|| actortarget.HasTag('ACS_Mage_Staff_Dolphin') 
+				|| actortarget == thePlayer
+				)
+				continue;
+
+				dmg = new W3DamageAction in theGame.damageMgr;
+				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Mage_Gust_Left_Damage', EHRT_Heavy, CPS_Undefined, false, false, true, false);
+
+				dmg.SetProcessBuffsIfNoDamage(true);
+				dmg.SetCanPlayHitParticle(true);
+
+				if (actortarget.UsesVitality()) 
+				{ 
+					damageMax = actortarget.GetStat( BCS_Vitality ) * 0.07; 
+				} 
+				else if (actortarget.UsesEssence()) 
+				{ 
+					damageMax = actortarget.GetStat( BCS_Essence ) * 0.07; 
+				} 
+
+				dmg.SetForceExplosionDismemberment();
+
+				thePlayer.GainStat( BCS_Focus, thePlayer.GetStatMax( BCS_Focus) * 0.025 );
+
+				ent = theGame.CreateEntity( 
+			
+				(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\fx\acs_ice_breathe_old.w2ent", true ), 
+				
+				actortarget.GetWorldPosition(), thePlayer.GetWorldRotation() );
+
+				if (ACS_GetItem_MageStaff_Water())
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_ELEMENTAL, damageMax );
+
+					ent.PlayEffect('diagonal_up_left_water_ACS');
+					ent.PlayEffect('blood_diagonal_up_left_water_ACS');
+
+					if (!actortarget.HasBuff(EET_Confusion))
+					{
+						dmg.AddEffectInfo( EET_Confusion, 0.5 );
+					}
+				}
+				else if (ACS_GetItem_MageStaff_Sand())
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_ELEMENTAL, damageMax );
+
+					ent.PlayEffect('diagonal_up_left_sand_ACS');
+					ent.PlayEffect('blood_diagonal_up_left_sand_ACS');
+
+					if (!actortarget.HasBuff(EET_Bleeding))
+					{
+						dmg.AddEffectInfo( EET_Bleeding, 0.5 );
+					}
+				}
+				else if (ACS_GetItem_MageStaff_Fire())
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_FIRE, damageMax );
+
+					ent.PlayEffect('diagonal_up_left_fire_ACS');
+					ent.PlayEffect('blood_diagonal_up_left_fire_ACS');
+
+					if (!actortarget.HasBuff(EET_Burning))
+					{
+						dmg.AddEffectInfo( EET_Burning, 0.5 );
+					}
+				}
+
+				ent.DestroyAfter(10);
+
+
+					
+				theGame.damageMgr.ProcessAction( dmg );
+										
+				delete dmg;
+			}
+		}
+
+		parent.DestroyAfter(10);
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+state ACS_Mage_Attack_Gust_Right in W3ACSMageAttacks
+{
+	private var dmg																																								: W3DamageAction;
+	private var actortarget																																						: CActor;
+	private var actors    																																						: array<CActor>;
+	private var i         																																						: int;
+	private var damageMax																																						: float;
+	private var ent 																																							: CEntity;
+
+
+	event OnEnterState(prevStateName : name)
+	{
+		ACS_Mage_Attack_Gust_Right_Entry();
+	}
+	
+	entry function ACS_Mage_Attack_Gust_Right_Entry()
+	{	
+		ACS_Mage_Attack_Gust_Right_Latent();
+	}
+
+	latent function dolphin_spawn_right()
+	{
+		var actor															: CActor; 
+		var temp															: CEntityTemplate;
+		var ent																: CEntity;
+		var playerPos														: Vector;
+		var meshcomp														: CComponent;
+		var animcomp 														: CAnimatedComponent;
+		var h 																: float;
+		var pos																: Vector;
+		var playerRot														: EulerAngles;
+
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\bob\data\characters\npc_entities\animals\dolphin.w2ent"
+			
+		, true );
+
+		playerPos = parent.GetWorldPosition() + parent.GetWorldRight() * -5;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += 90;
+		
+		ent = theGame.CreateEntity( temp, TraceFloor(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+		
+		animcomp.PlaySlotAnimationAsync( 'q703_sorcerer_water_show_magic_to_dolphins_up', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
+
+		ent.AddTag('ACS_Mage_Staff_Dolphin');
+
+		ent.DestroyAfter(10);
+	}
+
+	latent function ACS_Mage_Attack_Gust_Right_Latent()
+	{
+		if (ACS_GetItem_MageStaff_Water())
+		{
+			dolphin_spawn_right();
+			parent.PlayEffect('warning_up_right_water_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Sand())
+		{
+			parent.PlayEffect('warning_up_right_sand_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Fire())
+		{
+			parent.PlayEffect('warning_up_right_fire_ACS');
+		}
+
+		Sleep(0.5);
+
+		ACSGetEquippedSword().DestroyEffect( 'fx_staff_gameplay' );
+		ACSGetEquippedSword().PlayEffectSingle( 'fx_staff_gameplay' );
+		ACSGetEquippedSword().StopEffect( 'fx_staff_gameplay' );
+
+		if (ACS_GetItem_MageStaff_Water())
+		{
+			thePlayer.StopEffect( 'hand_sand_fx_water_ACS' );
+			thePlayer.PlayEffectSingle( 'hand_sand_fx_water_ACS' );
+			thePlayer.StopEffect( 'hand_sand_fx_water_ACS' );
+
+			parent.PlayEffect('diagonal_up_right_water_ACS');
+			parent.PlayEffect('blood_diagonal_up_right_water_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Sand())
+		{
+			thePlayer.StopEffect( 'hand_sand_fx_sand_ACS' );
+			thePlayer.PlayEffectSingle( 'hand_sand_fx_sand_ACS' );
+			thePlayer.StopEffect( 'hand_sand_fx_sand_ACS' );
+
+			parent.PlayEffect('diagonal_up_right_sand_ACS');
+			parent.PlayEffect('blood_diagonal_up_right_sand_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Fire())
+		{
+			thePlayer.StopEffect( 'hand_sand_fx_fire_ACS' );
+			thePlayer.PlayEffectSingle( 'hand_sand_fx_fire_ACS' );
+			thePlayer.StopEffect( 'hand_sand_fx_fire_ACS' );
+
+			parent.PlayEffect('diagonal_up_right_fire_ACS');
+			parent.PlayEffect('blood_diagonal_up_right_fire_ACS');
+		}
+
+		actors.Clear();
+
+		actors = parent.MageAttackGetNPCsAndPlayersInRange( 7.5, 20, , FLAG_ExcludePlayer + FLAG_OnlyAliveActors);
+
+		actors.Remove(thePlayer);
+
+		//actors.Clear();
+
+		//actors = GetWitcherPlayer().GetNPCsAndPlayersInCone(12.5, VecHeading(GetWitcherPlayer().GetHeadingVector()), 60, 50, , FLAG_ExcludePlayer + FLAG_Attitude_Hostile + FLAG_OnlyAliveActors );
+
+		if( actors.Size() > 0 )
+		{
+			for( i = 0; i < actors.Size(); i += 1 )
+			{
+				actortarget = (CActor)actors[i];
+
+				if (actortarget.HasTag('acs_snow_entity')
+				|| actortarget.HasTag('smokeman') 
+				|| actortarget.HasTag('ACS_Tentacle_1') 
+				|| actortarget.HasTag('ACS_Tentacle_2') 
+				|| actortarget.HasTag('ACS_Tentacle_3') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_1') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_2') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_3') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_6')
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_5')
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_4')
+				|| actortarget.HasTag('ACS_Vampire_Monster_Boss_Bar') 
+				|| actortarget.HasTag('ACS_Chaos_Cloud') 
+				|| actortarget.HasTag('ACS_Transformation_Vampire_Monster_Camera_Dummy') 
+				|| actortarget.HasTag('ACS_Mage_Staff_Dolphin') 
+				|| actortarget == thePlayer
+				)
+				continue;
+
+				dmg = new W3DamageAction in theGame.damageMgr;
+				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Mage_Gust_Right_Damage', EHRT_Heavy, CPS_Undefined, false, false, true, false);
+
+				dmg.SetProcessBuffsIfNoDamage(true);
+				dmg.SetCanPlayHitParticle(true);
+
+				if (actortarget.UsesVitality()) 
+				{ 
+					damageMax = actortarget.GetStat( BCS_Vitality ) * 0.07; 
+				} 
+				else if (actortarget.UsesEssence()) 
+				{ 
+					damageMax = actortarget.GetStat( BCS_Essence ) * 0.07; 
+				} 
+
+				dmg.SetForceExplosionDismemberment();
+
+				thePlayer.GainStat( BCS_Focus, thePlayer.GetStatMax( BCS_Focus) * 0.025 );
+
+
+				ent = theGame.CreateEntity( 
+			
+				(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\fx\acs_ice_breathe_old.w2ent", true ), 
+				
+				actortarget.GetWorldPosition(), thePlayer.GetWorldRotation() );
+
+				if (ACS_GetItem_MageStaff_Water())
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_ELEMENTAL, damageMax );
+
+					ent.PlayEffect('diagonal_up_right_water_ACS');
+					ent.PlayEffect('blood_diagonal_up_right_water_ACS');
+
+					if (!actortarget.HasBuff(EET_Confusion))
+					{
+						dmg.AddEffectInfo( EET_Confusion, 0.5 );
+					}
+				}
+				else if (ACS_GetItem_MageStaff_Sand())
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_ELEMENTAL, damageMax );
+
+					ent.PlayEffect('diagonal_up_right_sand_ACS');
+					ent.PlayEffect('blood_diagonal_up_right_sand_ACS');
+
+					if (!actortarget.HasBuff(EET_Bleeding))
+					{
+						dmg.AddEffectInfo( EET_Bleeding, 0.5 );
+					}
+				}
+				else if (ACS_GetItem_MageStaff_Fire())
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_FIRE, damageMax );
+
+					ent.PlayEffect('diagonal_up_right_fire_ACS');
+					ent.PlayEffect('blood_diagonal_up_right_fire_ACS');
+
+					if (!actortarget.HasBuff(EET_Burning))
+					{
+						dmg.AddEffectInfo( EET_Burning, 0.5 );
+					}
+				}
+
+				ent.DestroyAfter(10);
+
+					
+				theGame.damageMgr.ProcessAction( dmg );
+										
+				delete dmg;
+			}
+		}
+
+		parent.DestroyAfter(10);
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+state ACS_Mage_Attack_Gust_Up in W3ACSMageAttacks
+{
+	private var dmg																																								: W3DamageAction;
+	private var actortarget																																						: CActor;
+	private var actors    																																						: array<CActor>;
+	private var i         																																						: int;
+	private var damageMax																																						: float;
+	private var ent 																																							: CEntity;
+
+
+	event OnEnterState(prevStateName : name)
+	{
+		ACS_Mage_Attack_Gust_Up_Entry();
+	}
+	
+	entry function ACS_Mage_Attack_Gust_Up_Entry()
+	{	
+		ACS_Mage_Attack_Gust_Up_Latent();
+	}
+
+	latent function dolphin_spawn_up_1()
+	{
+		var actor															: CActor; 
+		var temp															: CEntityTemplate;
+		var ent																: CEntity;
+		var playerPos														: Vector;
+		var meshcomp														: CComponent;
+		var animcomp 														: CAnimatedComponent;
+		var h 																: float;
+		var pos																: Vector;
+		var playerRot														: EulerAngles;
+
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\bob\data\characters\npc_entities\animals\dolphin.w2ent"
+			
+		, true );
+
+		playerPos = parent.GetWorldPosition();
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw -= 90;
+		
+		ent = theGame.CreateEntity( temp, TraceFloor(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+		
+		animcomp.PlaySlotAnimationAsync( 'q703_sorcerer_water_show_magic_to_dolphins_up', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
+
+		ent.AddTag('ACS_Mage_Staff_Dolphin');
+
+		ent.DestroyAfter(10);
+	}
+
+	latent function dolphin_spawn_up_2()
+	{
+		var actor															: CActor; 
+		var temp															: CEntityTemplate;
+		var ent																: CEntity;
+		var playerPos														: Vector;
+		var meshcomp														: CComponent;
+		var animcomp 														: CAnimatedComponent;
+		var h 																: float;
+		var pos																: Vector;
+		var playerRot														: EulerAngles;
+
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\bob\data\characters\npc_entities\animals\dolphin.w2ent"
+			
+		, true );
+
+		playerPos = parent.GetWorldPosition();
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += 90;
+		
+		ent = theGame.CreateEntity( temp, TraceFloor(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+		
+		animcomp.PlaySlotAnimationAsync( 'q703_sorcerer_water_show_magic_to_dolphins_up', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
+
+		ent.AddTag('ACS_Mage_Staff_Dolphin');
+
+		ent.DestroyAfter(10);
+	}
+
+	latent function ACS_Mage_Attack_Gust_Up_Latent()
+	{
+		if (ACS_GetItem_MageStaff_Water())
+		{
+			dolphin_spawn_up_1();
+			dolphin_spawn_up_2();
+			parent.PlayEffect('warning_up_water_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Sand())
+		{
+			parent.PlayEffect('warning_up_sand_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Fire())
+		{
+			parent.PlayEffect('warning_up_fire_ACS');
+		}
+
+		Sleep(0.5);
+
+		ACSGetEquippedSword().DestroyEffect( 'fx_staff_gameplay' );
+		ACSGetEquippedSword().PlayEffectSingle( 'fx_staff_gameplay' );
+		ACSGetEquippedSword().StopEffect( 'fx_staff_gameplay' );
+
+		if (ACS_GetItem_MageStaff_Water())
+		{
+			thePlayer.StopEffect( 'hand_sand_fx_water_ACS' );
+			thePlayer.PlayEffectSingle( 'hand_sand_fx_water_ACS' );
+			thePlayer.StopEffect( 'hand_sand_fx_water_ACS' );
+
+			parent.PlayEffect('up_water_ACS');
+			parent.PlayEffect('blood_up_water_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Sand())
+		{
+			thePlayer.StopEffect( 'hand_sand_fx_sand_ACS' );
+			thePlayer.PlayEffectSingle( 'hand_sand_fx_sand_ACS' );
+			thePlayer.StopEffect( 'hand_sand_fx_sand_ACS' );
+
+			parent.PlayEffect('up_sand_ACS');
+			parent.PlayEffect('blood_up_sand_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Fire())
+		{
+			thePlayer.StopEffect( 'hand_sand_fx_fire_ACS' );
+			thePlayer.PlayEffectSingle( 'hand_sand_fx_fire_ACS' );
+			thePlayer.StopEffect( 'hand_sand_fx_fire_ACS' );
+
+			parent.PlayEffect('up_fire_ACS');
+			parent.PlayEffect('blood_up_fire_ACS');
+		}
+
+		actors.Clear();
+
+		actors = parent.MageAttackGetNPCsAndPlayersInRange( 7.5, 20, , FLAG_ExcludePlayer + FLAG_OnlyAliveActors);
+
+		actors.Remove(thePlayer);
+
+		//actors.Clear();
+
+		//actors = GetWitcherPlayer().GetNPCsAndPlayersInCone(12.5, VecHeading(GetWitcherPlayer().GetHeadingVector()), 60, 50, , FLAG_ExcludePlayer + FLAG_Attitude_Hostile + FLAG_OnlyAliveActors );
+
+		if( actors.Size() > 0 )
+		{
+			for( i = 0; i < actors.Size(); i += 1 )
+			{
+				actortarget = (CActor)actors[i];
+
+				if (actortarget.HasTag('acs_snow_entity')
+				|| actortarget.HasTag('smokeman') 
+				|| actortarget.HasTag('ACS_Tentacle_1') 
+				|| actortarget.HasTag('ACS_Tentacle_2') 
+				|| actortarget.HasTag('ACS_Tentacle_3') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_1') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_2') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_3') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_6')
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_5')
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_4')
+				|| actortarget.HasTag('ACS_Vampire_Monster_Boss_Bar') 
+				|| actortarget.HasTag('ACS_Chaos_Cloud') 
+				|| actortarget.HasTag('ACS_Transformation_Vampire_Monster_Camera_Dummy') 
+				|| actortarget.HasTag('ACS_Mage_Staff_Dolphin') 
+				|| actortarget == thePlayer
+				)
+				continue;
+
+				dmg = new W3DamageAction in theGame.damageMgr;
+				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Mage_Gust_Up_Damage', EHRT_Heavy, CPS_Undefined, false, false, true, false);
+
+				dmg.SetProcessBuffsIfNoDamage(true);
+				dmg.SetCanPlayHitParticle(true);
+
+				if (actortarget.UsesVitality()) 
+				{ 
+					damageMax = actortarget.GetStat( BCS_Vitality ) * 0.1; 
+				} 
+				else if (actortarget.UsesEssence()) 
+				{ 
+					damageMax = actortarget.GetStat( BCS_Essence ) * 0.1; 
+				} 
+
+				dmg.SetForceExplosionDismemberment();
+
+				thePlayer.GainStat( BCS_Focus, thePlayer.GetStatMax( BCS_Focus) * 0.025 );
+
+				ent = theGame.CreateEntity( 
+			
+				(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\fx\acs_ice_breathe_old.w2ent", true ), 
+				
+				actortarget.GetWorldPosition(), thePlayer.GetWorldRotation() );
+
+				if (ACS_GetItem_MageStaff_Water())
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_ELEMENTAL, damageMax );
+
+					ent.PlayEffect('up_water_ACS');
+					ent.PlayEffect('blood_up_water_ACS');
+
+					if (!actortarget.HasBuff(EET_Confusion))
+					{
+						dmg.AddEffectInfo( EET_Confusion, 0.5 );
+					}
+				}
+				else if (ACS_GetItem_MageStaff_Sand())
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_ELEMENTAL, damageMax );
+
+					ent.PlayEffect('up_sand_ACS');
+					ent.PlayEffect('blood_up_sand_ACS');
+
+					if (!actortarget.HasBuff(EET_Bleeding))
+					{
+						dmg.AddEffectInfo( EET_Bleeding, 0.5 );
+					}
+				}
+				else if (ACS_GetItem_MageStaff_Fire())
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_FIRE, damageMax );
+
+					ent.PlayEffect('up_fire_ACS');
+					ent.PlayEffect('blood_up_fire_ACS');
+
+					if (!actortarget.HasBuff(EET_Burning))
+					{
+						dmg.AddEffectInfo( EET_Burning, 0.5 );
+					}
+				}
+
+				ent.DestroyAfter(10);
+
+
+					
+				theGame.damageMgr.ProcessAction( dmg );
+										
+				delete dmg;
+
+			}
+		}
+
+		parent.DestroyAfter(10);
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+state ACS_Mage_Attack_Mega_Gust in W3ACSMageAttacks
+{
+	private var dmg																																								: W3DamageAction;
+	private var actortarget																																						: CActor;
+	private var actors    																																						: array<CActor>;
+	private var i         																																						: int;
+	private var damageMax																																						: float;
+	private var ent 																																							: CEntity;
+
+
+	event OnEnterState(prevStateName : name)
+	{
+		ACS_Mage_Attack_Mega_Gust_Entry();
+	}
+	
+	entry function ACS_Mage_Attack_Mega_Gust_Entry()
+	{	
+		ACS_Mage_Attack_Mega_Gust_Latent();
+	}
+
+	latent function dolphin_spawn_mega_1()
+	{
+		var actor															: CActor; 
+		var temp															: CEntityTemplate;
+		var ent																: CEntity;
+		var playerPos														: Vector;
+		var meshcomp														: CComponent;
+		var animcomp 														: CAnimatedComponent;
+		var h 																: float;
+		var pos																: Vector;
+		var playerRot														: EulerAngles;
+
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\bob\data\characters\npc_entities\animals\dolphin.w2ent"
+			
+		, true );
+
+		playerPos = parent.GetWorldPosition() + parent.GetWorldRight() * 5 + parent.GetWorldForward() * 5;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw -= 45;
+		
+		ent = theGame.CreateEntity( temp, TraceFloor(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+		
+		animcomp.PlaySlotAnimationAsync( 'q703_sorcerer_water_show_magic_to_dolphins_up', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
+		
+		ent.AddTag('ACS_Mage_Staff_Dolphin');
+
+		ent.DestroyAfter(10);
+	}
+
+	latent function dolphin_spawn_mega_2()
+	{
+		var actor															: CActor; 
+		var temp															: CEntityTemplate;
+		var ent																: CEntity;
+		var playerPos														: Vector;
+		var meshcomp														: CComponent;
+		var animcomp 														: CAnimatedComponent;
+		var h 																: float;
+		var pos																: Vector;
+		var playerRot														: EulerAngles;
+
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\bob\data\characters\npc_entities\animals\dolphin.w2ent"
+			
+		, true );
+
+		playerPos = parent.GetWorldPosition() + parent.GetWorldRight() * -5 + parent.GetWorldForward() * 5;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += 45;
+		
+		ent = theGame.CreateEntity( temp, TraceFloor(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+		
+		animcomp.PlaySlotAnimationAsync( 'q703_sorcerer_water_show_magic_to_dolphins_up', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
+
+		ent.AddTag('ACS_Mage_Staff_Dolphin');
+
+		ent.DestroyAfter(10);
+	}
+
+	latent function dolphin_spawn_mega_3()
+	{
+		var actor															: CActor; 
+		var temp															: CEntityTemplate;
+		var ent																: CEntity;
+		var playerPos														: Vector;
+		var meshcomp														: CComponent;
+		var animcomp 														: CAnimatedComponent;
+		var h 																: float;
+		var pos																: Vector;
+		var playerRot														: EulerAngles;
+
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\bob\data\characters\npc_entities\animals\dolphin.w2ent"
+			
+		, true );
+
+		playerPos = parent.GetWorldPosition() + parent.GetWorldRight() * 5 + parent.GetWorldForward() * -5;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += 225;
+		
+		ent = theGame.CreateEntity( temp, TraceFloor(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+		
+		animcomp.PlaySlotAnimationAsync( 'q703_sorcerer_water_show_magic_to_dolphins_up', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
+
+		ent.AddTag('ACS_Mage_Staff_Dolphin');
+
+		ent.DestroyAfter(10);
+	}
+
+	latent function dolphin_spawn_mega_4()
+	{
+		var actor															: CActor; 
+		var temp															: CEntityTemplate;
+		var ent																: CEntity;
+		var playerPos														: Vector;
+		var meshcomp														: CComponent;
+		var animcomp 														: CAnimatedComponent;
+		var h 																: float;
+		var pos																: Vector;
+		var playerRot														: EulerAngles;
+
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\bob\data\characters\npc_entities\animals\dolphin.w2ent"
+			
+		, true );
+
+		playerPos = parent.GetWorldPosition() + parent.GetWorldRight() * -5 + parent.GetWorldForward() * -5;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw -= 225;
+		
+		ent = theGame.CreateEntity( temp, TraceFloor(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+		
+		animcomp.PlaySlotAnimationAsync( 'q703_sorcerer_water_show_magic_to_dolphins_up', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
+
+		ent.AddTag('ACS_Mage_Staff_Dolphin');
+
+		ent.DestroyAfter(10);
+	}
+
+	latent function ACS_Mage_Attack_Mega_Gust_Latent()
+	{
+		if (ACS_GetItem_MageStaff_Water())
+		{
+			dolphin_spawn_mega_1();
+			dolphin_spawn_mega_2();
+			dolphin_spawn_mega_3();
+			dolphin_spawn_mega_4();
+
+			parent.PlayEffect('warning_up_water_ACS');
+			parent.PlayEffect('warning_up_left_water_ACS');
+			parent.PlayEffect('warning_up_right_water_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Sand())
+		{
+			parent.PlayEffect('warning_up_sand_ACS');
+			parent.PlayEffect('warning_up_left_sand_ACS');
+			parent.PlayEffect('warning_up_right_sand_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Fire())
+		{
+			parent.PlayEffect('warning_up_fire_ACS');
+			parent.PlayEffect('warning_up_left_fire_ACS');
+			parent.PlayEffect('warning_up_right_fire_ACS');
+		}
+
+		Sleep(1.5);
+
+		ACSGetEquippedSword().DestroyEffect( 'fx_staff_gameplay' );
+		ACSGetEquippedSword().PlayEffectSingle( 'fx_staff_gameplay' );
+		ACSGetEquippedSword().StopEffect( 'fx_staff_gameplay' );
+
+		if (ACS_GetItem_MageStaff_Water())
+		{
+			thePlayer.StopEffect( 'hand_sand_fx_water_ACS' );
+			thePlayer.PlayEffectSingle( 'hand_sand_fx_water_ACS' );
+			thePlayer.StopEffect( 'hand_sand_fx_water_ACS' );
+
+			parent.PlayEffect('teleport_in_water_ACS');
+			parent.PlayEffect('teleport_out_water_ACS');
+			parent.PlayEffect('quicksand_yrden_water_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Sand())
+		{
+			thePlayer.StopEffect( 'hand_sand_fx_sand_ACS' );
+			thePlayer.PlayEffectSingle( 'hand_sand_fx_sand_ACS' );
+			thePlayer.StopEffect( 'hand_sand_fx_sand_ACS' );
+
+			parent.PlayEffect('teleport_in_sand_ACS');
+			parent.PlayEffect('teleport_out_sand_ACS');
+			parent.PlayEffect('quicksand_yrden_sand_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Fire())
+		{
+			thePlayer.StopEffect( 'hand_sand_fx_fire_ACS' );
+			thePlayer.PlayEffectSingle( 'hand_sand_fx_fire_ACS' );
+			thePlayer.StopEffect( 'hand_sand_fx_fire_ACS' );
+
+			parent.PlayEffect('teleport_in_fire_ACS');
+			parent.PlayEffect('teleport_out_fire_ACS');
+			parent.PlayEffect('quicksand_yrden_fire_ACS');
+		}
+
+		actors.Clear();
+
+		actors = parent.MageAttackGetNPCsAndPlayersInRange( 10, 20, , FLAG_ExcludePlayer + FLAG_OnlyAliveActors);
+
+		actors.Remove(thePlayer);
+
+		//actors.Clear();
+
+		//actors = GetWitcherPlayer().GetNPCsAndPlayersInCone(12.5, VecHeading(GetWitcherPlayer().GetHeadingVector()), 60, 50, , FLAG_ExcludePlayer + FLAG_Attitude_Hostile + FLAG_OnlyAliveActors );
+
+		if( actors.Size() > 0 )
+		{
+			thePlayer.DrainFocus( thePlayer.GetStatMax( BCS_Focus) * 0.05 );
+
+			for( i = 0; i < actors.Size(); i += 1 )
+			{
+				actortarget = (CActor)actors[i];
+
+				if (actortarget.HasTag('acs_snow_entity')
+				|| actortarget.HasTag('smokeman') 
+				|| actortarget.HasTag('ACS_Tentacle_1') 
+				|| actortarget.HasTag('ACS_Tentacle_2') 
+				|| actortarget.HasTag('ACS_Tentacle_3') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_1') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_2') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_3') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_6')
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_5')
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_4')
+				|| actortarget.HasTag('ACS_Vampire_Monster_Boss_Bar') 
+				|| actortarget.HasTag('ACS_Chaos_Cloud') 
+				|| actortarget.HasTag('ACS_Transformation_Vampire_Monster_Camera_Dummy') 
+				|| actortarget.HasTag('ACS_Mage_Staff_Dolphin') 
+				|| actortarget == thePlayer
+				)
+				continue;
+
+				dmg = new W3DamageAction in theGame.damageMgr;
+				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Mage_Mega_Gust_Damage', EHRT_Heavy, CPS_Undefined, false, false, true, false);
+
+				dmg.SetProcessBuffsIfNoDamage(true);
+				dmg.SetCanPlayHitParticle(true);
+
+				if (actortarget.UsesVitality()) 
+				{ 
+					damageMax = (actortarget.GetStatMax( BCS_Vitality ) - actortarget.GetStat( BCS_Vitality )) * 0.1; 
+				} 
+				else if (actortarget.UsesEssence()) 
+				{ 
+					damageMax = (actortarget.GetStatMax( BCS_Essence ) - actortarget.GetStat( BCS_Essence )) * 0.1; 
+				} 
+
+				dmg.SetForceExplosionDismemberment();
+
+				ent = theGame.CreateEntity( 
+			
+				(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\fx\acs_ice_breathe_old.w2ent", true ), 
+				
+				actortarget.GetWorldPosition(), thePlayer.GetWorldRotation() );
+
+				if (ACS_GetItem_MageStaff_Water())
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_ELEMENTAL, damageMax );
+
+					ent.PlayEffect('teleport_in_water_ACS');
+
+					ent.PlayEffect('teleport_out_water_ACS');
+
+					ent.PlayEffect('quicksand_yrden_water_ACS');
+
+					if (!actortarget.HasBuff(EET_Confusion))
+					{
+						dmg.AddEffectInfo( EET_Confusion, 0.5 );
+					}
+				}
+				else if (ACS_GetItem_MageStaff_Sand())
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_ELEMENTAL, damageMax );
+
+					ent.PlayEffect('teleport_in_sand_ACS');
+
+					ent.PlayEffect('teleport_out_sand_ACS');
+
+					ent.PlayEffect('quicksand_yrden_sand_ACS');
+
+					if (!actortarget.HasBuff(EET_Bleeding))
+					{
+						dmg.AddEffectInfo( EET_Bleeding, 0.5 );
+					}
+				}
+				else if (ACS_GetItem_MageStaff_Fire())
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_FIRE, damageMax );
+
+					ent.PlayEffect('teleport_in_fire_ACS');
+
+					ent.PlayEffect('teleport_out_fire_ACS');
+
+					ent.PlayEffect('quicksand_yrden_fire_ACS');
+
+					if (!actortarget.HasBuff(EET_Burning))
+					{
+						dmg.AddEffectInfo( EET_Burning, 0.5 );
+					}
+				}
+
+				ent.DestroyAfter(10);
+				
+					
+				theGame.damageMgr.ProcessAction( dmg );
+										
+				delete dmg;
+			}
+		}
+
+		parent.DestroyAfter(10);
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+state ACS_Mage_Attack_Quicksand in W3ACSMageAttacks
+{
+	private var dmg																																								: W3DamageAction;
+	private var actortarget																																						: CActor;
+	private var actors    																																						: array<CActor>;
+	private var i         																																						: int;
+	private var damageMax																																						: float;
+	private var ent 																																							: CEntity;
+	private var animcomp 																																						: CAnimatedComponent;
+
+	event OnEnterState(prevStateName : name)
+	{
+		ACS_Mage_Attack_Quicksand_Entry();
+	}
+	
+	entry function ACS_Mage_Attack_Quicksand_Entry()
+	{	
+		ACS_Mage_Attack_Quicksand_Latent();
+	}
+
+	latent function dolphin_spawn_quicksand_1()
+	{
+		var actor															: CActor; 
+		var temp															: CEntityTemplate;
+		var ent																: CEntity;
+		var playerPos														: Vector;
+		var meshcomp														: CComponent;
+		var animcomp 														: CAnimatedComponent;
+		var h 																: float;
+		var pos																: Vector;
+		var playerRot														: EulerAngles;
+
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\bob\data\characters\npc_entities\animals\dolphin.w2ent"
+			
+		, true );
+
+		playerPos = parent.GetWorldPosition();
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw -= 45;
+		
+		ent = theGame.CreateEntity( temp, TraceFloor(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+		
+		animcomp.PlaySlotAnimationAsync( 'q703_sorcerer_water_show_magic_to_dolphins_left_to_right_v2', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
+
+		ent.AddTag('ACS_Mage_Staff_Dolphin');
+
+		ent.DestroyAfter(20);
+	}
+
+	latent function dolphin_spawn_quicksand_2()
+	{
+		var actor															: CActor; 
+		var temp															: CEntityTemplate;
+		var ent																: CEntity;
+		var playerPos														: Vector;
+		var meshcomp														: CComponent;
+		var animcomp 														: CAnimatedComponent;
+		var h 																: float;
+		var pos																: Vector;
+		var playerRot														: EulerAngles;
+
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\bob\data\characters\npc_entities\animals\dolphin.w2ent"
+			
+		, true );
+
+		playerPos = parent.GetWorldPosition();
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += 45;
+		
+		ent = theGame.CreateEntity( temp, TraceFloor(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+		
+		animcomp.PlaySlotAnimationAsync( 'q703_sorcerer_water_show_magic_to_dolphins_left_to_right_v2', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
+
+		ent.AddTag('ACS_Mage_Staff_Dolphin');
+
+		ent.DestroyAfter(20);
+	}
+
+	latent function dolphin_spawn_quicksand_3()
+	{
+		var actor															: CActor; 
+		var temp															: CEntityTemplate;
+		var ent																: CEntity;
+		var playerPos														: Vector;
+		var meshcomp														: CComponent;
+		var animcomp 														: CAnimatedComponent;
+		var h 																: float;
+		var pos																: Vector;
+		var playerRot														: EulerAngles;
+
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\bob\data\characters\npc_entities\animals\dolphin.w2ent"
+			
+		, true );
+
+		playerPos = parent.GetWorldPosition();
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += 225;
+		
+		ent = theGame.CreateEntity( temp, TraceFloor(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+		
+		animcomp.PlaySlotAnimationAsync( 'q703_sorcerer_water_show_magic_to_dolphins_left_to_right_v2', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
+
+		ent.AddTag('ACS_Mage_Staff_Dolphin');
+
+		ent.DestroyAfter(20);
+	}
+
+	latent function dolphin_spawn_quicksand_4()
+	{
+		var actor															: CActor; 
+		var temp															: CEntityTemplate;
+		var ent																: CEntity;
+		var playerPos														: Vector;
+		var meshcomp														: CComponent;
+		var animcomp 														: CAnimatedComponent;
+		var h 																: float;
+		var pos																: Vector;
+		var playerRot														: EulerAngles;
+
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\bob\data\characters\npc_entities\animals\dolphin.w2ent"
+			
+		, true );
+
+		playerPos = parent.GetWorldPosition();
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw -= 225;
+		
+		ent = theGame.CreateEntity( temp, TraceFloor(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+		
+		animcomp.PlaySlotAnimationAsync( 'q703_sorcerer_water_show_magic_to_dolphins_left_to_right_v2', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
+
+		ent.AddTag('ACS_Mage_Staff_Dolphin');
+
+		ent.DestroyAfter(20);
+	}
+
+	latent function ACS_Mage_Attack_Quicksand_Latent()
+	{
+		if (ACS_GetItem_MageStaff_Water())
+		{
+			dolphin_spawn_quicksand_1();
+			dolphin_spawn_quicksand_2();
+			dolphin_spawn_quicksand_3();
+			dolphin_spawn_quicksand_4();
+
+			parent.PlayEffect('trap_pre_2_water_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Sand())
+		{
+			parent.PlayEffect('trap_pre_sand_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Fire())
+		{
+			parent.PlayEffect('trap_pre_fire_ACS');
+		}
+
+		Sleep(1);
+
+		ACSGetEquippedSword().DestroyEffect( 'fx_staff_cast' );
+		ACSGetEquippedSword().PlayEffectSingle( 'fx_staff_cast' );
+		ACSGetEquippedSword().StopEffect( 'fx_staff_cast' );
+
+		ACSGetEquippedSword().DestroyEffect( 'fx_staff_gameplay' );
+		ACSGetEquippedSword().PlayEffectSingle( 'fx_staff_gameplay' );
+		ACSGetEquippedSword().StopEffect( 'fx_staff_gameplay' );
+
+		if (ACS_GetItem_MageStaff_Water())
+		{
+			thePlayer.StopEffect( 'hand_sand_fx_water_ACS' );
+			thePlayer.PlayEffectSingle( 'hand_sand_fx_water_ACS' );
+			thePlayer.StopEffect( 'hand_sand_fx_water_ACS' );
+
+			parent.PlayEffect('quicksand_water_ACS');
+			parent.StopEffect('quicksand_water_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Sand())
+		{
+			thePlayer.StopEffect( 'hand_sand_fx_sand_ACS' );
+			thePlayer.PlayEffectSingle( 'hand_sand_fx_sand_ACS' );
+			thePlayer.StopEffect( 'hand_sand_fx_sand_ACS' );
+
+			parent.PlayEffect('quicksand_sand_ACS');
+			parent.StopEffect('quicksand_sand_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Fire())
+		{
+			thePlayer.StopEffect( 'hand_sand_fx_fire_ACS' );
+			thePlayer.PlayEffectSingle( 'hand_sand_fx_fire_ACS' );
+			thePlayer.StopEffect( 'hand_sand_fx_fire_ACS' );
+
+			parent.PlayEffect('quicksand_fire_ACS');
+			parent.StopEffect('quicksand_fire_ACS');
+		}
+
+		actors.Clear();
+
+		actors = parent.MageAttackGetNPCsAndPlayersInRange( 15, 20, , FLAG_ExcludePlayer + FLAG_OnlyAliveActors);
+
+		actors.Remove(thePlayer);
+
+		//actors.Clear();
+
+		//actors = GetWitcherPlayer().GetNPCsAndPlayersInCone(12.5, VecHeading(GetWitcherPlayer().GetHeadingVector()), 60, 50, , FLAG_ExcludePlayer + FLAG_Attitude_Hostile + FLAG_OnlyAliveActors );
+
+		if( actors.Size() > 0 )
+		{
+			for( i = 0; i < actors.Size(); i += 1 )
+			{
+				actortarget = (CActor)actors[i];
+
+				if (actortarget.HasTag('acs_snow_entity')
+				|| actortarget.HasTag('smokeman') 
+				|| actortarget.HasTag('ACS_Tentacle_1') 
+				|| actortarget.HasTag('ACS_Tentacle_2') 
+				|| actortarget.HasTag('ACS_Tentacle_3') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_1') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_2') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_3') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_6')
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_5')
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_4')
+				|| actortarget.HasTag('ACS_Vampire_Monster_Boss_Bar') 
+				|| actortarget.HasTag('ACS_Chaos_Cloud') 
+				|| actortarget.HasTag('ACS_Transformation_Vampire_Monster_Camera_Dummy') 
+				|| actortarget.HasTag('ACS_Mage_Staff_Dolphin') 
+				|| actortarget == thePlayer
+				)
+				continue;
+
+				animcomp = (CAnimatedComponent)actortarget.GetComponentByClassName('CAnimatedComponent');
+
+				animcomp.FreezePoseFadeIn(0.5f);
+
+				animcomp.UnfreezePoseFadeOut(30.f);
+
+				dmg = new W3DamageAction in theGame.damageMgr;
+				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Mage_Quicksand_Damage', EHRT_Heavy, CPS_Undefined, false, false, true, false);
+
+				dmg.SetProcessBuffsIfNoDamage(true);
+				dmg.SetCanPlayHitParticle(true);
+
+				if (actortarget.UsesVitality()) 
+				{ 
+					damageMax = (actortarget.GetStatMax( BCS_Vitality ) - actortarget.GetStat( BCS_Vitality )) * 0.05; 
+				} 
+				else if (actortarget.UsesEssence()) 
+				{ 
+					damageMax = (actortarget.GetStatMax( BCS_Essence ) - actortarget.GetStat( BCS_Essence )) * 0.05; 
+				} 
+
+				dmg.SetForceExplosionDismemberment();
+
+				ent = theGame.CreateEntity( 
+			
+				(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\fx\acs_ice_breathe_old.w2ent", true ), 
+				
+				actortarget.GetWorldPosition(), thePlayer.GetWorldRotation() );
+
+				if (ACS_GetItem_MageStaff_Water())
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_ELEMENTAL, damageMax );
+
+					ent.PlayEffect('trap_pre_2_water_ACS');
+					ent.PlayEffect('quicksand_water_ACS');
+
+					if (!actortarget.HasBuff(EET_Bleeding))
+					{
+						dmg.AddEffectInfo( EET_Bleeding, 3 );
+					}
+				}
+				else if (ACS_GetItem_MageStaff_Sand())
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_ELEMENTAL, damageMax );
+
+					ent.PlayEffect('trap_pre_sand_ACS');
+					ent.PlayEffect('quicksand_sand_ACS');
+
+					if (!actortarget.HasBuff(EET_Bleeding))
+					{
+						dmg.AddEffectInfo( EET_Bleeding, 3 );
+					}
+				}
+				else if (ACS_GetItem_MageStaff_Fire())
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_FIRE, damageMax );
+
+					ent.PlayEffect('trap_pre_fire_ACS');
+					ent.PlayEffect('quicksand_fire_ACS');
+
+					if (!actortarget.HasBuff(EET_Burning))
+					{
+						dmg.AddEffectInfo( EET_Burning, 3 );
+					}
+				}
+
+				ent.DestroyAfter(30);
+				
+					
+				theGame.damageMgr.ProcessAction( dmg );
+										
+				delete dmg;
+			}
+		}
+
+		parent.DestroyAfter(30);
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+state ACS_Mage_Attack_SandCage in W3ACSMageAttacks
+{
+	private var dmg																																								: W3DamageAction;
+	private var actortarget																																						: CActor;
+	private var actors    																																						: array<CActor>;
+	private var i         																																						: int;
+	private var damageMax																																						: float;
+	private var ent 																																							: CEntity;
+	private var animcomp 																																						: CAnimatedComponent;
+
+	event OnEnterState(prevStateName : name)
+	{
+		ACS_Mage_Attack_SandCage_Entry();
+	}
+	
+	entry function ACS_Mage_Attack_SandCage_Entry()
+	{	
+		ACS_Mage_Attack_SandCage_Latent();
+	}
+
+	latent function dolphin_spawn_sandcage_1()
+	{
+		var actor															: CActor; 
+		var temp															: CEntityTemplate;
+		var ent																: CEntity;
+		var playerPos														: Vector;
+		var meshcomp														: CComponent;
+		var animcomp 														: CAnimatedComponent;
+		var h 																: float;
+		var pos																: Vector;
+		var playerRot														: EulerAngles;
+
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\bob\data\characters\npc_entities\animals\dolphin.w2ent"
+			
+		, true );
+
+		playerPos = parent.GetWorldPosition();
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw -= 45;
+		
+		ent = theGame.CreateEntity( temp, TraceFloor(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+		
+		animcomp.PlaySlotAnimationAsync( 'q703_sorcerer_water_show_magic_to_dolphins_up', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
+
+		ent.AddTag('ACS_Mage_Staff_Dolphin');
+
+		ent.DestroyAfter(10);
+	}
+
+	latent function dolphin_spawn_sandcage_2()
+	{
+		var actor															: CActor; 
+		var temp															: CEntityTemplate;
+		var ent																: CEntity;
+		var playerPos														: Vector;
+		var meshcomp														: CComponent;
+		var animcomp 														: CAnimatedComponent;
+		var h 																: float;
+		var pos																: Vector;
+		var playerRot														: EulerAngles;
+
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\bob\data\characters\npc_entities\animals\dolphin.w2ent"
+			
+		, true );
+
+		playerPos = parent.GetWorldPosition();
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += 45;
+		
+		ent = theGame.CreateEntity( temp, TraceFloor(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+		
+		animcomp.PlaySlotAnimationAsync( 'q703_sorcerer_water_show_magic_to_dolphins_up', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
+
+		ent.AddTag('ACS_Mage_Staff_Dolphin');
+
+		ent.DestroyAfter(10);
+	}
+
+	latent function dolphin_spawn_sandcage_3()
+	{
+		var actor															: CActor; 
+		var temp															: CEntityTemplate;
+		var ent																: CEntity;
+		var playerPos														: Vector;
+		var meshcomp														: CComponent;
+		var animcomp 														: CAnimatedComponent;
+		var h 																: float;
+		var pos																: Vector;
+		var playerRot														: EulerAngles;
+
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\bob\data\characters\npc_entities\animals\dolphin.w2ent"
+			
+		, true );
+
+		playerPos = parent.GetWorldPosition();
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += 225;
+		
+		ent = theGame.CreateEntity( temp, TraceFloor(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+		
+		animcomp.PlaySlotAnimationAsync( 'q703_sorcerer_water_show_magic_to_dolphins_up', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
+
+		ent.AddTag('ACS_Mage_Staff_Dolphin');
+
+		ent.DestroyAfter(10);
+	}
+
+	latent function dolphin_spawn_sandcage_4()
+	{
+		var actor															: CActor; 
+		var temp															: CEntityTemplate;
+		var ent																: CEntity;
+		var playerPos														: Vector;
+		var meshcomp														: CComponent;
+		var animcomp 														: CAnimatedComponent;
+		var h 																: float;
+		var pos																: Vector;
+		var playerRot														: EulerAngles;
+
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\bob\data\characters\npc_entities\animals\dolphin.w2ent"
+			
+		, true );
+
+		playerPos = parent.GetWorldPosition();
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw -= 225;
+		
+		ent = theGame.CreateEntity( temp, TraceFloor(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+		
+		animcomp.PlaySlotAnimationAsync( 'q703_sorcerer_water_show_magic_to_dolphins_up', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
+
+		ent.AddTag('ACS_Mage_Staff_Dolphin');
+
+		ent.DestroyAfter(10);
+	}
+
+	latent function ACS_Mage_Attack_SandCage_Latent()
+	{
+		if (ACS_GetItem_MageStaff_Water())
+		{
+			dolphin_spawn_sandcage_1();
+			dolphin_spawn_sandcage_2();
+			dolphin_spawn_sandcage_3();
+			dolphin_spawn_sandcage_4();
+
+			parent.PlayEffect('trap_pre_2_water_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Sand())
+		{
+			parent.PlayEffect('trap_pre_sand_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Fire())
+		{
+			parent.PlayEffect('trap_pre_fire_ACS');
+		}
+
+		Sleep(2);
+
+		ACSGetEquippedSword().DestroyEffect( 'fx_staff_cast' );
+		ACSGetEquippedSword().PlayEffectSingle( 'fx_staff_cast' );
+		ACSGetEquippedSword().StopEffect( 'fx_staff_cast' );
+
+		ACSGetEquippedSword().DestroyEffect( 'fx_staff_gameplay' );
+		ACSGetEquippedSword().PlayEffectSingle( 'fx_staff_gameplay' );
+		ACSGetEquippedSword().StopEffect( 'fx_staff_gameplay' );
+
+		if (ACS_GetItem_MageStaff_Water())
+		{
+			thePlayer.StopEffect( 'hand_sand_fx_water_ACS' );
+			thePlayer.PlayEffectSingle( 'hand_sand_fx_water_ACS' );
+			thePlayer.StopEffect( 'hand_sand_fx_water_ACS' );
+
+			parent.PlayEffect('trap_explode_2_water_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Sand())
+		{
+			thePlayer.StopEffect( 'hand_sand_fx_sand_ACS' );
+			thePlayer.PlayEffectSingle( 'hand_sand_fx_sand_ACS' );
+			thePlayer.StopEffect( 'hand_sand_fx_sand_ACS' );
+
+			parent.PlayEffect('trap_explode_sand_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Fire())
+		{
+			thePlayer.StopEffect( 'hand_sand_fx_fire_ACS' );
+			thePlayer.PlayEffectSingle( 'hand_sand_fx_fire_ACS' );
+			thePlayer.StopEffect( 'hand_sand_fx_fire_ACS' );
+
+			parent.PlayEffect('trap_explode_fire_ACS');
+		}
+
+		actors.Clear();
+
+		actors = parent.MageAttackGetNPCsAndPlayersInRange( 15, 20, , FLAG_ExcludePlayer + FLAG_OnlyAliveActors);
+
+		actors.Remove(thePlayer);
+
+		//actors.Clear();
+
+		//actors = GetWitcherPlayer().GetNPCsAndPlayersInCone(12.5, VecHeading(GetWitcherPlayer().GetHeadingVector()), 60, 50, , FLAG_ExcludePlayer + FLAG_Attitude_Hostile + FLAG_OnlyAliveActors );
+
+		if( actors.Size() > 0 )
+		{
+			for( i = 0; i < actors.Size(); i += 1 )
+			{
+				actortarget = (CActor)actors[i];
+
+				if (actortarget.HasTag('acs_snow_entity')
+				|| actortarget.HasTag('smokeman') 
+				|| actortarget.HasTag('ACS_Tentacle_1') 
+				|| actortarget.HasTag('ACS_Tentacle_2') 
+				|| actortarget.HasTag('ACS_Tentacle_3') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_1') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_2') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_3') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_6')
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_5')
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_4')
+				|| actortarget.HasTag('ACS_Vampire_Monster_Boss_Bar') 
+				|| actortarget.HasTag('ACS_Chaos_Cloud') 
+				|| actortarget.HasTag('ACS_Transformation_Vampire_Monster_Camera_Dummy') 
+				|| actortarget.HasTag('ACS_Mage_Staff_Dolphin') 
+				|| actortarget == thePlayer
+				)
+				continue;
+
+				dmg = new W3DamageAction in theGame.damageMgr;
+				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Mage_Sand_Cage_Damage', EHRT_Heavy, CPS_Undefined, false, false, true, false);
+
+				dmg.SetProcessBuffsIfNoDamage(true);
+				dmg.SetCanPlayHitParticle(true);
+
+				if (actortarget.UsesVitality()) 
+				{ 
+					damageMax = (actortarget.GetStatMax( BCS_Vitality ) - actortarget.GetStat( BCS_Vitality )) * 0.25; 
+				} 
+				else if (actortarget.UsesEssence()) 
+				{ 
+					damageMax = (actortarget.GetStatMax( BCS_Essence ) - actortarget.GetStat( BCS_Essence )) * 0.25; 
+				} 
+
+				dmg.SetForceExplosionDismemberment();
+
+				ent = theGame.CreateEntity( 
+			
+				(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\fx\acs_ice_breathe_old.w2ent", true ), 
+				
+				actortarget.GetWorldPosition(), thePlayer.GetWorldRotation() );
+
+				if (ACS_GetItem_MageStaff_Water())
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_ELEMENTAL, damageMax );
+
+					ent.PlayEffect('trap_explode_2_water_ACS');
+
+					ent.PlayEffect('trap_pre_2_water_ACS');
+				}
+				else if (ACS_GetItem_MageStaff_Sand())
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_ELEMENTAL, damageMax );
+
+					ent.PlayEffect('trap_explode_sand_ACS');
+
+					ent.PlayEffect('trap_pre_sand_ACS');
+
+				}
+				else if (ACS_GetItem_MageStaff_Fire())
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_FIRE, damageMax );
+
+					ent.PlayEffect('trap_explode_fire_ACS');
+
+					ent.PlayEffect('trap_pre_fire_ACS');
+				}
+
+				ent.DestroyAfter(10);
+
+				if (!actortarget.HasBuff(EET_Knockdown))
+				{
+					dmg.AddEffectInfo( EET_Knockdown, 2 );
+				}
+				
+					
+				theGame.damageMgr.ProcessAction( dmg );
+										
+				delete dmg;
+			}
+		}
+
+		parent.DestroyAfter(10);
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
+	}
+}
+
+state ACS_Mage_Attack_Tornado in W3ACSMageAttacks
+{
+	private var dmg																																								: W3DamageAction;
+	private var actortarget																																						: CActor;
+	private var actors    																																						: array<CActor>;
+	private var i         																																						: int;
+	private var damageMax																																						: float;
+	private var ent 																																							: CEntity;
+
+	event OnEnterState(prevStateName : name)
+	{
+		ACS_Mage_Attack_Tornado_Entry();
+	}
+	
+	entry function ACS_Mage_Attack_Tornado_Entry()
+	{	
+		ACS_Mage_Attack_Tornado_Latent();
+	}
+
+	latent function dolphin_spawn_tornado_1()
+	{
+		var actor															: CActor; 
+		var temp															: CEntityTemplate;
+		var ent																: CEntity;
+		var playerPos														: Vector;
+		var meshcomp														: CComponent;
+		var animcomp 														: CAnimatedComponent;
+		var h 																: float;
+		var pos																: Vector;
+		var playerRot														: EulerAngles;
+
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\bob\data\characters\npc_entities\animals\dolphin.w2ent"
+			
+		, true );
+
+		playerPos = parent.GetWorldPosition() + parent.GetWorldRight() * 5 + parent.GetWorldForward() * 5;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw -= 45;
+		
+		ent = theGame.CreateEntity( temp, TraceFloor(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+		
+		animcomp.PlaySlotAnimationAsync( 'q703_sorcerer_water_show_magic_to_dolphins_left_to_right_v2', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
+
+		ent.AddTag('ACS_Mage_Staff_Dolphin');
+
+		ent.DestroyAfter(20);
+	}
+
+	latent function dolphin_spawn_tornado_2()
+	{
+		var actor															: CActor; 
+		var temp															: CEntityTemplate;
+		var ent																: CEntity;
+		var playerPos														: Vector;
+		var meshcomp														: CComponent;
+		var animcomp 														: CAnimatedComponent;
+		var h 																: float;
+		var pos																: Vector;
+		var playerRot														: EulerAngles;
+
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\bob\data\characters\npc_entities\animals\dolphin.w2ent"
+			
+		, true );
+
+		playerPos = parent.GetWorldPosition() + parent.GetWorldRight() * -5 + parent.GetWorldForward() * 5;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += 45;
+		
+		ent = theGame.CreateEntity( temp, TraceFloor(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+		
+		animcomp.PlaySlotAnimationAsync( 'q703_sorcerer_water_show_magic_to_dolphins_left_to_right_v2', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
+
+		ent.AddTag('ACS_Mage_Staff_Dolphin');
+
+		ent.DestroyAfter(20);
+	}
+
+	latent function dolphin_spawn_tornado_3()
+	{
+		var actor															: CActor; 
+		var temp															: CEntityTemplate;
+		var ent																: CEntity;
+		var playerPos														: Vector;
+		var meshcomp														: CComponent;
+		var animcomp 														: CAnimatedComponent;
+		var h 																: float;
+		var pos																: Vector;
+		var playerRot														: EulerAngles;
+
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\bob\data\characters\npc_entities\animals\dolphin.w2ent"
+			
+		, true );
+
+		playerPos = parent.GetWorldPosition() + parent.GetWorldRight() * 5 + parent.GetWorldForward() * -5;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw += 225;
+		
+		ent = theGame.CreateEntity( temp, TraceFloor(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+		
+		animcomp.PlaySlotAnimationAsync( 'q703_sorcerer_water_show_magic_to_dolphins_left_to_right_v2', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
+
+		ent.AddTag('ACS_Mage_Staff_Dolphin');
+
+		ent.DestroyAfter(20);
+	}
+
+	latent function dolphin_spawn_tornado_4()
+	{
+		var actor															: CActor; 
+		var temp															: CEntityTemplate;
+		var ent																: CEntity;
+		var playerPos														: Vector;
+		var meshcomp														: CComponent;
+		var animcomp 														: CAnimatedComponent;
+		var h 																: float;
+		var pos																: Vector;
+		var playerRot														: EulerAngles;
+
+		temp = (CEntityTemplate)LoadResourceAsync( 
+
+		"dlc\bob\data\characters\npc_entities\animals\dolphin.w2ent"
+			
+		, true );
+
+		playerPos = parent.GetWorldPosition() + parent.GetWorldRight() * -5 + parent.GetWorldForward() * -5;
+
+		playerRot = thePlayer.GetWorldRotation();
+
+		playerRot.Yaw -= 225;
+		
+		ent = theGame.CreateEntity( temp, TraceFloor(playerPos), playerRot );
+
+		animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+		meshcomp = ent.GetComponentByClassName('CMeshComponent');
+		h = 1;
+		animcomp.SetScale(Vector(h,h,h,1));
+		meshcomp.SetScale(Vector(h,h,h,1));	
+		
+		animcomp.PlaySlotAnimationAsync( 'q703_sorcerer_water_show_magic_to_dolphins_left_to_right_v2', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
+
+		ent.AddTag('ACS_Mage_Staff_Dolphin');
+
+		ent.DestroyAfter(20);
+	}
+
+	latent function ACS_Mage_Attack_Tornado_Latent()
+	{
+		if (ACS_GetItem_MageStaff_Water())
+		{
+			dolphin_spawn_tornado_1();
+			dolphin_spawn_tornado_2();
+			dolphin_spawn_tornado_3();
+			dolphin_spawn_tornado_4();
+
+			parent.PlayEffect('trap_pre_2_water_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Sand())
+		{
+			parent.PlayEffect('trap_pre_sand_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Fire())
+		{
+			parent.PlayEffect('trap_pre_fire_ACS');
+		}
+
+		Sleep(2);
+
+		ACSGetEquippedSword().DestroyEffect( 'fx_staff_cast' );
+		ACSGetEquippedSword().PlayEffectSingle( 'fx_staff_cast' );
+		ACSGetEquippedSword().StopEffect( 'fx_staff_cast' );
+
+		ACSGetEquippedSword().DestroyEffect( 'fx_staff_gameplay' );
+		ACSGetEquippedSword().PlayEffectSingle( 'fx_staff_gameplay' );
+		ACSGetEquippedSword().StopEffect( 'fx_staff_gameplay' );
+
+		if (ACS_GetItem_MageStaff_Water())
+		{
+			thePlayer.StopEffect( 'hand_sand_fx_water_ACS' );
+			thePlayer.PlayEffectSingle( 'hand_sand_fx_water_ACS' );
+			thePlayer.StopEffect( 'hand_sand_fx_water_ACS' );
+
+			parent.PlayEffect('tornado_water_ACS');
+			parent.PlayEffect('quicksand_water_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Sand())
+		{
+			thePlayer.StopEffect( 'hand_sand_fx_sand_ACS' );
+			thePlayer.PlayEffectSingle( 'hand_sand_fx_sand_ACS' );
+			thePlayer.StopEffect( 'hand_sand_fx_sand_ACS' );
+
+			parent.PlayEffect('tornado_sand_ACS');
+			parent.PlayEffect('quicksand_sand_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Fire())
+		{
+			thePlayer.StopEffect( 'hand_sand_fx_fire_ACS' );
+			thePlayer.PlayEffectSingle( 'hand_sand_fx_fire_ACS' );
+			thePlayer.StopEffect( 'hand_sand_fx_fire_ACS' );
+
+			parent.PlayEffect('tornado_fire_ACS');
+			parent.PlayEffect('quicksand_fire_ACS');
+		}
+
+		parent.AddTimer('tornado_target_check', 0.1, true);
+
+		actors.Clear();
+
+		actors = parent.MageAttackGetNPCsAndPlayersInRange( 15, 20, , FLAG_ExcludePlayer + FLAG_OnlyAliveActors);
+
+		actors.Remove(thePlayer);
+		
+		if( actors.Size() > 0 )
+		{
+			for( i = 0; i < actors.Size(); i += 1 )
+			{
+				actortarget = (CActor)actors[i];
+
+				if (actortarget.HasTag('acs_snow_entity')
+				|| actortarget.HasTag('smokeman') 
+				|| actortarget.HasTag('ACS_Tentacle_1') 
+				|| actortarget.HasTag('ACS_Tentacle_2') 
+				|| actortarget.HasTag('ACS_Tentacle_3') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_1') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_2') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_3') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_6')
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_5')
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_4')
+				|| actortarget.HasTag('ACS_Vampire_Monster_Boss_Bar') 
+				|| actortarget.HasTag('ACS_Chaos_Cloud') 
+				|| actortarget.HasTag('ACS_Transformation_Vampire_Monster_Camera_Dummy') 
+				|| actortarget.HasTag('ACS_Mage_Staff_Dolphin') 
+				|| actortarget == thePlayer
+				)
+				continue;
+
+				dmg = new W3DamageAction in theGame.damageMgr;
+				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Mage_Tornado_Damage', EHRT_Heavy, CPS_Undefined, false, false, true, false);
+
+				dmg.SetProcessBuffsIfNoDamage(true);
+				dmg.SetCanPlayHitParticle(true);
+
+				if (actortarget.UsesVitality()) 
+				{ 
+					damageMax = (actortarget.GetStatMax( BCS_Vitality ) - actortarget.GetStat( BCS_Vitality )) * 0.25; 
+				} 
+				else if (actortarget.UsesEssence()) 
+				{ 
+					damageMax = (actortarget.GetStatMax( BCS_Essence ) - actortarget.GetStat( BCS_Essence )) * 0.25; 
+				} 
+
+				dmg.SetForceExplosionDismemberment();
+
+				ent = theGame.CreateEntity( 
+			
+				(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\fx\acs_ice_breathe_old.w2ent", true ), 
+				
+				actortarget.GetWorldPosition(), thePlayer.GetWorldRotation() );
+
+				if (ACS_GetItem_MageStaff_Water())
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_ELEMENTAL, damageMax );
+
+					ent.PlayEffect('teleport_in_water_ACS');
+					ent.PlayEffect('teleport_out_water_ACS');
+					ent.PlayEffect('quicksand_yrden_water_ACS');
+					ent.PlayEffect('quicksand_water_ACS');
+					ent.PlayEffect('trap_pre_2_water_ACS');
+				}
+				else if (ACS_GetItem_MageStaff_Sand())
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_ELEMENTAL, damageMax );
+
+					ent.PlayEffect('teleport_in_sand_ACS');
+					ent.PlayEffect('teleport_out_sand_ACS');
+					ent.PlayEffect('quicksand_yrden_sand_ACS');
+					ent.PlayEffect('quicksand_sand_ACS');
+					ent.PlayEffect('trap_pre_sand_ACS');
+				}
+				else if (ACS_GetItem_MageStaff_Fire())
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_FIRE, damageMax );
+
+					ent.PlayEffect('teleport_in_fire_ACS');
+					ent.PlayEffect('teleport_out_fire_ACS');
+					ent.PlayEffect('quicksand_yrden_fire_ACS');
+					ent.PlayEffect('quicksand_fire_ACS');
+					ent.PlayEffect('trap_pre_fire_ACS');
+				}
+
+				ent.DestroyAfter(10);
+
+				if (!actortarget.HasBuff(EET_Knockdown))
+				{
+					dmg.AddEffectInfo( EET_Knockdown, 2 );
+				}
+				
+					
+				theGame.damageMgr.ProcessAction( dmg );
+										
+				delete dmg;
+			}
+		}
+
+		parent.DestroyAfter(20);
+	}
+	
+	event OnLeaveState( nextStateName : name ) 
+	{
+		super.OnLeaveState(nextStateName);
 	}
 }

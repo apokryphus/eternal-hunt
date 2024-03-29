@@ -435,11 +435,6 @@ function GetACSStorage() : W3ACSStorage
     return storage;
 }
 
-exec function acskillcount()
-{
-	GetWitcherPlayer().DisplayHudMessage( IntToString(FactsQuerySum("ACS_Persistent_Kill_Count")));
-}
-
 function ACS_Kill_Count_Menu() 
 {
 	var msg				: W3TutorialPopupData;

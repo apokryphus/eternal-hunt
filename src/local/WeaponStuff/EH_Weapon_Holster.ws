@@ -170,7 +170,7 @@ function ACS_WeaponHolsterInit()
 		}
 		*/
 	}
-
+	
 	GetWitcherPlayer().GetItemEquippedOnSlot(EES_SilverSword, silverID);
 	GetWitcherPlayer().GetItemEquippedOnSlot(EES_SteelSword, steelID);
 	GetWitcherPlayer().GetItemEquippedOnSlot(EES_RangedWeapon, rangedID);

@@ -8,11 +8,6 @@ function ACS_Custom_Attack_Range( data : CPreAttackEventData ) : array< CGamepla
 	var pos, targetPos				: Vector;
 	var i							: int;
 	
-	pos = thePlayer.GetWorldPosition();
-	pos.Z += 0.8;
-	
-	targets.Clear();
-	
 	if (!thePlayer.IsPerformingFinisher())
 	{
 		if ( thePlayer.IsWeaponHeld( 'fist' ) )
@@ -32,7 +27,7 @@ function ACS_Custom_Attack_Range( data : CPreAttackEventData ) : array< CGamepla
 			}
 			else 
 			{
-				dist = 1.25;
+				dist = 1.125;
 				ang = 30;
 			}
 		}
@@ -44,7 +39,7 @@ function ACS_Custom_Attack_Range( data : CPreAttackEventData ) : array< CGamepla
 			)
 			{
 				dist = 1.5;
-				ang =	55;
+				ang =	70;
 
 				if(  thePlayer.IsDoingSpecialAttack( false ) )
 				{
@@ -68,7 +63,7 @@ function ACS_Custom_Attack_Range( data : CPreAttackEventData ) : array< CGamepla
 			)
 			{
 				dist = 1.5;
-				ang =	55;
+				ang =	70;
 
 				if(  thePlayer.IsDoingSpecialAttack( false ) )
 				{
@@ -90,7 +85,7 @@ function ACS_Custom_Attack_Range( data : CPreAttackEventData ) : array< CGamepla
 			else if ( thePlayer.HasTag('axii_sword_equipped') )
 			{
 				dist = 1.6;
-				ang =	55;	
+				ang =	70;	
 
 				if (thePlayer.HasTag('ACS_Sparagmos_Active'))
 				{
@@ -107,12 +102,12 @@ function ACS_Custom_Attack_Range( data : CPreAttackEventData ) : array< CGamepla
 				)
 				{
 					dist = 2.25;
-					ang =	55;
+					ang =	70;
 				}
 				else if ( ACS_GetWeaponMode() == 3 )
 				{ 
 					dist = 1.75;
-					ang =	55;
+					ang =	70;
 				}
 			}
 			else if ( thePlayer.HasTag('aard_sword_equipped') )
@@ -123,7 +118,7 @@ function ACS_Custom_Attack_Range( data : CPreAttackEventData ) : array< CGamepla
 			else if ( thePlayer.HasTag('aard_secondary_sword_equipped') )
 			{
 				dist = 2;
-				ang = 45;
+				ang = 70;
 			}
 			else if ( thePlayer.HasTag('yrden_sword_equipped') )
 			{
@@ -132,12 +127,12 @@ function ACS_Custom_Attack_Range( data : CPreAttackEventData ) : array< CGamepla
 					if (ACS_GetArmigerModeWeaponType() == 0)
 					{
 						dist = 2.5;
-						ang = 60;
+						ang = 70;
 					}
 					else 
 					{
 						dist = 2;
-						ang = 30;
+						ang = 70;
 					}
 				}
 				else if ( ACS_GetWeaponMode() == 1 )
@@ -145,12 +140,12 @@ function ACS_Custom_Attack_Range( data : CPreAttackEventData ) : array< CGamepla
 					if (ACS_GetFocusModeWeaponType() == 0)
 					{
 						dist = 2.5;
-						ang = 60;
+						ang = 70;
 					}
 					else 
 					{
 						dist = 2;
-						ang = 30;
+						ang = 70;
 					}
 				}
 				else if ( ACS_GetWeaponMode() == 2 )
@@ -158,18 +153,18 @@ function ACS_Custom_Attack_Range( data : CPreAttackEventData ) : array< CGamepla
 					if (ACS_GetHybridModeWeaponType() == 0)
 					{
 						dist = 2.5;
-						ang = 60;
+						ang = 70;
 					}
 					else 
 					{
 						dist = 2;
-						ang = 30;
+						ang = 70;
 					}
 				}
 				else if ( ACS_GetWeaponMode() == 3 )
 				{
 					dist = 2.5;
-					ang = 60;
+					ang = 70;
 				}
 			}
 			else if ( thePlayer.HasTag('yrden_secondary_sword_equipped') )
@@ -180,7 +175,7 @@ function ACS_Custom_Attack_Range( data : CPreAttackEventData ) : array< CGamepla
 			else if ( thePlayer.HasTag('quen_sword_equipped') )
 			{
 				dist = 1.6;
-				ang =	55;
+				ang =	70;
 
 				if (thePlayer.HasTag('ACS_Shadow_Dash_Empowered'))
 				{
@@ -197,7 +192,7 @@ function ACS_Custom_Attack_Range( data : CPreAttackEventData ) : array< CGamepla
 				else
 				{
 					dist = 2.25;
-					ang =	55;
+					ang =	70;
 				}
 			}
 			else 
@@ -213,12 +208,12 @@ function ACS_Custom_Attack_Range( data : CPreAttackEventData ) : array< CGamepla
 					if( !thePlayer.IsDoingSpecialAttack( false )
 					&& !thePlayer.IsDoingSpecialAttack( true ) )
 					{
-						dist += 1;
+						dist += 1.5;
 					}
 				}
 				else
 				{
-					dist += 1;
+					dist += 1.5;
 				}
 			}
 		}
@@ -304,9 +299,14 @@ function ACS_Custom_Attack_Range( data : CPreAttackEventData ) : array< CGamepla
 	}
 	else 
 	{
-		dist = 1;
+		dist = 1.125;
 		ang = 30;
 	}
+
+	targets.Clear();
+
+	pos = thePlayer.GetWorldPosition();
+	pos.Z += 0.8;
 
 	FindGameplayEntitiesInCone( targets, thePlayer.GetWorldPosition(), VecHeading( thePlayer.GetWorldForward() ), ang, dist, 999, ,FLAG_ExcludePlayer + FLAG_OnlyAliveActors );
 	for( i = targets.Size()-1; i >= 0; i -= 1 ) 
@@ -546,6 +546,31 @@ function ACS_Load_Sound()
 	{
 		theSound.SoundLoadBank( "monster_golem.bnk", false );
 	}
+
+	if ( !theSound.SoundIsBankLoaded("monster_cockatrice.bnk") )
+	{
+		theSound.SoundLoadBank( "monster_cockatrice.bnk", false );
+	}
+
+	if ( !theSound.SoundIsBankLoaded("monster_harpy.bnk") )
+	{
+		theSound.SoundLoadBank( "monster_harpy.bnk", false );
+	}
+
+	if ( !theSound.SoundIsBankLoaded("monster_griffon.bnk") )
+	{
+		theSound.SoundLoadBank( "monster_griffon.bnk", false );
+	}
+
+	if ( !theSound.SoundIsBankLoaded("animals_crow.bnk") )
+	{
+		theSound.SoundLoadBank( "animals_crow.bnk", false );
+	}
+
+	if ( !theSound.SoundIsBankLoaded("magic_teleport.bnk") )
+	{
+		theSound.SoundLoadBank( "magic_teleport.bnk", false );
+	}
 }
 
 function ACS_Enabled(): bool 
@@ -731,6 +756,8 @@ function ACS_InitializeSettings()
 
 	theGame.GetInGameConfigWrapper().ApplyGroupPreset('EHmodRageMechanicSettings', 0);
 
+	theGame.GetInGameConfigWrapper().ApplyGroupPreset('EHmodSignComboSystemSettings', 0);
+
 	theGame.GetInGameConfigWrapper().ApplyGroupPreset('EHmodArmigerModeSettings', 0);
 
 	theGame.GetInGameConfigWrapper().ApplyGroupPreset('EHmodFocusModeSettings', 0);
@@ -743,8 +770,6 @@ function ACS_InitializeSettings()
 	
 	theGame.GetInGameConfigWrapper().ApplyGroupPreset('EHmodTauntSettings', 1);
 
-	theGame.GetInGameConfigWrapper().ApplyGroupPreset('EHmodSpecialAbilitiesSettings', 1);
-
 	theGame.GetInGameConfigWrapper().ApplyGroupPreset('EHmodDamageSettings', 0);
 
 	theGame.GetInGameConfigWrapper().ApplyGroupPreset('EHmodMiscSettings', 0);
@@ -756,6 +781,10 @@ function ACS_InitializeSettings()
 	theGame.GetInGameConfigWrapper().ApplyGroupPreset('EHmodStaminaSettings', 0);
 
 	theGame.GetInGameConfigWrapper().ApplyGroupPreset('EHmodEncountersSettings', 0);
+
+	theGame.GetInGameConfigWrapper().ApplyGroupPreset('EHmodEventsSettings', 0);
+
+	theGame.GetInGameConfigWrapper().ApplyGroupPreset('EHmodAdditionalWorldEncountersSettings', 0);
 
 	theGame.GetInGameConfigWrapper().ApplyGroupPreset('EHmodDodgeSettings', 1);
 
@@ -995,6 +1024,14 @@ function ACS_DefaultMovesetCombatAnimationOverrideMode_Enabled(): bool
 	configValue =(int) configValueString;
 
 	if( FactsQuerySum("q001_nightmare_ended") <= 0)
+	{
+		return false;
+	}
+
+	if (thePlayer.HasBuff(EET_AirDrain)
+	|| thePlayer.HasBuff(EET_Choking)
+	|| thePlayer.HasBuff(EET_Drowning)
+	)
 	{
 		return false;
 	}
@@ -1489,6 +1526,38 @@ function ACS_ExperimentalDismemberment_Enabled(): bool
 	else return (bool)configValueString;
 }
 
+function ACS_BurningAlwaysDismember_Enabled(): bool 
+{
+	var configValue :int;
+	var configValueString : string;
+	
+	configValueString = ACSCustomFinishersGetConfigValue('EHmodBurningAlwaysDismember');
+	configValue =(int) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return false;
+	}
+	
+	else return (bool)configValueString;
+}
+
+function ACS_HeavyAttackAlwaysDismember_Enabled(): bool 
+{
+	var configValue :int;
+	var configValueString : string;
+	
+	configValueString = ACSCustomFinishersGetConfigValue('EHmodHeavyAttackAlwaysDismember');
+	configValue =(int) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return true;
+	}
+	
+	else return (bool)configValueString;
+}
+
 function ACS_CustomFinisherChance(): float
 {
 	var configValue :float;
@@ -1810,6 +1879,89 @@ function ACS_RageMechanicRadius(): float
 	else return configValue;
 }
 
+// Sign Combo System Settings
+
+function ACSSignComboSystemGetConfigValue(nam : name) : string
+{
+	var conf: CInGameConfigWrapper;
+	var value: string;
+	
+	conf = theGame.GetInGameConfigWrapper();
+	
+	value = conf.GetVarValue('EHmodSignComboSystemSettings', nam);
+
+	return value;
+}
+
+function ACS_SignComboSystem_Enabled(): bool 
+{
+	var configValue :int;
+	var configValueString : string;
+	
+	configValueString = ACSSignComboSystemGetConfigValue('EHmodSignComboSystem');
+	configValue =(int) configValueString;
+
+	if( FactsQuerySum("q001_nightmare_ended") <= 0)
+	{
+		return false;
+	}
+
+	if(configValueString=="" || configValue<0)
+	{
+		return true;
+	}
+	
+	else return (bool)configValueString;
+}
+
+function ACS_SignComboSystemCooldown(): float
+{
+	var configValue :float;
+	var configValueString : string;
+	
+	configValueString = ACSSignComboSystemGetConfigValue('EHmodSignComboSystemCooldown');
+	configValue =(float) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return 10;
+	}
+	
+	else return configValue;
+}
+
+function ACS_SignComboSystemMaxHealthDamageWhenAboveHalfHealth(): float
+{
+	var configValue :float;
+	var configValueString : string;
+	
+	configValueString = ACSSignComboSystemGetConfigValue('EHmodSignComboSystemMaxHealthDamageWhenAboveHalfHealth');
+	configValue =(float) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return 0.125;
+	}
+	
+	else return configValue;
+}
+
+function ACS_SignComboSystemMissingMaxHealthDamageWhenBelowHalfHealth(): float
+{
+	var configValue :float;
+	var configValueString : string;
+	
+	configValueString = ACSSignComboSystemGetConfigValue('EHmodSignComboSystemMissingMaxHealthDamageWhenBelowHalfHealth');
+	configValue =(float) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return 0.125;
+	}
+	
+	else return configValue;
+}
+
 
 // Darkness Settings
 
@@ -2025,7 +2177,7 @@ function ACS_Marker_Visual_Bubble_Enabled(): bool
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return false;
 	}
 	
 	else return (bool)configValueString;
@@ -2243,6 +2395,22 @@ function ACS_SlideEverywhere_Enabled(): bool
 	else return (bool)configValueString;
 }
 
+function ACS_ForceOpenLockedDoorsWithAard_Enabled(): bool 
+{
+	var configValue :int;
+	var configValueString : string;
+	
+	configValueString = ACSMiscSettingsGetConfigValue('EHmodForceOpenLockedDoorsWithAard');
+	configValue =(int) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return false;
+	}
+	
+	else return (bool)configValueString;
+}
+
 function ACS_EnhancedSigns_Enabled(): bool 
 {
 	var configValue :int;
@@ -2254,6 +2422,22 @@ function ACS_EnhancedSigns_Enabled(): bool
 	if(configValueString=="" || configValue<0)
 	{
 		return true;
+	}
+	
+	else return (bool)configValueString;
+}
+
+function ACS_Instant_Mount_Enabled(): bool 
+{
+	var configValue :int;
+	var configValueString : string;
+	
+	configValueString = ACSMiscSettingsGetConfigValue('EHmodInstantMountEnabled');
+	configValue =(int) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return false;
 	}
 	
 	else return (bool)configValueString;
@@ -2471,6 +2655,22 @@ function ACS_HorseRiders_Enabled(): bool
 	var configValueString : string;
 	
 	configValueString = ACSVisualSettingsGetConfigValue('EHmodHorseRidersEnabled');
+	configValue =(int) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return true;
+	}
+	
+	else return (bool)configValueString;
+}
+
+function ACS_CrowSwarm_Enabled(): bool 
+{
+	var configValue :int;
+	var configValueString : string;
+	
+	configValueString = ACSVisualSettingsGetConfigValue('EHmodCrowSwarmEnabled');
 	configValue =(int) configValueString;
 
 	if(configValueString=="" || configValue<0)
@@ -2785,6 +2985,54 @@ function ACS_DisableAllCameraLights_Enabled(): bool
 	else return (bool)configValueString;
 }
 
+function ACS_IconicSwordVFXOff_Enabled(): bool 
+{
+	var configValue :int;
+	var configValueString : string;
+	
+	configValueString = ACSVisualSettingsGetConfigValue('EHmodIconicSwordVFXOffEnabled');
+	configValue =(int) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return false;
+	}
+	
+	else return (bool)configValueString;
+}
+
+function ACS_AlternateScabbardSteel_Enabled(): bool 
+{
+	var configValue :int;
+	var configValueString : string;
+	
+	configValueString = ACSVisualSettingsGetConfigValue('EHmodAlternateScabbardSteelEnabled');
+	configValue =(int) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return false;
+	}
+	
+	else return (bool)configValueString;
+}
+
+function ACS_AlternateScabbardSilver_Enabled(): bool 
+{
+	var configValue :int;
+	var configValueString : string;
+	
+	configValueString = ACSVisualSettingsGetConfigValue('EHmodAlternateScabbardSilverEnabled');
+	configValue =(int) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return false;
+	}
+	
+	else return (bool)configValueString;
+}
+
 // Taunt Settings
 
 function ACSTauntSettingsGetConfigValue(nam : name) : string
@@ -2990,6 +3238,37 @@ function ACS_Sprinting_JumpExtend_GetDistance(): int
 	else return configValue;
 }
 
+function ACS_JumpGlide_Enabled(): bool 
+{
+	var configValue :int;
+	var configValueString : string;
+	
+	configValueString = ACSJumpSettingsGetConfigValue('EHmodJumpGlide');
+	configValue =(int) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return false;
+	}
+	
+	else return (bool)configValueString;
+}
+
+function ACS_JumpGlideForm(): int 
+{
+	var configValue :int;
+	var configValueString : string;
+	
+	configValueString = ACSJumpSettingsGetConfigValue('EHmodJumpGlideForm');
+	configValue =(int) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return 0;
+	}
+	
+	else return configValue;
+}
 
 // Bruxa Dash Settings
 
@@ -3131,54 +3410,6 @@ function ACS_BruxaDodgeSlideBack_Enabled(): bool
 	else return (bool)configValueString;
 }
 
-function ACS_BruxaDodgeCenter_Enabled(): bool 
-{
-	var configValue :int;
-	var configValueString : string;
-	
-	configValueString = ACSDodgeSettingsGetConfigValue('EHmodBruxaDodgeCenter');
-	configValue =(int) configValueString;
-
-	if(configValueString=="" || configValue<0)
-	{
-		return false;
-	}
-	
-	else return (bool)configValueString;
-}
-
-function ACS_BruxaDodgeLeft_Enabled(): bool 
-{
-	var configValue :int;
-	var configValueString : string;
-	
-	configValueString = ACSDodgeSettingsGetConfigValue('EHmodBruxaDodgeLeft');
-	configValue =(int) configValueString;
-
-	if(configValueString=="" || configValue<0)
-	{
-		return false;
-	}
-	
-	else return (bool)configValueString;
-}
-
-function ACS_BruxaDodgeRight_Enabled(): bool 
-{
-	var configValue :int;
-	var configValueString : string;
-	
-	configValueString = ACSDodgeSettingsGetConfigValue('EHmodBruxaDodgeRight');
-	configValue =(int) configValueString;
-
-	if(configValueString=="" || configValue<0)
-	{
-		return false;
-	}
-	
-	else return (bool)configValueString;
-}
-
 function ACS_WildHuntBlink_Enabled(): bool 
 {
 	var configValue :int;
@@ -3253,6 +3484,27 @@ function ACS_HoldToRoll_Enabled(): bool
 	else return (bool)configValueString;
 }
 
+function ACS_Skate_Enabled(): bool 
+{
+	var configValue :int;
+	var configValueString : string;
+	
+	configValueString = ACSDodgeSettingsGetConfigValue('EHmodSkateEnabled');
+	configValue =(int) configValueString;
+
+	if( FactsQuerySum("q001_nightmare_ended") <= 0)
+	{
+		return false;
+	}
+
+	if(configValueString=="" || configValue<0)
+	{
+		return false;
+	}
+	
+	else return (bool)configValueString;
+}
+
 // Default Geralt Moveset Dodge and Roll Override Settings
 
 function ACSDefaultGeraltMovesetDodgeAndRollOverrideSettingsGetConfigValue(nam : name) : string
@@ -3284,6 +3536,14 @@ function ACS_DefaultGeraltMovesetOverrideModeDodge_Enabled(): bool
 	configValue =(int) configValueString;
 
 	if( FactsQuerySum("q001_nightmare_ended") <= 0)
+	{
+		return false;
+	}
+
+	if (thePlayer.HasBuff(EET_AirDrain)
+	|| thePlayer.HasBuff(EET_Choking)
+	|| thePlayer.HasBuff(EET_Drowning)
+	)
 	{
 		return false;
 	}
@@ -3394,6 +3654,14 @@ function ACS_DefaultGeraltMovesetOverrideModeRoll_Enabled(): bool
 	configValue =(int) configValueString;
 
 	if( FactsQuerySum("q001_nightmare_ended") <= 0)
+	{
+		return false;
+	}
+
+	if (thePlayer.HasBuff(EET_AirDrain)
+	|| thePlayer.HasBuff(EET_Choking)
+	|| thePlayer.HasBuff(EET_Drowning)
+	)
 	{
 		return false;
 	}
@@ -3548,164 +3816,6 @@ function ACS_WraithModeInput(): int
 	}
 	
 	else return configValue;
-}
-
-// Special Abilities Settings
-
-function ACSSpecialAbilitiesSettingsGetConfigValue(nam : name) : string
-{
-	var conf: CInGameConfigWrapper;
-	var value: string;
-	
-	conf = theGame.GetInGameConfigWrapper();
-	
-	value = conf.GetVarValue('EHmodSpecialAbilitiesSettings', nam);
-
-	return value;
-}
-
-function ACS_SummonedShades_Enabled(): bool 
-{
-	var configValue :int;
-	var configValueString : string;
-	
-	configValueString = ACSSpecialAbilitiesSettingsGetConfigValue('EHmodSummonedShades');
-	configValue =(int) configValueString;
-
-	if(configValueString=="" || configValue<0)
-	{
-		return false;
-	}
-	
-	else return (bool)configValueString;
-}
-
-function ACS_BeamAttack_Enabled(): bool 
-{
-	var configValue :int;
-	var configValueString : string;
-	
-	configValueString = ACSSpecialAbilitiesSettingsGetConfigValue('EHmodBeamAttack');
-	configValue =(int) configValueString;
-
-	if(configValueString=="" || configValue<0)
-	{
-		return false;
-	}
-	
-	else return (bool)configValueString;
-}
-
-function ACS_SwordArray_Enabled(): bool 
-{
-	var configValue :int;
-	var configValueString : string;
-	
-	configValueString = ACSSpecialAbilitiesSettingsGetConfigValue('EHmodSwordArray');
-	configValue =(int) configValueString;
-
-	if(configValueString=="" || configValue<0)
-	{
-		return false;
-	}
-	
-	else return (bool)configValueString;
-}
-
-function ACS_ShieldEntity_Enabled(): bool 
-{
-	var configValue :int;
-	var configValueString : string;
-	
-	configValueString = ACSSpecialAbilitiesSettingsGetConfigValue('EHmodShieldEntity');
-	configValue =(int) configValueString;
-
-	if(configValueString=="" || configValue<0)
-	{
-		return false;
-	}
-	
-	else return (bool)configValueString;
-}
-
-function ACS_QuenMonsterSummon_Enabled(): bool 
-{
-	var configValue :int;
-	var configValueString : string;
-	
-	configValueString = ACSSpecialAbilitiesSettingsGetConfigValue('EHmodQuenMonsterSummon');
-	configValue =(int) configValueString;
-
-	if(configValueString=="" || configValue<0)
-	{
-		return false;
-	}
-	
-	else return (bool)configValueString;
-}
-
-function ACS_YrdenSkeleSummon_Enabled(): bool
-{
-	var configValue :int;
-	var configValueString : string;
-	
-	configValueString = ACSSpecialAbilitiesSettingsGetConfigValue('EHmodYrdenSkeleSummon');
-	configValue =(int) configValueString;
-
-	if(configValueString=="" || configValue<0)
-	{
-		return false;
-	}
-	
-	else return (bool)configValueString;
-}
-
-function ACS_AardPull_Enabled(): bool
-{
-	var configValue :int;
-	var configValueString : string;
-	
-	configValueString = ACSSpecialAbilitiesSettingsGetConfigValue('EHmodAardPull');
-	configValue =(int) configValueString;
-
-	if(configValueString=="" || configValue<0)
-	{
-		return false;
-	}
-	
-	else return (bool)configValueString;
-}
-
-function ACS_BruxaCamoDecoy_Enabled(): bool 
-{
-	var configValue :int;
-	var configValueString : string;
-	
-	configValueString = ACSSpecialAbilitiesSettingsGetConfigValue('EHmodBruxaCamoDecoy');
-	configValue =(int) configValueString;
-
-	if(configValueString=="" || configValue<0)
-	{
-		return false;
-	}
-	
-	else return (bool)configValueString;
-}
-
-function ACS_BruxaBite_Enabled(): bool 
-{
-	var configValue :int;
-	var configValueString : string;
-	
-	configValueString = ACSSpecialAbilitiesSettingsGetConfigValue('EHmodBruxaBite');
-	configValue =(int) configValueString;
-
-	if(configValueString=="" || configValue<0)
-	{
-		return false;
-	}
-	
-	else return (bool)configValueString;
 }
 
 // Damage Settings
@@ -3920,6 +4030,22 @@ function ACS_Player_DamageTaken_Multiplier(): float
 	var configValueString : string;
 	
 	configValueString = ACSDamageSettingsGetConfigValue('EHmodPlayerDamageTakenMultiplier');
+	configValue =(float) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return 1;
+	}
+	
+	else return configValue;
+}
+
+function ACS_Enemy_Health_Multiplier(): float
+{
+	var configValue :float;
+	var configValueString : string;
+	
+	configValueString = ACSDamageSettingsGetConfigValue('EHmodEnemyHealthMultiplier');
 	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
@@ -4198,17 +4324,95 @@ function ACSEncountersSettingsGetConfigValue(nam : name) : string
 	return value;
 }
 
+// Events Settings
+
+function ACSEventsSettingsGetConfigValue(nam : name) : string
+{
+	var conf: CInGameConfigWrapper;
+	var value: string;
+	
+	conf = theGame.GetInGameConfigWrapper();
+	
+	value = conf.GetVarValue('EHmodEventsSettings', nam);
+
+	return value;
+}
+
+function ACS_AllowSimultaneousEventSpawning_Enabled(): bool 
+{
+	var configValue :int;
+	var configValueString : string;
+	
+	configValueString = ACSEventsSettingsGetConfigValue('EHmodAllowSimultaneousEventsSpawning');
+	configValue =(int) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return false;
+	}
+
+	else return (bool)configValueString;
+}
+
+function ACS_EventDelayMinimumTimeInSeconds(): float
+{
+	var configValue :float;
+	var configValueString : string;
+	
+	configValueString = ACSEventsSettingsGetConfigValue('EHmodEventDelayMinimumTimeInSeconds');
+	configValue =(float) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return 30;
+	}
+	
+	else return configValue;
+}
+
+function ACS_EventDelayMaximumTimeInSeconds(): float
+{
+	var configValue :float;
+	var configValueString : string;
+	
+	configValueString = ACSEventsSettingsGetConfigValue('EHmodEventDelayMaximumTimeInSeconds');
+	configValue =(float) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return 60;
+	}
+	
+	else return configValue;
+}
+
 function ACS_ShadowsSpawnChancesNormal(): float
 {
 	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodShadowsSpawnChancesNormal');
+	configValueString = ACSEventsSettingsGetConfigValue('EHmodShadowsSpawnChancesNormal');
 	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
 		return 0.1;
+	}
+	
+	else return configValue;
+}
+
+function ACS_ShadowsSpawnDelayTimeInSeconds(): float
+{
+	var configValue :float;
+	var configValueString : string;
+	
+	configValueString = ACSEventsSettingsGetConfigValue('EHmodShadowsSpawnDelayInSeconds');
+	configValue =(float) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return 420;
 	}
 	
 	else return configValue;
@@ -4219,12 +4423,28 @@ function ACS_WildHuntSpawnChancesNormal(): float
 	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodWildHuntSpawnChancesNormal');
+	configValueString = ACSEventsSettingsGetConfigValue('EHmodWildHuntSpawnChancesNormal');
 	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
 		return 0.1;
+	}
+	
+	else return configValue;
+}
+
+function ACS_WildhuntSpawnDelayTimeInSeconds(): float
+{
+	var configValue :float;
+	var configValueString : string;
+	
+	configValueString = ACSEventsSettingsGetConfigValue('EHmodWildhuntSpawnDelayInSeconds');
+	configValue =(float) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return 840;
 	}
 	
 	else return configValue;
@@ -4235,12 +4455,28 @@ function ACS_NightStalkerSpawnChancesNormal(): float
 	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodNightStalkerSpawnChancesNormal');
+	configValueString = ACSEventsSettingsGetConfigValue('EHmodNightStalkerSpawnChancesNormal');
 	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
 		return 0.1;
+	}
+	
+	else return configValue;
+}
+
+function ACS_NightStalkerSpawnDelayTimeInSeconds(): float
+{
+	var configValue :float;
+	var configValueString : string;
+	
+	configValueString = ACSEventsSettingsGetConfigValue('EHmodNightStalkerSpawnDelayInSeconds');
+	configValue =(float) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return 840;
 	}
 	
 	else return configValue;
@@ -4251,7 +4487,7 @@ function ACS_ElderbloodAssassinSpawnChancesNormal(): float
 	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodElderbloodAssassinSpawnChancesNormal');
+	configValueString = ACSEventsSettingsGetConfigValue('EHmodElderbloodAssassinSpawnChancesNormal');
 	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
@@ -4262,868 +4498,1026 @@ function ACS_ElderbloodAssassinSpawnChancesNormal(): float
 	else return configValue;
 }
 
-function ACS_DraugirEncounters_Enabled(): bool 
+function ACS_ElderbloodAssassinSpawnDelayTimeInSeconds(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodDraugirEncountersEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSEventsSettingsGetConfigValue('EHmodElderbloodAssassinSpawnDelayInSeconds');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 220;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_Forest_God_Enabled(): bool 
+// Additional World Encounters Settings
+
+function ACSAdditionalWorldEncountersSettingsGetConfigValue(nam : name) : string
 {
-	var configValue :int;
-	var configValueString : string;
+	var conf: CInGameConfigWrapper;
+	var value: string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodForestGodEnabled');
-	configValue =(int) configValueString;
+	conf = theGame.GetInGameConfigWrapper();
+	
+	value = conf.GetVarValue('EHmodAdditionalWorldEncountersSettings', nam);
 
-	if(configValueString=="" || configValue<0)
-	{
-		return true;
-	}
-
-	else return (bool)configValueString;
+	return value;
 }
 
-function ACS_Ice_Titans_Enabled(): bool 
+function ACS_DraugirEncounters_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodIceTitansEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodDraugirEncountersEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_Fire_Bear_Altar_Enabled(): bool 
+function ACS_Forest_God_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodFireBearAltarEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodForestGodEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_Knightmare_Enabled(): bool 
+function ACS_Ice_Titans_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodKnightmareEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodIceTitansEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_SheWhoKnows_Enabled(): bool 
+function ACS_Fire_Bear_Altar_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodSheWhoKnowsEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodFireBearAltarEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_BigLizard_Enabled(): bool 
+function ACS_Knightmare_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodBigLizardEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodKnightmareEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_RatMage_Enabled(): bool 
+function ACS_SheWhoKnows_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodRatMageEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodSheWhoKnowsEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_Mages_Enabled(): bool 
+function ACS_BigLizard_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodMagesEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodBigLizardEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_CloakedVamp_Enabled(): bool 
+function ACS_RatMage_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodCloakedVampEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodRatMageEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_Draug_Enabled(): bool 
+function ACS_Mages_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodDraugEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodMagesEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_Berserkers_Enabled(): bool 
+function ACS_CloakedVamp_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodBerserkersEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodCloakedVampEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_LynxWitchers_Enabled(): bool 
+function ACS_Chironex_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodLynxWitchersEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodChironexEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_FireGargoyle_Enabled(): bool 
+function ACS_Dao_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodFireGargoyleEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodDaoEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_Fluffy_Enabled(): bool 
+function ACS_Draug_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodFluffyEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodDraugEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_FogAssassin_Enabled(): bool 
+function ACS_Berserkers_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodFogAssassinEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodBerserkersEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_XenoTyrantEgg_Enabled(): bool 
+function ACS_LynxWitchers_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodXenoTyrantEggEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodLynxWitchersEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_Cultists_Enabled(): bool 
+function ACS_FireGargoyle_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodCultistsEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodFireGargoyleEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_MelusineOfTheStorm_Enabled(): bool 
+function ACS_Fluffy_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodMelusineEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodFluffyEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_PirateZombie_Enabled(): bool 
+function ACS_FogAssassin_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodPirateZombieEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodFogAssassinEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_Svalblod_Enabled(): bool 
+function ACS_XenoTyrantEgg_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodSvalblodEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodXenoTyrantEggEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_Duskwraith_Enabled(): bool 
+function ACS_Cultists_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodDuskwraithEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodCultistsEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_MegaWraith_Enabled(): bool 
+function ACS_MelusineOfTheStorm_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodMegaWraithEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodMelusineEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_FireGryphon_Enabled(): bool 
+function ACS_PirateZombie_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodFireGryphonEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodPirateZombieEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_Incubus_Enabled(): bool 
+function ACS_Svalblod_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodIncubusEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodSvalblodEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_Mula_Enabled(): bool 
+function ACS_Duskwraith_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodMulaEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodDuskwraithEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_BloodHym_Enabled(): bool 
+function ACS_MegaWraith_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodBloodHymEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodMegaWraithEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_NekkerGuardian_Enabled(): bool 
+function ACS_FireGryphon_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodNekkerGuardianEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodFireGryphonEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_Necrofiend_Nest_Enabled(): bool 
+function ACS_Incubus_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodNecrofiendNestEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodIncubusEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_HarpyQueen_Nest_Enabled(): bool 
+function ACS_Mula_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodHarpyQueenNestEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodMulaEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_Heart_Of_Darkness_Enabled(): bool 
+function ACS_BloodHym_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodHeartOfDarknessEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodBloodHymEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_Bumbakvetch_Enabled(): bool 
+function ACS_NekkerGuardian_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodBumbakvetchEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodNekkerGuardianEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_Frost_Boar_Enabled(): bool 
+function ACS_Necrofiend_Nest_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodFrostBoarEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodNecrofiendNestEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_Nimean_Panther_Enabled(): bool 
+function ACS_HarpyQueen_Nest_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodNimeanPantherEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodHarpyQueenNestEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_Shadow_Pixies_Enabled(): bool 
+function ACS_Heart_Of_Darkness_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodShadowPixiesEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodHeartOfDarknessEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_Maerolorn_Enabled(): bool 
+function ACS_Bumbakvetch_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodMaerolornEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodBumbakvetchEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_Demonic_Construct_Enabled(): bool 
+function ACS_Frost_Boar_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodDemonicConstructEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodFrostBoarEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_Dark_Knight_Enabled(): bool 
+function ACS_Nimean_Panther_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodDarkKnightEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodNimeanPantherEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_Voref_Enabled(): bool 
+function ACS_Shadow_Pixies_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodVorefEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodShadowPixiesEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_Ifrit_Enabled(): bool 
+function ACS_Maerolorn_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodIfritEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodMaerolornEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_Viy_Enabled(): bool 
+function ACS_Demonic_Construct_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodViyEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodDemonicConstructEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_Phooca_Enabled(): bool 
+function ACS_Dark_Knight_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodPhoocaEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodDarkKnightEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_Plumard_Enabled(): bool 
+function ACS_Voref_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodPlumardEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodVorefEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_The_Beast_Enabled(): bool 
+function ACS_Ifrit_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodTheBeastEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodIfritEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_Giant_Trolls_Enabled(): bool 
+function ACS_Iridescent_Sharley_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodGiantTrollsEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodIridescentSharleyEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_Elemental_Titans_Enabled(): bool 
+function ACS_Viy_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodElementalTitansEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodViyEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_ShadesCrusadersEncounters_Enabled(): bool 
+function ACS_Phooca_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodShadesCrusadersEncountersEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodPhoocaEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_ShadesHuntersEncounters_Enabled(): bool 
+function ACS_Plumard_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodShadesHuntersEncountersEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodPlumardEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_ShadesRoguesEncounters_Enabled(): bool 
+function ACS_The_Beast_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodShadesRoguesEncountersEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodTheBeastEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_ShadesShowdownEncounters_Enabled(): bool 
+function ACS_Giant_Trolls_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodShadesShowdownEncountersEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodGiantTrollsEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_ShadesDancerWaxing_Enabled(): bool 
+function ACS_Elemental_Titans_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodShadesDancerWaxingEncountersEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodElementalTitansEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_ShadesDancerWaning_Enabled(): bool 
+function ACS_ShadesCrusadersEncounters_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodShadesDancerWaningEncountersEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodShadesCrusadersEncountersEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_Kara_Enabled(): bool 
+function ACS_ShadesHuntersEncounters_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodShadesKaraEncountersEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodShadesHuntersEncountersEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
-
-	else return (bool)configValueString;
+	
+	else return configValue;
 }
 
-function ACS_ShadesNightmareIncarnate_Enabled(): bool 
+function ACS_ShadesRoguesEncounters_Enabled(): float
 {
-	var configValue :int;
+	var configValue :float;
 	var configValueString : string;
 	
-	configValueString = ACSEncountersSettingsGetConfigValue('EHmodShadesNightmareIncarnateEncountersEnabled');
-	configValue =(int) configValueString;
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodShadesRoguesEncountersEnabled');
+	configValue =(float) configValueString;
 
 	if(configValueString=="" || configValue<0)
 	{
-		return true;
+		return 1;
 	}
+	
+	else return configValue;
+}
 
-	else return (bool)configValueString;
+function ACS_ShadesShowdownEncounters_Enabled(): float
+{
+	var configValue :float;
+	var configValueString : string;
+	
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodShadesShowdownEncountersEnabled');
+	configValue =(float) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return 1;
+	}
+	
+	else return configValue;
+}
+
+function ACS_ShadesDancerWaxing_Enabled(): float
+{
+	var configValue :float;
+	var configValueString : string;
+	
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodShadesDancerWaxingEncountersEnabled');
+	configValue =(float) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return 1;
+	}
+	
+	else return configValue;
+}
+
+function ACS_ShadesDancerWaning_Enabled(): float
+{
+	var configValue :float;
+	var configValueString : string;
+	
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodShadesDancerWaningEncountersEnabled');
+	configValue =(float) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return 1;
+	}
+	
+	else return configValue;
+}
+
+function ACS_Kara_Enabled(): float
+{
+	var configValue :float;
+	var configValueString : string;
+	
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodShadesKaraEncountersEnabled');
+	configValue =(float) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return 1;
+	}
+	
+	else return configValue;
+}
+
+function ACS_ShadesNightmareIncarnate_Enabled(): float
+{
+	var configValue :float;
+	var configValueString : string;
+	
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodShadesNightmareIncarnateEncountersEnabled');
+	configValue =(float) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return 1;
+	}
+	
+	else return configValue;
+}
+
+function ACS_Knocker_Enabled(): float
+{
+	var configValue :float;
+	var configValueString : string;
+	
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodKnockerEnabled');
+	configValue =(float) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return 0.75;
+	}
+	
+	else return configValue;
+}
+
+function ACS_Nekurat_Enabled(): float
+{
+	var configValue :float;
+	var configValueString : string;
+	
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodNekuratEnabled');
+	configValue =(float) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return 1;
+	}
+	
+	else return configValue;
+}
+
+function ACS_Botchling_Enabled(): float
+{
+	var configValue :float;
+	var configValueString : string;
+	
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodBotchlingEnabled');
+	configValue =(float) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return 1;
+	}
+	
+	else return configValue;
+}
+
+function ACS_Vendigo_Enabled(): float
+{
+	var configValue :float;
+	var configValueString : string;
+	
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodVendigoEnabled');
+	configValue =(float) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return 0.75;
+	}
+	
+	else return configValue;
+}
+
+function ACS_SwarmMother_Enabled(): float
+{
+	var configValue :float;
+	var configValueString : string;
+	
+	configValueString = ACSAdditionalWorldEncountersSettingsGetConfigValue('EHmodSwarmMotherEnabled');
+	configValue =(float) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return 1;
+	}
+	
+	else return configValue;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -5236,6 +5630,16 @@ function ACS_New_Replacers_Female_Active(): bool
 	}
 
 	return false;
+}
+
+function ACS_EH_EX_Installed(): bool
+{
+	return theGame.GetDLCManager().IsDLCAvailable('dlc_eh_ex');	
+}
+
+function ACS_EH_EX_Enabled(): bool
+{
+	return theGame.GetDLCManager().IsDLCEnabled('dlc_eh_ex');		
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -5372,7 +5776,7 @@ function ACS_GetItem_Olgierd_Steel(): CEntity
 
 	if( 
 	thePlayer.GetInventory().GetItemName( sword_id ) == 'Olgierd Sabre'
-	
+	|| thePlayer.GetInventory().GetItemName( sword_id ) == 'ACS_True_Iris'
 	|| thePlayer.GetInventory().GetItemName( sword_id ) == 'Shades Steel Rakuyo' 
 	|| thePlayer.GetInventory().GetItemName( sword_id ) == 'Shades Steel Vulcan'
 	|| thePlayer.GetInventory().GetItemName( sword_id ) == 'Shades Steel Flameborn'
@@ -5422,6 +5826,7 @@ function ACS_GetItem_Olgierd_Steel(): CEntity
 	|| thePlayer.GetInventory().GetItemName( sword_id ) == 'Hakland Sabre'
 	
 	|| thePlayer.GetInventory().GetItemName( sword_id ) == 'Ofir Sabre 1'
+
 	)
 	{
 		sword = thePlayer.GetInventory().GetItemEntityUnsafe(sword_id);
@@ -5477,6 +5882,99 @@ function ACS_GetItem_Katana_Steel(): CEntity
 	return sword;
 }
 
+function ACS_GetItem_MageStaff_Steel(): bool
+{
+	if ( 
+	
+	ACS_GetItem_MageStaff_Water()
+	|| ACS_GetItem_MageStaff_Sand()
+	|| ACS_GetItem_MageStaff_Fire()
+	|| ACS_GetItem_MageStaff_Ice()
+
+	)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+function ACS_GetItem_MageStaff_Water(): CEntity
+{
+	var sword_id 		: SItemUniqueId;
+	var sword 			: CEntity;
+
+	thePlayer.GetInventory().GetItemEquippedOnSlot(EES_SteelSword, sword_id);
+
+	if( 
+	
+	thePlayer.GetInventory().GetItemName( sword_id ) == 'ACS_Water_Staff'
+
+	)
+	{
+		sword = thePlayer.GetInventory().GetItemEntityUnsafe(sword_id);
+	}
+
+	return sword;
+}
+
+function ACS_GetItem_MageStaff_Sand(): CEntity
+{
+	var sword_id 		: SItemUniqueId;
+	var sword 			: CEntity;
+
+	thePlayer.GetInventory().GetItemEquippedOnSlot(EES_SteelSword, sword_id);
+
+	if( 
+	
+	thePlayer.GetInventory().GetItemName( sword_id ) == 'ACS_Sand_Staff'
+
+	)
+	{
+		sword = thePlayer.GetInventory().GetItemEntityUnsafe(sword_id);
+	}
+
+	return sword;
+}
+
+function ACS_GetItem_MageStaff_Fire(): CEntity
+{
+	var sword_id 		: SItemUniqueId;
+	var sword 			: CEntity;
+
+	thePlayer.GetInventory().GetItemEquippedOnSlot(EES_SteelSword, sword_id);
+
+	if( 
+
+	thePlayer.GetInventory().GetItemName( sword_id ) == 'ACS_Fire_Staff'
+
+	)
+	{
+		sword = thePlayer.GetInventory().GetItemEntityUnsafe(sword_id);
+	}
+
+	return sword;
+}
+
+function ACS_GetItem_MageStaff_Ice(): CEntity
+{
+	var sword_id 		: SItemUniqueId;
+	var sword 			: CEntity;
+
+	thePlayer.GetInventory().GetItemEquippedOnSlot(EES_SteelSword, sword_id);
+
+	if( 
+	
+	thePlayer.GetInventory().GetItemName( sword_id ) == 'ACS_Ice_Staff'
+
+	)
+	{
+		sword = thePlayer.GetInventory().GetItemEntityUnsafe(sword_id);
+	}
+
+	return sword;
+}
+
 function ACS_GetItem_Caretaker_Shovel(): CEntity
 {
 	var sword_id 		: SItemUniqueId;
@@ -5492,6 +5990,30 @@ function ACS_GetItem_Caretaker_Shovel(): CEntity
 	}
 
 	return sword;
+}
+
+function ACS_Imlerith_Mace_Equipped() : bool
+{
+	var sword_id_steel, sword_id_silver 		: SItemUniqueId;
+	var sword 									: CEntity;
+
+	thePlayer.GetInventory().GetItemEquippedOnSlot(EES_SteelSword, sword_id_steel);
+
+	thePlayer.GetInventory().GetItemEquippedOnSlot(EES_SilverSword, sword_id_silver);
+
+	if( 
+	thePlayer.GetInventory().GetItemName( sword_id_steel ) == 'Imlerith Macex'
+	|| thePlayer.GetInventory().GetItemName( sword_id_steel ) == 'Imlerith Mace1'
+	|| thePlayer.GetInventory().GetItemName( sword_id_steel ) == 'ACS_Imlerith_Mace'
+	|| thePlayer.GetInventory().GetItemName( sword_id_silver ) == 'ACS_Imlerith_Mace_Silver'
+	|| thePlayer.GetInventory().GetItemName( sword_id_silver ) == 'S_Imlerith Macex'
+	|| thePlayer.GetInventory().GetItemName( sword_id_silver ) == 'Immace Silver'
+	)
+	{
+		return true;
+	}
+
+	return false;
 }
 
 function ACS_GetItem_Imlerith_Steel(): CEntity
@@ -5657,8 +6179,6 @@ function ACS_GetItem_Spear_Steel(): CEntity
 	|| thePlayer.GetInventory().GetItemName( sword_id ) == 'ACS_Pitchfork'
 	
 	|| thePlayer.GetInventory().GetItemName( sword_id ) == 'ACS_Rake'
-	
-	|| thePlayer.GetInventory().GetItemName( sword_id ) == 'ACS_Caranthir_Staff'
 
 	|| thePlayer.GetInventory().GetItemName( sword_id ) == 'ACS_Shepherd_Stick'
 
@@ -5996,6 +6516,8 @@ function ACS_GetItem_Olgierd_Silver(): CEntity
 	|| thePlayer.GetInventory().GetItemName( sword_id ) == 'Sparda'
 
 	|| thePlayer.GetInventory().GetItemName( sword_id ) == 'NGP Sparda'
+	
+	|| thePlayer.GetInventory().GetItemName( sword_id ) == 'ACS_Novalis'
 	)
 	{
 		sword = thePlayer.GetInventory().GetItemEntityUnsafe(sword_id);
@@ -6241,6 +6763,8 @@ function ACS_GetItem_Greg_Silver(): CEntity
 	
 	|| thePlayer.GetInventory().GetItemName( sword_id ) == 'kama_silver'
 
+	|| thePlayer.GetInventory().GetItemName( sword_id ) == 'ACS_Calidus_Fire_Sword'
+
 	)
 	{
 		sword = thePlayer.GetInventory().GetItemEntityUnsafe(sword_id);
@@ -6299,6 +6823,7 @@ function ACS_GetItem_Axe_Silver(): CEntity
 	|| thePlayer.GetInventory().GetItemName( sword_id ) == 'ACS_Twohanded_Hammer_2_Silver'
 
 	|| thePlayer.GetInventory().GetItemName( sword_id ) == 'ACS_Wild_Hunt_Hammer_Silver'
+	|| thePlayer.GetInventory().GetItemName( sword_id ) == 'ACS_Demonic_Construct_Hammer'
 
 	)
 	{
@@ -6370,10 +6895,8 @@ function ACS_GetItem_Aerondight(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+
+	return false;
 }
 
 function ACS_GetItem_Iris(): bool
@@ -6382,24 +6905,216 @@ function ACS_GetItem_Iris(): bool
 	{
 		return true;
 	}
-	else
+
+	return false;
+}
+
+function ACS_GetItem_MageStaff(): bool
+{
+	if( thePlayer.GetInventory().ItemHasTag( thePlayer.GetInventory().GetCurrentlyHeldSword(), 'acsmagestaff' ))
 	{
-		return false;
+		return true;
 	}
+
+	return false;
+}
+
+function ACS_GetItem_Novalis(): bool
+{
+	if ( GetWitcherPlayer().IsItemEquippedByName( 'ACS_Novalis')) 
+	{
+		return true;
+	}
+
+	return false;
+}
+
+function ACS_DontReplaceScabbardSilver() : bool
+{
+	var sword_id 		: SItemUniqueId;
+
+	thePlayer.GetInventory().GetItemEquippedOnSlot(EES_SilverSword, sword_id);
+
+	if( 
+	StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Sabre" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Scoiatael" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Gregoire" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Axe" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Spear" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Halberd" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Pole" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Hammer" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Club" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Blackjack" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Poker" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Guisarme" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Mace" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Hatchet" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Staff" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Wand" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Oar" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Pickaxe" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Shovel" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Broom" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Paling" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Pitchfork" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Rake" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Scoop" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Scythe" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Stick" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Eredin" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Giant" )
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "sabre" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "scoiatael" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "gregoire" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "axe" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "spear" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "halberd" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "pole" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "hammer" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "club" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "blackjack" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "poker" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "guisarme" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "mace" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "hatchet" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "staff" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "wand" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "oar" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "pickaxe" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "shovel" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "broom" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "paling" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "pitchfork" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "rake" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "scoop" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "scythe" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "stick" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "eredin" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "giant" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "calidus" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Calidus" ) 
+	|| thePlayer.GetInventory().ItemHasTag(sword_id,'mod_origin_ofir') 
+	|| thePlayer.GetInventory().ItemHasTag(sword_id,'Ofir') 
+	|| thePlayer.GetInventory().ItemHasTag(sword_id,'OlgierdSabre') 
+	|| thePlayer.GetInventory().ItemHasTag(sword_id,'NovalisSabre') 
+	|| thePlayer.GetInventory().ItemHasTag(sword_id,'ironshade') 
+	)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+function ACS_DontReplaceScabbardSteel() : bool
+{
+	var sword_id 		: SItemUniqueId;
+
+	thePlayer.GetInventory().GetItemEquippedOnSlot(EES_SteelSword, sword_id);
+
+	if( 
+	StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Sabre" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Scoiatael" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Gregoire" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Axe" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Spear" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Halberd" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Pole" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Hammer" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Club" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Blackjack" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Poker" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Guisarme" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Mace" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Hatchet" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Staff" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Wand" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Oar" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Pickaxe" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Shovel" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Broom" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Paling" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Pitchfork" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Rake" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Scoop" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Scythe" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Stick" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Eredin" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Giant" )
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "sabre" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "scoiatael" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "gregoire" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "axe" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "spear" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "halberd" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "pole" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "hammer" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "club" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "blackjack" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "poker" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "guisarme" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "mace" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "hatchet" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "staff" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "wand" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "oar" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "pickaxe" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "shovel" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "broom" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "paling" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "pitchfork" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "rake" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "scoop" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "scythe" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "stick" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "eredin" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "giant" ) 
+	|| thePlayer.GetInventory().ItemHasTag(sword_id,'mod_origin_ofir') 
+	|| thePlayer.GetInventory().ItemHasTag(sword_id,'Ofir') 
+	|| thePlayer.GetInventory().ItemHasTag(sword_id,'OlgierdSabre') 
+	|| thePlayer.GetInventory().ItemHasTag(sword_id,'NovalisSabre')
+	|| thePlayer.GetInventory().ItemHasTag(sword_id,'ironshade') 
+	)
+	{
+		return true;
+	}
+
+	return false;
 }
 
 function ACS_GetItem_VampClaw(): bool
 {
-	if ( GetWitcherPlayer().IsItemEquippedByName( 'q702_vampire_gloves')
-	|| GetWitcherPlayer().IsItemEquippedByName( 'q704_vampire_gloves')	
+	if ( ACS_GetItem_VampClaw_Normal()
+	|| ACS_GetItem_VampClaw_Blood()
 	) 
 	{
 		return true;
 	}
-	else
+
+	return false;
+}
+
+function ACS_GetItem_VampClaw_Normal(): bool
+{
+	if ( GetWitcherPlayer().IsItemEquippedByName( 'q702_vampire_gloves')
+	) 
 	{
-		return false;
+		return true;
 	}
+
+	return false;
+}
+
+function ACS_GetItem_VampClaw_Blood(): bool
+{
+	if ( GetWitcherPlayer().IsItemEquippedByName( 'q704_vampire_gloves')	
+	) 
+	{
+		return true;
+	}
+
+	return false;
 }
 
 function ACS_GetItem_VampClaw_Shades(): bool
@@ -6411,10 +7126,8 @@ function ACS_GetItem_VampClaw_Shades(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+
+	return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -6435,10 +7148,7 @@ function ACS_GetItem_Wolf_Armor(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_GetItem_Wolf_Boots(): bool
@@ -6457,10 +7167,7 @@ function ACS_GetItem_Wolf_Boots(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_GetItem_Wolf_Gloves(): bool
@@ -6479,10 +7186,7 @@ function ACS_GetItem_Wolf_Gloves(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_GetItem_Wolf_Pants(): bool
@@ -6501,10 +7205,7 @@ function ACS_GetItem_Wolf_Pants(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_GetItem_Wolf_Silver_Sword(): bool
@@ -6521,10 +7222,7 @@ function ACS_GetItem_Wolf_Silver_Sword(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_GetItem_Wolf_Steel_Sword(): bool
@@ -6541,10 +7239,7 @@ function ACS_GetItem_Wolf_Steel_Sword(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_Wolf_School_Check(): bool
@@ -6560,10 +7255,7 @@ function ACS_Wolf_School_Check(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_Wolf_School_Check_For_Item(): bool
@@ -6579,10 +7271,7 @@ function ACS_Wolf_School_Check_For_Item(): bool
 		ACS_WolfSchool_Tutorial();
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -6603,10 +7292,7 @@ function ACS_GetItem_Bear_Armor(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_GetItem_Bear_Boots(): bool
@@ -6625,10 +7311,7 @@ function ACS_GetItem_Bear_Boots(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_GetItem_Bear_Gloves(): bool
@@ -6647,10 +7330,7 @@ function ACS_GetItem_Bear_Gloves(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_GetItem_Bear_Pants(): bool
@@ -6669,10 +7349,7 @@ function ACS_GetItem_Bear_Pants(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_GetItem_Bear_Silver_Sword(): bool
@@ -6689,10 +7366,7 @@ function ACS_GetItem_Bear_Silver_Sword(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_GetItem_Bear_Steel_Sword(): bool
@@ -6709,10 +7383,7 @@ function ACS_GetItem_Bear_Steel_Sword(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_Bear_School_Check(): bool
@@ -6728,10 +7399,7 @@ function ACS_Bear_School_Check(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_Bear_School_Check_For_Item(): bool
@@ -6747,10 +7415,7 @@ function ACS_Bear_School_Check_For_Item(): bool
 		ACS_BearSchool_Tutorial();
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -6771,10 +7436,7 @@ function ACS_GetItem_Cat_Armor(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_GetItem_Cat_Boots(): bool
@@ -6793,10 +7455,7 @@ function ACS_GetItem_Cat_Boots(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_GetItem_Cat_Gloves(): bool
@@ -6815,10 +7474,7 @@ function ACS_GetItem_Cat_Gloves(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_GetItem_Cat_Pants(): bool
@@ -6837,10 +7493,7 @@ function ACS_GetItem_Cat_Pants(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_GetItem_Cat_Silver_Sword(): bool
@@ -6859,10 +7512,7 @@ function ACS_GetItem_Cat_Silver_Sword(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_GetItem_Cat_Steel_Sword(): bool
@@ -6881,10 +7531,7 @@ function ACS_GetItem_Cat_Steel_Sword(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_Cat_School_Check(): bool
@@ -6900,10 +7547,7 @@ function ACS_Cat_School_Check(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_Cat_School_Check_For_Item(): bool
@@ -6919,10 +7563,7 @@ function ACS_Cat_School_Check_For_Item(): bool
 		ACS_CatSchool_Tutorial();
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -6943,10 +7584,7 @@ function ACS_GetItem_Griffin_Armor(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_GetItem_Griffin_Boots(): bool
@@ -6965,10 +7603,7 @@ function ACS_GetItem_Griffin_Boots(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_GetItem_Griffin_Gloves(): bool
@@ -6987,10 +7622,7 @@ function ACS_GetItem_Griffin_Gloves(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_GetItem_Griffin_Pants(): bool
@@ -7009,10 +7641,7 @@ function ACS_GetItem_Griffin_Pants(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_GetItem_Griffin_Silver_Sword(): bool
@@ -7029,10 +7658,7 @@ function ACS_GetItem_Griffin_Silver_Sword(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_GetItem_Griffin_Steel_Sword(): bool
@@ -7049,10 +7675,7 @@ function ACS_GetItem_Griffin_Steel_Sword(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_Griffin_School_Check(): bool
@@ -7068,10 +7691,7 @@ function ACS_Griffin_School_Check(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_Griffin_School_Check_For_Item(): bool
@@ -7087,10 +7707,7 @@ function ACS_Griffin_School_Check_For_Item(): bool
 		ACS_GriffinSchool_Tutorial();
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -7105,10 +7722,7 @@ function ACS_GetItem_Manticore_Armor(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_GetItem_Manticore_Boots(): bool
@@ -7121,10 +7735,7 @@ function ACS_GetItem_Manticore_Boots(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_GetItem_Manticore_Gloves(): bool
@@ -7137,10 +7748,7 @@ function ACS_GetItem_Manticore_Gloves(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_GetItem_Manticore_Pants(): bool
@@ -7153,10 +7761,7 @@ function ACS_GetItem_Manticore_Pants(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_GetItem_Manticore_Silver_Sword(): bool
@@ -7169,10 +7774,7 @@ function ACS_GetItem_Manticore_Silver_Sword(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_GetItem_Manticore_Steel_Sword(): bool
@@ -7185,10 +7787,7 @@ function ACS_GetItem_Manticore_Steel_Sword(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_Manticore_School_Check(): bool
@@ -7204,10 +7803,7 @@ function ACS_Manticore_School_Check(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_Manticore_School_Check_For_Item(): bool
@@ -7223,10 +7819,7 @@ function ACS_Manticore_School_Check_For_Item(): bool
 		ACS_ManticoreSchool_Tutorial();
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -7239,10 +7832,7 @@ function ACS_GetItem_Viper_Armor(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_GetItem_Viper_Boots(): bool
@@ -7253,10 +7843,7 @@ function ACS_GetItem_Viper_Boots(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_GetItem_Viper_Gloves(): bool
@@ -7267,10 +7854,7 @@ function ACS_GetItem_Viper_Gloves(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_GetItem_Viper_Pants(): bool
@@ -7281,10 +7865,7 @@ function ACS_GetItem_Viper_Pants(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_GetItem_Viper_Silver_Sword(): bool
@@ -7297,10 +7878,7 @@ function ACS_GetItem_Viper_Silver_Sword(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_GetItem_Viper_Steel_Sword(): bool
@@ -7313,10 +7891,7 @@ function ACS_GetItem_Viper_Steel_Sword(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_Viper_School_Check(): bool
@@ -7332,10 +7907,7 @@ function ACS_Viper_School_Check(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_Viper_School_Check_For_Item(): bool
@@ -7351,10 +7923,7 @@ function ACS_Viper_School_Check_For_Item(): bool
 		ACS_ViperSchool_Tutorial();
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -7371,10 +7940,7 @@ function ACS_GetItem_Forgotten_Wolf_Armor(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_GetItem_Forgotten_Wolf_Boots(): bool
@@ -7389,10 +7955,7 @@ function ACS_GetItem_Forgotten_Wolf_Boots(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_GetItem_Forgotten_Wolf_Gloves(): bool
@@ -7407,10 +7970,7 @@ function ACS_GetItem_Forgotten_Wolf_Gloves(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_GetItem_Forgotten_Wolf_Pants(): bool
@@ -7425,10 +7985,7 @@ function ACS_GetItem_Forgotten_Wolf_Pants(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_GetItem_Forgotten_Wolf_Silver_Sword(): bool
@@ -7443,10 +8000,7 @@ function ACS_GetItem_Forgotten_Wolf_Silver_Sword(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_GetItem_Forgotten_Wolf_Steel_Sword(): bool
@@ -7461,10 +8015,7 @@ function ACS_GetItem_Forgotten_Wolf_Steel_Sword(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_Forgotten_Wolf_Check(): bool
@@ -7480,10 +8031,8 @@ function ACS_Forgotten_Wolf_Check(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	
+	return false;
 }
 
 function ACS_Forgotten_Wolf_Check_For_Item(): bool
@@ -7499,10 +8048,8 @@ function ACS_Forgotten_Wolf_Check_For_Item(): bool
 		ACS_ForgottenWolfSchool_Tutorial();
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+
+	return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -7520,10 +8067,8 @@ function ACS_GetItem_AllBlack_Equipped_Held(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+
+	return false;
 }
 
 function ACS_GetItem_AllBlack_Equipped(): bool
@@ -7539,10 +8084,8 @@ function ACS_GetItem_AllBlack_Equipped(): bool
 		ACS_AllBlack_Tutorial();
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+
+	return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -7561,10 +8104,7 @@ function ACS_GetItem_Zireal_Steel(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_GetItem_Zireal_Silver(): bool
@@ -7580,10 +8120,7 @@ function ACS_GetItem_Zireal_Silver(): bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 function ACS_Zireael_Check(): bool
@@ -7595,10 +8132,7 @@ function ACS_Zireael_Check(): bool
 		ACS_Zireal_Tutorial();
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -7781,7 +8315,6 @@ function ACS_ShouldHideWeaponCheck_Steel() : bool
 	//|| thePlayer.GetInventory().GetItemName( sword_id ) == 'ACS_Staff'
 	//|| thePlayer.GetInventory().GetItemName( sword_id ) == 'ACS_Oar'
 	//|| thePlayer.GetInventory().GetItemName( sword_id ) == 'ACS_Broom' 
-	//|| thePlayer.GetInventory().GetItemName( sword_id ) == 'ACS_Caranthir_Staff'
 	//|| thePlayer.GetInventory().GetItemName( sword_id ) == 'ACS_Knight_Lance_1'
 	//|| thePlayer.GetInventory().GetItemName( sword_id ) == 'ACS_Knight_Lance_2'
 	//|| thePlayer.GetInventory().GetItemName( sword_id ) == 'ACS_Hakland_Spear'
@@ -7797,10 +8330,8 @@ function ACS_ShouldHideWeaponCheck_Steel() : bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+
+	return false;
 }
 
 function ACS_ShouldHideWeaponCheck_Silver() : bool
@@ -7846,10 +8377,8 @@ function ACS_ShouldHideWeaponCheck_Silver() : bool
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+
+	return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -7881,13 +8410,15 @@ function ACS_ShouldChangeWeaponWalkOneHandWeaponCheck_Steel() : bool
 	|| thePlayer.GetInventory().GetItemName( sword_id ) == 'ACS_Staff'
 	|| thePlayer.GetInventory().GetItemName( sword_id ) == 'ACS_Oar'
 	|| thePlayer.GetInventory().GetItemName( sword_id ) == 'ACS_Broom' 
-	|| thePlayer.GetInventory().GetItemName( sword_id ) == 'ACS_Caranthir_Staff'
+	|| thePlayer.GetInventory().GetItemName( sword_id ) == 'ACS_Ice_Staff'
 	|| thePlayer.GetInventory().GetItemName( sword_id ) == 'ACS_Knight_Lance_1'
 	|| thePlayer.GetInventory().GetItemName( sword_id ) == 'ACS_Knight_Lance_2'
 	|| thePlayer.GetInventory().GetItemName( sword_id ) == 'ACS_Hakland_Spear'
 	|| thePlayer.GetInventory().GetItemName( sword_id ) == 'ACS_Wild_Hunt_Spear'
 	|| thePlayer.GetInventory().GetItemName( sword_id ) == 'ACS_Wild_Hunt_Halberd'
-
+	|| thePlayer.GetInventory().GetItemName( sword_id ) == 'ACS_Water_Staff'
+	|| thePlayer.GetInventory().GetItemName( sword_id ) == 'ACS_Sand_Staff'
+	|| thePlayer.GetInventory().GetItemName( sword_id ) == 'ACS_Fire_Staff'
 	)
 	{
 		if (thePlayer.GetInventory().IsItemHeld( sword_id ))
@@ -8034,6 +8565,7 @@ function ACS_ShouldChangeWeaponWalkTwoHandWeaponCheck_Silver() : bool
 	|| thePlayer.GetInventory().GetItemName( sword_id ) == 'ACS_Twohanded_Hammer_2_Silver'
 
 	|| thePlayer.GetInventory().GetItemName( sword_id ) == 'ACS_Wild_Hunt_Hammer_Silver'
+	|| thePlayer.GetInventory().GetItemName( sword_id ) == 'ACS_Demonic_Construct_Hammer'
 	)
 	{
 		if (thePlayer.GetInventory().IsItemHeld( sword_id ))
@@ -8228,6 +8760,8 @@ function ACS_ThingsThatShouldBeRemoved_BASE_ALT()
 
 	GetACSWatcher().RemoveDefaltSwordWalkCancel();
 
+	GetACSWatcher().RemoveMageAttackTimers();
+
 	if (thePlayer.HasTag('ACS_IsSwordWalkingFinished'))
 	{
 		thePlayer.RemoveTag('ACS_IsSwordWalkingFinished');
@@ -8398,27 +8932,6 @@ function ACS_ThingsThatShouldBeRemoved_BASE()
 
 	thePlayer.RemoveTag('ACS_Viper_Special_Attack');
 
-	//GetWitcherPlayer().GetSignEntity(ST_Aard).OnSignAborted(true);
-
-	//GetWitcherPlayer().GetSignEntity(ST_Yrden).OnSignAborted(true);
-
-	//GetWitcherPlayer().GetSignEntity(ST_Igni).OnSignAborted(true);
-
-	//GetWitcherPlayer().GetSignEntity(ST_Quen).OnSignAborted(true);
-
-	//GetACSWatcher().RemoveTimer('ACS_WeaponEquipDelay');
-
-	/*
-	if (thePlayer.HasTag('ACS_Size_Adjusted'))
-	{
-		GetACSWatcher().Grow_Geralt_Immediate();
-
-		thePlayer.RemoveTag('ACS_Size_Adjusted');
-	}
-	*/
-
-	//thePlayer.CancelHoldAttacks();
-
 	thePlayer.StopEffect('hand_special_fx');
 
 	thePlayer.StopEffect('special_attack_fx');
@@ -8426,6 +8939,8 @@ function ACS_ThingsThatShouldBeRemoved_BASE()
 	thePlayer.StopEffect('ethereal_debuff');
 
 	thePlayer.StopEffect('shout');
+
+	GetACSWatcher().RemoveMageAttackTimers();
 
 	if (!thePlayer.HasTag('ACS_Camo_Active'))
 	{
@@ -8493,6 +9008,29 @@ function ACS_ThingsThatShouldBeRemoved_BASE()
 	thePlayer.SetIsCurrentlyDodging(false);
 
 	GetACSWatcher().RemoveTimer('RollDelay');
+
+
+
+	//GetWitcherPlayer().GetSignEntity(ST_Aard).OnSignAborted(true);
+
+	//GetWitcherPlayer().GetSignEntity(ST_Yrden).OnSignAborted(true);
+
+	//GetWitcherPlayer().GetSignEntity(ST_Igni).OnSignAborted(true);
+
+	//GetWitcherPlayer().GetSignEntity(ST_Quen).OnSignAborted(true);
+
+	//GetACSWatcher().RemoveTimer('ACS_WeaponEquipDelay');
+
+	/*
+	if (thePlayer.HasTag('ACS_Size_Adjusted'))
+	{
+		GetACSWatcher().Grow_Geralt_Immediate();
+
+		thePlayer.RemoveTag('ACS_Size_Adjusted');
+	}
+	*/
+
+	//thePlayer.CancelHoldAttacks();
 }
 
 function ACS_ThingsThatShouldBeRemoved()
@@ -8779,6 +9317,22 @@ function ACS_Pre_Attack( animEventName : name, animEventType : EAnimationEventTy
 			}
 		}
 	}
+
+	if(ACS_GetItem_MageStaff())
+	{
+		if (!ACSGetEquippedSword().IsEffectActive('heavy_trail_fx', false))
+		{
+			ACSGetEquippedSword().PlayEffectSingle( 'heavy_trail_fx' );
+		}
+
+		if (!ACSGetEquippedSword().IsEffectActive('light_trail_fx', false))
+		{
+			ACSGetEquippedSword().PlayEffectSingle( 'light_trail_fx' );
+		}
+
+		ACSGetEquippedSword().StopEffect( 'heavy_trail_fx' );
+		ACSGetEquippedSword().StopEffect( 'light_trail_fx' );
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -8896,7 +9450,7 @@ function ACS_AttitudeCheck( actor : CActor ) : bool
 	|| theGame.GetGlobalAttitude( actor.GetBaseAttitudeGroup(), 'player' ) == AIA_Hostile
 	|| (actor.IsAttackableByPlayer() && actor.IsTargetableByPlayer()))
 	&& actor.IsAlive()
-	&& targetDistance <= 15 * 15
+	&& targetDistance <= 50 * 50
 	)
 	{
 		return true;
@@ -8906,7 +9460,7 @@ function ACS_AttitudeCheck( actor : CActor ) : bool
 	|| theGame.GetGlobalAttitude( actor.GetBaseAttitudeGroup(), 'player' ) == AIA_Friendly
 	|| !actor.IsAlive()
 	|| actor == thePlayer
-	|| targetDistance > 15 * 15
+	|| targetDistance > 50 * 50
 	)
 	{
 		return false;
@@ -9205,8 +9759,11 @@ function ACS_ExplorationDelay_actual()
 {
 	if (!thePlayer.IsInCombat() && thePlayer.HasTag('vampire_claws_equipped'))
 	{
-		thePlayer.PlayEffectSingle('claws_effect');
-		thePlayer.StopEffect('claws_effect');
+		if (!ACS_HideVampireClaws_Enabled())
+		{
+			thePlayer.PlayEffectSingle('claws_effect');
+			thePlayer.StopEffect('claws_effect');
+		}
 
 		ClawDestroy();
 	}
@@ -9409,27 +9966,20 @@ state Setup_Combat_Action_CastSign_Engage in cACS_Setup_Combat_Action_CastSign
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-struct ACS_Manual_Sword_Drawing_Check 
-{
-	var manual_sword_drawing	: int;
-}
-
-function ACS_Manual_Sword_Drawing_Check_Actual(): int 
-{
-	var property: ACS_Manual_Sword_Drawing_Check;
-
-	property = GetACSWatcher().vACS_Manual_Sword_Drawing_Check;
-
-	return property.manual_sword_drawing;
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 function GetACSWatcher() : W3ACSWatcher
 {
 	var watcher 			 : W3ACSWatcher;
 	
 	watcher = (W3ACSWatcher)theGame.GetEntityByTag( 'acswatcher' );
+
+	return watcher;
+}
+
+function GetACSWatcherSecondary() : W3ACSWatcherSecondary
+{
+	var watcher 			 : W3ACSWatcherSecondary;
+	
+	watcher = (W3ACSWatcherSecondary)theGame.GetEntityByTag( 'acswatchersecondary' );
 
 	return watcher;
 }
@@ -9477,18 +10027,22 @@ statemachine class W3ACSWatcherSpawner extends CEntity
 		}
 	}
 
+	function ACS_Watcher_Summon()
+	{
+		var ent_1 : W3ACSWatcher;
+
+		var ent_2 : W3ACSWatcherSecondary;
+
+		ent_1 = (W3ACSWatcher)theGame.CreateEntity( (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\ACS_Baraddur.w2ent", true ), thePlayer.GetWorldPosition() );
+
+		ent_2 = (W3ACSWatcherSecondary)theGame.CreateEntity( (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\ACS_Orthanc.w2ent", true ), thePlayer.GetWorldPosition() );
+	}
+
 	public function ACSFactsStuff() 
 	{
     	FactsRemove("acs_started");
    		FactsAdd("acs_started", 1);
     }
-}
-
-function ACS_Watcher_Summon()
-{
-	var ent : W3ACSWatcher;
-
-	ent = (W3ACSWatcher)theGame.CreateEntity( (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\ACS_Baraddur.w2ent", true ), thePlayer.GetWorldPosition() );
 }
 
 function GetACSLookatEntity() : CEntity
@@ -9497,56 +10051,6 @@ function GetACSLookatEntity() : CEntity
 	
 	ent = (CEntity)theGame.GetEntityByTag( 'acs_lookat_entity' );
 	return ent;
-}
-
-function GetACSTestEnt() : CEntity
-{
-	var ent 				 : CEntity;
-	
-	ent = (CEntity)theGame.GetEntityByTag( 'ACS_Test_Ent' );
-	return ent;
-}
-
-function GetACSTestEnt_Array() : array<CEntity>
-{
-	var ents 											: array<CEntity>;
-	
-	theGame.GetEntitiesByTag( 'ACS_Test_Ent', ents );	
-	
-	return ents;
-}
-
-function GetACSTestEnt_Array_Destroy()
-{	
-	var i												: int;
-	var ents 											: array<CEntity>;
-
-	ents.Clear();
-
-	theGame.GetEntitiesByTag( 'ACS_Test_Ent', ents );	
-	
-	for( i = 0; i < ents.Size(); i += 1 )
-	{
-		ents[i].Destroy();
-	}
-}
-
-function GetACSTestEnt_Array_StopEffects()
-{	
-	var i												: int;
-	var ents 											: array<CEntity>;
-
-	ents.Clear();
-
-	theGame.GetEntitiesByTag( 'ACS_Test_Ent', ents );	
-	
-	for( i = 0; i < ents.Size(); i += 1 )
-	{
-		ents[i].StopAllEffects();
-		ents[i].DestroyAfter(1);
-	}
-
-	thePlayer.SoundEvent("magic_man_tornado_loop_stop");
 }
 
 function GetACSArmorCone() : CEntity
@@ -9807,27 +10311,6 @@ exec function acsspawneredin()
 exec function acsspawnnighthunter()
 {
 	GetACSWatcher().ACS_SpawnNightStalker();
-}
-
-exec function acsspawnunseenblade()
-{
-	ACS_Blade_Of_The_Unseen().Destroy();
-
-	GetACSStorage().Number_Of_Bruxae_Slain_Reset();
-
-	GetACSWatcher().RemoveTimer('unseen_blade_spawn_delay');
-	GetACSWatcher().RemoveTimer('unseen_blade_hunt_delay');
-
-	ACS_Unseen_Blade_Summon_Start();
-}
-
-exec function acsspawnunseenmonster()
-{
-	ACS_Blade_Of_The_Unseen().Destroy();
-
-	GetACSStorage().Unseen_Blade_Death_Count_Reset();
-		
-	ACS_Unseen_Monster_Summon_Start();
 }
 
 function GetACSNaglfar() : CEntity
@@ -10193,6 +10676,26 @@ function ACS_Transformation_Toad_Check() : bool
 function ACS_Transformation_Red_Miasmal_Check() : bool
 {
 	if (FactsQuerySum("acs_red_miasmal_curse_activated") > 0)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+function ACS_Transformation_Sharley_Check() : bool
+{
+	if (FactsQuerySum("acs_sharley_curse_activated") > 0)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+function ACS_Transformation_Black_Wolf_Check() : bool
+{
+	if (FactsQuerySum("acs_black_wolf_curse_activated") > 0)
 	{
 		return true;
 	}
@@ -10752,6 +11255,218 @@ function ACS_Caranthir_Armor_Equipped_Check() : bool
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+function ACS_Knight_Armor_Check() : bool
+{
+	if (GetWitcherPlayer().IsItemEquippedByName('sq701_geralt_armor')
+	|| GetWitcherPlayer().IsItemEquippedByName('Knight Geralt Armor 3')
+	|| GetWitcherPlayer().IsItemEquippedByName('Knight Geralt Armor 2')
+	|| GetWitcherPlayer().IsItemEquippedByName('Knight Geralt Armor 1')
+	|| GetWitcherPlayer().IsItemEquippedByName('Knight Geralt A Armor 3')
+	|| GetWitcherPlayer().IsItemEquippedByName('Knight Geralt A Armor 2')
+	|| GetWitcherPlayer().IsItemEquippedByName('Knight Geralt A Armor 1')
+	)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+function ACS_Knight_Armor_Gold_Check() : bool
+{
+	if (GetWitcherPlayer().IsItemEquippedByName('Toussaint Armor 3')
+	|| GetWitcherPlayer().IsItemEquippedByName('Toussaint Armor 2')
+	)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function ACS_Knight_Armor_V1_Check() : bool
+{
+	if (GetWitcherPlayer().IsItemEquippedByName('sq701_geralt_armor')
+	|| GetWitcherPlayer().IsItemEquippedByName('Knight Geralt Armor 1')
+	|| GetWitcherPlayer().IsItemEquippedByName('Knight Geralt A Armor 1')
+	)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+//01
+//04
+//06
+//13
+
+function ACS_Knight_Armor_V2_Check() : bool
+{
+	if (GetWitcherPlayer().IsItemEquippedByName('Knight Geralt Armor 2')
+	|| GetWitcherPlayer().IsItemEquippedByName('Knight Geralt A Armor 2')
+	)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+//03
+//04
+//08
+//14
+
+function ACS_Knight_Armor_V3_Check() : bool
+{
+	if (GetWitcherPlayer().IsItemEquippedByName('Knight Geralt Armor 3')
+	|| GetWitcherPlayer().IsItemEquippedByName('Knight Geralt A Armor 3')
+	)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function ACS_Witcher_Knight_Armor_V1_Check() : bool
+{
+	if (GetWitcherPlayer().IsItemEquippedByName('Gryphon Armor 2')
+	|| GetWitcherPlayer().IsItemEquippedByName('NGP Gryphon Armor 2')
+	)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+function ACS_Witcher_Knight_Armor_V2_Check() : bool
+{
+	if (GetWitcherPlayer().IsItemEquippedByName('Gryphon Armor 3')
+	|| GetWitcherPlayer().IsItemEquippedByName('NGP Gryphon Armor 3')
+	)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+function ACS_Witcher_Knight_Armor_V3_Check() : bool
+{
+	if (GetWitcherPlayer().IsItemEquippedByName( 'Gryphon Armor 4')
+	|| GetWitcherPlayer().IsItemEquippedByName( 'NGP Gryphon Armor 4')
+	|| GetWitcherPlayer().IsItemEquippedByName( 'Bear Armor 4')
+	|| GetWitcherPlayer().IsItemEquippedByName( 'NGP Bear Armor 4')
+	)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+function ACS_Witcher_Bear_Armor_Check() : bool
+{
+	if (GetWitcherPlayer().IsItemEquippedByName( 'Bear Armor 4')
+	|| GetWitcherPlayer().IsItemEquippedByName( 'NGP Bear Armor 4')
+	)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+//05
+
+//04
+
+//09
+
+//15
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function ACS_Knight_Armor_Gold_V1_Check() : bool
+{
+	if (GetWitcherPlayer().IsItemEquippedByName('Toussaint Armor 2')
+	)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+//03
+//04
+//08
+//14
+
+function ACS_Knight_Armor_Gold_V2_Check() : bool
+{
+	if (GetWitcherPlayer().IsItemEquippedByName('Toussaint Armor 3')
+	)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+
+//05
+
+//04
+
+//08
+
+//15
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function ACS_Vampire_Armor_Black_Check() : bool
+{
+	if (GetWitcherPlayer().IsItemEquippedByName('q702_vampire_armor')
+	)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+//03
+//04
+//08
+//14
+
+function ACS_Vampire_Armor_Red_Check() : bool
+{
+	if (GetWitcherPlayer().IsItemEquippedByName('q704_vampire_armor')
+	)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+//03
+//04
+//08
+//14
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 function ACS_IsNight() : bool
 {
 	var currentHour: int;
@@ -11052,6 +11767,30 @@ function ACS_Focus_Mode_Camera_Destroy()
 	{
 		gas[i].Destroy();
 	}
+}
+
+function ACS_Kestral_Camera_Destroy()
+{	
+	var gas 											: array<CEntity>;
+	var i												: int;
+	
+	gas.Clear();
+
+	theGame.GetEntitiesByTag( 'ACS_Kestral_Custom_Camera', gas );	
+	
+	for( i = 0; i < gas.Size(); i += 1 )
+	{
+		gas[i].Destroy();
+	}
+}
+
+function ACSGetKestralCamera() : ACSKestralCamera
+{
+	var entity 			 : ACSKestralCamera;
+
+	entity = (ACSKestralCamera)theGame.GetEntityByTag( 'ACS_Kestral_Custom_Camera' );
+
+	return entity;
 }
 
 function ACS_GetPointOfInterests() : array<SEntityMapPinInfo>
@@ -11771,10 +12510,7 @@ function ACS_CanSprintBase( speed : float ) : bool
 		return false;
 	}
 	
-	if ( thePlayer.HasBuff( EET_OverEncumbered ) )
-	{
-		return false;
-	}
+
 	if ( !thePlayer.IsSwimming() )
 	{
 		if ( !thePlayer.GetIsSprinting() && !thePlayer.IsInCombat() && thePlayer.GetStatPercents(BCS_Stamina) <= 0.9 )
@@ -11783,11 +12519,6 @@ function ACS_CanSprintBase( speed : float ) : bool
 		}
 
 		if( ( !thePlayer.IsCombatMusicEnabled() || thePlayer.IsInFistFightMiniGame() ) && ( !thePlayer.IsActionAllowed(EIAB_RunAndSprint) || !thePlayer.IsActionAllowed(EIAB_Sprint) )  )
-		{
-			return false;
-		}
-
-		if( thePlayer.IsTerrainTooSteepToRunUp() )
 		{
 			return false;
 		}
@@ -11964,6 +12695,146 @@ function ACSVampireClawsEquippedCheck() : bool
 	return false;
 }
 
+function ACSSpearEquippedCheck() : bool
+{
+	if (ACS_GetWeaponMode() == 0)
+	{
+		if
+		(
+			GetWitcherPlayer().HasTag('quen_secondary_sword_equipped')
+		)
+		{
+			return true;
+		}
+	}
+	else if (ACS_GetWeaponMode() == 1)
+	{
+		if
+		(
+			ACS_GetFocusModeSilverWeapon() == 2
+			|| ACS_GetFocusModeSteelWeapon() == 2
+		)
+		{
+			return true;
+		}
+	}
+	else if (ACS_GetWeaponMode() == 2)
+	{
+		if
+		(
+			GetWitcherPlayer().HasTag('quen_secondary_sword_equipped')
+		)
+		{
+			return true;
+		}
+	}
+	else if (ACS_GetWeaponMode() == 3)
+	{
+		if (ACS_GetItem_Spear_Silver() || ACS_GetItem_Spear_Steel())
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+function ACSOlgierdSabreEquippedCheck() : bool
+{
+	if (ACS_GetWeaponMode() == 0)
+	{
+		if
+		(
+			GetWitcherPlayer().HasTag('quen_sword_equipped')
+		)
+		{
+			return true;
+		}
+	}
+	else if (ACS_GetWeaponMode() == 1)
+	{
+		if
+		(
+			ACS_GetFocusModeSilverWeapon() == 1
+			|| ACS_GetFocusModeSteelWeapon() == 1
+		)
+		{
+			return true;
+		}
+	}
+	else if (ACS_GetWeaponMode() == 2)
+	{
+		if
+		(
+			GetWitcherPlayer().HasTag('quen_sword_equipped')
+		)
+		{
+			return true;
+		}
+	}
+	else if (ACS_GetWeaponMode() == 3)
+	{
+		if (
+		ACS_GetItem_Olgierd_Steel() 
+		|| ACS_GetItem_Olgierd_Silver()
+		)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+function ACSEredinSwordEquippedCheck() : bool
+{
+	if (ACS_GetWeaponMode() == 0)
+	{
+		if
+		(
+			GetWitcherPlayer().HasTag('axii_sword_equipped')
+		)
+		{
+			return true;
+		}
+	}
+	else if (ACS_GetWeaponMode() == 1)
+	{
+		if
+		(
+			ACS_GetFocusModeSilverWeapon() == 3
+			|| ACS_GetFocusModeSteelWeapon() == 3
+		)
+		{
+			return true;
+		}
+	}
+	else if (ACS_GetWeaponMode() == 2)
+	{
+		if
+		(
+			GetWitcherPlayer().HasTag('axii_sword_equipped')
+		)
+		{
+			return true;
+		}
+	}
+	else if (ACS_GetWeaponMode() == 3)
+	{
+		if (
+		ACS_GetItem_Eredin_Silver() 
+		|| ACS_GetItem_Eredin_Steel()
+		)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
 function ACSYrdenCircle1DestroyAll()
 {	
 	var actors 											: array<CEntity>;
@@ -12035,18 +12906,95 @@ function ACS_IsPOIMarkerCloseEnough( target : CEntity ) : bool
 	return VecDistanceSquared( target.GetWorldPosition(), thePlayer.GetWorldPosition() ) < VISIBILITY_DISTANCE * VISIBILITY_DISTANCE;
 }
 
+function ACS_VectorIsInsideScreenMargins( screenPos : Vector ) : bool
+{
+	var hud									: CR4ScriptedHud;
+	var marginLeftTop						: Vector;
+	var marginRightBottom					: Vector;
+	var screenMargin 						: float = 0.0125; 
+
+	hud = (CR4ScriptedHud)theGame.GetHud();	
+
+	marginLeftTop = hud.GetScaleformPoint( screenMargin, screenMargin );
+
+	marginRightBottom = hud.GetScaleformPoint( 1 - screenMargin, 1 - screenMargin );
+
+	if( screenPos.X <= marginLeftTop.X 
+	|| screenPos.X >= marginRightBottom.X 
+	||screenPos.Y <= marginLeftTop.Y 
+	|| screenPos.Y >= marginRightBottom.Y )
+	{
+		return false;
+	}
+
+	return true;
+}
+
+function ACS_ScreenPosTranslate( out newScreenPos : Vector, screenPos : Vector ) : bool
+{
+	var hud									: CR4ScriptedHud;
+
+	if( !theCamera.WorldVectorToViewRatio( screenPos, newScreenPos.X, newScreenPos.Y ) )
+	{
+		GetOppositeCameraScreenPos( screenPos, newScreenPos.X, newScreenPos.Y );
+	}
+
+	newScreenPos.X = ( newScreenPos.X + 1 ) / 2;
+	newScreenPos.Y = ( newScreenPos.Y + 1 ) / 2;
+
+	hud = (CR4ScriptedHud)theGame.GetHud();	
+
+	newScreenPos = hud.GetScaleformPoint( newScreenPos.X, newScreenPos.Y );
+
+	return true;
+}
+
 function ACS_HUD_Marker_Manager( target : CEntity, mcOneliner : CScriptedFlashSprite)
 {
-	var screenPos			: Vector;
+	var screenPos							: Vector;
+	var hud									: CR4ScriptedHud;
+	var marginLeftTop						: Vector;
+	var marginRightBottom					: Vector;
+	var screenMargin 						: float = 0.0125; 
+
+	hud = (CR4ScriptedHud)theGame.GetHud();	
+
+	marginLeftTop = hud.GetScaleformPoint( screenMargin, screenMargin );
+
+	marginRightBottom = hud.GetScaleformPoint( 1 - screenMargin, 1 - screenMargin );
 
 	if ( target.HasTag('ACS_Guiding_Light_Marker'))
 	{
 		if ( target && ACS_IsQuestMarkerTrackedCloseEnough(target))
 		{
-			if ( GetBaseScreenPosition( screenPos, target, NULL, 0, true ) )
+			if ( ACS_ScreenPosTranslate(screenPos, target.GetWorldPosition()) )
 			{
-				screenPos.Y -= 45;
+				if (ACS_VectorIsInsideScreenMargins(screenPos))
+				{
+					screenPos.Y -= 45;
+				}
+				else
+				{
+					if( screenPos.X < marginLeftTop.X )
+					{
+						screenPos.X = marginLeftTop.X;
+					}
+					else if( screenPos.X > marginRightBottom.X )
+					{
+						screenPos.X = marginRightBottom.X;
+					}
+					else if( screenPos.Y < marginLeftTop.Y )
+					{
+						screenPos.Y = marginLeftTop.Y;
+					}
+					else
+					{
+						screenPos.Y = marginRightBottom.Y;
+					}
+				}
+				
 				mcOneliner.SetPosition( screenPos.X, screenPos.Y );
+
 				mcOneliner.SetVisible( true );
 			}
 			else
@@ -12064,10 +13012,34 @@ function ACS_HUD_Marker_Manager( target : CEntity, mcOneliner : CScriptedFlashSp
 	{
 		if ( target && ACS_IsQuestMarkerUntrackedCloseEnough(target))
 		{
-			if ( GetBaseScreenPosition( screenPos, target, NULL, 0, true ) )
+			if ( ACS_ScreenPosTranslate(screenPos, target.GetWorldPosition()) )
 			{
-				screenPos.Y -= 45;
+				if (ACS_VectorIsInsideScreenMargins(screenPos))
+				{
+					screenPos.Y -= 45;
+				}
+				else
+				{
+					if( screenPos.X < marginLeftTop.X )
+					{
+						screenPos.X = marginLeftTop.X;
+					}
+					else if( screenPos.X > marginRightBottom.X )
+					{
+						screenPos.X = marginRightBottom.X;
+					}
+					else if( screenPos.Y < marginLeftTop.Y )
+					{
+						screenPos.Y = marginLeftTop.Y;
+					}
+					else
+					{
+						screenPos.Y = marginRightBottom.Y;
+					}
+				}
+				
 				mcOneliner.SetPosition( screenPos.X, screenPos.Y );
+
 				mcOneliner.SetVisible( true );
 			}
 			else
@@ -12084,10 +13056,34 @@ function ACS_HUD_Marker_Manager( target : CEntity, mcOneliner : CScriptedFlashSp
 	{
 		if ( target && ACS_IsPOIMarkerCloseEnough(target))
 		{
-			if ( GetBaseScreenPosition( screenPos, target, NULL, 0, true ) )
+			if ( ACS_ScreenPosTranslate(screenPos, target.GetWorldPosition()) )
 			{
-				screenPos.Y -= 45;
+				if (ACS_VectorIsInsideScreenMargins(screenPos))
+				{
+					screenPos.Y -= 45;
+				}
+				else
+				{
+					if( screenPos.X < marginLeftTop.X )
+					{
+						screenPos.X = marginLeftTop.X;
+					}
+					else if( screenPos.X > marginRightBottom.X )
+					{
+						screenPos.X = marginRightBottom.X;
+					}
+					else if( screenPos.Y < marginLeftTop.Y )
+					{
+						screenPos.Y = marginLeftTop.Y;
+					}
+					else
+					{
+						screenPos.Y = marginRightBottom.Y;
+					}
+				}
+				
 				mcOneliner.SetPosition( screenPos.X, screenPos.Y );
+
 				mcOneliner.SetVisible( true );
 			}
 			else
@@ -12104,10 +13100,34 @@ function ACS_HUD_Marker_Manager( target : CEntity, mcOneliner : CScriptedFlashSp
 	{
 		if ( target )
 		{
-			if ( GetBaseScreenPosition( screenPos, target, NULL, 0, true ) )
+			if ( ACS_ScreenPosTranslate(screenPos, target.GetWorldPosition()) )
 			{
-				screenPos.Y -= 45;
+				if (ACS_VectorIsInsideScreenMargins(screenPos))
+				{
+					screenPos.Y -= 45;
+				}
+				else
+				{
+					if( screenPos.X < marginLeftTop.X )
+					{
+						screenPos.X = marginLeftTop.X;
+					}
+					else if( screenPos.X > marginRightBottom.X )
+					{
+						screenPos.X = marginRightBottom.X;
+					}
+					else if( screenPos.Y < marginLeftTop.Y )
+					{
+						screenPos.Y = marginLeftTop.Y;
+					}
+					else
+					{
+						screenPos.Y = marginRightBottom.Y;
+					}
+				}
+				
 				mcOneliner.SetPosition( screenPos.X, screenPos.Y );
+
 				mcOneliner.SetVisible( true );
 			}
 			else
@@ -12119,5 +13139,135 @@ function ACS_HUD_Marker_Manager( target : CEntity, mcOneliner : CScriptedFlashSp
 		{
 			mcOneliner.SetVisible( false );
 		}
+	}
+}
+
+function ACS_Movement_Prevention() : bool
+{
+	if (thePlayer.HasTag('ACS_Movement_Prevention_Tag'))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+function ACS_Interaction_Movement_Prevention_Delay()
+{
+	if (!thePlayer.HasTag('ACS_Movement_Prevention_Tag'))
+	{
+		thePlayer.AddTag('ACS_Movement_Prevention_Tag');
+	}
+	
+	GetACSWatcher().RemoveTimer('MovementRestoreDelay');
+	GetACSWatcher().AddTimer('MovementRestoreDelay', 10, false);
+}
+
+class W3ACSCustomWingEntity extends CActor
+{
+
+	editable var forcedAppearance : string;
+
+	event OnSpawned( spawnData : SEntitySpawnData )
+	{	
+		super.OnSpawned( spawnData );
+		ApplyAppearance( forcedAppearance );
+
+		AddTimer('OwlWingEntityCheck', 0.1, false);
+	}
+
+	timer function OwlWingEntityCheck(deltaTime : float, id : int) 
+	{
+		var ent									: CEntity;
+		var actor								: CActor; 
+		var animatedComponent 					: CAnimatedComponent;
+		var meshcomp							: CComponent;
+		var animcomp 							: CAnimatedComponent;
+		var h 									: float;
+
+		if (this.HasTag('ACS_Owl_Wing_Entity'))
+		{
+			ent = theGame.CreateEntity( (CEntityTemplate)LoadResource( 
+
+			"dlc\dlc_acs\data\models\owl_crow\acs_owl.w2ent"
+
+			, true ), this.GetWorldPosition(), this.GetWorldRotation() );
+
+			animcomp = (CAnimatedComponent)ent.GetComponentByClassName('CAnimatedComponent');
+			meshcomp = ent.GetComponentByClassName('CMeshComponent');
+			h = 1.25;
+			animcomp.SetScale(Vector(h,h,h,1));
+			meshcomp.SetScale(Vector(h,h,h,1));	
+			
+			ent.CreateAttachment( this, , Vector( 0, -0.3, 0.1 ), EulerAngles(-33.75,0,0) );
+
+			ent.AddTag('ACS_Owl_Body');
+
+			actor = (CActor)( ACS_Wings_Entity_Owl_Body());
+
+			animatedComponent = (CAnimatedComponent)actor.GetComponentByClassName( 'CAnimatedComponent' );	
+		
+			animatedComponent.PlaySlotAnimationAsync( 'clapping_wings', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.125f, 0.125f));
+
+			AddTimer('OwlBodyAnims', 2.5f, true);
+		}
+    }
+
+	timer function OwlBodyAnims(deltaTime : float, id : int) 
+	{
+		var actor							: CActor; 
+		var animatedComponent 				: CAnimatedComponent;
+		var anim_names						: array<name>;
+
+		actor = (CActor)( ACS_Wings_Entity_Owl_Body());
+		
+		animatedComponent = (CAnimatedComponent)actor.GetComponentByClassName( 'CAnimatedComponent' );	
+
+		anim_names.Clear();
+
+		anim_names.PushBack('clapping_wings');
+
+		if (RandF() < 0.5)
+		{
+			//anim_names.PushBack('idle01');
+		}
+		else
+		{
+			//anim_names.PushBack('idle02');
+		}
+		
+		
+		animatedComponent.PlaySlotAnimationAsync( anim_names[RandRange(anim_names.Size())], 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.125f, 0.125f));
+	}
+
+
+	event OnDestroyed()
+	{
+		ACS_Wings_Entity_Owl_Body().Destroy();
+	}
+	
+}
+
+function ACS_Wings_Entity_Owl_Body() : CActor
+{
+	var ent 			 : CActor;
+	
+	ent = (CActor)theGame.GetEntityByTag( 'ACS_Owl_Body' );
+	return ent;
+}
+
+exec function acsswordspikes()
+{
+	if (!thePlayer.HasTag('ACS_BackSwords_Equipped'))
+	{
+		GetACSWatcher().ACS_Swordsanoo_Normal();
+
+		thePlayer.AddTag('ACS_BackSwords_Equipped');
+	}
+	else if (thePlayer.HasTag('ACS_BackSwords_Equipped'))
+	{
+		ACS_Swordsanoo_Destroy();
+
+		thePlayer.RemoveTag('ACS_BackSwords_Equipped');
 	}
 }

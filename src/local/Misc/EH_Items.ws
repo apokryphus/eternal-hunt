@@ -41,7 +41,7 @@ class W3ACSWolvenFangItem extends W3QuestUsableItem
 			&& FactsQuerySum("acs_wolven_curse_activated") <= 0
 			)
 			{
-				ACS_TransformationWerewolf_Tutorial();
+				GetACSWatcher().AddTimer('ACS_Transformation_Tutorial_Delay', 1, false);
 
 				GetACSWatcher().ACS_Transformation_Create_Savelock();
 
@@ -63,8 +63,6 @@ class W3ACSWolvenFangItem extends W3QuestUsableItem
 				GetWitcherPlayer().AddBuffImmunity_AllCritical('ACS_Transformation_Immunity_Critical', true); 
 
 				GetACSWatcher().Spawn_Transformation_Werewolf();
-
-				//GetACSWatcher().TransformationCustomCamera();
 
 				GetACSWatcher().AddTimer('Transformation_Werewolf_Fear', 0.5, true);
 
@@ -178,7 +176,7 @@ class W3ACSVampireRingItem extends W3QuestUsableItem
 				GetWitcherPlayer().BlockAction( EIAB_OpenMeditation,		'ACS_Transformation');
 				GetWitcherPlayer().BlockAction( EIAB_RadialMenu,			'ACS_Transformation');
 
-				ACS_Vampire_Ring_Tutorial();
+				GetACSWatcher().AddTimer('ACS_Transformation_Tutorial_Delay', 1, false);
 			}
 			else if (
 			FactsQuerySum("acs_transformation_activated") > 0
@@ -256,8 +254,6 @@ class W3ACSVampireNecklaceItem extends W3QuestUsableItem
 
 				GetACSWatcher().Spawn_Transformation_Vampiress();
 
-				//GetACSWatcher().TransformationCustomCamera();
-
 				GetACSWatcher().AddTimer('Transformation_Werewolf_Fear', 0.5, true);
 
 				playerAnimcomp.FreezePose();
@@ -276,7 +272,7 @@ class W3ACSVampireNecklaceItem extends W3QuestUsableItem
 				GetWitcherPlayer().BlockAction( EIAB_OpenMeditation,		'ACS_Transformation');
 				GetWitcherPlayer().BlockAction( EIAB_RadialMenu,			'ACS_Transformation');
 
-				ACS_Vampire_Necklace_Tutorial();
+				GetACSWatcher().AddTimer('ACS_Transformation_Tutorial_Delay', 1, false);
 			}
 			else if (
 			FactsQuerySum("acs_transformation_activated") > 0
@@ -354,8 +350,6 @@ class W3ACSBruxaFangItem extends W3QuestUsableItem
 
 				GetACSWatcher().Spawn_Transformation_Bruxa();
 
-				//GetACSWatcher().TransformationCustomCamera();
-
 				GetACSWatcher().AddTimer('Transformation_Werewolf_Fear', 0.5, true);
 
 				playerAnimcomp.FreezePose();
@@ -374,7 +368,7 @@ class W3ACSBruxaFangItem extends W3QuestUsableItem
 				GetWitcherPlayer().BlockAction( EIAB_OpenMeditation,		'ACS_Transformation');
 				GetWitcherPlayer().BlockAction( EIAB_RadialMenu,			'ACS_Transformation');
 
-				ACS_Bruxa_Fang_Tutorial();
+				GetACSWatcher().AddTimer('ACS_Bruxa_Transformation_Tutorial_Delay', 1, false);
 			}
 			else if (
 			FactsQuerySum("acs_transformation_activated") > 0
@@ -452,8 +446,6 @@ class W3ACSToadSlimeItem extends W3QuestUsableItem
 
 				GetACSWatcher().Spawn_Transformation_Toad();
 
-				//GetACSWatcher().TransformationCustomCamera();
-
 				GetACSWatcher().AddTimer('Transformation_Werewolf_Fear', 0.5, true);
 
 				playerAnimcomp.FreezePose();
@@ -472,7 +464,7 @@ class W3ACSToadSlimeItem extends W3QuestUsableItem
 				GetWitcherPlayer().BlockAction( EIAB_OpenMeditation,		'ACS_Transformation');
 				GetWitcherPlayer().BlockAction( EIAB_RadialMenu,			'ACS_Transformation');
 
-				ACS_Toad_Prince_Venom_Tutorial();
+				GetACSWatcher().AddTimer('ACS_Transformation_Tutorial_Delay', 1, false);
 			}
 			else if (
 			FactsQuerySum("acs_transformation_activated") > 0
@@ -528,7 +520,7 @@ class W3ACSRedMiasmalFragmentItem extends W3QuestUsableItem
 			&& FactsQuerySum("acs_red_miasmal_curse_activated") <= 0
 			)
 			{
-				ACS_Red_Miasmal_Fragment_Tutorial();
+				GetACSWatcher().AddTimer('ACS_Transformation_Tutorial_Delay', 1, false);
 
 				GetACSWatcher().ACS_Transformation_Create_Savelock();
 
@@ -550,8 +542,6 @@ class W3ACSRedMiasmalFragmentItem extends W3QuestUsableItem
 				GetWitcherPlayer().AddBuffImmunity_AllCritical('ACS_Transformation_Immunity_Critical', true); 
 
 				GetACSWatcher().Spawn_Transformation_Red_Miasmal();
-
-				//GetACSWatcher().TransformationCustomCamera();
 
 				GetACSWatcher().AddTimer('Transformation_Werewolf_Fear', 0.5, true);
 
@@ -582,6 +572,199 @@ class W3ACSRedMiasmalFragmentItem extends W3QuestUsableItem
 	}
 }
 
+class W3ACSSharleyShardItem extends W3QuestUsableItem
+{
+	private var playerAnimcomp : CAnimatedComponent;
+
+	event OnSpawned( spawnData : SEntitySpawnData )
+	{
+		super.OnSpawned(spawnData);
+	}
+	
+	event OnUsed( usedBy : CEntity )
+	{
+		super.OnUsed( usedBy );
+
+		playerAnimcomp = (CAnimatedComponent)GetWitcherPlayer().GetComponentByClassName('CAnimatedComponent');
+		
+		if ( usedBy == GetWitcherPlayer() )
+		{
+			if ( GetWitcherPlayer().IsInInterior() )
+			{
+				GetWitcherPlayer().DisplayHudMessage(GetLocStringByKeyExt( "menu_cannot_perform_action_here" ));
+				return false;
+			}
+
+			if (GetWitcherPlayer().IsAnyWeaponHeld() && !GetWitcherPlayer().IsWeaponHeld('fist'))
+			{
+				GetWitcherPlayer().DisplayHudMessage( "Weapon must be sheathed." );
+
+				thePlayer.OnMeleeForceHolster( true );
+				thePlayer.OnRangedForceHolster( true );
+
+				return false;
+			}
+
+			if (!GetACSWatcher())
+			{
+				return false;
+			}
+			
+			if (
+			FactsQuerySum("acs_transformation_activated") <= 0
+			&& FactsQuerySum("acs_sharley_curse_activated") <= 0
+			)
+			{
+				GetACSWatcher().AddTimer('ACS_Transformation_Tutorial_Delay', 1, false);
+
+				GetACSWatcher().ACS_Transformation_Create_Savelock();
+
+				GetACSWatcher().RemoveTimer('DisableSharleyStart');
+
+				GetWitcherPlayer().StopAllEffects();
+
+				FactsAdd("acs_transformation_activated", 1, -1);
+
+				FactsAdd("acs_sharley_curse_activated", 1, -1);
+				
+				GetWitcherPlayer().PlayEffectSingle('smoke_explosion');
+				GetWitcherPlayer().StopEffect('smoke_explosion');
+
+				GetWitcherPlayer().PlayEffectSingle('teleport');
+				GetWitcherPlayer().StopEffect('teleport');
+
+				GetWitcherPlayer().AddBuffImmunity_AllNegative('ACS_Transformation_Immunity_Negative', true); 
+				GetWitcherPlayer().AddBuffImmunity_AllCritical('ACS_Transformation_Immunity_Critical', true); 
+
+				GetACSWatcher().Spawn_Transformation_Sharley();
+
+				GetACSWatcher().AddTimer('Transformation_Werewolf_Fear', 0.5, true);
+
+				playerAnimcomp.FreezePose();
+
+				GetWitcherPlayer().BlockAction(EIAB_CallHorse,				'ACS_Transformation');
+				GetWitcherPlayer().BlockAction(EIAB_DrawWeapon, 			'ACS_Transformation'); 
+				GetWitcherPlayer().BlockAction(EIAB_FastTravel, 			'ACS_Transformation');
+				GetWitcherPlayer().BlockAction(EIAB_InteractionAction, 		'ACS_Transformation');
+				GetWitcherPlayer().BlockAction(EIAB_Crossbow,				'ACS_Transformation');
+				GetWitcherPlayer().BlockAction(EIAB_UsableItem,				'ACS_Transformation');
+				GetWitcherPlayer().BlockAction(EIAB_ThrowBomb,				'ACS_Transformation');
+				GetWitcherPlayer().BlockAction(EIAB_Jump,					'ACS_Transformation');
+
+				GetWitcherPlayer().BlockAction( EIAB_Parry,					'ACS_Transformation');
+				GetWitcherPlayer().BlockAction( EIAB_MeditationWaiting,		'ACS_Transformation');
+				GetWitcherPlayer().BlockAction( EIAB_OpenMeditation,		'ACS_Transformation');
+				GetWitcherPlayer().BlockAction( EIAB_RadialMenu,			'ACS_Transformation');
+			}
+			else if (
+			FactsQuerySum("acs_transformation_activated") > 0
+			&& FactsQuerySum("acs_sharley_curse_activated") > 0
+			)
+			{
+				GetACSWatcher().DisableSharley_Actual();
+			}
+		}		
+	}
+}
+
+class W3ACSWolfPeltItem extends W3QuestUsableItem
+{
+	private var playerAnimcomp : CAnimatedComponent;
+
+	event OnSpawned( spawnData : SEntitySpawnData )
+	{
+		super.OnSpawned(spawnData);
+	}
+	
+	event OnUsed( usedBy : CEntity )
+	{
+		super.OnUsed( usedBy );
+
+		playerAnimcomp = (CAnimatedComponent)GetWitcherPlayer().GetComponentByClassName('CAnimatedComponent');
+		
+		if ( usedBy == GetWitcherPlayer() )
+		{
+			if ( GetWitcherPlayer().IsInInterior() )
+			{
+				GetWitcherPlayer().DisplayHudMessage(GetLocStringByKeyExt( "menu_cannot_perform_action_here" ));
+				return false;
+			}
+
+			if (GetWitcherPlayer().IsAnyWeaponHeld() && !GetWitcherPlayer().IsWeaponHeld('fist'))
+			{
+				GetWitcherPlayer().DisplayHudMessage( "Weapon must be sheathed." );
+
+				thePlayer.OnMeleeForceHolster( true );
+				thePlayer.OnRangedForceHolster( true );
+
+				return false;
+			}
+
+			if (!GetACSWatcher())
+			{
+				return false;
+			}
+			
+			if (
+			FactsQuerySum("acs_transformation_activated") <= 0
+			&& FactsQuerySum("acs_black_wolf_curse_activated") <= 0
+			)
+			{
+				GetACSWatcher().AddTimer('ACS_Transformation_Tutorial_Delay', 1, false);
+
+				GetACSWatcher().ACS_Transformation_Create_Savelock();
+
+				GetACSWatcher().RemoveTimer('DisableBlackWolfStart');
+
+				GetWitcherPlayer().StopAllEffects();
+
+				FactsAdd("acs_transformation_activated", 1, -1);
+
+				FactsAdd("acs_black_wolf_curse_activated", 1, -1);
+				
+				GetWitcherPlayer().PlayEffectSingle('smoke_explosion');
+				GetWitcherPlayer().StopEffect('smoke_explosion');
+
+				GetWitcherPlayer().PlayEffectSingle('teleport');
+				GetWitcherPlayer().StopEffect('teleport');
+
+				GetWitcherPlayer().AddBuffImmunity_AllNegative('ACS_Transformation_Immunity_Negative', true); 
+				GetWitcherPlayer().AddBuffImmunity_AllCritical('ACS_Transformation_Immunity_Critical', true); 
+
+				GetACSWatcher().Spawn_Transformation_Black_Wolf();
+
+				GetACSWatcher().AddTimer('Transformation_Werewolf_Fear', 0.5, true);
+
+				playerAnimcomp.FreezePose();
+
+				GetWitcherPlayer().BlockAction(EIAB_CallHorse,				'ACS_Transformation');
+				GetWitcherPlayer().BlockAction(EIAB_DrawWeapon, 			'ACS_Transformation'); 
+				GetWitcherPlayer().BlockAction(EIAB_FastTravel, 			'ACS_Transformation');
+				GetWitcherPlayer().BlockAction(EIAB_InteractionAction, 		'ACS_Transformation');
+				GetWitcherPlayer().BlockAction(EIAB_Crossbow,				'ACS_Transformation');
+				GetWitcherPlayer().BlockAction(EIAB_UsableItem,				'ACS_Transformation');
+				GetWitcherPlayer().BlockAction(EIAB_ThrowBomb,				'ACS_Transformation');
+				GetWitcherPlayer().BlockAction(EIAB_Jump,					'ACS_Transformation');
+
+				GetWitcherPlayer().BlockAction( EIAB_Parry,					'ACS_Transformation');
+				GetWitcherPlayer().BlockAction( EIAB_MeditationWaiting,		'ACS_Transformation');
+				GetWitcherPlayer().BlockAction( EIAB_OpenMeditation,		'ACS_Transformation');
+				GetWitcherPlayer().BlockAction( EIAB_RadialMenu,			'ACS_Transformation');
+			}
+			else if (
+			FactsQuerySum("acs_transformation_activated") > 0
+			&& FactsQuerySum("acs_black_wolf_curse_activated") > 0
+			)
+			{
+				GetACSWatcher().DisableBlackWolf_Actual();
+			}
+		}		
+	}
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////
+
 class W3ACSWisp extends W3QuestUsableItem 
 {
     private var wispCurrentRotationCircleAngle 								: float; 
@@ -600,8 +783,6 @@ class W3ACSWisp extends W3QuestUsableItem
     
     private var active 																		: bool;
    
-	var wispPos 																		: Vector;
-
     event OnUsed(usedBy : CEntity) 
 	{
 		super.OnUsed(usedBy);
@@ -626,6 +807,8 @@ class W3ACSWisp extends W3QuestUsableItem
 				entity.AddTag('ACS_Wisp');
 
 				entity.PlayEffectSingle('wisp_fx');
+
+				//entity.PlayEffectSingle('502_barrier_hold');
 
 				FactsAdd("ACS_Wisp_Released", 1, -1);
 			}
@@ -653,10 +836,10 @@ class W3ACSWisp extends W3QuestUsableItem
 
 	event OnSpawned(spawnData : SEntitySpawnData) 
 	{
-		var bonePos : Vector;
+		var bonePos															: Vector;
+		var temp 															: CEntityTemplate;
+		var ent																: CEntity;
 
-		wispPos = this.GetWorldPosition();
-		
 		//get position of left hand (boneindex for l_hand is 24)
 		bonePos = MatrixGetTranslation(thePlayer.GetBoneWorldMatrixByIndex(24));
 
@@ -747,7 +930,7 @@ class W3ACSWisp extends W3QuestUsableItem
 	   // get current target
 	   if (thePlayer.IsInCombat())
 	   {
-		 target = thePlayer.GetTarget();
+		 target = thePlayer.moveTarget;
 	   }
 	   else 
 	   {
@@ -1342,6 +1525,8 @@ function ACS_WispCheck()
 			entity.AddTag('ACS_Wisp');
 
 			entity.PlayEffectSingle('wisp_fx');
+
+			//entity.PlayEffectSingle('502_barrier_hold');
 		}
 		else
 		{
@@ -1373,6 +1558,15 @@ function ACSDestroyWispEnts()
 	}
 }
 
+function ACSWisp() : W3ACSWisp
+{
+	var entity 			 : W3ACSWisp;
+	
+	entity = (W3ACSWisp)theGame.GetEntityByTag( 'ACS_Wisp' );
+	
+	return entity;
+}
+
 function ACSDestroyWispEntsDelay()
 {	
 	var ents 											: array<CEntity>;
@@ -1387,6 +1581,1986 @@ function ACSDestroyWispEntsDelay()
 		ents[i].DestroyAfter(1);
 	}
 }
+
+
+///////////////////////////////////////////////////////////////////////////////////////////
+
+class W3ACSKestralSkullItem extends W3QuestUsableItem
+{
+	private var entity                          										:  CEntity;
+    private var temp1, temp2                  											:  CEntityTemplate;
+    private var path1, path2                   											:  string;
+
+	event OnSpawned( spawnData : SEntitySpawnData )
+	{
+		super.OnSpawned(spawnData);
+	}
+	
+	event OnUsed( usedBy : CEntity )
+	{
+		super.OnUsed( usedBy );
+
+		if ( usedBy == GetWitcherPlayer() )
+		{
+			super.OnUsed(usedBy);
+
+			if(usedBy == GetWitcherPlayer()) 
+			{
+				if (FactsQuerySum("ACS_Kestral_Released") <= 0)
+				{
+					ACSKestralDestroySingle();
+
+					ACSDestroyKestralEnts();
+
+					GetACSWatcher().AddTimer('ACS_Kestral_Skull_Tutorial_Delay', 0.5, false);
+
+					if (thePlayer.IsInInterior())
+					{
+						path2 = "dlc\dlc_acs\data\entities\items\acs_kestral_interior.w2ent";
+
+						temp2 = (CEntityTemplate)LoadResource(path2,true);
+
+						entity = (W3ACSKestralSkull)theGame.CreateEntity(temp2, thePlayer.GetWorldPosition() + Vector(0,0,2), thePlayer.GetWorldRotation());
+
+						entity.AddTag('ACS_Kestral_Skull_Interior');
+					}
+					else
+					{
+						path1 = "dlc\dlc_acs\data\entities\items\acs_kestral.w2ent";
+
+						temp1 = (CEntityTemplate)LoadResource(path1,true);
+
+						entity = (W3ACSKestralSkull)theGame.CreateEntity(temp1, thePlayer.GetWorldPosition() + Vector(0,0,2), thePlayer.GetWorldRotation());
+
+						entity.AddTag('ACS_Kestral_Skull_Exterior');
+					}
+
+					entity.AddTag('ACS_Kestral_Skull');
+
+					FactsAdd("ACS_Kestral_Released", 1, -1);
+				}
+				else if (FactsQuerySum("ACS_Kestral_Released") > 0)
+				{
+					if(theGame.IsFocusModeActive())
+					{
+						if (FactsQuerySum("ACS_Kestral_Camera_Active") <= 0)
+						{
+							GetACSWatcher().CreateKestralCamera();
+
+							FactsAdd("ACS_Kestral_Camera_Active", 1, -1);
+						}
+						else if (FactsQuerySum("ACS_Kestral_Camera_Active") > 0)
+						{
+							ACSGetKestralCamera().Stop();
+
+							ACSGetKestralCamera().Destroy();
+
+							FactsRemove("ACS_Kestral_Camera_Active");
+						}
+					}
+					else
+					{
+						if (FactsQuerySum("ACS_Kestral_Camera_Active") > 0)
+						{
+							ACSGetKestralCamera().Stop();
+
+							ACSGetKestralCamera().Destroy();
+
+							FactsRemove("ACS_Kestral_Camera_Active");
+						}
+						else
+						{
+							ACSKestralDestroySingle();
+
+							ACSDestroyKestralEnts();
+
+							FactsRemove("ACS_Kestral_Released");
+						}
+					}
+						
+				}
+			}
+		}		
+	}
+}
+
+class W3ACSKestralSkull extends CGameplayEntity 
+{
+    private var wispCurrentRotationCircleAngle 								: float; 
+    private var wispCurrentRotation 												: EulerAngles; 
+    private var wispCurrentPosition 													: Vector;
+    private var wispCurrentVelocity 													: Vector;
+    private var wispCurrentAcceleration 											: Vector;
+	
+	private var wispGoalPosition 														: Vector;
+    private var wispGoalPositionOffset 												: Vector;
+    private var wispGoalPositionOffset_regenerateInSeconds 				: float;
+   
+    private var entity                          											:  CEntity;
+    private var entityTemplate                  										:  CEntityTemplate;
+    private var resourcePath                   											:  string;
+    
+    private var active 																		: bool;
+
+
+	event OnDestroyed() 
+	{	
+		var ent                          											:  CEntity;
+    	var temp1, temp2                  											:  CEntityTemplate;
+   		var path1, path2                   											:  string;
+
+		resourcePath = "dlc\dlc_acs\data\entities\other\fx_ent.w2ent";
+	
+		entityTemplate = (CEntityTemplate)LoadResource(resourcePath,true);
+
+		entity = (CEntity)theGame.CreateEntity(entityTemplate, this.GetWorldPosition(), this.GetWorldRotation());
+
+		entity.PlayEffect('teleport_out');
+
+		entity.DestroyAfter(3);
+
+
+		if (this.HasTag('ACS_Kestral_Skull_Interior_Respawn'))
+		{
+			path2 = "dlc\dlc_acs\data\entities\items\acs_kestral_interior.w2ent";
+
+			temp2 = (CEntityTemplate)LoadResource(path2,true);
+
+			ent = (W3ACSKestralSkull)theGame.CreateEntity(temp2, thePlayer.GetWorldPosition() + Vector(0,0,2), thePlayer.GetWorldRotation());
+
+			ent.AddTag('ACS_Kestral_Skull_Interior');
+
+			ent.AddTag('ACS_Kestral_Skull');
+		}
+		else if (this.HasTag('ACS_Kestral_Skull_Exterior_Respawn'))
+		{
+			path1 = "dlc\dlc_acs\data\entities\items\acs_kestral.w2ent";
+
+			temp1 = (CEntityTemplate)LoadResource(path1,true);
+
+			ent = (W3ACSKestralSkull)theGame.CreateEntity(temp1, thePlayer.GetWorldPosition() + Vector(0,0,2), thePlayer.GetWorldRotation());
+
+			ent.AddTag('ACS_Kestral_Skull_Exterior');
+
+			ent.AddTag('ACS_Kestral_Skull');
+		}
+	}
+
+	event OnSpawned(spawnData : SEntitySpawnData) 
+	{
+		var bonePos															: Vector;
+		var temp 															: CEntityTemplate;
+		var ent																: CEntity;
+
+		bonePos = MatrixGetTranslation(thePlayer.GetBoneWorldMatrixByIndex(24));
+
+		this.AddTimer('AreaCheck', 0.0001, true);
+
+		this.AddTimer('FollowPlayer', 0.0001, true);
+
+		PlayEffect('teleport_in');
+		StopEffect('teleport_in');
+
+		PlayEffectSingle('feathers_fx');
+
+		wispCurrentPosition = bonePos + Vector(0,0,0.1);
+
+        wispCurrentVelocity = Vector(3,0,0);
+
+		wispCurrentAcceleration = Vector(0,0,0);
+	}	
+
+	var last_kestral_attack_refresh_time : float;
+
+	function kestral_can_attack(): bool 
+	{
+		return theGame.GetEngineTimeAsSeconds() - last_kestral_attack_refresh_time > 5;
+	}
+
+	function refresh_kestral_attack_cooldown() 
+	{
+		last_kestral_attack_refresh_time = theGame.GetEngineTimeAsSeconds();
+	}
+
+	var last_kestral_damage_refresh_time : float;
+
+	function kestral_can_do_damage(): bool 
+	{
+		return theGame.GetEngineTimeAsSeconds() - last_kestral_damage_refresh_time > 0.25;
+	}
+
+	function refresh_kestral_damage_cooldown() 
+	{
+		last_kestral_damage_refresh_time = theGame.GetEngineTimeAsSeconds();
+	}
+
+	function kestral_damage()
+	{
+		var i									: int;
+		var entities 							: array<CGameplayEntity>;
+		var actortarget 						: CActor;
+		var dmg									: W3DamageAction;
+		var damageMax, damageMin				: float;
+		var fxent                        	  	: CEntity;
+    	var temp                  				: CEntityTemplate;
+    	var path                   				: string;
+		var targetpos							: Vector;
+		
+		if (kestral_can_do_damage())
+		{
+			refresh_kestral_damage_cooldown();
+
+			entities.Clear();
+
+			FindGameplayEntitiesInSphere(entities, this.GetWorldPosition(), 1.5, 20, ,FLAG_ExcludePlayer + FLAG_Attitude_Hostile + FLAG_OnlyAliveActors , ,);
+			
+			if( entities.Size() > 0 )
+			{
+				for( i = 0; i < entities.Size(); i += 1 )
+				{
+					actortarget = (CActor)entities[i];
+
+					if (actortarget == GetACSTransformationBlackWolf()
+					|| actortarget.HasTag('acs_snow_entity')
+					|| actortarget.HasTag('smokeman') 
+					|| actortarget.HasTag('ACS_Tentacle_1') 
+					|| actortarget.HasTag('ACS_Tentacle_2') 
+					|| actortarget.HasTag('ACS_Tentacle_3') 
+					|| actortarget.HasTag('ACS_Necrofiend_Tentacle_1') 
+					|| actortarget.HasTag('ACS_Necrofiend_Tentacle_2') 
+					|| actortarget.HasTag('ACS_Necrofiend_Tentacle_3') 
+					|| actortarget.HasTag('ACS_Necrofiend_Tentacle_6')
+					|| actortarget.HasTag('ACS_Necrofiend_Tentacle_5')
+					|| actortarget.HasTag('ACS_Necrofiend_Tentacle_4')
+					|| actortarget.HasTag('ACS_Vampire_Monster_Boss_Bar') 
+					|| actortarget.HasTag('ACS_Chaos_Cloud')
+					)
+					continue;
+
+					actortarget.IsAttacked();
+
+					actortarget.SignalGameplayEventParamInt('Time2Dodge', (int)EDT_Attack_Light );
+
+					dmg = new W3DamageAction in theGame.damageMgr;
+					
+					dmg.Initialize(thePlayer, actortarget, NULL, thePlayer.GetName(), EHRT_Heavy, CPS_Undefined, false, false, true, false);
+					
+					dmg.SetProcessBuffsIfNoDamage(true);
+					
+					dmg.SetIgnoreImmortalityMode(false);
+
+					dmg.SetHitAnimationPlayType(EAHA_ForceYes);
+
+					if (actortarget.UsesVitality()) 
+					{ 
+						damageMax = actortarget.GetStat( BCS_Vitality ) * 0.03125; 
+
+						damageMin = actortarget.GetStat( BCS_Vitality ) * 0.03125; 
+					} 
+					else if (actortarget.UsesEssence()) 
+					{ 
+						if (((CMovingPhysicalAgentComponent)(actortarget.GetMovingAgentComponent())).GetCapsuleHeight() >= 2
+						|| actortarget.GetRadius() >= 0.7
+						)
+						{
+							damageMax = actortarget.GetStat( BCS_Essence ) * 0.03125; 
+						
+							damageMin = actortarget.GetStat( BCS_Essence ) * 0.03125; 
+						}
+						else
+						{
+							damageMax = actortarget.GetStat( BCS_Essence ) * 0.03125; 
+						
+							damageMin = actortarget.GetStat( BCS_Essence ) * 0.03125; 
+						}
+					}
+
+					dmg.SetHitReactionType( EHRT_Heavy, true);
+
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_PHYSICAL, RandRangeF(damageMax,damageMin) );
+
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_SILVER, RandRangeF(damageMax,damageMin) );
+
+					//dmg.AddEffectInfo( EET_Bleeding, 3 );
+
+					dmg.SetForceExplosionDismemberment();
+						
+					theGame.damageMgr.ProcessAction( dmg );
+						
+					delete dmg;	
+
+
+
+					path = "gameplay\abilities\sorceresses\fx_dummy_entity.w2ent";
+			
+					temp = (CEntityTemplate)LoadResource(path,true);
+
+					targetpos = actortarget.GetWorldPosition();
+					targetpos.Z += 1;
+
+					fxent = (CEntity)theGame.CreateEntity(temp, targetpos, actortarget.GetWorldRotation());
+
+					fxent.CreateAttachment(actortarget,, Vector( 0, 0, 1 ), EulerAngles(0,0,0));
+
+					fxent.PlayEffect('hit_electric');
+
+					fxent.DestroyAfter(3);
+
+					this.StopEffect('hit_electric');
+					this.PlayEffect('hit_electric');
+				}
+			}
+		}
+	}
+
+	var last_kestral_lightning_refresh_time : float;
+
+	function kestral_can_perform_lightning(): bool 
+	{
+		return theGame.GetEngineTimeAsSeconds() - last_kestral_lightning_refresh_time > 3;
+	}
+
+	function refresh_kestral_lightning_cooldown() 
+	{
+		last_kestral_lightning_refresh_time = theGame.GetEngineTimeAsSeconds();
+	}
+
+	timer function kestral_lightning (deltaTime : float, id : int) 
+	{
+		var actortarget 						: CActor;
+		var dmg									: W3DamageAction;
+		var damageMax, damageMin				: float;
+		var fxent                        	  	: CEntity;
+    	var temp                  				: CEntityTemplate;
+    	var path                   				: string;
+		var targetpos							: Vector;
+		
+		actortarget = (CActor)thePlayer.moveTarget;
+
+		if (actortarget)
+		{
+			path = "gameplay\abilities\sorceresses\fx_dummy_entity.w2ent";
+		
+			temp = (CEntityTemplate)LoadResource(path,true);
+
+			targetpos = actortarget.GetWorldPosition();
+			targetpos.Z += 1;
+
+			fxent = (CEntity)theGame.CreateEntity(temp, targetpos, actortarget.GetWorldRotation());
+
+			fxent.CreateAttachment(actortarget,, Vector( 0, 0, 1 ), EulerAngles(0,0,0));
+
+			fxent.PlayEffect('hit_electric');
+
+			fxent.DestroyAfter(3);
+
+			this.StopEffect('lightning');
+			this.PlayEffect('lightning', fxent);
+
+			this.StopEffect('hit_electric');
+			this.PlayEffect('hit_electric');
+
+			dmg = new W3DamageAction in theGame.damageMgr;
+			
+			dmg.Initialize(thePlayer, actortarget, NULL, thePlayer.GetName(), EHRT_Heavy, CPS_Undefined, false, false, true, false);
+			
+			dmg.SetProcessBuffsIfNoDamage(true);
+			
+			dmg.SetIgnoreImmortalityMode(false);
+
+			dmg.SetHitAnimationPlayType(EAHA_ForceYes);
+
+			if (actortarget.UsesVitality()) 
+			{ 
+				damageMax = actortarget.GetStat( BCS_Vitality ) * 0.125; 
+
+				damageMin = actortarget.GetStat( BCS_Vitality ) * 0.0625; 
+			} 
+			else if (actortarget.UsesEssence()) 
+			{ 
+				if (((CMovingPhysicalAgentComponent)(actortarget.GetMovingAgentComponent())).GetCapsuleHeight() >= 2
+				|| actortarget.GetRadius() >= 0.7
+				)
+				{
+					damageMax = actortarget.GetStat( BCS_Essence ) * 0.0625; 
+				
+					damageMin = actortarget.GetStat( BCS_Essence ) * 0.03125; 
+				}
+				else
+				{
+					damageMax = actortarget.GetStat( BCS_Essence ) * 0.125; 
+				
+					damageMin = actortarget.GetStat( BCS_Essence ) * 0.0625; 
+				}
+			}
+
+			dmg.SetHitReactionType( EHRT_Heavy, true);
+
+			dmg.AddDamage( theGame.params.DAMAGE_NAME_DIRECT, RandRangeF(damageMax,damageMin) );
+
+			dmg.SetForceExplosionDismemberment();
+				
+			theGame.damageMgr.ProcessAction( dmg );
+				
+			delete dmg;	
+		}
+	}
+
+	function kestral_lightning_interior() 
+	{
+		var actortarget 						: CActor;
+		var dmg									: W3DamageAction;
+		var damageMax, damageMin				: float;
+		var fxent                        	  	: CEntity;
+    	var temp                  				: CEntityTemplate;
+    	var path                   				: string;
+		var targetpos							: Vector;
+		
+		if (kestral_can_perform_lightning())
+		{
+			refresh_kestral_lightning_cooldown();
+
+			actortarget = (CActor)thePlayer.moveTarget;
+
+			if (actortarget)
+			{
+				path = "gameplay\abilities\sorceresses\fx_dummy_entity.w2ent";
+			
+				temp = (CEntityTemplate)LoadResource(path,true);
+
+				targetpos = actortarget.GetWorldPosition();
+				targetpos.Z += 1;
+
+				fxent = (CEntity)theGame.CreateEntity(temp, targetpos, actortarget.GetWorldRotation());
+
+				fxent.CreateAttachment(actortarget,, Vector( 0, 0, 1 ), EulerAngles(0,0,0));
+
+				fxent.PlayEffect('hit_electric');
+
+				fxent.DestroyAfter(3);
+
+				this.StopEffect('lightning');
+				this.PlayEffect('lightning', fxent);
+
+				this.StopEffect('hit_electric');
+				this.PlayEffect('hit_electric');
+
+				dmg = new W3DamageAction in theGame.damageMgr;
+				
+				dmg.Initialize(thePlayer, actortarget, NULL, thePlayer.GetName(), EHRT_Heavy, CPS_Undefined, false, false, true, false);
+				
+				dmg.SetProcessBuffsIfNoDamage(true);
+				
+				dmg.SetIgnoreImmortalityMode(false);
+
+				dmg.SetHitAnimationPlayType(EAHA_ForceYes);
+
+				if (actortarget.UsesVitality()) 
+				{ 
+					damageMax = actortarget.GetStat( BCS_Vitality ) * 0.125; 
+
+					damageMin = actortarget.GetStat( BCS_Vitality ) * 0.0625; 
+				} 
+				else if (actortarget.UsesEssence()) 
+				{ 
+					if (((CMovingPhysicalAgentComponent)(actortarget.GetMovingAgentComponent())).GetCapsuleHeight() >= 2
+					|| actortarget.GetRadius() >= 0.7
+					)
+					{
+						damageMax = actortarget.GetStat( BCS_Essence ) * 0.0625; 
+					
+						damageMin = actortarget.GetStat( BCS_Essence ) * 0.03125; 
+					}
+					else
+					{
+						damageMax = actortarget.GetStat( BCS_Essence ) * 0.125; 
+					
+						damageMin = actortarget.GetStat( BCS_Essence ) * 0.0625; 
+					}
+				}
+
+				dmg.SetHitReactionType( EHRT_Heavy, true);
+
+				dmg.AddDamage( theGame.params.DAMAGE_NAME_DIRECT, RandRangeF(damageMax,damageMin) );
+
+				dmg.SetForceExplosionDismemberment();
+					
+				theGame.damageMgr.ProcessAction( dmg );
+					
+				delete dmg;	
+			}
+		}
+	}
+
+	timer function reveal_crow(deltaTime : float, id : int) 
+	{
+		DestroyEffect('teleport_in');
+		PlayEffect('teleport_in');
+		StopEffect('teleport_in');
+
+		PlayEffectSingle('feathers_fx');
+
+		StopEffect('disappear');
+
+		if (thePlayer.IsInCombat())
+		{
+			RemoveTimer('kestral_lightning');
+			AddTimer('kestral_lightning', 2, false);
+		}
+	}
+
+	timer function AreaCheck(deltaTime : float, id : int) 
+	{
+		if(thePlayer.IsInInterior()) 
+		{
+			if (this.HasTag('ACS_Kestral_Skull_Exterior'))
+			{
+				this.AddTag('ACS_Kestral_Skull_Interior_Respawn');
+
+				this.Destroy();
+			}
+		}
+		else
+		{
+			if (this.HasTag('ACS_Kestral_Skull_Interior'))
+			{
+				this.AddTag('ACS_Kestral_Skull_Exterior_Respawn');
+
+				this.Destroy();
+			}
+		}
+	}
+
+    timer function FollowPlayer(deltaTime : float, id : int) 
+	{
+		var target : CEntity;
+		var targetPosition, attackposition : Vector;
+		var targetRotation : EulerAngles;
+		
+        var playerPosition : Vector;
+        var playerRotation : EulerAngles;      
+        
+        var goalAcceleration : Vector;
+        var navigationComputeZReturn : float;  
+ 
+        var rotationCircleRadius : float;
+        var rotationCircleMovementSpeed : float;
+        var selfRotationSpeed : float;
+        var maxAcceleration : float;      
+        var accelerationMultiplier : float;
+        var maxVelocity : float;
+        var velocityDampeningFactor : float;
+
+		var lookatents										: array<CGameplayEntity>;
+		var i, j											: int;
+
+		var gameLightComp, gameInteractComp 				: CComponent;
+
+		var pos, lookatentsPos								 : Vector;
+
+		var targetDistance									: float;
+
+		var bonePos															: Vector;
+
+		if (this.HasTag('ACS_Kestral_Skull_Exterior'))
+		{
+			rotationCircleMovementSpeed = 100;
+			rotationCircleRadius = 7.5;
+			selfRotationSpeed = 200;
+			maxAcceleration = 200;
+			accelerationMultiplier = 100;
+			maxVelocity = 100;
+			velocityDampeningFactor = 0.9;
+
+
+			wispCurrentRotationCircleAngle += deltaTime * rotationCircleMovementSpeed;
+	
+			while(wispCurrentRotationCircleAngle > 360) 
+			{          
+				wispCurrentRotationCircleAngle -= 360;                        
+			}
+
+			pos = thePlayer.GetWorldPosition();
+			pos.Z += 0.8;
+		
+			if (thePlayer.IsInCombat())
+			{
+				target = thePlayer.moveTarget;
+			}
+			else 
+			{
+				lookatents.Clear();
+
+				FindGameplayEntitiesInCone( lookatents, thePlayer.GetWorldPosition() + theCamera.GetCameraDirection(), VecHeading( theCamera.GetCameraDirection() ), 120, 120, 1, , FLAG_ExcludePlayer );
+
+				for(i = 0; i < lookatents.Size(); i += 1)
+				{
+					if 
+					( 
+					lookatents[i] == GetWitcherPlayer() 
+					|| lookatents[i] == GetACSWatcher()
+					|| lookatents[i] == theCamera
+					)
+					{
+						continue;
+					}
+
+					for( j = lookatents.Size()-1; j >= 0; j -= 1 ) 
+					{	
+						lookatentsPos = lookatents[j].GetWorldPosition();
+						
+						if ( AbsF( lookatentsPos.Z - pos.Z ) > 2.5 )
+						{
+							lookatents.EraseFast(j);
+						}
+
+						if (lookatents.Size() > 0)
+						{
+							if ( lookatents[j] = thePlayer.GetDisplayTarget())
+							{
+								target = thePlayer.GetDisplayTarget();
+							}
+							else
+							{
+								gameLightComp = lookatents[j].GetComponentByClassName('CGameplayLightComponent');
+
+								gameInteractComp = lookatents[j].GetComponentByClassName('CInteractionComponent');
+
+								if(
+								(CNewNPC)lookatents[j]
+								|| (COilBarrelEntity)lookatents[j]
+								|| gameLightComp
+								|| gameInteractComp
+								|| (W3AnimationInteractionEntity)lookatents[j]
+								|| (CInteractiveEntity)lookatents[j]
+								|| (W3NoticeBoard)lookatents[j]
+								|| (W3FastTravelEntity)lookatents[j]
+								|| (W3SmartObject)lookatents[j]
+								|| (W3ItemRepairObject)lookatents[j]
+								|| (W3AlchemyTable)lookatents[j]
+								|| (W3Stables)lookatents[j]
+								|| (W3LockableEntity)lookatents[j] 
+								|| (W3Poster)lookatents[j]
+								|| (W3LadderInteraction)lookatents[j]
+								)
+								{
+									target = lookatents[j];
+								}
+							}
+						}
+					}	
+				}
+			}
+
+			playerPosition = TraceFloor(thePlayer.GetWorldPosition());
+			targetPosition = TraceFloor(target.GetWorldPosition());
+
+			playerRotation = thePlayer.GetWorldRotation();
+
+			targetRotation = target.GetWorldRotation();
+
+			if(target 
+			&& (theGame.IsFocusModeActive() 
+			|| (thePlayer.IsInCombat() 
+			|| thePlayer.IsThreatened()) 
+			&& target)
+			) 
+			{	
+				wispGoalPosition = targetPosition;
+
+				if (thePlayer.IsInCombat() || thePlayer.IsThreatened())
+				{
+					
+				}
+				else
+				{
+					
+				}
+			} 
+			else 
+			{
+				if (thePlayer.IsInCombat() || thePlayer.IsThreatened())
+				{
+					
+				}
+				else
+				{
+					
+				}
+
+				wispGoalPosition = playerPosition;
+			}
+			
+			wispGoalPosition += wispGoalPositionOffset;
+			wispGoalPosition.X += CosF(Deg2Rad(wispCurrentRotationCircleAngle)) * rotationCircleRadius;
+			wispGoalPosition.Y += SinF(Deg2Rad(wispCurrentRotationCircleAngle)) * rotationCircleRadius;
+
+			if ((thePlayer.IsInCombat() 
+			|| thePlayer.IsThreatened()) )
+			{
+				if (this.HasTag('ACS_Kestral_Attack_Mode'))
+				{
+					wispGoalPosition.Z += 4;
+				}
+				else
+				{
+					wispGoalPosition.Z += 4.5;
+				}
+			}
+			else
+			{
+				wispGoalPosition.Z += 6;
+			}
+		
+			attackposition = targetPosition;
+
+			targetDistance = VecDistanceSquared2D( this.GetWorldPosition(), targetPosition ) ;
+
+			if (thePlayer.IsInCombat())
+			{
+				kestral_damage();
+
+				if (kestral_can_attack())
+				{
+					refresh_kestral_attack_cooldown();
+
+					if(!this.HasTag('ACS_Kestral_Attack_Mode'))
+					{
+						//PlayEffect('teleport_in');
+						//StopEffect('teleport_in');
+
+						DestroyEffect('teleport_out');
+						PlayEffect('teleport_out');
+						//StopEffect('teleport_out');
+
+						DestroyEffect('disappear');
+						PlayEffect('disappear');
+
+						DestroyEffect('feathers_fx');
+
+						RemoveTimer('reveal_crow');
+						AddTimer('reveal_crow', 1, false);
+
+						this.AddTag('ACS_Kestral_Attack_Mode');
+					}
+					else if(this.HasTag('ACS_Kestral_Attack_Mode'))
+					{
+						//PlayEffect('teleport_in');
+						//StopEffect('teleport_in');
+
+						DestroyEffect('teleport_out');
+						PlayEffect('teleport_out');
+						//StopEffect('teleport_out');
+
+						DestroyEffect('disappear');
+						PlayEffect('disappear');
+
+						DestroyEffect('feathers_fx');
+
+						RemoveTimer('reveal_crow');
+						AddTimer('reveal_crow', 1, false);
+
+						this.RemoveTag('ACS_Kestral_Attack_Mode');
+					}
+				}
+
+				if(!this.HasTag('ACS_Kestral_In_Combat'))
+				{
+					this.AddTag('ACS_Kestral_In_Combat');
+				}
+
+				if (this.HasTag('ACS_Kestral_Attack_Mode'))
+				{
+					wispGoalPositionOffset_regenerateInSeconds -= deltaTime;
+
+					if(wispGoalPositionOffset_regenerateInSeconds < 0) 
+					{
+						wispGoalPositionOffset_regenerateInSeconds = 0.1;
+
+						wispGoalPositionOffset = VecNormalize(attackposition) * rotationCircleRadius;
+
+						wispGoalPositionOffset.Z -= 3;
+					}
+				}
+				else
+				{
+					wispGoalPositionOffset_regenerateInSeconds -= deltaTime;
+
+					if(wispGoalPositionOffset_regenerateInSeconds < 0) 
+					{
+						wispGoalPositionOffset_regenerateInSeconds = 0.1;
+
+						wispGoalPositionOffset = VecRand() * rotationCircleRadius * 0.01;
+
+						//wispGoalPositionOffset = VecNormalize(attackposition) * rotationCircleRadius;
+
+						//wispGoalPositionOffset.Z += 3;
+					}	
+				}
+			}
+			else
+			{
+				if(this.HasTag('ACS_Kestral_Attack_Mode'))
+				{
+					this.RemoveTag('ACS_Kestral_Attack_Mode');
+				}
+
+				if(this.HasTag('ACS_Kestral_In_Combat'))
+				{
+					DestroyEffect('teleport_out');
+					PlayEffect('teleport_out');
+
+					DestroyEffect('disappear');
+					PlayEffect('disappear');
+
+					DestroyEffect('feathers_fx');
+
+					RemoveTimer('reveal_crow');
+					AddTimer('reveal_crow', 2, false);
+
+					this.RemoveTag('ACS_Kestral_In_Combat');
+				}
+
+				wispGoalPositionOffset_regenerateInSeconds -= deltaTime;
+
+				if(wispGoalPositionOffset_regenerateInSeconds < 0) 
+				{
+					wispGoalPositionOffset_regenerateInSeconds = 0.1;
+
+					wispGoalPositionOffset = VecRand() * rotationCircleRadius * 0.01;
+				}	
+			}
+			
+			wispCurrentAcceleration = (wispGoalPosition - wispCurrentPosition) * accelerationMultiplier;
+	
+			if(VecLength(wispCurrentAcceleration) > maxAcceleration) 
+			{
+				wispCurrentAcceleration = VecNormalize(wispCurrentAcceleration) * maxAcceleration;
+			}
+
+			wispCurrentVelocity += wispCurrentAcceleration * deltaTime;
+
+			wispCurrentVelocity *= velocityDampeningFactor;
+
+			if(VecLength(wispCurrentVelocity) > maxVelocity) 
+			{
+				wispCurrentVelocity = VecNormalize(wispCurrentVelocity) * maxVelocity;
+			}
+	
+			if (theGame.GetWorld().NavigationComputeZ( wispCurrentPosition, wispCurrentPosition.Z - 2, wispCurrentPosition.Z + 2, navigationComputeZReturn ) )
+			{
+				if(AbsF(wispCurrentPosition.Z - navigationComputeZReturn) < 0.1) 
+				{
+					wispCurrentVelocity.Z *= -0.9;
+				}
+			}
+
+			wispCurrentPosition += wispCurrentVelocity * deltaTime;
+	
+			if(VecDistance(wispCurrentPosition, wispGoalPosition) > 100) {
+				wispCurrentPosition = wispGoalPosition;
+				wispCurrentVelocity = Vector(0,0,0);
+				wispCurrentAcceleration = Vector(0,0,0);
+			}
+	
+			wispCurrentRotation.Roll = -45;
+			wispCurrentRotation.Yaw += deltaTime * rotationCircleMovementSpeed;
+		}
+		else if (this.HasTag('ACS_Kestral_Skull_Interior'))
+		{
+			bonePos = MatrixGetTranslation(thePlayer.GetBoneWorldMatrixByIndex(thePlayer.GetBoneIndex( 'l_shoulder' )));
+
+			wispCurrentPosition = bonePos + (thePlayer.GetWorldRight() * -0.5) + (thePlayer.GetWorldUp() * 0.5) + (thePlayer.GetWorldForward() * -0.25);
+
+			wispCurrentRotation = thePlayer.GetWorldRotation();
+
+			if (thePlayer.IsInCombat())
+			{
+				if (thePlayer.GetTarget())
+				{
+					kestral_lightning_interior();
+				}
+			}
+		}
+			
+		this.TeleportWithRotation(wispCurrentPosition, wispCurrentRotation); 
+    }   
+}
+
+function ACS_KestralCheck()
+{
+	var entity                          										:  CEntity;
+	var temp1, temp2                  											:  CEntityTemplate;
+    var path1, path2                   											:  string;
+
+	if (FactsQuerySum("ACS_Kestral_Camera_Active") > 0)
+	{
+		FactsRemove("ACS_Kestral_Camera_Active");
+	}
+
+	if (FactsQuerySum("ACS_Kestral_Released") > 0 && thePlayer.inv.HasItem('acs_kestral_skull'))
+	{
+		ACSKestralDestroySingle();
+
+		ACSDestroyKestralEnts();
+
+		if (thePlayer.inv.HasItem('acs_kestral_skull'))
+		{
+			if (thePlayer.IsInInterior())
+			{
+				path2 = "dlc\dlc_acs\data\entities\items\acs_kestral_interior.w2ent";
+
+				temp2 = (CEntityTemplate)LoadResource(path2,true);
+
+				entity = (W3ACSKestralSkull)theGame.CreateEntity(temp2, thePlayer.GetWorldPosition() + Vector(0,0,2), thePlayer.GetWorldRotation());
+
+				entity.AddTag('ACS_Kestral_Skull_Interior');
+			}
+			else
+			{
+				path1 = "dlc\dlc_acs\data\entities\items\acs_kestral.w2ent";
+
+				temp1 = (CEntityTemplate)LoadResource(path1,true);
+
+				entity = (W3ACSKestralSkull)theGame.CreateEntity(temp1, thePlayer.GetWorldPosition() + Vector(0,0,2), thePlayer.GetWorldRotation());
+
+				entity.AddTag('ACS_Kestral_Skull_Exterior');
+			}
+
+			entity.AddTag('ACS_Kestral_Skull');
+		}
+		else
+		{
+			FactsRemove("ACS_Kestral_Released");
+		}
+	}
+}
+
+function ACSKestralDestroySingle()
+{
+	var entity 			 : W3ACSKestralSkull;
+	
+	entity = (W3ACSKestralSkull)theGame.GetEntityByTag( 'ACS_Kestral_Skull' );
+	entity.RemoveTag('ACS_Kestral_Skull');
+	entity.Destroy();
+}
+
+function ACSDestroyKestralEnts()
+{	
+	var ents 											: array<CEntity>;
+	var i												: int;
+
+	ents.Clear();
+
+	theGame.GetEntitiesByTag( 'ACS_Kestral_Skull', ents );	
+	
+	for( i = 0; i < ents.Size(); i += 1 )
+	{
+		ents[i].RemoveTag('ACS_Kestral_Skull');
+		
+		ents[i].Destroy();
+	}
+}
+
+function ACSKestralSkull() : W3ACSKestralSkull
+{
+	var entity 			 : W3ACSKestralSkull;
+	
+	entity = (W3ACSKestralSkull)theGame.GetEntityByTag( 'ACS_Kestral_Skull' );
+	
+	return entity;
+}
+
+function ACSDestroyKestralEntsDelay()
+{	
+	var ents 											: array<CEntity>;
+	var i												: int;
+
+	ents.Clear();
+
+	theGame.GetEntitiesByTag( 'ACS_Kestral_Skull', ents );	
+	
+	for( i = 0; i < ents.Size(); i += 1 )
+	{
+		ents[i].RemoveTag('ACS_Kestral_Skull');
+
+		ents[i].DestroyAfter(1);
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////
+
+class W3ACSPhoenixAshesItem extends W3QuestUsableItem
+{
+	private var entity                          										:  CEntity;
+    private var temp1, temp2                  											:  CEntityTemplate;
+    private var path1, path2                   											:  string;
+
+	event OnSpawned( spawnData : SEntitySpawnData )
+	{
+		super.OnSpawned(spawnData);
+	}
+	
+	event OnUsed( usedBy : CEntity )
+	{
+		super.OnUsed( usedBy );
+
+		if ( usedBy == GetWitcherPlayer() )
+		{
+			super.OnUsed(usedBy);
+
+			if(usedBy == GetWitcherPlayer()) 
+			{
+				if (FactsQuerySum("ACS_Phoenix_Released") <= 0)
+				{
+					ACSPhoenixDestroySingle();
+
+					ACSDestroyPhoenixEnts();
+
+					GetACSWatcher().AddTimer('ACS_Phoenix_Ashes_Tutorial_Delay', 0.5, false);
+
+					if (thePlayer.IsInInterior())
+					{
+						path2 = "dlc\dlc_acs\data\entities\items\acs_phoenix_interior.w2ent";
+
+						temp2 = (CEntityTemplate)LoadResource(path2,true);
+
+						entity = (W3ACSPhoenix)theGame.CreateEntity(temp2, thePlayer.GetWorldPosition() + Vector(0,0,2), thePlayer.GetWorldRotation());
+
+						entity.AddTag('ACS_Phoenix_Interior');
+					}
+					else
+					{
+						path1 = "dlc\dlc_acs\data\entities\items\acs_phoenix.w2ent";
+
+						temp1 = (CEntityTemplate)LoadResource(path1,true);
+
+						entity = (W3ACSPhoenix)theGame.CreateEntity(temp1, thePlayer.GetWorldPosition() + Vector(0,0,2), thePlayer.GetWorldRotation());
+
+						entity.AddTag('ACS_Phoenix_Exterior');
+					}
+
+					entity.AddTag('ACS_Phoenix');
+
+					FactsAdd("ACS_Phoenix_Released", 1, -1);
+				}
+				else if (FactsQuerySum("ACS_Phoenix_Released") > 0)
+				{
+					ACSPhoenixDestroySingle();
+
+					ACSDestroyPhoenixEnts();
+
+					FactsRemove("ACS_Phoenix_Released");
+				}
+			}
+		}		
+	}
+}
+
+class W3ACSPhoenix extends CGameplayEntity 
+{
+    private var wispCurrentRotationCircleAngle 								: float; 
+    private var wispCurrentRotation 												: EulerAngles; 
+    private var wispCurrentPosition 													: Vector;
+    private var wispCurrentVelocity 													: Vector;
+    private var wispCurrentAcceleration 											: Vector;
+	
+	private var wispGoalPosition 														: Vector;
+    private var wispGoalPositionOffset 												: Vector;
+    private var wispGoalPositionOffset_regenerateInSeconds 				: float;
+   
+    private var entity                          											:  CEntity;
+    private var entityTemplate                  										:  CEntityTemplate;
+    private var resourcePath                   											:  string;
+    
+    private var active 																		: bool;
+
+
+	event OnDestroyed() 
+	{	
+		var ent                          											:  CEntity;
+    	var temp1, temp2                  											:  CEntityTemplate;
+   		var path1, path2                   											:  string;
+
+		resourcePath = "dlc\dlc_acs\data\entities\other\fx_ent.w2ent";
+	
+		entityTemplate = (CEntityTemplate)LoadResource(resourcePath,true);
+
+		entity = (CEntity)theGame.CreateEntity(entityTemplate, this.GetWorldPosition(), this.GetWorldRotation());
+
+		entity.PlayEffect('teleport_out_fire');
+
+		entity.DestroyAfter(3);
+
+
+		if (this.HasTag('ACS_Phoenix_Interior_Respawn'))
+		{
+			path2 = "dlc\dlc_acs\data\entities\items\acs_phoenix_interior.w2ent";
+
+			temp2 = (CEntityTemplate)LoadResource(path2,true);
+
+			ent = (W3ACSPhoenix)theGame.CreateEntity(temp2, thePlayer.GetWorldPosition() + Vector(0,0,2), thePlayer.GetWorldRotation());
+
+			ent.AddTag('ACS_Phoenix_Interior');
+
+			ent.AddTag('ACS_Phoenix');
+		}
+		else if (this.HasTag('ACS_Phoenix_Exterior_Respawn'))
+		{
+			path1 = "dlc\dlc_acs\data\entities\items\acs_Phoenix.w2ent";
+
+			temp1 = (CEntityTemplate)LoadResource(path1,true);
+
+			ent = (W3ACSPhoenix)theGame.CreateEntity(temp1, thePlayer.GetWorldPosition() + Vector(0,0,2), thePlayer.GetWorldRotation());
+
+			ent.AddTag('ACS_Phoenix_Exterior');
+
+			ent.AddTag('ACS_Phoenix');
+		}
+	}
+
+	event OnSpawned(spawnData : SEntitySpawnData) 
+	{
+		var bonePos															: Vector;
+		var temp 															: CEntityTemplate;
+		var ent																: CEntity;
+
+		bonePos = MatrixGetTranslation(thePlayer.GetBoneWorldMatrixByIndex(24));
+
+		this.AddTimer('AreaCheck', 0.0001, true);
+
+		this.AddTimer('FollowPlayer', 0.0001, true);
+
+		PlayEffect('teleport_in');
+		StopEffect('teleport_in');
+
+		PlayEffectSingle('feathers_fx');
+
+		wispCurrentPosition = bonePos + Vector(0,0,0.1);
+
+        wispCurrentVelocity = Vector(3,0,0);
+
+		wispCurrentAcceleration = Vector(0,0,0);
+	}	
+
+	var last_kestral_attack_refresh_time : float;
+
+	function kestral_can_attack(): bool 
+	{
+		return theGame.GetEngineTimeAsSeconds() - last_kestral_attack_refresh_time > 5;
+	}
+
+	function refresh_kestral_attack_cooldown() 
+	{
+		last_kestral_attack_refresh_time = theGame.GetEngineTimeAsSeconds();
+	}
+
+	var last_kestral_damage_refresh_time : float;
+
+	function kestral_can_do_damage(): bool 
+	{
+		return theGame.GetEngineTimeAsSeconds() - last_kestral_damage_refresh_time > 0.25;
+	}
+
+	function refresh_kestral_damage_cooldown() 
+	{
+		last_kestral_damage_refresh_time = theGame.GetEngineTimeAsSeconds();
+	}
+
+	function kestral_damage()
+	{
+		var i									: int;
+		var entities 							: array<CGameplayEntity>;
+		var actortarget 						: CActor;
+		var dmg									: W3DamageAction;
+		var damageMax, damageMin				: float;
+		var fxent                        	  	: CEntity;
+    	var temp                  				: CEntityTemplate;
+    	var path                   				: string;
+		var targetpos							: Vector;
+		
+		if (kestral_can_do_damage())
+		{
+			refresh_kestral_damage_cooldown();
+
+			entities.Clear();
+
+			FindGameplayEntitiesInSphere(entities, this.GetWorldPosition(), 1.5, 20, ,FLAG_ExcludePlayer + FLAG_Attitude_Hostile + FLAG_OnlyAliveActors , ,);
+			
+			if( entities.Size() > 0 )
+			{
+				for( i = 0; i < entities.Size(); i += 1 )
+				{
+					actortarget = (CActor)entities[i];
+
+					if (actortarget == GetACSTransformationBlackWolf()
+					|| actortarget.HasTag('acs_snow_entity')
+					|| actortarget.HasTag('smokeman') 
+					|| actortarget.HasTag('ACS_Tentacle_1') 
+					|| actortarget.HasTag('ACS_Tentacle_2') 
+					|| actortarget.HasTag('ACS_Tentacle_3') 
+					|| actortarget.HasTag('ACS_Necrofiend_Tentacle_1') 
+					|| actortarget.HasTag('ACS_Necrofiend_Tentacle_2') 
+					|| actortarget.HasTag('ACS_Necrofiend_Tentacle_3') 
+					|| actortarget.HasTag('ACS_Necrofiend_Tentacle_6')
+					|| actortarget.HasTag('ACS_Necrofiend_Tentacle_5')
+					|| actortarget.HasTag('ACS_Necrofiend_Tentacle_4')
+					|| actortarget.HasTag('ACS_Vampire_Monster_Boss_Bar') 
+					|| actortarget.HasTag('ACS_Chaos_Cloud')
+					)
+					continue;
+
+					actortarget.IsAttacked();
+
+					actortarget.SignalGameplayEventParamInt('Time2Dodge', (int)EDT_Attack_Light );
+
+					dmg = new W3DamageAction in theGame.damageMgr;
+					
+					dmg.Initialize(thePlayer, actortarget, NULL, thePlayer.GetName(), EHRT_Heavy, CPS_Undefined, false, false, true, false);
+					
+					dmg.SetProcessBuffsIfNoDamage(true);
+					
+					dmg.SetIgnoreImmortalityMode(false);
+
+					dmg.SetHitAnimationPlayType(EAHA_ForceYes);
+
+					if (actortarget.UsesVitality()) 
+					{ 
+						damageMax = actortarget.GetStat( BCS_Vitality ) * 0.03125; 
+
+						damageMin = actortarget.GetStat( BCS_Vitality ) * 0.03125; 
+					} 
+					else if (actortarget.UsesEssence()) 
+					{ 
+						if (((CMovingPhysicalAgentComponent)(actortarget.GetMovingAgentComponent())).GetCapsuleHeight() >= 2
+						|| actortarget.GetRadius() >= 0.7
+						)
+						{
+							damageMax = actortarget.GetStat( BCS_Essence ) * 0.03125; 
+						
+							damageMin = actortarget.GetStat( BCS_Essence ) * 0.03125; 
+						}
+						else
+						{
+							damageMax = actortarget.GetStat( BCS_Essence ) * 0.03125; 
+						
+							damageMin = actortarget.GetStat( BCS_Essence ) * 0.03125; 
+						}
+					}
+
+					dmg.SetHitReactionType( EHRT_Heavy, true);
+
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_PHYSICAL, RandRangeF(damageMax,damageMin) );
+
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_SILVER, RandRangeF(damageMax,damageMin) );
+
+					dmg.AddEffectInfo( EET_Burning, 1 );
+
+					dmg.SetForceExplosionDismemberment();
+						
+					theGame.damageMgr.ProcessAction( dmg );
+						
+					delete dmg;	
+
+
+
+					path = "dlc\dlc_acs\data\entities\other\fx_dummy_entity_ifrit.w2ent";
+			
+					temp = (CEntityTemplate)LoadResource(path,true);
+
+					targetpos = actortarget.GetWorldPosition();
+					targetpos.Z += 1;
+
+					fxent = (CEntity)theGame.CreateEntity(temp, targetpos, actortarget.GetWorldRotation());
+
+					fxent.CreateAttachment(actortarget,, Vector( 0, 0, 1 ), EulerAngles(0,0,0));
+
+					fxent.PlayEffect('hit_fire');
+
+					fxent.DestroyAfter(3);
+
+					this.StopEffect('hit_electric');
+					this.PlayEffect('hit_electric');
+				}
+			}
+		}
+	}
+
+	var last_kestral_lightning_refresh_time : float;
+
+	function kestral_can_perform_lightning(): bool 
+	{
+		return theGame.GetEngineTimeAsSeconds() - last_kestral_lightning_refresh_time > 3;
+	}
+
+	function refresh_kestral_lightning_cooldown() 
+	{
+		last_kestral_lightning_refresh_time = theGame.GetEngineTimeAsSeconds();
+	}
+
+	timer function kestral_lightning (deltaTime : float, id : int) 
+	{
+		var actortarget 						: CActor;
+		var dmg									: W3DamageAction;
+		var damageMax, damageMin				: float;
+		var fxent                        	  	: CEntity;
+    	var temp                  				: CEntityTemplate;
+    	var path                   				: string;
+		var targetpos							: Vector;
+		
+		actortarget = (CActor)thePlayer.moveTarget;
+
+		if (actortarget)
+		{
+			path = "dlc\dlc_acs\data\entities\other\fx_dummy_entity_ifrit.w2ent";
+		
+			temp = (CEntityTemplate)LoadResource(path,true);
+
+			targetpos = actortarget.GetWorldPosition();
+			targetpos.Z += 1;
+
+			fxent = (CEntity)theGame.CreateEntity(temp, targetpos, actortarget.GetWorldRotation());
+
+			fxent.CreateAttachment(actortarget,, Vector( 0, 0, 1 ), EulerAngles(0,0,0));
+
+			fxent.PlayEffect('hit_fire');
+
+			fxent.DestroyAfter(3);
+
+			this.StopEffect('lightning');
+			this.PlayEffect('lightning', fxent);
+
+			this.StopEffect('hit_electric');
+			this.PlayEffect('hit_electric');
+
+			dmg = new W3DamageAction in theGame.damageMgr;
+			
+			dmg.Initialize(thePlayer, actortarget, NULL, thePlayer.GetName(), EHRT_Heavy, CPS_Undefined, false, false, true, false);
+			
+			dmg.SetProcessBuffsIfNoDamage(true);
+			
+			dmg.SetIgnoreImmortalityMode(false);
+
+			dmg.SetHitAnimationPlayType(EAHA_ForceYes);
+
+			if (actortarget.UsesVitality()) 
+			{ 
+				damageMax = actortarget.GetStat( BCS_Vitality ) * 0.125; 
+
+				damageMin = actortarget.GetStat( BCS_Vitality ) * 0.0625; 
+			} 
+			else if (actortarget.UsesEssence()) 
+			{ 
+				if (((CMovingPhysicalAgentComponent)(actortarget.GetMovingAgentComponent())).GetCapsuleHeight() >= 2
+				|| actortarget.GetRadius() >= 0.7
+				)
+				{
+					damageMax = actortarget.GetStat( BCS_Essence ) * 0.0625; 
+				
+					damageMin = actortarget.GetStat( BCS_Essence ) * 0.03125; 
+				}
+				else
+				{
+					damageMax = actortarget.GetStat( BCS_Essence ) * 0.125; 
+				
+					damageMin = actortarget.GetStat( BCS_Essence ) * 0.0625; 
+				}
+			}
+
+			dmg.SetHitReactionType( EHRT_Heavy, true);
+
+			dmg.AddDamage( theGame.params.DAMAGE_NAME_DIRECT, RandRangeF(damageMax,damageMin) );
+
+			dmg.AddEffectInfo( EET_Burning, 1 );
+
+			dmg.SetForceExplosionDismemberment();
+				
+			theGame.damageMgr.ProcessAction( dmg );
+				
+			delete dmg;	
+		}
+	}
+
+	function kestral_lightning_interior() 
+	{
+		var actortarget 						: CActor;
+		var dmg									: W3DamageAction;
+		var damageMax, damageMin				: float;
+		var fxent                        	  	: CEntity;
+    	var temp                  				: CEntityTemplate;
+    	var path                   				: string;
+		var targetpos							: Vector;
+		
+		if (kestral_can_perform_lightning())
+		{
+			refresh_kestral_lightning_cooldown();
+
+			actortarget = (CActor)thePlayer.moveTarget;
+
+			if (actortarget)
+			{
+				path = "dlc\dlc_acs\data\entities\other\fx_dummy_entity_ifrit.w2ent";
+			
+				temp = (CEntityTemplate)LoadResource(path,true);
+
+				targetpos = actortarget.GetWorldPosition();
+				targetpos.Z += 1;
+
+				fxent = (CEntity)theGame.CreateEntity(temp, targetpos, actortarget.GetWorldRotation());
+
+				fxent.CreateAttachment(actortarget,, Vector( 0, 0, 1 ), EulerAngles(0,0,0));
+
+				fxent.PlayEffect('hit_fire');
+
+				fxent.DestroyAfter(3);
+
+				this.StopEffect('lightning');
+				this.PlayEffect('lightning', fxent);
+
+				this.StopEffect('hit_electric');
+				this.PlayEffect('hit_electric');
+
+				dmg = new W3DamageAction in theGame.damageMgr;
+				
+				dmg.Initialize(thePlayer, actortarget, NULL, thePlayer.GetName(), EHRT_Heavy, CPS_Undefined, false, false, true, false);
+				
+				dmg.SetProcessBuffsIfNoDamage(true);
+				
+				dmg.SetIgnoreImmortalityMode(false);
+
+				dmg.SetHitAnimationPlayType(EAHA_ForceYes);
+
+				if (actortarget.UsesVitality()) 
+				{ 
+					damageMax = actortarget.GetStat( BCS_Vitality ) * 0.125; 
+
+					damageMin = actortarget.GetStat( BCS_Vitality ) * 0.0625; 
+				} 
+				else if (actortarget.UsesEssence()) 
+				{ 
+					if (((CMovingPhysicalAgentComponent)(actortarget.GetMovingAgentComponent())).GetCapsuleHeight() >= 2
+					|| actortarget.GetRadius() >= 0.7
+					)
+					{
+						damageMax = actortarget.GetStat( BCS_Essence ) * 0.0625; 
+					
+						damageMin = actortarget.GetStat( BCS_Essence ) * 0.03125; 
+					}
+					else
+					{
+						damageMax = actortarget.GetStat( BCS_Essence ) * 0.125; 
+					
+						damageMin = actortarget.GetStat( BCS_Essence ) * 0.0625; 
+					}
+				}
+
+				dmg.SetHitReactionType( EHRT_Heavy, true);
+
+				dmg.AddDamage( theGame.params.DAMAGE_NAME_DIRECT, RandRangeF(damageMax,damageMin) );
+
+				dmg.AddEffectInfo( EET_Burning, 1 );
+
+				dmg.SetForceExplosionDismemberment();
+					
+				theGame.damageMgr.ProcessAction( dmg );
+					
+				delete dmg;	
+			}
+		}
+	}
+
+	timer function reveal_crow(deltaTime : float, id : int) 
+	{
+		DestroyEffect('teleport_in');
+		PlayEffect('teleport_in');
+		StopEffect('teleport_in');
+
+		PlayEffectSingle('feathers_fx');
+
+		StopEffect('disappear');
+
+		if (thePlayer.IsInCombat())
+		{
+			RemoveTimer('kestral_lightning');
+			AddTimer('kestral_lightning', 2, false);
+		}
+	}
+
+	timer function AreaCheck(deltaTime : float, id : int) 
+	{
+		if(thePlayer.IsInInterior()) 
+		{
+			if (this.HasTag('ACS_Phoenix_Exterior'))
+			{
+				this.AddTag('ACS_Phoenix_Interior_Respawn');
+
+				this.Destroy();
+			}
+		}
+		else
+		{
+			if (this.HasTag('ACS_Phoenix_Interior'))
+			{
+				this.AddTag('ACS_Phoenix_Exterior_Respawn');
+
+				this.Destroy();
+			}
+		}
+	}
+
+    timer function FollowPlayer(deltaTime : float, id : int) 
+	{
+		var target : CEntity;
+		var targetPosition, attackposition : Vector;
+		var targetRotation : EulerAngles;
+		
+        var playerPosition : Vector;
+        var playerRotation : EulerAngles;      
+        
+        var goalAcceleration : Vector;
+        var navigationComputeZReturn : float;  
+ 
+        var rotationCircleRadius : float;
+        var rotationCircleMovementSpeed : float;
+        var selfRotationSpeed : float;
+        var maxAcceleration : float;      
+        var accelerationMultiplier : float;
+        var maxVelocity : float;
+        var velocityDampeningFactor : float;
+
+		var lookatents										: array<CGameplayEntity>;
+		var i, j											: int;
+
+		var gameLightComp, gameInteractComp 				: CComponent;
+
+		var pos, lookatentsPos								 : Vector;
+
+		var targetDistance									: float;
+
+		var bonePos															: Vector;
+
+		if (this.HasTag('ACS_Phoenix_Exterior'))
+		{
+			rotationCircleMovementSpeed = 100;
+			rotationCircleRadius = 7.5;
+			selfRotationSpeed = 200;
+			maxAcceleration = 200;
+			accelerationMultiplier = 100;
+			maxVelocity = 100;
+			velocityDampeningFactor = 0.9;
+
+
+			wispCurrentRotationCircleAngle += deltaTime * rotationCircleMovementSpeed;
+	
+			while(wispCurrentRotationCircleAngle > 360) 
+			{          
+				wispCurrentRotationCircleAngle -= 360;                        
+			}
+
+			pos = thePlayer.GetWorldPosition();
+			pos.Z += 0.8;
+		
+			if (thePlayer.IsInCombat())
+			{
+				target = thePlayer.moveTarget;
+			}
+			else 
+			{
+				lookatents.Clear();
+
+				FindGameplayEntitiesInCone( lookatents, thePlayer.GetWorldPosition() + theCamera.GetCameraDirection(), VecHeading( theCamera.GetCameraDirection() ), 120, 120, 1, , FLAG_ExcludePlayer );
+
+				for(i = 0; i < lookatents.Size(); i += 1)
+				{
+					if 
+					( 
+					lookatents[i] == GetWitcherPlayer() 
+					|| lookatents[i] == GetACSWatcher()
+					|| lookatents[i] == theCamera
+					)
+					{
+						continue;
+					}
+
+					for( j = lookatents.Size()-1; j >= 0; j -= 1 ) 
+					{	
+						lookatentsPos = lookatents[j].GetWorldPosition();
+						
+						if ( AbsF( lookatentsPos.Z - pos.Z ) > 2.5 )
+						{
+							lookatents.EraseFast(j);
+						}
+
+						if (lookatents.Size() > 0)
+						{
+							if ( lookatents[j] = thePlayer.GetDisplayTarget())
+							{
+								target = thePlayer.GetDisplayTarget();
+							}
+							else
+							{
+								gameLightComp = lookatents[j].GetComponentByClassName('CGameplayLightComponent');
+
+								gameInteractComp = lookatents[j].GetComponentByClassName('CInteractionComponent');
+
+								if(
+								(CNewNPC)lookatents[j]
+								|| (COilBarrelEntity)lookatents[j]
+								|| gameLightComp
+								|| gameInteractComp
+								|| (W3AnimationInteractionEntity)lookatents[j]
+								|| (CInteractiveEntity)lookatents[j]
+								|| (W3NoticeBoard)lookatents[j]
+								|| (W3FastTravelEntity)lookatents[j]
+								|| (W3SmartObject)lookatents[j]
+								|| (W3ItemRepairObject)lookatents[j]
+								|| (W3AlchemyTable)lookatents[j]
+								|| (W3Stables)lookatents[j]
+								|| (W3LockableEntity)lookatents[j] 
+								|| (W3Poster)lookatents[j]
+								|| (W3LadderInteraction)lookatents[j]
+								)
+								{
+									target = lookatents[j];
+								}
+							}
+						}
+					}	
+				}
+			}
+
+			playerPosition = TraceFloor(thePlayer.GetWorldPosition());
+			targetPosition = TraceFloor(target.GetWorldPosition());
+
+			playerRotation = thePlayer.GetWorldRotation();
+
+			targetRotation = target.GetWorldRotation();
+
+			if(target 
+			&& (theGame.IsFocusModeActive() 
+			|| (thePlayer.IsInCombat() 
+			|| thePlayer.IsThreatened()) 
+			&& target)
+			) 
+			{	
+				wispGoalPosition = targetPosition;
+
+				if (thePlayer.IsInCombat() || thePlayer.IsThreatened())
+				{
+					
+				}
+				else
+				{
+					
+				}
+			} 
+			else 
+			{
+				if (thePlayer.IsInCombat() || thePlayer.IsThreatened())
+				{
+					
+				}
+				else
+				{
+					
+				}
+
+				wispGoalPosition = playerPosition;
+			}
+			
+			wispGoalPosition += wispGoalPositionOffset;
+			wispGoalPosition.X += CosF(Deg2Rad(wispCurrentRotationCircleAngle)) * rotationCircleRadius;
+			wispGoalPosition.Y += SinF(Deg2Rad(wispCurrentRotationCircleAngle)) * rotationCircleRadius;
+
+			if ((thePlayer.IsInCombat() 
+			|| thePlayer.IsThreatened()) )
+			{
+				if (this.HasTag('ACS_Kestral_Attack_Mode'))
+				{
+					wispGoalPosition.Z += 4;
+				}
+				else
+				{
+					wispGoalPosition.Z += 4.5;
+				}
+			}
+			else
+			{
+				wispGoalPosition.Z += 6;
+			}
+		
+			attackposition = targetPosition;
+
+			targetDistance = VecDistanceSquared2D( this.GetWorldPosition(), targetPosition ) ;
+
+			if (thePlayer.IsInCombat())
+			{
+				kestral_damage();
+
+				if (kestral_can_attack())
+				{
+					refresh_kestral_attack_cooldown();
+
+					if(!this.HasTag('ACS_Kestral_Attack_Mode'))
+					{
+						//PlayEffect('teleport_in');
+						//StopEffect('teleport_in');
+
+						DestroyEffect('teleport_out');
+						PlayEffect('teleport_out');
+						//StopEffect('teleport_out');
+
+						DestroyEffect('disappear');
+						PlayEffect('disappear');
+
+						DestroyEffect('feathers_fx');
+
+						RemoveTimer('reveal_crow');
+						AddTimer('reveal_crow', 1, false);
+
+						this.AddTag('ACS_Kestral_Attack_Mode');
+					}
+					else if(this.HasTag('ACS_Kestral_Attack_Mode'))
+					{
+						//PlayEffect('teleport_in');
+						//StopEffect('teleport_in');
+
+						DestroyEffect('teleport_out');
+						PlayEffect('teleport_out');
+						//StopEffect('teleport_out');
+
+						DestroyEffect('disappear');
+						PlayEffect('disappear');
+
+						DestroyEffect('feathers_fx');
+
+						RemoveTimer('reveal_crow');
+						AddTimer('reveal_crow', 1, false);
+
+						this.RemoveTag('ACS_Kestral_Attack_Mode');
+					}
+				}
+
+				if(!this.HasTag('ACS_Kestral_In_Combat'))
+				{
+					this.AddTag('ACS_Kestral_In_Combat');
+				}
+
+				if (this.HasTag('ACS_Kestral_Attack_Mode'))
+				{
+					wispGoalPositionOffset_regenerateInSeconds -= deltaTime;
+
+					if(wispGoalPositionOffset_regenerateInSeconds < 0) 
+					{
+						wispGoalPositionOffset_regenerateInSeconds = 0.1;
+
+						wispGoalPositionOffset = VecNormalize(attackposition) * rotationCircleRadius;
+
+						wispGoalPositionOffset.Z -= 3;
+					}
+				}
+				else
+				{
+					wispGoalPositionOffset_regenerateInSeconds -= deltaTime;
+
+					if(wispGoalPositionOffset_regenerateInSeconds < 0) 
+					{
+						wispGoalPositionOffset_regenerateInSeconds = 0.1;
+
+						wispGoalPositionOffset = VecRand() * rotationCircleRadius * 0.01;
+
+						//wispGoalPositionOffset = VecNormalize(attackposition) * rotationCircleRadius;
+
+						//wispGoalPositionOffset.Z += 3;
+					}	
+				}
+			}
+			else
+			{
+				if(this.HasTag('ACS_Kestral_Attack_Mode'))
+				{
+					this.RemoveTag('ACS_Kestral_Attack_Mode');
+				}
+
+				if(this.HasTag('ACS_Kestral_In_Combat'))
+				{
+					DestroyEffect('teleport_out');
+					PlayEffect('teleport_out');
+
+					DestroyEffect('disappear');
+					PlayEffect('disappear');
+
+					DestroyEffect('feathers_fx');
+
+					RemoveTimer('reveal_crow');
+					AddTimer('reveal_crow', 2, false);
+
+					this.RemoveTag('ACS_Kestral_In_Combat');
+				}
+
+				wispGoalPositionOffset_regenerateInSeconds -= deltaTime;
+
+				if(wispGoalPositionOffset_regenerateInSeconds < 0) 
+				{
+					wispGoalPositionOffset_regenerateInSeconds = 0.1;
+
+					wispGoalPositionOffset = VecRand() * rotationCircleRadius * 0.01;
+				}	
+			}
+			
+			wispCurrentAcceleration = (wispGoalPosition - wispCurrentPosition) * accelerationMultiplier;
+	
+			if(VecLength(wispCurrentAcceleration) > maxAcceleration) 
+			{
+				wispCurrentAcceleration = VecNormalize(wispCurrentAcceleration) * maxAcceleration;
+			}
+
+			wispCurrentVelocity += wispCurrentAcceleration * deltaTime;
+
+			wispCurrentVelocity *= velocityDampeningFactor;
+
+			if(VecLength(wispCurrentVelocity) > maxVelocity) 
+			{
+				wispCurrentVelocity = VecNormalize(wispCurrentVelocity) * maxVelocity;
+			}
+	
+			if (theGame.GetWorld().NavigationComputeZ( wispCurrentPosition, wispCurrentPosition.Z - 2, wispCurrentPosition.Z + 2, navigationComputeZReturn ) )
+			{
+				if(AbsF(wispCurrentPosition.Z - navigationComputeZReturn) < 0.1) 
+				{
+					wispCurrentVelocity.Z *= -0.9;
+				}
+			}
+
+			wispCurrentPosition += wispCurrentVelocity * deltaTime;
+	
+			if(VecDistance(wispCurrentPosition, wispGoalPosition) > 100) {
+				wispCurrentPosition = wispGoalPosition;
+				wispCurrentVelocity = Vector(0,0,0);
+				wispCurrentAcceleration = Vector(0,0,0);
+			}
+	
+			wispCurrentRotation.Roll = -45;
+			wispCurrentRotation.Yaw += deltaTime * rotationCircleMovementSpeed;
+		}
+		else if (this.HasTag('ACS_Phoenix_Interior'))
+		{
+			bonePos = MatrixGetTranslation(thePlayer.GetBoneWorldMatrixByIndex(thePlayer.GetBoneIndex( 'l_shoulder' )));
+
+			wispCurrentPosition = bonePos + (thePlayer.GetWorldRight() * -0.5) + (thePlayer.GetWorldUp() * 0.5) + (thePlayer.GetWorldForward() * -0.25);
+
+			wispCurrentRotation = thePlayer.GetWorldRotation();
+
+			if (thePlayer.IsInCombat())
+			{
+				if (thePlayer.GetTarget())
+				{
+					kestral_lightning_interior();
+				}
+			}
+		}
+			
+		this.TeleportWithRotation(wispCurrentPosition, wispCurrentRotation); 
+    }   
+}
+
+function ACS_PhoenixCheck()
+{
+	var entity                          										:  CEntity;
+	var temp1, temp2                  											:  CEntityTemplate;
+    var path1, path2                   											:  string;
+
+	if (FactsQuerySum("ACS_Phoenix_Released") > 0 && thePlayer.inv.HasItem('acs_phoenix_ashes'))
+	{
+		ACSPhoenixDestroySingle();
+
+		ACSDestroyPhoenixEnts();
+
+		if (thePlayer.inv.HasItem('acs_phoenix_ashes'))
+		{
+			if (thePlayer.IsInInterior())
+			{
+				path2 = "dlc\dlc_acs\data\entities\items\acs_phoenix_interior.w2ent";
+
+				temp2 = (CEntityTemplate)LoadResource(path2,true);
+
+				entity = (W3ACSPhoenix)theGame.CreateEntity(temp2, thePlayer.GetWorldPosition() + Vector(0,0,2), thePlayer.GetWorldRotation());
+
+				entity.AddTag('ACS_Phoenix_Interior');
+			}
+			else
+			{
+				path1 = "dlc\dlc_acs\data\entities\items\acs_phoenix.w2ent";
+
+				temp1 = (CEntityTemplate)LoadResource(path1,true);
+
+				entity = (W3ACSPhoenix)theGame.CreateEntity(temp1, thePlayer.GetWorldPosition() + Vector(0,0,2), thePlayer.GetWorldRotation());
+
+				entity.AddTag('ACS_Phoenix_Exterior');
+			}
+
+			entity.AddTag('ACS_Phoenix');
+		}
+		else
+		{
+			FactsRemove("ACS_Phoenix_Released");
+		}
+	}
+}
+
+function ACSPhoenixDestroySingle()
+{
+	var entity 			 : W3ACSPhoenix;
+	
+	entity = (W3ACSPhoenix)theGame.GetEntityByTag( 'ACS_Phoenix' );
+	entity.RemoveTag('ACS_Phoenix');
+	entity.Destroy();
+}
+
+function ACSDestroyPhoenixEnts()
+{	
+	var ents 											: array<CEntity>;
+	var i												: int;
+
+	ents.Clear();
+
+	theGame.GetEntitiesByTag( 'ACS_Phoenix', ents );	
+	
+	for( i = 0; i < ents.Size(); i += 1 )
+	{
+		ents[i].RemoveTag('ACS_Phoenix');
+		
+		ents[i].Destroy();
+	}
+}
+
+function ACSPhoenix() : W3ACSPhoenix
+{
+	var entity 			 : W3ACSPhoenix;
+	
+	entity = (W3ACSPhoenix)theGame.GetEntityByTag( 'ACS_Phoenix' );
+	
+	return entity;
+}
+
+function ACSDestroyPhoenixEntsDelay()
+{	
+	var ents 											: array<CEntity>;
+	var i												: int;
+
+	ents.Clear();
+
+	theGame.GetEntitiesByTag( 'ACS_Phoenix', ents );	
+	
+	for( i = 0; i < ents.Size(); i += 1 )
+	{
+		ents[i].RemoveTag('ACS_Phoenix');
+
+		ents[i].DestroyAfter(1);
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////
 
 class W3ACSWolfHeartItem extends W3QuestUsableItem
 {
@@ -1406,7 +3580,7 @@ class W3ACSWolfHeartItem extends W3QuestUsableItem
 				return false;
 			}
 
-			ACS_Wolf_Heart_Tutorial();
+			GetACSWatcher().AddTimer('ACS_Wolf_Heart_Tutorial_Delay', 1, false);
 			
 			if (
 			FactsQuerySum("acs_wolf_companion_summoned") <= 0
@@ -1663,7 +3837,12 @@ class W3ACSPirateAmuletItem extends W3QuestUsableItem
 
 		if ( usedBy == GetWitcherPlayer() )
 		{
-			ACS_Pirate_Amulet_Tutorial();
+			if (!GetACSWatcher())
+			{
+				return false;
+			}
+
+			GetACSWatcher().AddTimer('ACS_Pirate_Amulet_Tutorial_Delay', 1, false);
 			
 			if (RandF() < 0.5)
 			{
