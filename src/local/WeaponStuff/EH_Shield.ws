@@ -87,11 +87,6 @@ state Aard_Pull in cACS_Shield_Summon
 
 	entry function AardPull_Entry()
 	{
-		AardPull_Latent();
-	}
-
-	latent function AardPull_Latent()
-	{	
 		if (!GetWitcherPlayer().HasTag('ACS_AardPull_Active'))
 		{
 			GetWitcherPlayer().AddTag('ACS_AardPull_Active');
@@ -100,11 +95,6 @@ state Aard_Pull in cACS_Shield_Summon
 		GetWitcherPlayer().PlayEffectSingle('swarm_gathers');
 		GetWitcherPlayer().StopEffect('swarm_gathers');
 
-		SpawnBats();
-	}
-
-	latent function SpawnBats()
-	{
 		playerPos = GetWitcherPlayer().GetWorldPosition();
 
 		playerRot = GetWitcherPlayer().GetWorldRotation();
@@ -210,11 +200,6 @@ state BruxaCamoDecoy in cACS_Shield_Summon
 	}
 
 	entry function BruxaCamo_Entry()
-	{
-		BruxaCamo_Latent();
-	}
-
-	latent function BruxaCamo_Latent()
 	{	
 		GetWitcherPlayer().StopAllEffects();
 		GetWitcherPlayer().DestroyEffect('shadowdash');
@@ -588,11 +573,6 @@ state Yrden_Revive_Normal in cACS_Shield_Summon
 
 	entry function Revive_Entry()
 	{
-		Revive_Latent();
-	}
-
-	latent function Revive_Latent()
-	{
 		entities.Clear();
 
 		FindGameplayEntitiesInRange( entities, GetWitcherPlayer(), 10, 10,, FLAG_ExcludePlayer,,'CNewNPC' );
@@ -758,11 +738,6 @@ state Yrden_Skele_Summon_Normal in cACS_Shield_Summon
 		Skele_Summon();
 	}
 
-	entry function Skele_Summon()
-	{
-		Skele_Summon_Actual();
-	}
-
 	latent function tomb_names_array()
 	{
 		tomb_names.Clear();
@@ -770,7 +745,7 @@ state Yrden_Skele_Summon_Normal in cACS_Shield_Summon
 		tomb_names.PushBack("dlc\bob\data\quests\minor_quests\quest_files\mq7017_talking_horse\entities\mq7017_tombstone.w2ent");
 	}
 
-	latent function Skele_Summon_Actual()
+	entry function Skele_Summon()
 	{
 		entities.Clear();
 
@@ -882,11 +857,6 @@ state Quen_Wolf_Summon in cACS_Shield_Summon
 	}
 	
 	entry function Wolf_Summon()
-	{
-		Wolf_Summon_Actual();
-	}
-	
-	latent function Wolf_Summon_Actual()
 	{	
 		actor = (CActor)( GetWitcherPlayer().GetTarget() );
 		
@@ -955,11 +925,6 @@ state Quen_Centipede_Summon in cACS_Shield_Summon
 	}
 	
 	entry function Centipede_Summon()
-	{
-		Centipede_Summon_Actual();
-	}
-	
-	latent function Centipede_Summon_Actual()
 	{	
 	
 		actor = (CActor)( GetWitcherPlayer().GetTarget() );
@@ -1022,15 +987,8 @@ state Axii_Shield in cACS_Shield_Summon
 		super.OnEnterState(prevStateName);
 		Shield_Summon();
 	}
-	
-	entry function Shield_Summon()
-	{
-		//shield_pre = (CEntity)theGame.GetEntityByTag( 'ACS_Shield' );
-		//shield_pre.Destroy();
-		SummonAxiiShield();
-	}
 
-	latent function SummonAxiiShield()
+	entry function Shield_Summon()
 	{	
 		//settings_interrupt.blendIn = 0;
 		//settings_interrupt.blendOut = 0;
@@ -1077,15 +1035,10 @@ state Axii_Persistent_Shield in cACS_Shield_Summon
 	}
 	
 	entry function Persistent_Shield_Summon()
-	{
-		//Sleep(0.5);
+	{	
 		shield_pre = (CEntity)theGame.GetEntityByTag( 'ACS_Shield' );
 		shield_pre.Destroy();
-		Persistent_SummonAxiiShield();
-	}
 
-	latent function Persistent_SummonAxiiShield()
-	{	
 		if (GetWitcherPlayer().HasTag('ACS_Special_Dodge'))
 		{
 			GetWitcherPlayer().RemoveTag('ACS_Special_Dodge');
@@ -1603,13 +1556,8 @@ state Bruxa_Camo_Decoy_Deactivate_Claw_Equip_Standalone_Engage in cBruxa_Camo_De
 		super.OnEnterState(prevStateName);
 		ClawEquipStandalone_Entry();
 	}
-	
+
 	entry function ClawEquipStandalone_Entry()
-	{
-		ClawEquipStandalone_Latent();
-	}
-	
-	latent function ClawEquipStandalone_Latent()
 	{
 		/*
 		ACS_Vampire_Arms_1_Get().Destroy();

@@ -22,16 +22,11 @@ state ACS_Hood_Enable_Engage in cACS_Hood
 	event OnEnterState(prevStateName : name)
 	{
 		super.OnEnterState(prevStateName);
-		Hood_Enable_Entry();
-	}
-	
-	entry function Hood_Enable_Entry()
-	{
 		Hood_Enable_Latent();
 		Hair_Thing();
 	}
 	
-	latent function Hood_Enable_Latent()
+	entry function Hood_Enable_Latent()
 	{
 		l_actor = thePlayer;
 		l_comp = l_actor.GetComponentByClassName( 'CAppearanceComponent' );	
@@ -200,7 +195,7 @@ state ACS_Hood_Enable_Engage in cACS_Hood
 		((CAppearanceComponent)l_comp).IncludeAppearanceTemplate(temp_1);
 	}
 
-	latent function Hair_Thing()
+	entry function Hair_Thing()
 	{
 		var inv : CInventoryComponent;
 		var witcher : W3PlayerWitcher;
@@ -248,13 +243,8 @@ state ACS_Hood_Disable_Engage in cACS_Hood
 		super.OnEnterState(prevStateName);
 		Hood_Disable_Entry();
 	}
-	
+
 	entry function Hood_Disable_Entry()
-	{
-		Hood_Disable_Latent();
-	}
-	
-	latent function Hood_Disable_Latent()
 	{
 		l_actor = thePlayer;
 		l_comp = l_actor.GetComponentByClassName( 'CAppearanceComponent' );
@@ -467,13 +457,8 @@ state Engage in cACS_Facegear_Include
 		super.OnEnterState(prevStateName);
 		Facegear_Include();
 	}
-	
+
 	entry function Facegear_Include()
-	{
-		Facegear_Include_Start();
-	}
-	
-	latent function Facegear_Include_Start()
 	{	
 		l_actor = thePlayer;
 		l_comp = l_actor.GetComponentByClassName( 'CAppearanceComponent' );
@@ -509,13 +494,8 @@ state Engage in cACS_Facegear_Exclude
 		super.OnEnterState(prevStateName);
 		Facegear_Exclude();
 	}
-	
+
 	entry function Facegear_Exclude()
-	{
-		Facegear_Exclude_Start();
-	}
-	
-	latent function Facegear_Exclude_Start()
 	{	
 		l_actor = thePlayer;
 		l_comp = l_actor.GetComponentByClassName( 'CAppearanceComponent' );
@@ -562,13 +542,8 @@ state AttachEredinSkirt in cACS_Wildhunt_Additional_Pieces
 		super.OnEnterState(prevStateName);
 		AttachEredinSkirt_Entry();
 	}
-	
+
 	entry function AttachEredinSkirt_Entry()
-	{
-		AttachEredinSkirt_Latent();
-	}
-	
-	latent function AttachEredinSkirt_Latent()
 	{	
 		var ent, anchor											            : CEntity;
 		var rot, attach_rot, bone_rot                        				: EulerAngles;
@@ -628,13 +603,8 @@ state AttachEredinCloak in cACS_Wildhunt_Additional_Pieces
 		super.OnEnterState(prevStateName);
 		AttachEredinCloak_Entry();
 	}
-	
+
 	entry function AttachEredinCloak_Entry()
-	{
-		AttachEredinCloak_Latent();
-	}
-	
-	latent function AttachEredinCloak_Latent()
 	{	
 		var ent, anchor											            : CEntity;
 		var rot, attach_rot, bone_rot                        				: EulerAngles;
@@ -705,13 +675,8 @@ state AttachVGXEredinCloak in cACS_Wildhunt_Additional_Pieces
 		super.OnEnterState(prevStateName);
 		AttachVGXEredinCloak_Entry();
 	}
-	
+
 	entry function AttachVGXEredinCloak_Entry()
-	{
-		AttachVGXEredinCloak_Latent();
-	}
-	
-	latent function AttachVGXEredinCloak_Latent()
 	{	
 		var ent, anchor											            : CEntity;
 		var rot, attach_rot, bone_rot                        				: EulerAngles;
@@ -782,13 +747,8 @@ state AttachImlerithSkirt in cACS_Wildhunt_Additional_Pieces
 		super.OnEnterState(prevStateName);
 		AttachImlerithSkirt_Entry();
 	}
-	
+
 	entry function AttachImlerithSkirt_Entry()
-	{
-		AttachImlerithSkirt_Latent();
-	}
-	
-	latent function AttachImlerithSkirt_Latent()
 	{	
 		var ent, anchor											            : CEntity;
 		var rot, attach_rot, bone_rot                        				: EulerAngles;
@@ -970,13 +930,8 @@ state ACS_Witcher_Bear_Armor_Fur_Include in cACS_Knight_Additional_Pieces
 		super.OnEnterState(prevStateName);
 		ACS_Witcher_Bear_Armor_Fur_Include_Entry();
 	}
-	
+
 	entry function ACS_Witcher_Bear_Armor_Fur_Include_Entry()
-	{
-		ACS_Witcher_Bear_Armor_Fur_Include_Latent();
-	}
-	
-	latent function ACS_Witcher_Bear_Armor_Fur_Include_Latent()
 	{	
 		var p_comp				: CComponent;
 		var temp				: CEntityTemplate;
@@ -1018,11 +973,6 @@ state ACS_Witcher_Bear_Armor_Fur_Exclude in cACS_Knight_Additional_Pieces
 	}
 	
 	entry function ACS_Witcher_Bear_Armor_Fur_Exclude_Entry()
-	{
-		ACS_Witcher_Bear_Armor_Fur_Exclude_Latent();
-	}
-	
-	latent function ACS_Witcher_Bear_Armor_Fur_Exclude_Latent()
 	{	
 		var p_comp				: CComponent;
 		var temp				: CEntityTemplate;
@@ -1065,12 +1015,8 @@ state ACS_Knight_Armor_V1_Pieces_Include in cACS_Knight_Additional_Pieces
 		ACS_Knight_Armor_V1_Pieces_Include_Entry();
 	}
 	
+
 	entry function ACS_Knight_Armor_V1_Pieces_Include_Entry()
-	{
-		ACS_Knight_Armor_V1_Pieces_Include_Latent();
-	}
-	
-	latent function ACS_Knight_Armor_V1_Pieces_Include_Latent()
 	{	
 		var p_comp				: CComponent;
 		var temp				: CEntityTemplate;
@@ -1145,13 +1091,8 @@ state ACS_Knight_Armor_V1_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		super.OnEnterState(prevStateName);
 		ACS_Knight_Armor_V1_Pieces_Exclude_Entry();
 	}
-	
+
 	entry function ACS_Knight_Armor_V1_Pieces_Exclude_Entry()
-	{
-		ACS_Knight_Armor_V1_Pieces_Exclude_Latent();
-	}
-	
-	latent function ACS_Knight_Armor_V1_Pieces_Exclude_Latent()
 	{	
 		var p_comp				: CComponent;
 		var temp				: CEntityTemplate;
@@ -1232,11 +1173,6 @@ state ACS_Knight_Armor_V2_Pieces_Include in cACS_Knight_Additional_Pieces
 	}
 	
 	entry function ACS_Knight_Armor_V2_Pieces_Include_Entry()
-	{
-		ACS_Knight_Armor_V2_Pieces_Include_Latent();
-	}
-	
-	latent function ACS_Knight_Armor_V2_Pieces_Include_Latent()
 	{	
 		var p_comp				: CComponent;
 		var temp				: CEntityTemplate;
@@ -1312,13 +1248,8 @@ state ACS_Knight_Armor_V2_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		super.OnEnterState(prevStateName);
 		ACS_Knight_Armor_V2_Pieces_Exclude_Entry();
 	}
-	
+
 	entry function ACS_Knight_Armor_V2_Pieces_Exclude_Entry()
-	{
-		ACS_Knight_Armor_V2_Pieces_Exclude_Latent();
-	}
-	
-	latent function ACS_Knight_Armor_V2_Pieces_Exclude_Latent()
 	{	
 		var p_comp				: CComponent;
 		var temp				: CEntityTemplate;
@@ -1397,11 +1328,6 @@ state ACS_Knight_Armor_V3_Pieces_Include in cACS_Knight_Additional_Pieces
 	}
 	
 	entry function ACS_Knight_Armor_V3_Pieces_Include_Entry()
-	{
-		ACS_Knight_Armor_V3_Pieces_Include_Latent();
-	}
-	
-	latent function ACS_Knight_Armor_V3_Pieces_Include_Latent()
 	{	
 		var p_comp				: CComponent;
 		var temp				: CEntityTemplate;
@@ -1487,11 +1413,6 @@ state ACS_Knight_Armor_V3_Pieces_Exclude in cACS_Knight_Additional_Pieces
 	}
 	
 	entry function ACS_Knight_Armor_V3_Pieces_Exclude_Entry()
-	{
-		ACS_Knight_Armor_V3_Pieces_Exclude_Latent();
-	}
-	
-	latent function ACS_Knight_Armor_V3_Pieces_Exclude_Latent()
 	{	
 		var p_comp				: CComponent;
 		var temp				: CEntityTemplate;
@@ -1579,11 +1500,6 @@ state ACS_Witcher_Knight_Armor_V1_Pieces_Include in cACS_Knight_Additional_Piece
 	}
 	
 	entry function ACS_Witcher_Knight_Armor_V1_Pieces_Include_Entry()
-	{
-		ACS_Witcher_Knight_Armor_V1_Pieces_Include_Latent();
-	}
-	
-	latent function ACS_Witcher_Knight_Armor_V1_Pieces_Include_Latent()
 	{	
 		var p_comp				: CComponent;
 		var temp				: CEntityTemplate;
@@ -1641,11 +1557,6 @@ state ACS_Witcher_Knight_Armor_V1_Pieces_Exclude in cACS_Knight_Additional_Piece
 	}
 	
 	entry function ACS_Witcher_Knight_Armor_V1_Pieces_Exclude_Entry()
-	{
-		ACS_Witcher_Knight_Armor_V1_Pieces_Exclude_Latent();
-	}
-	
-	latent function ACS_Witcher_Knight_Armor_V1_Pieces_Exclude_Latent()
 	{	
 		var p_comp				: CComponent;
 		var temp				: CEntityTemplate;
@@ -1705,13 +1616,8 @@ state ACS_Witcher_Knight_Armor_V2_Pieces_Include in cACS_Knight_Additional_Piece
 		super.OnEnterState(prevStateName);
 		ACS_Witcher_Knight_Armor_V2_Pieces_Include_Entry();
 	}
-	
+
 	entry function ACS_Witcher_Knight_Armor_V2_Pieces_Include_Entry()
-	{
-		ACS_Witcher_Knight_Armor_V2_Pieces_Include_Latent();
-	}
-	
-	latent function ACS_Witcher_Knight_Armor_V2_Pieces_Include_Latent()
 	{	
 		var p_comp				: CComponent;
 		var temp				: CEntityTemplate;
@@ -1771,11 +1677,6 @@ state ACS_Witcher_Knight_Armor_V2_Pieces_Exclude in cACS_Knight_Additional_Piece
 	}
 	
 	entry function ACS_Witcher_Knight_Armor_V2_Pieces_Exclude_Entry()
-	{
-		ACS_Witcher_Knight_Armor_V2_Pieces_Exclude_Latent();
-	}
-	
-	latent function ACS_Witcher_Knight_Armor_V2_Pieces_Exclude_Latent()
 	{	
 		var p_comp				: CComponent;
 		var temp				: CEntityTemplate;
@@ -1835,13 +1736,8 @@ state ACS_Witcher_Knight_Armor_V3_Pieces_Include in cACS_Knight_Additional_Piece
 		super.OnEnterState(prevStateName);
 		ACS_Witcher_Knight_Armor_V3_Pieces_Include_Entry();
 	}
-	
+
 	entry function ACS_Witcher_Knight_Armor_V3_Pieces_Include_Entry()
-	{
-		ACS_Witcher_Knight_Armor_V3_Pieces_Include_Latent();
-	}
-	
-	latent function ACS_Witcher_Knight_Armor_V3_Pieces_Include_Latent()
 	{	
 		var p_comp				: CComponent;
 		var temp				: CEntityTemplate;
@@ -1907,13 +1803,8 @@ state ACS_Witcher_Knight_Armor_V3_Pieces_Exclude in cACS_Knight_Additional_Piece
 		super.OnEnterState(prevStateName);
 		ACS_Witcher_Knight_Armor_V3_Pieces_Exclude_Entry();
 	}
-	
+
 	entry function ACS_Witcher_Knight_Armor_V3_Pieces_Exclude_Entry()
-	{
-		ACS_Witcher_Knight_Armor_V3_Pieces_Exclude_Latent();
-	}
-	
-	latent function ACS_Witcher_Knight_Armor_V3_Pieces_Exclude_Latent()
 	{	
 		var p_comp				: CComponent;
 		var temp				: CEntityTemplate;
@@ -1981,13 +1872,8 @@ state ACS_Knight_Armor_Gold_V1_Pieces_Include in cACS_Knight_Additional_Pieces
 		super.OnEnterState(prevStateName);
 		ACS_Knight_Armor_Gold_V1_Pieces_Include_Entry();
 	}
-	
+
 	entry function ACS_Knight_Armor_Gold_V1_Pieces_Include_Entry()
-	{
-		ACS_Knight_Armor_Gold_V1_Pieces_Include_Latent();
-	}
-	
-	latent function ACS_Knight_Armor_Gold_V1_Pieces_Include_Latent()
 	{	
 		var p_comp				: CComponent;
 		var temp				: CEntityTemplate;
@@ -2063,13 +1949,8 @@ state ACS_Knight_Armor_Gold_V1_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		super.OnEnterState(prevStateName);
 		ACS_Knight_Armor_Gold_V1_Pieces_Exclude_Entry();
 	}
-	
+
 	entry function ACS_Knight_Armor_Gold_V1_Pieces_Exclude_Entry()
-	{
-		ACS_Knight_Armor_Gold_V1_Pieces_Exclude_Latent();
-	}
-	
-	latent function ACS_Knight_Armor_Gold_V1_Pieces_Exclude_Latent()
 	{	
 		var p_comp				: CComponent;
 		var temp				: CEntityTemplate;
@@ -2148,11 +2029,6 @@ state ACS_Knight_Armor_Gold_V2_Pieces_Include in cACS_Knight_Additional_Pieces
 	}
 	
 	entry function ACS_Knight_Armor_Gold_V2_Pieces_Include_Entry()
-	{
-		ACS_Knight_Armor_Gold_V2_Pieces_Include_Latent();
-	}
-	
-	latent function ACS_Knight_Armor_Gold_V2_Pieces_Include_Latent()
 	{	
 		var p_comp				: CComponent;
 		var temp				: CEntityTemplate;
@@ -2236,11 +2112,6 @@ state ACS_Knight_Armor_Gold_V2_Pieces_Exclude in cACS_Knight_Additional_Pieces
 	}
 	
 	entry function ACS_Knight_Armor_Gold_V2_Pieces_Exclude_Entry()
-	{
-		ACS_Knight_Armor_Gold_V2_Pieces_Exclude_Latent();
-	}
-	
-	latent function ACS_Knight_Armor_Gold_V2_Pieces_Exclude_Latent()
 	{	
 		var p_comp				: CComponent;
 		var temp				: CEntityTemplate;
@@ -2325,13 +2196,8 @@ state ACS_Vampire_Armor_Black_Pieces_Include in cACS_Knight_Additional_Pieces
 		super.OnEnterState(prevStateName);
 		ACS_Vampire_Armor_Black_Pieces_Include_Entry();
 	}
-	
+
 	entry function ACS_Vampire_Armor_Black_Pieces_Include_Entry()
-	{
-		ACS_Vampire_Armor_Black_Pieces_Include_Latent();
-	}
-	
-	latent function ACS_Vampire_Armor_Black_Pieces_Include_Latent()
 	{	
 		var p_comp				: CComponent;
 		var temp				: CEntityTemplate;
@@ -2410,11 +2276,6 @@ state ACS_Vampire_Armor_Black_Pieces_Exclude in cACS_Knight_Additional_Pieces
 	}
 	
 	entry function ACS_Vampire_Armor_Black_Pieces_Exclude_Entry()
-	{
-		ACS_Vampire_Armor_Black_Pieces_Exclude_Latent();
-	}
-	
-	latent function ACS_Vampire_Armor_Black_Pieces_Exclude_Latent()
 	{	
 		var p_comp				: CComponent;
 		var temp				: CEntityTemplate;
@@ -2495,11 +2356,6 @@ state ACS_Vampire_Armor_Red_Pieces_Include in cACS_Knight_Additional_Pieces
 	
 	entry function ACS_Vampire_Armor_Red_Pieces_Include_Entry()
 	{
-		ACS_Vampire_Armor_Red_Pieces_Include_Latent();
-	}
-	
-	latent function ACS_Vampire_Armor_Red_Pieces_Include_Latent()
-	{	
 		var p_comp				: CComponent;
 		var temp				: CEntityTemplate;
 
@@ -2577,11 +2433,6 @@ state ACS_Vampire_Armor_Red_Pieces_Exclude in cACS_Knight_Additional_Pieces
 	
 	entry function ACS_Vampire_Armor_Red_Pieces_Exclude_Entry()
 	{
-		ACS_Vampire_Armor_Red_Pieces_Exclude_Latent();
-	}
-	
-	latent function ACS_Vampire_Armor_Red_Pieces_Exclude_Latent()
-	{	
 		var p_comp				: CComponent;
 		var temp				: CEntityTemplate;
 
@@ -2672,11 +2523,6 @@ state Engage in cACS_Crach_Cape_Include
 	}
 	
 	entry function Crach_Cape_Include()
-	{
-		Crach_Cape_Include_Start();
-	}
-	
-	latent function Crach_Cape_Include_Start()
 	{	
 		l_actor = thePlayer;
 		l_comp = l_actor.GetComponentByClassName( 'CAppearanceComponent' );
@@ -2714,11 +2560,6 @@ state Engage in cACS_Crach_Cape_Exclude
 	}
 	
 	entry function Crach_Cape_Exclude()
-	{
-		Crach_Cape_Exclude_Start();
-	}
-	
-	latent function Crach_Cape_Exclude_Start()
 	{	
 		l_actor = thePlayer;
 		l_comp = l_actor.GetComponentByClassName( 'CAppearanceComponent' );
@@ -2754,14 +2595,9 @@ state Engage in cACS_Warden_Tail_Include
 		super.OnEnterState(prevStateName);
 		Warden_Tail_Include();
 	}
-	
+
 	entry function Warden_Tail_Include()
 	{
-		Warden_Tail_Include_Start();
-	}
-	
-	latent function Warden_Tail_Include_Start()
-	{	
 		l_actor = thePlayer;
 		l_comp = l_actor.GetComponentByClassName( 'CAppearanceComponent' );
 
@@ -2803,11 +2639,6 @@ state Engage in cACS_Warden_Tail_Exclude
 	
 	entry function Warden_Tail_Exclude()
 	{
-		Warden_Tail_Exclude_Start();
-	}
-	
-	latent function Warden_Tail_Exclude_Start()
-	{	
 		l_actor = thePlayer;
 		l_comp = l_actor.GetComponentByClassName( 'CAppearanceComponent' );
 
@@ -2853,11 +2684,7 @@ state Engage in cACS_Additional_Helmets
 	event OnEnterState(prevStateName : name)
 	{
 		super.OnEnterState(prevStateName);
-		Additional_Helmets();
-	}
-	
-	entry function Additional_Helmets()
-	{
+
 		GetACSWatcher().Additional_Helmets_Destroy();
 
 		if ( ACS_SOI_Installed() && ACS_SOI_Enabled())
@@ -2870,7 +2697,7 @@ state Engage in cACS_Additional_Helmets
 		}
 	}
 	
-	latent function Helmets_Attach_Shades()
+	entry function Helmets_Attach_Shades()
 	{	
 		l_actor = thePlayer;
 		l_comp = l_actor.GetComponentByClassName( 'CAppearanceComponent' );
@@ -2993,7 +2820,7 @@ state Engage in cACS_Additional_Helmets
 		helm_4.AddTag('acs_helm_4');
 	}
 
-	latent function Helmets_Attach()
+	entry function Helmets_Attach()
 	{	
 		l_actor = thePlayer;
 		l_comp = l_actor.GetComponentByClassName( 'CAppearanceComponent' );
@@ -3176,11 +3003,7 @@ state Engage in cACS_Additional_Helmet_Appearance_Destroy
 	event OnEnterState(prevStateName : name)
 	{
 		super.OnEnterState(prevStateName);
-		Additional_Helmet_Appearance();
-	}
-	
-	entry function Additional_Helmet_Appearance()
-	{
+
 		if ( ACS_SOI_Installed() && ACS_SOI_Enabled())
 		{
 			Helmet_Appearance_Exclude_Shades();
@@ -3191,7 +3014,7 @@ state Engage in cACS_Additional_Helmet_Appearance_Destroy
 		}
 	}
 	
-	latent function Helmet_Appearance_Exclude_Shades()
+	entry function Helmet_Appearance_Exclude_Shades()
 	{	
 		l_actor = thePlayer;
 		l_comp = l_actor.GetComponentByClassName( 'CAppearanceComponent' );
@@ -3226,7 +3049,7 @@ state Engage in cACS_Additional_Helmet_Appearance_Destroy
 		ids.Clear();
 	}
 
-	latent function Helmet_Appearance_Exclude()
+	entry function Helmet_Appearance_Exclude()
 	{	
 		l_actor = thePlayer;
 		l_comp = l_actor.GetComponentByClassName( 'CAppearanceComponent' );
@@ -3289,13 +3112,8 @@ state Engage in cACS_Shoulder_Armor_Toggle_On
 		super.OnEnterState(prevStateName);
 		Shoulder_Armor_Toggle_On();
 	}
-	
+
 	entry function Shoulder_Armor_Toggle_On()
-	{
-		Toggle_On();
-	}
-	
-	latent function Toggle_On()
 	{	
 		l_actor = thePlayer;
 		l_comp = l_actor.GetComponentByClassName( 'CAppearanceComponent' );
@@ -3345,13 +3163,8 @@ state Engage in cACS_Shoulder_Armor_Toggle_Off
 		super.OnEnterState(prevStateName);
 		Shoulder_Armor_Toggle_Off();
 	}
-	
+
 	entry function Shoulder_Armor_Toggle_Off()
-	{
-		Toggle_Off();
-	}
-	
-	latent function Toggle_Off()
 	{	
 		l_actor = thePlayer;
 		l_comp = l_actor.GetComponentByClassName( 'CAppearanceComponent' );
@@ -3401,13 +3214,8 @@ state Engage in cACS_Fur_Toggle_On
 		super.OnEnterState(prevStateName);
 		Fur_Toggle_On();
 	}
-	
+
 	entry function Fur_Toggle_On()
-	{
-		Toggle_On();
-	}
-	
-	latent function Toggle_On()
 	{	
 		l_actor = thePlayer;
 		l_comp = l_actor.GetComponentByClassName( 'CAppearanceComponent' );
@@ -3454,14 +3262,9 @@ state Engage in cACS_Fur_Toggle_Off
 		super.OnEnterState(prevStateName);
 		Fur_Toggle_Off();
 	}
-	
+
 	entry function Fur_Toggle_Off()
 	{
-		Toggle_Off();
-	}
-	
-	latent function Toggle_Off()
-	{	
 		l_actor = thePlayer;
 		l_comp = l_actor.GetComponentByClassName( 'CAppearanceComponent' );
 
@@ -3509,11 +3312,6 @@ state Engage in cACS_Cape_Toggle_On
 	}
 	
 	entry function Cape_Toggle_On()
-	{
-		Toggle_On();
-	}
-	
-	latent function Toggle_On()
 	{	
 		l_actor = thePlayer;
 		l_comp = l_actor.GetComponentByClassName( 'CAppearanceComponent' );
@@ -3559,11 +3357,6 @@ state Engage in cACS_Cape_Toggle_Off
 	}
 	
 	entry function Cape_Toggle_Off()
-	{
-		Toggle_Off();
-	}
-	
-	latent function Toggle_Off()
 	{	
 		l_actor = thePlayer;
 		l_comp = l_actor.GetComponentByClassName( 'CAppearanceComponent' );
@@ -3694,13 +3487,8 @@ state Normal in cACS_Swordsanoo
 		super.OnEnterState(prevStateName);
 		Swordsanoo_Normal_Entry();
 	}
-	
+
 	entry function Swordsanoo_Normal_Entry()
-	{
-		Swordsanoo_Normal_Attach();
-	}
-	
-	latent function Swordsanoo_Normal_Attach()
 	{	
 		ACS_Swordsanoo_Destroy();
 		
@@ -4026,11 +3814,6 @@ state Energy in cACS_Swordsanoo
 	
 	entry function Swordsanoo_Energy_Entry()
 	{
-		Swordsanoo_Energy_Attach();
-	}
-	
-	latent function Swordsanoo_Energy_Attach()
-	{	
 		ACS_Swordsanoo_Destroy();
 		
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

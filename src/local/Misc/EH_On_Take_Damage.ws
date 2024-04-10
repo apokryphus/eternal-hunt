@@ -4,95 +4,22 @@ function ACS_OnTakeDamage(action: W3DamageAction)
 	var movementAdjustor				: CMovementAdjustor;
 	var ticket 							: SMovementAdjustmentRequestTicket;
 
-
 	if (GetWitcherPlayer().HasTag('ACS_IsPerformingFinisher')
 	|| GetWitcherPlayer().IsPerformingFinisher())
 	{
 		return;
 	}
 
-	if( GetWitcherPlayer().HasBuff( EET_Mutation11Immortal ) )
+	if( (GetWitcherPlayer().IsActionBlockedBy(EIAB_Movement, 'Mutation11') 
+	&& GetWitcherPlayer().IsMutationActive( EPMT_Mutation11 ) 
+	&& !GetWitcherPlayer().HasBuff( EET_Mutation11Debuff ) 
+	&& !GetWitcherPlayer().IsInAir())
+	|| (GetWitcherPlayer().HasBuff( EET_Mutation11Immortal ))
+	)
 	{
 		ACS_ThingsThatShouldBeRemoved();
 
-		if (ACS_Transformation_Werewolf_Check())
-		{
-			GetACSWatcher().DisableWerewolf_Actual();
-		}
-
-		if (ACS_Transformation_Vampiress_Check())
-		{
-			GetACSWatcher().DisableVampiress_Actual();
-		}
-
-		if (ACS_Transformation_Vampire_Monster_Check())
-		{
-			GetACSWatcher().DisableTransformationVampireMonster_Actual_No_Teleport();
-		}
-
-		if (ACS_Transformation_Toad_Check())
-		{
-			GetACSWatcher().DisableTransformationToad_Actual();
-		}
-
-		if (ACS_Transformation_Red_Miasmal_Check())
-		{
-			GetACSWatcher().DisableRedMiasmal_Actual();
-		}
-
-		if (ACS_Transformation_Sharley_Check())
-		{
-			GetACSWatcher().DisableSharley_Actual();
-		}
-
-		if (ACS_Transformation_Black_Wolf_Check())
-		{
-			GetACSWatcher().DisableBlackWolf_Actual();
-		}
-
-		GetWitcherPlayer().AddTag('ACS_Second_Life_Active');
-
-		return;
-	}
-
-	if( GetWitcherPlayer().IsActionBlockedBy(EIAB_Movement, 'Mutation11') && GetWitcherPlayer().IsMutationActive( EPMT_Mutation11 ) && !GetWitcherPlayer().HasBuff( EET_Mutation11Debuff ) && !GetWitcherPlayer().IsInAir() )
-	{
-		ACS_ThingsThatShouldBeRemoved();
-
-		if (ACS_Transformation_Werewolf_Check())
-		{
-			GetACSWatcher().DisableWerewolf_Actual();
-		}
-
-		if (ACS_Transformation_Vampiress_Check())
-		{
-			GetACSWatcher().DisableVampiress_Actual();
-		}
-
-		if (ACS_Transformation_Vampire_Monster_Check())
-		{
-			GetACSWatcher().DisableTransformationVampireMonster_Actual_No_Teleport();
-		}
-
-		if (ACS_Transformation_Toad_Check())
-		{
-			GetACSWatcher().DisableTransformationToad_Actual();
-		}
-
-		if (ACS_Transformation_Red_Miasmal_Check())
-		{
-			GetACSWatcher().DisableRedMiasmal_Actual();
-		}
-
-		if (ACS_Transformation_Sharley_Check())
-		{
-			GetACSWatcher().DisableSharley_Actual();
-		}
-
-		if (ACS_Transformation_Black_Wolf_Check())
-		{
-			GetACSWatcher().DisableBlackWolf_Actual();
-		}
+		GetACSWatcher().ACS_TransformationDisable();
 
 		GetWitcherPlayer().AddTag('ACS_Second_Life_Active');
 
@@ -281,6 +208,10 @@ function ACS_OnTakeDamage(action: W3DamageAction)
 
 	ACS_Maerolorn_On_Take_Damage(action);
 
+	ACS_Mourntart_On_Take_Damage(action);
+
+	ACS_MonsterHuntMonster_On_Take_Damage(action);
+
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	ACS_Ghoul_Base_On_Take_Damage(action);
@@ -293,7 +224,7 @@ function ACS_OnTakeDamage(action: W3DamageAction)
 
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+	
 	ACS_Enemy_On_Take_Damage_General(action);
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -385,6 +316,8 @@ function ACS_OnTakeDamage(action: W3DamageAction)
 	ACS_Botchling_Attack(action);
 
 	ACS_Draugir_Attack(action);
+	
+	ACS_Mourntart_Attack(action);
 
 	//ACS_Infected_Prime_Attack(action);
 
@@ -448,40 +381,7 @@ function ACS_OnTakeDamage(action: W3DamageAction)
 			{
 				if (FactsQuerySum("ACS_Enter_Unconscious_Start") <= 0)
 				{
-					if (ACS_Transformation_Werewolf_Check())
-					{
-						GetACSWatcher().DisableWerewolf();
-					}
-
-					if (ACS_Transformation_Vampiress_Check())
-					{
-						GetACSWatcher().DisableVampiress();
-					}
-
-					if (ACS_Transformation_Vampire_Monster_Check())
-					{
-						GetACSWatcher().DisableTransformationVampireMonster();
-					}
-
-					if (ACS_Transformation_Toad_Check())
-					{
-						GetACSWatcher().DisableTransformationToad();
-					}
-
-					if (ACS_Transformation_Red_Miasmal_Check())
-					{
-						GetACSWatcher().DisableRedMiasmal_Actual();
-					}
-
-					if (ACS_Transformation_Sharley_Check())
-					{
-						GetACSWatcher().DisableSharley_Actual();
-					}
-
-					if (ACS_Transformation_Black_Wolf_Check())
-					{
-						GetACSWatcher().DisableBlackWolf_Actual();
-					}
+					GetACSWatcher().ACS_TransformationDisable();
 
 					ACS_Guards_Tutorial();
 
@@ -630,40 +530,7 @@ function ACS_OnTakeDamage(action: W3DamageAction)
 					{
 						ACS_ThingsThatShouldBeRemoved();
 
-						if (ACS_Transformation_Werewolf_Check())
-						{
-							GetACSWatcher().DisableWerewolf_Actual();
-						}
-
-						if (ACS_Transformation_Vampiress_Check())
-						{
-							GetACSWatcher().DisableVampiress_Actual();
-						}
-
-						if (ACS_Transformation_Vampire_Monster_Check())
-						{
-							GetACSWatcher().DisableTransformationVampireMonster_Actual_No_Teleport();
-						}
-
-						if (ACS_Transformation_Toad_Check())
-						{
-							GetACSWatcher().DisableTransformationToad_Actual();
-						}
-
-						if (ACS_Transformation_Red_Miasmal_Check())
-						{
-							GetACSWatcher().DisableRedMiasmal_Actual();
-						}
-
-						if (ACS_Transformation_Sharley_Check())
-						{
-							GetACSWatcher().DisableSharley_Actual();
-						}
-
-						if (ACS_Transformation_Black_Wolf_Check())
-						{
-							GetACSWatcher().DisableBlackWolf_Actual();
-						}
+						GetACSWatcher().ACS_TransformationDisable();
 
 						GetWitcherPlayer().EnableCharacterCollisions(true); 
 
@@ -779,40 +646,7 @@ function ACS_OnTakeDamage(action: W3DamageAction)
 		{
 			ACS_ThingsThatShouldBeRemoved();
 
-			if (ACS_Transformation_Werewolf_Check())
-			{
-				GetACSWatcher().DisableWerewolf_Actual();
-			}
-
-			if (ACS_Transformation_Vampiress_Check())
-			{
-				GetACSWatcher().DisableVampiress_Actual();
-			}
-
-			if (ACS_Transformation_Vampire_Monster_Check())
-			{
-				GetACSWatcher().DisableTransformationVampireMonster_Actual_No_Teleport();
-			}
-
-			if (ACS_Transformation_Toad_Check())
-			{
-				GetACSWatcher().DisableTransformationToad_Actual();
-			}
-
-			if (ACS_Transformation_Red_Miasmal_Check())
-			{
-				GetACSWatcher().DisableRedMiasmal_Actual();
-			}
-
-			if (ACS_Transformation_Sharley_Check())
-			{
-				GetACSWatcher().DisableSharley_Actual();
-			}
-
-			if (ACS_Transformation_Black_Wolf_Check())
-			{
-				GetACSWatcher().DisableBlackWolf_Actual();
-			}
+			GetACSWatcher().ACS_TransformationDisable();
 
 			thePlayer.AddTag('ACS_Second_Life_Active');
 		}
@@ -861,40 +695,7 @@ function ACS_Player_Fall_Negate(action: W3DamageAction)
 
 					GetWitcherPlayer().SetIsCurrentlyDodging(false);
 
-					if (ACS_Transformation_Werewolf_Check())
-					{
-						GetACSWatcher().DisableWerewolf_Actual();
-					}
-
-					if (ACS_Transformation_Vampiress_Check())
-					{
-						GetACSWatcher().DisableVampiress_Actual();
-					}
-
-					if (ACS_Transformation_Vampire_Monster_Check())
-					{
-						GetACSWatcher().DisableTransformationVampireMonster_Actual_No_Teleport();
-					}
-
-					if (ACS_Transformation_Toad_Check())
-					{
-						GetACSWatcher().DisableTransformationToad_Actual();
-					}
-
-					if (ACS_Transformation_Red_Miasmal_Check())
-					{
-						GetACSWatcher().DisableRedMiasmal_Actual();
-					}
-
-					if (ACS_Transformation_Sharley_Check())
-					{
-						GetACSWatcher().DisableSharley_Actual();
-					}
-
-					if (ACS_Transformation_Black_Wolf_Check())
-					{
-						GetACSWatcher().DisableBlackWolf_Actual();
-					}
+					GetACSWatcher().ACS_TransformationDisable();
 
 					if (GetWitcherPlayer().GetStat( BCS_Focus ) != 0)
 					{
@@ -2118,7 +1919,7 @@ function ACS_Record_Kill(action: W3DamageAction)
 		{
 			if(!npc.HasTag('ACS_Death_Recorded'))
 			{
-				GetACSStorage().Killcount_Increment();
+				GetACSStorage().acs_Killcount_Increment();
 
 				GetACSWatcher().ACS_Persistent_Killcount();
 
@@ -2136,7 +1937,7 @@ function ACS_KillCount_Manager( npc : CActor )
 	|| npc.GetMovingAgentComponent().GetName() == "man_base"
 	)
 	{
-		GetACSStorage().HumanKillcount_Increment();
+		GetACSStorage().acs_HumanKillcount_Increment();
 	}
 	else
 	{
@@ -2152,7 +1953,7 @@ function ACS_KillCount_Manager( npc : CActor )
 			|| npc.HasAbility('mon_boar_ep2_base')
 		)
 		{
-			GetACSStorage().BeastKillcount_Increment();
+			GetACSStorage().acs_BeastKillcount_Increment();
 		}
 		else if 
 		(
@@ -2162,7 +1963,7 @@ function ACS_KillCount_Manager( npc : CActor )
 			|| npc.HasAbility('mon_q704_ft_wilk')
 		)
 		{
-			GetACSStorage().CursedOnesKillcount_Increment();
+			GetACSStorage().acs_CursedOnesKillcount_Increment();
 		}
 		else if 
 		(
@@ -2178,7 +1979,7 @@ function ACS_KillCount_Manager( npc : CActor )
 			|| npc.HasAbility('mon_basilisk')
 		)
 		{
-			GetACSStorage().DraconidsKillcount_Increment();
+			GetACSStorage().acs_DraconidsKillcount_Increment();
 		}
 		else if 
 		(
@@ -2195,7 +1996,7 @@ function ACS_KillCount_Manager( npc : CActor )
 			|| npc.HasAbility('mon_dark_pixie_base')
 		)
 		{
-			GetACSStorage().ElementaKillcount_Increment();
+			GetACSStorage().acs_ElementaKillcount_Increment();
 		}
 		else if 
 		(
@@ -2207,7 +2008,7 @@ function ACS_KillCount_Manager( npc : CActor )
 			|| npc.HasAbility('mon_erynia')
 		)
 		{
-			GetACSStorage().HybridsKillcount_Increment();
+			GetACSStorage().acs_HybridsKillcount_Increment();
 		}
 		else if 
 		(
@@ -2226,7 +2027,7 @@ function ACS_KillCount_Manager( npc : CActor )
 			|| npc.HasAbility('mon_black_spider_ep2_base')
 		)
 		{
-			GetACSStorage().InsectoidsKillcount_Increment();
+			GetACSStorage().acs_InsectoidsKillcount_Increment();
 		}
 		else if 
 		(
@@ -2247,7 +2048,7 @@ function ACS_KillCount_Manager( npc : CActor )
 			|| npc.HasAbility('ghoul_hardcore')
 		)
 		{
-			GetACSStorage().NecrophagesKillcount_Increment();
+			GetACSStorage().acs_NecrophagesKillcount_Increment();
 		}
 		else if 
 		(
@@ -2260,7 +2061,7 @@ function ACS_KillCount_Manager( npc : CActor )
 			|| npc.HasAbility('mon_cloud_giant')
 		)
 		{
-			GetACSStorage().OgroidsKillcount_Increment();
+			GetACSStorage().acs_OgroidsKillcount_Increment();
 		}
 		else if 
 		(
@@ -2275,7 +2076,7 @@ function ACS_KillCount_Manager( npc : CActor )
 			|| npc.HasTag('witch')
 		)
 		{
-			GetACSStorage().RelictsKillcount_Increment();
+			GetACSStorage().acs_RelictsKillcount_Increment();
 		}
 		else if 
 		(
@@ -2292,7 +2093,7 @@ function ACS_KillCount_Manager( npc : CActor )
 			|| npc.HasAbility('banshee_rapunzel')
 		)
 		{
-			GetACSStorage().SpectersKillcount_Increment();
+			GetACSStorage().acs_SpectersKillcount_Increment();
 		}
 		else if 
 		(
@@ -2306,11 +2107,11 @@ function ACS_KillCount_Manager( npc : CActor )
 			|| npc.HasTag('dettlaff_vampire')
 		)
 		{
-			GetACSStorage().VampiresKillcount_Increment();
+			GetACSStorage().acs_VampiresKillcount_Increment();
 		}
 		else 
 		{
-			GetACSStorage().OtherKillcount_Increment();
+			GetACSStorage().acs_OtherKillcount_Increment();
 		}
 	}
 }
@@ -4058,30 +3859,30 @@ function ACS_Unseen_Blade_On_Take_Damage(action: W3DamageAction)
 			{
 				if (npc.UsesVitality())
 				{
-					if (GetACSStorage().Unseen_Blade_Death_Count() == 0)
+					if (GetACSStorage().acs_Unseen_Blade_Death_Count() == 0)
 					{
 						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.125;
 					}
-					else if (GetACSStorage().Unseen_Blade_Death_Count() == 1)
+					else if (GetACSStorage().acs_Unseen_Blade_Death_Count() == 1)
 					{
 						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.25;
 					}
-					else if (GetACSStorage().Unseen_Blade_Death_Count() == 2)
+					else if (GetACSStorage().acs_Unseen_Blade_Death_Count() == 2)
 					{
 						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.5;
 					}
 				}
 				else if (npc.UsesEssence())
 				{
-					if (GetACSStorage().Unseen_Blade_Death_Count() == 0)
+					if (GetACSStorage().acs_Unseen_Blade_Death_Count() == 0)
 					{
 						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.125;
 					}
-					else if (GetACSStorage().Unseen_Blade_Death_Count() == 1)
+					else if (GetACSStorage().acs_Unseen_Blade_Death_Count() == 1)
 					{
 						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.25;
 					}
-					else if (GetACSStorage().Unseen_Blade_Death_Count() == 2)
+					else if (GetACSStorage().acs_Unseen_Blade_Death_Count() == 2)
 					{
 						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.5;
 					}
@@ -5493,23 +5294,23 @@ function ACS_Bruxa_On_Take_Damage(action: W3DamageAction)
 				{
 					if(!ACS_Blade_Of_The_Unseen() && !ACSVampireMonster())
 					{
-						GetACSStorage().Number_Of_Bruxae_Slain_Increment();
+						GetACSStorage().acs_Number_Of_Bruxae_Slain_Increment();
 						
-						if (GetACSStorage().Number_Of_Bruxae_Slain() == 1)
+						if (GetACSStorage().acs_Number_Of_Bruxae_Slain() == 1)
 						{
 							GetWitcherPlayer().DisplayHudMessage( "Ignorance is fatal." );
 
 							GetACSWatcher().RemoveTimer('unseen_blade_spawn_delay');
 							GetACSWatcher().AddTimer('unseen_blade_spawn_delay', 305, true);
 						}
-						else if (GetACSStorage().Number_Of_Bruxae_Slain() == 2)
+						else if (GetACSStorage().acs_Number_Of_Bruxae_Slain() == 2)
 						{
 							GetWitcherPlayer().DisplayHudMessage( "None escape the shadow of their deeds." );
 
 							GetACSWatcher().RemoveTimer('unseen_blade_spawn_delay');
 							GetACSWatcher().AddTimer('unseen_blade_spawn_delay', 155, true);
 						}
-						else if (GetACSStorage().Number_Of_Bruxae_Slain() == 3)
+						else if (GetACSStorage().acs_Number_Of_Bruxae_Slain() == 3)
 						{
 							GetWitcherPlayer().DisplayHudMessage( "Prepare yourself, witcher." );
 
@@ -5763,7 +5564,9 @@ function ACS_Melusine_Original_On_Take_Damage(action: W3DamageAction)
 	playerVictim = (CPlayer)action.victim;
 
 	if 
-	(npc && StrContains( npc.GetReadableName(), "mh210_lamia" ) && npc.HasAbility('mon_siren_base') )
+	(npc 
+	&& StrContains( npc.GetReadableName(), "mh210_lamia" ) || StrContains( npc.GetReadableName(), "mh210_lamia" )
+	&& npc.HasAbility('mon_siren_base') )
 	{
 		if (playerAttacker)
 		{
@@ -9548,6 +9351,221 @@ function ACS_Maerolorn_On_Take_Damage(action: W3DamageAction)
 	}
 }
 
+function ACS_Mourntart_On_Take_Damage(action: W3DamageAction)
+{
+    var playerAttacker, playerVictim																								: CPlayer;
+	var npc, npcAttacker 																											: CActor;
+	var params 																														: SCustomEffectParams;
+	
+    npc = (CActor)action.victim;
+	
+	npcAttacker = (CActor)action.attacker;
+	
+	playerAttacker = (CPlayer)action.attacker;
+	
+	playerVictim = (CPlayer)action.victim;
+
+	if 
+	( npc && npc.HasTag('ACS_MonsterHunt_Mourntart'))
+	{
+		if ( playerAttacker )
+		{
+			if ( !action.IsDoTDamage() 
+			&& !action.WasDodged() 
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
+			&& !(((W3Action_Attack)action).IsParried())
+			)
+			{
+				if (npc.HasTag('ACS_Mourntart_Tongue_Disabled'))
+				{
+					if (npc.UsesVitality())
+					{
+						if( thePlayer.IsDoingSpecialAttack(false))
+						{
+							action.processedDmg.vitalityDamage += action.processedDmg.vitalityDamage * 0.5;
+						}
+						else
+						{
+							action.processedDmg.vitalityDamage += action.processedDmg.vitalityDamage;
+						}
+					}
+					else if (npc.UsesEssence())
+					{
+						if( thePlayer.IsDoingSpecialAttack(false))
+						{
+							action.processedDmg.essenceDamage += action.processedDmg.essenceDamage * 0.5;
+						}
+						else
+						{
+							action.processedDmg.essenceDamage += action.processedDmg.essenceDamage;
+						}
+					}
+				}
+				else
+				{
+					if (npc.HasTag('ACS_Mourntart_Below_Half_Health_With_Tongue'))
+					{
+						if (npc.UsesVitality())
+						{
+							if( thePlayer.IsDoingSpecialAttack(false))
+							{
+								action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.5;
+							}
+							else
+							{
+								action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.25;
+							}
+						}
+						else if (npc.UsesEssence())
+						{
+							if( thePlayer.IsDoingSpecialAttack(false))
+							{
+								action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.5;
+							}
+							else
+							{
+								action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.25;
+							}
+						}
+					}
+					else
+					{
+						if (npc.UsesVitality())
+						{
+							if( thePlayer.IsDoingSpecialAttack(false))
+							{
+								action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.85;
+							}
+							else
+							{
+								action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.75;
+							}
+						}
+						else if (npc.UsesEssence())
+						{
+							if( thePlayer.IsDoingSpecialAttack(false))
+							{
+								action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.85;
+							}
+							else
+							{
+								action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.75;
+							}
+						}
+
+						if (
+						(npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= npc.GetMaxHealth() * 0.33)
+						||(npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= npc.GetMaxHealth() * 0.33)
+						)
+						{
+							if (!npc.HasTag('ACS_Mourntart_Half_Health_Stage'))
+							{
+								ACS_MonsterBehSwitch('Mourntart_Beh_Switch_Under_Half_Health_With_Tongue_Engage');
+
+								GetACSStorage().acs_deleteOnelinerByTag("ACS_Mourntart_Counter_Oneliner");
+
+								ACS_OnelinerEntity(
+								(new ACS_Oneliner_TagBuilder in thePlayer)
+								.tag("font")
+								.attr("size", "26")
+								.attr("color", "#f00000")
+								.text("BERSERK")
+								, npc, "ACS_Mourntart_Counter_Oneliner", Vector(0,0,1.5), 5);
+
+								npc.AddTag('ACS_Mourntart_Half_Health_Stage');
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+function ACS_MonsterHuntMonster_On_Take_Damage(action: W3DamageAction)
+{
+    var playerAttacker, playerVictim																								: CPlayer;
+	var npc, npcAttacker 																											: CActor;
+	var params 																														: SCustomEffectParams;
+	
+    npc = (CActor)action.victim;
+	
+	npcAttacker = (CActor)action.attacker;
+	
+	playerAttacker = (CPlayer)action.attacker;
+	
+	playerVictim = (CPlayer)action.victim;
+
+	if 
+	( npc && npc.HasTag('ACS_MonsterHunt_Monster'))
+	{
+		if ( playerAttacker )
+		{
+			if ( !action.IsDoTDamage() 
+			&& !action.WasDodged() 
+			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
+			&& !(((W3Action_Attack)action).IsParried())
+			)
+			{
+				if ( action.GetHitReactionType() == EHRT_Light )
+				{
+					if (npc.UsesVitality())
+					{
+						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.5;
+					}
+					else if (npc.UsesEssence())
+					{
+						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.5;
+					}
+
+					if (RandF() < 0.75)
+					{
+						npc.SetCanPlayHitAnim(false);
+
+						((CNewNPC)npc).SetUnstoppable( true );
+					}
+					else
+					{
+						npc.SetCanPlayHitAnim(true);
+
+						((CNewNPC)npc).SetUnstoppable( false );
+					}
+				}
+				else if ( action.GetHitReactionType() == EHRT_Heavy )
+				{
+					if (!npc.HasTag('ACS_MonsterHuntMonster_Set_Unstoppable'))
+					{
+						npc.SetCanPlayHitAnim(false);
+
+						((CNewNPC)npc).SetUnstoppable( true );
+
+						npc.AddTag('ACS_MonsterHuntMonster_Set_Unstoppable');
+					}
+					else
+					{
+						npc.SetCanPlayHitAnim(true);
+
+						((CNewNPC)npc).SetUnstoppable( false );
+
+						npc.RemoveTag('ACS_MonsterHuntMonster_Set_Unstoppable');
+					}
+				}
+			}
+		}
+		else
+		{
+			if (npc.UsesVitality())
+			{
+				action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
+			}
+			else if (npc.UsesEssence())
+			{
+				action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage;
+			}
+		}
+	}
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function ACS_Red_Blood_Death_On_Take_Damage(action: W3DamageAction)
@@ -9789,7 +9807,9 @@ function ACS_Player_Attack(action: W3DamageAction)
 
 		if (ACS_Armor_Equipped_Check() 
 		&& !action.IsDoTDamage() 
-		//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
+		&& action.IsActionMelee() 
+		&& !thePlayer.IsUsingHorse() 
+		&& !thePlayer.IsUsingVehicle()
 		&& action.WasDodged() 
 		)
 		{
@@ -9801,7 +9821,9 @@ function ACS_Player_Attack(action: W3DamageAction)
 
 		if ( !action.IsDoTDamage() 
 		&& !action.WasDodged() 
-		//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
+		&& action.IsActionMelee() 
+		&& !thePlayer.IsUsingHorse() 
+		&& !thePlayer.IsUsingVehicle()
 		&& !(((W3Action_Attack)action).IsParried())
 		)
 		{
@@ -14522,6 +14544,146 @@ function ACS_Draugir_Attack(action: W3DamageAction)
 	}
 }
 
+function ACS_Mourntart_Attack(action: W3DamageAction)
+{
+    var playerAttacker, playerVictim						: CPlayer;
+	var npc, npcAttacker 									: CActor;
+	var dmg													: W3DamageAction;
+	var damage 												: float;
+	var params 												: SCustomEffectParams;
+	
+    npc = (CActor)action.victim;
+	
+	npcAttacker = (CActor)action.attacker;
+	
+	playerAttacker = (CPlayer)action.attacker;
+	
+	playerVictim = (CPlayer)action.victim;
+
+    if ( npcAttacker
+	&& npcAttacker.HasTag('ACS_MonsterHunt_Mourntart')
+	&& !action.IsDoTDamage()
+	&& playerVictim
+	)
+	{	
+		if ((((W3Action_Attack)action).IsCountered()))
+		{
+			if (!npcAttacker.HasTag('ACS_Mourntart_Below_Half_Health_With_Tongue'))
+			{
+				if (!npcAttacker.HasTag('ACS_Mourntart_1st_Hit_Counter')
+				&& !npcAttacker.HasTag('ACS_Mourntart_2nd_Hit_Counter')
+				)
+				{
+					GetACSStorage().acs_deleteOnelinerByTag("ACS_Mourntart_Counter_Oneliner");
+
+					ACS_OnelinerEntity(
+					(new ACS_Oneliner_TagBuilder in thePlayer)
+					.tag("font")
+					.attr("size", "26")
+					.attr("color", "#f00000")
+					.text("Counter: 1/3")
+					, npcAttacker, "ACS_Mourntart_Counter_Oneliner", Vector(0,0,1.5), 5);
+
+					npcAttacker.AddTag('ACS_Mourntart_1st_Hit_Counter');
+				}
+				else if (npcAttacker.HasTag('ACS_Mourntart_1st_Hit_Counter'))
+				{
+					GetACSStorage().acs_deleteOnelinerByTag("ACS_Mourntart_Counter_Oneliner");
+
+					ACS_OnelinerEntity(
+					(new ACS_Oneliner_TagBuilder in thePlayer)
+					.tag("font")
+					.attr("size", "26")
+					.attr("color", "#f00000")
+					.text("Counter: 2/3")
+					, npcAttacker, "ACS_Mourntart_Counter_Oneliner", Vector(0,0,1.5), 5);
+
+					npcAttacker.RemoveTag('ACS_Mourntart_1st_Hit_Counter');
+
+					npcAttacker.AddTag('ACS_Mourntart_2nd_Hit_Counter');
+				}
+				else if (npcAttacker.HasTag('ACS_Mourntart_2nd_Hit_Counter'))
+				{
+					GetACSStorage().acs_deleteOnelinerByTag("ACS_Mourntart_Counter_Oneliner");
+
+					ACS_OnelinerEntity(
+					(new ACS_Oneliner_TagBuilder in thePlayer)
+					.tag("font")
+					.attr("size", "26")
+					.attr("color", "#f00000")
+					.text("Counter: 3/3<br/>Tongue Disabled<br/>BERSERK")
+					, npcAttacker, "ACS_Mourntart_Counter_Oneliner", Vector(0,0,1.5), 5);
+
+					ACS_MonsterBehSwitch('Mourntart_Beh_Switch_Cut_Off_Tongue_Engage');
+				}
+			}
+		}
+		else
+		{
+			if (!action.WasDodged() && !GetWitcherPlayer().IsCurrentlyDodging())
+			{
+				GetWitcherPlayer().SoundEvent("cmb_play_dismemberment_gore");
+
+				if (npcAttacker.HasTag('ACS_Mourntart_Tongue_Disabled'))
+				{
+					params.effectType = EET_Bleeding;
+					params.creator = npcAttacker;
+					params.sourceName = "ACS_Mourntart_Effect";
+					params.duration = 5;
+
+					thePlayer.AddEffectCustom( params );	
+				}
+				else
+				{
+					if (npcAttacker.HasTag('ACS_Mourntart_Below_Half_Health_With_Tongue'))
+					{
+						params.effectType = EET_Poison;
+						params.creator = npcAttacker;
+						params.sourceName = "ACS_Mourntart_Effect";
+						params.duration = 5;
+
+						thePlayer.AddEffectCustom( params );	
+
+						params.effectType = EET_Bleeding;
+						params.creator = npcAttacker;
+						params.sourceName = "ACS_Mourntart_Effect";
+						params.duration = 5;
+
+						thePlayer.AddEffectCustom( params );
+
+						thePlayer.GainStat(BCS_Toxicity, thePlayer.GetStatMax(BCS_Toxicity) * 0.125 );
+					}
+					else
+					{
+						params.effectType = EET_Poison;
+						params.creator = npcAttacker;
+						params.sourceName = "ACS_Mourntart_Effect";
+						params.duration = 3;
+
+						thePlayer.AddEffectCustom( params );	
+
+						params.effectType = EET_Bleeding;
+						params.creator = npcAttacker;
+						params.sourceName = "ACS_Mourntart_Effect";
+						params.duration = 3;
+
+						thePlayer.AddEffectCustom( params );	
+
+						params.effectType = EET_Knockdown;
+						params.creator = npcAttacker;
+						params.sourceName = "ACS_Mourntart_Effect";
+						params.duration = 1;
+
+						thePlayer.AddEffectCustom( params );	
+
+						thePlayer.GainStat(BCS_Toxicity, thePlayer.GetStatMax(BCS_Toxicity) * 0.1 );
+					}
+				}
+			}
+		}
+	}
+}
+
 function ACS_Viy_Attack(action: W3DamageAction)
 {
     var playerAttacker, playerVictim						: CPlayer;
@@ -14575,6 +14737,8 @@ function ACS_Plumard_Attack(action: W3DamageAction)
 	{	
 		if (!action.WasDodged() && !GetWitcherPlayer().IsCurrentlyDodging())
 		{
+			action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.75f;
+
 			if (!playerVictim.HasBuff(EET_Bleeding))
 			{
 				playerVictim.AddEffectDefault( EET_Bleeding, npcAttacker, 'ACS_Plumard' );

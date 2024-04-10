@@ -417,7 +417,7 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 		steelsword = (CDrawableComponent)((GetWitcherPlayer().GetInventory().GetItemEntityUnsafe(steelID)).GetMeshComponent());
 		silversword = (CDrawableComponent)((GetWitcherPlayer().GetInventory().GetItemEntityUnsafe(silverID)).GetMeshComponent());
 		
-		ACS_StartAerondightEffectInit();
+		
 		
 		if ( GetWitcherPlayer().GetInventory().IsItemHeld(steelID) )
 		{
@@ -519,7 +519,7 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SilverSword, silverID);
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SteelSword, steelID);
 
-		ACS_StartAerondightEffectInit();
+		
 
 		if ( ACS_SOI_Installed() && ACS_SOI_Enabled() )
 		{
@@ -1378,7 +1378,7 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SilverSword, silverID);
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SteelSword, steelID);
 
-		ACS_StartAerondightEffectInit();
+		
 
 		if ( GetWitcherPlayer().IsWeaponHeld( 'silversword' ) )
 		{
@@ -1518,7 +1518,7 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 		r_anchor.PlayEffect('mist_regis_q702');
 		l_anchor.PlayEffect('mist_regis_q702');
 		
-		ACS_StopAerondightEffectInit();
+		
 
 		ACS_HideSword();
 		
@@ -1643,7 +1643,7 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 	latent function AardSwordEvolving()
 	{
-		ACS_StopAerondightEffectInit();
+		
 
 		if ( ACS_SOI_Installed() && ACS_SOI_Enabled() && ACS_Warglaives_Installed() && ACS_Warglaives_Enabled() )
 		{
@@ -3307,7 +3307,7 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 	latent function AardSwordStatic()
 	{
-		ACS_StopAerondightEffectInit();
+		
 
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SilverSword, silverID);
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SteelSword, steelID);
@@ -3776,7 +3776,7 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SilverSword, silverID);
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SteelSword, steelID);
 
-		ACS_StartAerondightEffectInit();
+		
 
 		if ( ACS_SOI_Installed() && ACS_SOI_Enabled() )
 		{
@@ -5271,7 +5271,7 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SilverSword, silverID);
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SteelSword, steelID);
 
-		ACS_StartAerondightEffectInit();
+		
 
 		if ( GetWitcherPlayer().IsWeaponHeld( 'silversword' ) )
 		{
@@ -5356,7 +5356,7 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SilverSword, silverID);
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SteelSword, steelID);
 	
-		ACS_StartAerondightEffectInit();
+		
 
 		if ( GetWitcherPlayer().IsWeaponHeld( 'silversword' ) )
 		{
@@ -5541,7 +5541,7 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SilverSword, silverID);
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SteelSword, steelID);
 
-		ACS_StartAerondightEffectInit();
+		
 
 		if ( GetWitcherPlayer().IsWeaponHeld( 'silversword' ) )
 		{
@@ -5628,7 +5628,7 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 		 
 		
-		ACS_StartAerondightEffectInit();
+		
 
 		if ( ACS_SOI_Installed() && ACS_SOI_Enabled() )
 		{
@@ -6201,7 +6201,7 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 		 
 		
-		ACS_StartAerondightEffectInit();
+		
 
 		if ( GetWitcherPlayer().IsWeaponHeld( 'silversword' ) )
 		{
@@ -6284,7 +6284,7 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 		 
 		
-		ACS_StartAerondightEffectInit();
+		
 
 		if ( ACS_SOI_Installed() && ACS_SOI_Enabled() )
 		{
@@ -7433,7 +7433,7 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 		 
 		
-		ACS_StartAerondightEffectInit();
+		
 
 		
 		if ( GetWitcherPlayer().IsWeaponHeld( 'silversword' ) )
@@ -7517,7 +7517,7 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 		 
 		
-		ACS_StartAerondightEffectInit();
+		
 
 		if ( ACS_SOI_Installed() && ACS_SOI_Enabled() )
 		{
@@ -8287,7 +8287,7 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 		 
 		
-		ACS_StartAerondightEffectInit();
+		
 
 		if ( GetWitcherPlayer().IsWeaponHeld( 'silversword' ) )
 		{
@@ -8368,7 +8368,7 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SilverSword, silverID);
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SteelSword, steelID);
 
-		ACS_StartAerondightEffectInit();
+		
 
 		if ( ACS_SOI_Installed() && ACS_SOI_Enabled() )
 		{
@@ -9107,7 +9107,7 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SilverSword, silverID);
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SteelSword, steelID);
 		
-		ACS_StartAerondightEffectInit();
+		
 
 		if ( GetWitcherPlayer().IsWeaponHeld( 'silversword' ) )
 		{

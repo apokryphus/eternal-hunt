@@ -71,11 +71,6 @@ state ACS_JumpExtendState in cACS_JumpExtend
 	
 	entry function JumpExtend_Entry()
 	{
-		JumpExtendLatent();
-	}
-	
-	latent function JumpExtendLatent()
-	{
 		settings_interrupt.blendIn = 0;
 		settings_interrupt.blendOut = 0;
 

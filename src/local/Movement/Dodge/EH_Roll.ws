@@ -799,6 +799,11 @@ state WildHuntBlink_Engage in cWildHuntBlink
 				thePlayer.PlayEffect('teleport_out_fire_ACS');
 				thePlayer.StopEffect('teleport_out_fire_ACS');
 			}
+			else if (ACS_GetItem_MageStaff_Ice())
+			{
+				thePlayer.PlayEffectSingle('eredin_disappear');
+				thePlayer.StopEffect('eredin_disappear');
+			}
 
 			ACSGetEquippedSword().DestroyEffect( 'fx_staff_cast' );
 			ACSGetEquippedSword().PlayEffectSingle( 'fx_staff_cast' );

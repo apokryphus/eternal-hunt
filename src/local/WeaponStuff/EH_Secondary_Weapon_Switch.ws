@@ -1407,8 +1407,6 @@ state Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 		silversword = (CDrawableComponent)((GetWitcherPlayer().GetInventory().GetItemEntityUnsafe(silverID)).GetMeshComponent());
 		
 		ACS_WeaponDestroyInit();
-		
-		ACS_StartAerondightEffectInit();
 
 		trail_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\fx\acs_sword_trail.w2ent" , true );
 
@@ -1540,8 +1538,6 @@ state Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 
 		ACS_WeaponDestroyInit();
 		
-		ACS_StartAerondightEffectInit();
-
 		trail_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\fx\acs_sword_trail.w2ent" , true );
 
 		sword_trail_1 = (CEntity)theGame.CreateEntity( trail_temp, GetWitcherPlayer().GetWorldPosition() + Vector( 0, 0, -20 ) );
@@ -2151,8 +2147,6 @@ state Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 
 		ACS_WeaponDestroyInit();
 		
-		ACS_StartAerondightEffectInit();
-
 		trail_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\fx\acs_sword_trail.w2ent" , true );
 
 		sword_trail_1 = (CEntity)theGame.CreateEntity( trail_temp, GetWitcherPlayer().GetWorldPosition() + Vector( 0, 0, -20 ) );
@@ -2277,8 +2271,6 @@ state Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SteelSword, steelID);
 
 		ACS_WeaponDestroyInit();
-		
-		ACS_StartAerondightEffectInit();
 
 		trail_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\fx\acs_sword_trail.w2ent" , true );
 
@@ -3464,8 +3456,6 @@ state Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SteelSword, steelID);
 
 		ACS_WeaponDestroyInit();
-		
-		ACS_StartAerondightEffectInit();
 
 		trail_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\fx\acs_sword_trail.w2ent" , true );
 
@@ -3591,8 +3581,6 @@ state Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SteelSword, steelID);
 
 		ACS_WeaponDestroyInit();
-		
-		ACS_StartAerondightEffectInit();
 
 		trail_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\fx\acs_sword_trail.w2ent" , true );
 
@@ -4399,8 +4387,6 @@ state Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SteelSword, steelID);
 
 		ACS_WeaponDestroyInit();
-		
-		ACS_StartAerondightEffectInit();
 
 		trail_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\fx\acs_sword_trail.w2ent" , true );
 
@@ -4526,8 +4512,6 @@ state Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SteelSword, steelID);
 
 		ACS_WeaponDestroyInit();
-		
-		ACS_StartAerondightEffectInit();
 
 		trail_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\fx\acs_sword_trail.w2ent" , true );
 
@@ -5317,8 +5301,6 @@ state Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SteelSword, steelID);
 		
 		ACS_WeaponDestroyInit();
-		
-		ACS_StartAerondightEffectInit();
 
 		trail_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\fx\acs_sword_trail.w2ent" , true );
 

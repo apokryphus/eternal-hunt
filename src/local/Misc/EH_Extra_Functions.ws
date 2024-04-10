@@ -2183,6 +2183,70 @@ function ACS_Marker_Visual_Bubble_Enabled(): bool
 	else return (bool)configValueString;
 }
 
+function ACS_Minimap_Enabled(): bool 
+{
+	var configValue :int;
+	var configValueString : string;
+
+	configValueString = ACSHudSettingsGetConfigValue('EHmodMinimapEnabled');
+	configValue =(int) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return true;
+	}
+	
+	else return (bool)configValueString;
+}
+
+function ACS_Compass_Mode_Enabled(): bool 
+{
+	var configValue :int;
+	var configValueString : string;
+	
+	configValueString = ACSHudSettingsGetConfigValue('EHmodCompassModeEnabled');
+	configValue =(int) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return true;
+	}
+	
+	else return (bool)configValueString;
+}
+
+function ACS_Compass_Bar_Despawn_Delay(): float
+{
+	var configValue :float;
+	var configValueString : string;
+	
+	configValueString = ACSHudSettingsGetConfigValue('EHmodCompassBarDespawnDelay');
+	configValue =(float) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return 7;
+	}
+	
+	else return configValue;
+}
+
+function ACS_Enemy_Marker_Despawn_Delay(): float
+{
+	var configValue :float;
+	var configValueString : string;
+	
+	configValueString = ACSHudSettingsGetConfigValue('EHmodEnemyMarkerDespawnDelay');
+	configValue =(float) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return 7;
+	}
+	
+	else return configValue;
+}
+
 function ACS_Quest_Marker_Despawn_Delay(): float
 {
 	var configValue :float;
@@ -2291,6 +2355,22 @@ function ACS_POI_Quest_Marker_Distance_To_Display(): float
 	if(configValueString=="" || configValue<0)
 	{
 		return 5000;
+	}
+	
+	else return configValue;
+}
+
+function ACS_Enemy_Marker_Distance_To_Display(): float
+{
+	var configValue :float;
+	var configValueString : string;
+	
+	configValueString = ACSHudSettingsGetConfigValue('EHmodEnemyMarkerDistanceToDisplay');
+	configValue =(float) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return 50;
 	}
 	
 	else return configValue;
@@ -2465,6 +2545,22 @@ function ACS_AutoRead_Enabled(): bool
 	var configValueString : string;
 	
 	configValueString = ACSMiscSettingsGetConfigValue('EHmodAutoReadEnabled');
+	configValue =(int) configValueString;
+
+	if(configValueString=="" || configValue<0)
+	{
+		return false;
+	}
+	
+	else return (bool)configValueString;
+}
+
+function ACS_Interaction_Buffer_Enabled(): bool 
+{
+	var configValue :int;
+	var configValueString : string;
+	
+	configValueString = ACSMiscSettingsGetConfigValue('EHmodInteractionBufferEnabled');
 	configValue =(int) configValueString;
 
 	if(configValueString=="" || configValue<0)
@@ -6266,6 +6362,8 @@ function ACS_GetItem_Greg_Steel(): CEntity
 
 	|| thePlayer.GetInventory().GetItemName( sword_id ) == 'ACS_Blackjack'
 
+	|| thePlayer.GetInventory().GetItemName( sword_id ) == 'Leviathan' 
+
 	)
 	{
 		sword = thePlayer.GetInventory().GetItemEntityUnsafe(sword_id);
@@ -6291,6 +6389,41 @@ function ACS_GetItem_Hammer_Steel(): CEntity
 	}
 
 	return sword;
+}
+
+function ACS_GetItem_Leviathan(): CEntity
+{
+	var sword_id 		: SItemUniqueId;
+	var sword 			: CEntity;
+
+	//thePlayer.GetInventory().GetItemEquippedOnSlot(EES_SteelSword, sword_id);
+
+	sword_id = ACS_GetCurrentlyHeldSecondaryWeapon();
+
+	if( thePlayer.GetInventory().GetItemName( sword_id ) == 'Leviathan'  )
+	{
+		sword = thePlayer.GetInventory().GetItemEntityUnsafe(sword_id);
+	}
+
+	return sword;
+}
+
+function ACS_GetCurrentlyHeldSecondaryWeapon() : SItemUniqueId
+{
+	var i	: int;
+	var w	: array<SItemUniqueId>;
+	
+	w = thePlayer.GetInventory().GetHeldWeapons();
+	
+	for( i = 0 ; i < w.Size() ; i+=1 )
+	{
+		if( thePlayer.GetInventory().IsItemSecondaryWeapon( w[i] ) )
+		{
+			return w[i];
+		}
+	}
+	
+	return GetInvalidUniqueId();		
 }
 
 function ACS_GetItem_Axe_Steel(): CEntity
@@ -6994,11 +7127,13 @@ function ACS_DontReplaceScabbardSilver() : bool
 	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "giant" ) 
 	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "calidus" ) 
 	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Calidus" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Leviathan" ) 
 	|| thePlayer.GetInventory().ItemHasTag(sword_id,'mod_origin_ofir') 
 	|| thePlayer.GetInventory().ItemHasTag(sword_id,'Ofir') 
 	|| thePlayer.GetInventory().ItemHasTag(sword_id,'OlgierdSabre') 
 	|| thePlayer.GetInventory().ItemHasTag(sword_id,'NovalisSabre') 
 	|| thePlayer.GetInventory().ItemHasTag(sword_id,'ironshade') 
+	|| thePlayer.GetInventory().ItemHasTag(sword_id,'Leviathan') 
 	)
 	{
 		return true;
@@ -7070,11 +7205,13 @@ function ACS_DontReplaceScabbardSteel() : bool
 	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "stick" ) 
 	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "eredin" ) 
 	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "giant" ) 
+	|| StrContains( NameToString(thePlayer.GetInventory().GetItemName( sword_id )), "Leviathan" ) 
 	|| thePlayer.GetInventory().ItemHasTag(sword_id,'mod_origin_ofir') 
 	|| thePlayer.GetInventory().ItemHasTag(sword_id,'Ofir') 
 	|| thePlayer.GetInventory().ItemHasTag(sword_id,'OlgierdSabre') 
 	|| thePlayer.GetInventory().ItemHasTag(sword_id,'NovalisSabre')
 	|| thePlayer.GetInventory().ItemHasTag(sword_id,'ironshade') 
+	|| thePlayer.GetInventory().ItemHasTag(sword_id,'Leviathan') 
 	)
 	{
 		return true;
@@ -9333,6 +9470,14 @@ function ACS_Pre_Attack( animEventName : name, animEventType : EAnimationEventTy
 		ACSGetEquippedSword().StopEffect( 'heavy_trail_fx' );
 		ACSGetEquippedSword().StopEffect( 'light_trail_fx' );
 	}
+
+	if (thePlayer.HasTag('ACS_Ice_Giant_Mode'))
+	{
+		if (thePlayer.IsAnyWeaponHeld() && !thePlayer.IsWeaponHeld('fist'))
+		{
+			ACS_Frost_Cone();
+		}
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -9568,140 +9713,6 @@ function ACS_PlayerSettlementCheck (optional radius_check: float): bool
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function ACS_StartAerondightEffectInit()
-{
-	var vStartAerondightEffect : cStartAerondightEffect;
-	vStartAerondightEffect = new cStartAerondightEffect in theGame;
-			
-	vStartAerondightEffect.Engage();
-}
-
-statemachine class cStartAerondightEffect
-{
-    function Engage()
-	{
-		this.PushState('Engage');
-	}
-}
- 
-state Engage in cStartAerondightEffect
-{
-	event OnEnterState(prevStateName : name)
-	{
-		super.OnEnterState(prevStateName);
-		StartAerondightEffects();
-	}
-	
-	entry function StartAerondightEffects()
-	{
-		var l_aerondightEnt			: CItemEntity;
-		var l_effectComponent		: W3AerondightFXComponent;
-		var l_newChargingEffect		: name;
-		var m_maxCount					: int;
-		
-		thePlayer.GetInventory().GetCurrentlyHeldSwordEntity( l_aerondightEnt );
-		
-		if (!thePlayer.HasTag('aard_sword_equipped'))
-		{
-			l_newChargingEffect = l_effectComponent.m_visualEffects[ m_maxCount - 1 ];
-			
-			l_aerondightEnt.PlayEffectSingle( l_newChargingEffect );
-		}
-	}
-	
-	event OnLeaveState( nextStateName : name ) 
-	{
-		super.OnLeaveState(nextStateName);
-	}
-}
-
-function ACS_SCAAR_1_Installed()
-{
-	return;
-}
-
-function ACS_SCAAR_2_Installed()
-{
-	return;
-}
-
-function ACS_SCAAR_3_Installed()
-{
-	return;
-}
-
-function ACS_Theft_Prevention_7()
-{
-	return;
-}
-
-function ACS_StopAerondightEffectInit()
-{
-	var vStopAerondightEffect : cStopAerondightEffect;
-	vStopAerondightEffect = new cStopAerondightEffect in theGame;
-			
-	vStopAerondightEffect.Engage();
-}
-
-statemachine class cStopAerondightEffect
-{
-    function Engage()
-	{
-		this.PushState('Engage');
-	}
-}
- 
-state Engage in cStopAerondightEffect
-{
-	event OnEnterState(prevStateName : name)
-	{
-		super.OnEnterState(prevStateName);
-		StopAerondightEffects();
-	}
-	
-	entry function StopAerondightEffects()
-	{
-		var l_aerondightEnt			: CItemEntity;
-		var l_effectComponent		: W3AerondightFXComponent;
-		
-		thePlayer.GetInventory().GetCurrentlyHeldSwordEntity( l_aerondightEnt );	
-
-		l_effectComponent = (W3AerondightFXComponent)l_aerondightEnt.GetComponentByClassName( 'W3AerondightFXComponent' );
-		
-		if (thePlayer.HasTag('aard_sword_equipped'))
-		{
-			l_aerondightEnt.StopAllEffects();
-		}
-	}
-	
-	event OnLeaveState( nextStateName : name ) 
-	{
-		super.OnLeaveState(nextStateName);
-	}
-}
-
-function ACS_SCAAR_4_Installed()
-{
-	return;
-}
-
-function ACS_SCAAR_5_Installed()
-{
-	return;
-}
-
-function ACS_SCAAR_6_Installed()
-{
-	return;
-}
-
-function ACS_Theft_Prevention_6()
-{
-	return;
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 function ACS_ExplorationDelayHack()
 {
 	if ( ACS_Transformation_Activated_Check() )
@@ -9816,11 +9827,6 @@ state Setup_Combat_Action_Light_Engage in cACS_Setup_Combat_Action_Light
 	}
 	
 	entry function Attack_Light_Entry()
-	{	
-		Attack_Light_Latent();
-	}
-	
-	latent function Attack_Light_Latent()
 	{
 		if (thePlayer.HasTag('igni_secondary_sword_equipped_TAG'))
 		{
@@ -9882,13 +9888,8 @@ state Setup_Combat_Action_Heavy_Engage in cACS_Setup_Combat_Action_Heavy
 	{
 		Attack_Heavy_Entry();
 	}
-	
+
 	entry function Attack_Heavy_Entry()
-	{	
-		Attack_Heavy_Latent();
-	}
-	
-	latent function Attack_Heavy_Latent()
 	{
 		GetACSWatcher().RemoveTimer('DefaltSwordWalk');
 
@@ -9936,13 +9937,8 @@ state Setup_Combat_Action_CastSign_Engage in cACS_Setup_Combat_Action_CastSign
 	{
 		CastSign_Entry();
 	}
-	
+
 	entry function CastSign_Entry()
-	{	
-		CastSign_Latent();
-	}
-	
-	latent function CastSign_Latent()
 	{
 		GetACSWatcher().DeactivateThings();
 
@@ -10075,7 +10071,7 @@ function ACS_Armor_Cone()
 	projectileCollision.PushBack( 'Static' );		
 	projectileCollision.PushBack( 'ParticleCollider' ); 
 
-	GetACSArmorCone().Destroy();
+	//GetACSArmorCone().Destroy();
 
 	rot = thePlayer.GetWorldRotation();
 
@@ -10114,6 +10110,37 @@ function ACS_Armor_Cone()
 	proj_1.SetAttackRange( theGame.GetAttackRangeForEntity( ent, 'cone' ) );
 	proj_1.ShootCakeProjectileAtPosition( 60, 3.5f, 0.0f, 30.0f, targetPosition, 500, projectileCollision );		
 	proj_1.DestroyAfter(1);
+}
+
+function GetACSFrostCone() : CEntity
+{
+	var entity 			 : CEntity;
+	
+	entity = (CEntity)theGame.GetEntityByTag( 'ACS_Frost_Cone' );
+	return entity;
+}
+
+function ACS_Frost_Cone()
+{
+	var ent          									: CEntity;
+	var rot                      						: EulerAngles;
+    var pos												: Vector;
+
+	//GetACSFrostCone().Destroy();
+
+	rot = thePlayer.GetWorldRotation();
+
+    pos = thePlayer.GetWorldPosition() + thePlayer.GetWorldForward();
+
+	pos.Z += 1.5;
+
+	ent = theGame.CreateEntity( (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\fx\acs_ice_breathe_old.w2ent", true ), pos, rot );
+
+	ent.AddTag('ACS_Frost_Cone');
+
+	ent.DestroyAfter(5);
+
+	ent.PlayEffectSingle('cone_ground_mutation_6_aard');
 }
 
 function ACS_RedBladeProjectileActual()
@@ -11878,6 +11905,7 @@ function ACS_GetPointOfInterestLocations() : array<Vector>
 		|| all_pins[i].entityType=='QuestAvailableHoS' 
 		|| all_pins[i].entityType=='QuestAvailableBaW'
 		|| all_pins[i].entityType=='NotDiscoveredPOI' 
+		|| all_pins[i].entityType=='MagicLamp' 
 		) 
 		{
 			if ( !theGame.GetCommonMapManager().IsEntityMapPinDisabled(all_pins[i].entityName) )
@@ -11916,7 +11944,6 @@ function ACS_GetAvailableQuestPoints() : array<SCommonMapPinInstance>
 		pinInstances[i].visibleType == 'QuestAvailable'
 		|| pinInstances[i].visibleType=='QuestAvailableHoS' 
 		|| pinInstances[i].visibleType=='QuestAvailableBaW' 
-
 		|| pinInstances[i].visibleType=='QuestReturn' 
 		|| pinInstances[i].visibleType=='MonsterQuest' 
 		|| pinInstances[i].visibleType=='TreasureQuest' 
@@ -11929,6 +11956,8 @@ function ACS_GetAvailableQuestPoints() : array<SCommonMapPinInstance>
 		|| pinInstances[i].visibleType=='HorseRace' 
 		|| pinInstances[i].visibleType=='BoatRace' 
 		|| pinInstances[i].visibleType=='NoticeBoardFull' 
+		|| pinInstances[i].visibleType=='RoadSign' 
+		|| pinInstances[i].visibleType=='Harbor' 
 		
 		/*
 		|| pinInstances[i].visibleType=='MonsterNest' 
@@ -11969,6 +11998,28 @@ function ACS_GetAvailableQuestPoints() : array<SCommonMapPinInstance>
 	}
 
 	return questPins;
+}
+
+function ACS_GetNearbyEnemyLocations() : array<Vector>
+{
+	var actor							: CActor; 
+	var actors		    				: array<CActor>;
+	var i								: int;
+	var pos								: array<Vector>;
+
+	actors.Clear();
+
+	actors = thePlayer.GetNPCsAndPlayersInRange( ACS_Enemy_Marker_Distance_To_Display(), 50, , FLAG_OnlyAliveActors + FLAG_Attitude_Hostile + FLAG_ExcludePlayer);
+
+	if( actors.Size() > 0 )
+	{
+		for (i = 0; i < actors.Size(); i += 1) 
+		{
+			pos.PushBack(actors[i].GetWorldPosition());
+		}
+	}
+
+	return pos;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -12259,9 +12310,9 @@ function ACSTrackedQuestsEntsDestroy()
 		actors[i].Destroy();
 	}
 
-	GetACSWatcher().ACS_Guiding_Light_Untracked_Quest_Marker_Remove();
+	GetACSStorage().acs_deleteOnelinerByTag("ACS_Untracked_Quest_GUI_Marker");
 
-	GetACSWatcher().ACS_Guiding_Light_Untracked_Marker_Distance_Remove();
+	GetACSStorage().acs_deleteOnelinerByTag("ACS_Untracked_Quest_Distance_GUI_Marker");
 
 	if (FactsQuerySum("ACS_Guiding_Light_Untracked_Quest_Marker_Distance_Available") > 0)
 	{
@@ -12305,11 +12356,11 @@ function ACSTrackedQuestsEntsTeleportRotate()
 			actors[i].DestroyEffect('untracked_quest_marker_biggest_x4');
 			actors[i].DestroyEffect('pridefall_marker');
 
-			GetACSWatcher().ACS_Guiding_Light_Untracked_Quest_Marker_Remove();
-
+			GetACSStorage().acs_deleteOnelinerByTag("ACS_Untracked_Quest_GUI_Marker");
+			
 			if (FactsQuerySum("ACS_Guiding_Light_Untracked_Quest_Marker_Distance_Available") > 0)
 			{
-				GetACSWatcher().ACS_Guiding_Light_Untracked_Marker_Distance_Remove();
+				GetACSStorage().acs_deleteOnelinerByTag("ACS_Untracked_Quest_Distance_GUI_Marker");
 
 				FactsRemove("ACS_Guiding_Light_Untracked_Quest_Marker_Distance_Available");
 			}
@@ -12855,293 +12906,6 @@ function ACSYrdenCircle1DestroyAll()
 	}
 }
 
-statemachine class W3ACSGuidingLightMarkerEntity extends CActor
-{
-	event OnSpawned( spawnData : SEntitySpawnData )
-	{
-	}
-
-	event OnTakeDamage( action : W3DamageAction )
-	{
-	}
-
-	event OnDeath( damageData : W3DamageAction )
-	{
-	}
-}
-
-function ACS_IsVanillaTargetCloseEnough( target : CEntity ) : bool
-{
-	var VISIBILITY_DISTANCE : float;	
-	
-	VISIBILITY_DISTANCE = 45; 
-
-	return VecDistanceSquared( target.GetWorldPosition(), thePlayer.GetWorldPosition() ) < VISIBILITY_DISTANCE * VISIBILITY_DISTANCE;
-}
-
-function ACS_IsQuestMarkerTrackedCloseEnough( target : CEntity ) : bool
-{
-	var VISIBILITY_DISTANCE : float;	
-	
-	VISIBILITY_DISTANCE = ACS_Quest_Marker_Distance_To_Display(); 
-
-	return VecDistanceSquared( target.GetWorldPosition(), thePlayer.GetWorldPosition() ) < VISIBILITY_DISTANCE * VISIBILITY_DISTANCE;
-}
-
-function ACS_IsQuestMarkerUntrackedCloseEnough( target : CEntity ) : bool
-{
-	var VISIBILITY_DISTANCE : float;	
-	
-	VISIBILITY_DISTANCE = ACS_Untracked_Quest_Marker_Distance_To_Display(); 
-
-	return VecDistanceSquared( target.GetWorldPosition(), thePlayer.GetWorldPosition() ) < VISIBILITY_DISTANCE * VISIBILITY_DISTANCE;
-}
-
-function ACS_IsPOIMarkerCloseEnough( target : CEntity ) : bool
-{
-	var VISIBILITY_DISTANCE : float;	
-	
-	VISIBILITY_DISTANCE = ACS_POI_Quest_Marker_Distance_To_Display(); 
-
-	return VecDistanceSquared( target.GetWorldPosition(), thePlayer.GetWorldPosition() ) < VISIBILITY_DISTANCE * VISIBILITY_DISTANCE;
-}
-
-function ACS_VectorIsInsideScreenMargins( screenPos : Vector ) : bool
-{
-	var hud									: CR4ScriptedHud;
-	var marginLeftTop						: Vector;
-	var marginRightBottom					: Vector;
-	var screenMargin 						: float = 0.0125; 
-
-	hud = (CR4ScriptedHud)theGame.GetHud();	
-
-	marginLeftTop = hud.GetScaleformPoint( screenMargin, screenMargin );
-
-	marginRightBottom = hud.GetScaleformPoint( 1 - screenMargin, 1 - screenMargin );
-
-	if( screenPos.X <= marginLeftTop.X 
-	|| screenPos.X >= marginRightBottom.X 
-	||screenPos.Y <= marginLeftTop.Y 
-	|| screenPos.Y >= marginRightBottom.Y )
-	{
-		return false;
-	}
-
-	return true;
-}
-
-function ACS_ScreenPosTranslate( out newScreenPos : Vector, screenPos : Vector ) : bool
-{
-	var hud									: CR4ScriptedHud;
-
-	if( !theCamera.WorldVectorToViewRatio( screenPos, newScreenPos.X, newScreenPos.Y ) )
-	{
-		GetOppositeCameraScreenPos( screenPos, newScreenPos.X, newScreenPos.Y );
-	}
-
-	newScreenPos.X = ( newScreenPos.X + 1 ) / 2;
-	newScreenPos.Y = ( newScreenPos.Y + 1 ) / 2;
-
-	hud = (CR4ScriptedHud)theGame.GetHud();	
-
-	newScreenPos = hud.GetScaleformPoint( newScreenPos.X, newScreenPos.Y );
-
-	return true;
-}
-
-function ACS_HUD_Marker_Manager( target : CEntity, mcOneliner : CScriptedFlashSprite)
-{
-	var screenPos							: Vector;
-	var hud									: CR4ScriptedHud;
-	var marginLeftTop						: Vector;
-	var marginRightBottom					: Vector;
-	var screenMargin 						: float = 0.0125; 
-
-	hud = (CR4ScriptedHud)theGame.GetHud();	
-
-	marginLeftTop = hud.GetScaleformPoint( screenMargin, screenMargin );
-
-	marginRightBottom = hud.GetScaleformPoint( 1 - screenMargin, 1 - screenMargin );
-
-	if ( target.HasTag('ACS_Guiding_Light_Marker'))
-	{
-		if ( target && ACS_IsQuestMarkerTrackedCloseEnough(target))
-		{
-			if ( ACS_ScreenPosTranslate(screenPos, target.GetWorldPosition()) )
-			{
-				if (ACS_VectorIsInsideScreenMargins(screenPos))
-				{
-					screenPos.Y -= 45;
-				}
-				else
-				{
-					if( screenPos.X < marginLeftTop.X )
-					{
-						screenPos.X = marginLeftTop.X;
-					}
-					else if( screenPos.X > marginRightBottom.X )
-					{
-						screenPos.X = marginRightBottom.X;
-					}
-					else if( screenPos.Y < marginLeftTop.Y )
-					{
-						screenPos.Y = marginLeftTop.Y;
-					}
-					else
-					{
-						screenPos.Y = marginRightBottom.Y;
-					}
-				}
-				
-				mcOneliner.SetPosition( screenPos.X, screenPos.Y );
-
-				mcOneliner.SetVisible( true );
-			}
-			else
-			{
-				mcOneliner.SetVisible( false );
-			}
-		}
-		else
-		{
-			mcOneliner.SetVisible( false );
-		}
-	}
-	else if ( target.HasTag('ACS_All_Tracked_Quest_Entity')
-	|| target.HasTag('ACS_Guiding_Light_Available_Quest_Marker'))
-	{
-		if ( target && ACS_IsQuestMarkerUntrackedCloseEnough(target))
-		{
-			if ( ACS_ScreenPosTranslate(screenPos, target.GetWorldPosition()) )
-			{
-				if (ACS_VectorIsInsideScreenMargins(screenPos))
-				{
-					screenPos.Y -= 45;
-				}
-				else
-				{
-					if( screenPos.X < marginLeftTop.X )
-					{
-						screenPos.X = marginLeftTop.X;
-					}
-					else if( screenPos.X > marginRightBottom.X )
-					{
-						screenPos.X = marginRightBottom.X;
-					}
-					else if( screenPos.Y < marginLeftTop.Y )
-					{
-						screenPos.Y = marginLeftTop.Y;
-					}
-					else
-					{
-						screenPos.Y = marginRightBottom.Y;
-					}
-				}
-				
-				mcOneliner.SetPosition( screenPos.X, screenPos.Y );
-
-				mcOneliner.SetVisible( true );
-			}
-			else
-			{
-				mcOneliner.SetVisible( false );
-			}
-		}
-		else
-		{
-			mcOneliner.SetVisible( false );
-		}
-	}
-	else if ( target.HasTag('ACS_Guiding_Light_POI_Marker'))
-	{
-		if ( target && ACS_IsPOIMarkerCloseEnough(target))
-		{
-			if ( ACS_ScreenPosTranslate(screenPos, target.GetWorldPosition()) )
-			{
-				if (ACS_VectorIsInsideScreenMargins(screenPos))
-				{
-					screenPos.Y -= 45;
-				}
-				else
-				{
-					if( screenPos.X < marginLeftTop.X )
-					{
-						screenPos.X = marginLeftTop.X;
-					}
-					else if( screenPos.X > marginRightBottom.X )
-					{
-						screenPos.X = marginRightBottom.X;
-					}
-					else if( screenPos.Y < marginLeftTop.Y )
-					{
-						screenPos.Y = marginLeftTop.Y;
-					}
-					else
-					{
-						screenPos.Y = marginRightBottom.Y;
-					}
-				}
-				
-				mcOneliner.SetPosition( screenPos.X, screenPos.Y );
-
-				mcOneliner.SetVisible( true );
-			}
-			else
-			{
-				mcOneliner.SetVisible( false );
-			}
-		}
-		else
-		{
-			mcOneliner.SetVisible( false );
-		}
-	}
-	else
-	{
-		if ( target )
-		{
-			if ( ACS_ScreenPosTranslate(screenPos, target.GetWorldPosition()) )
-			{
-				if (ACS_VectorIsInsideScreenMargins(screenPos))
-				{
-					screenPos.Y -= 45;
-				}
-				else
-				{
-					if( screenPos.X < marginLeftTop.X )
-					{
-						screenPos.X = marginLeftTop.X;
-					}
-					else if( screenPos.X > marginRightBottom.X )
-					{
-						screenPos.X = marginRightBottom.X;
-					}
-					else if( screenPos.Y < marginLeftTop.Y )
-					{
-						screenPos.Y = marginLeftTop.Y;
-					}
-					else
-					{
-						screenPos.Y = marginRightBottom.Y;
-					}
-				}
-				
-				mcOneliner.SetPosition( screenPos.X, screenPos.Y );
-
-				mcOneliner.SetVisible( true );
-			}
-			else
-			{
-				mcOneliner.SetVisible( false );
-			}
-		}
-		else
-		{
-			mcOneliner.SetVisible( false );
-		}
-	}
-}
-
 function ACS_Movement_Prevention() : bool
 {
 	if (thePlayer.HasTag('ACS_Movement_Prevention_Tag'))
@@ -13165,7 +12929,6 @@ function ACS_Interaction_Movement_Prevention_Delay()
 
 class W3ACSCustomWingEntity extends CActor
 {
-
 	editable var forcedAppearance : string;
 
 	event OnSpawned( spawnData : SEntitySpawnData )

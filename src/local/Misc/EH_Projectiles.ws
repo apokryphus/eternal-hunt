@@ -733,6 +733,19 @@ class W3ACSKnifeProjectile extends W3AdvancedProjectile
 	{
 		var knife_temp							: CEntityTemplate;
 		var knife 								: CEntity;
+
+		knife_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\entities\other\acs_knife_loot_old.w2ent", true );
+
+		knife = (CEntity)theGame.CreateEntity( knife_temp, this.GetWorldPosition() );
+
+		((W3AnimatedContainer)(knife)).GetInventory().AddAnItem( 'ACS_Knife' , 1 );
+	}
+
+	/*
+	function CreateKnife()
+	{
+		var knife_temp							: CEntityTemplate;
+		var knife 								: CEntity;
 		var droppeditemID 						: SItemUniqueId;
 
 		knife_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\fx\acs_guiding_light.w2ent", true );
@@ -762,6 +775,1063 @@ class W3ACSKnifeProjectile extends W3AdvancedProjectile
 		((CActor)(knife)).GetInventory().DropItemInBag(droppeditemID, 1);
 
 		knife.DestroyAfter(0.5);
+	}
+	*/
+}
+
+function GetACSLeviathan() : W3ACSLeviathanProjectile
+{
+	var entity 			 : W3ACSLeviathanProjectile;
+	
+	entity = (W3ACSLeviathanProjectile)theGame.GetEntityByTag( 'ACS_Leviathan_Projectile' );
+	return entity;
+}
+
+function GetACSLeviathanContainer() : W3LeviathanContainer
+{
+	var entity 			 : W3LeviathanContainer;
+	
+	entity = (W3LeviathanContainer)theGame.GetEntityByTag( 'ACS_Leviathan_Container' );
+	return entity;
+}
+
+function GetACSLeviathanAdditionalFX() : CEntity
+{
+	var entity 			 : CEntity;
+	
+	entity = (CEntity)theGame.GetEntityByTag( 'ACS_Leviathan_Additional_FX' );
+	return entity;
+}
+
+function GetACSLeviathanTemporaryStorageUnit() : W3AnimatedContainer
+{
+	var entity 			 : W3AnimatedContainer;
+	
+	entity = (W3AnimatedContainer)theGame.GetEntityByTag( 'ACS_Leviathan_Temporary_Storage_Unit' );
+	return entity;
+}
+
+
+class W3ACSLeviathanProjectile extends W3AdvancedProjectile
+{
+	private var bone 									: name;
+	private var actor, actortarget						: CActor;
+	private var target									: CNewNPC;	
+	private var i	 									: int;
+	private var victims									: array<CGameplayEntity>;
+	private var comp, meshComponent						: CMeshComponent;
+	private var rot, bone_rot, attach_rot					: EulerAngles;
+	private var res, stopped 							: bool;
+	private var arrowHitPos, arrowSize, bone_pos, pos, attach_vec	: Vector;
+	private var boundingBox								: Box;
+	private var rotMat									: Matrix;
+	private var effType									: EEffectType;
+	private var crit									: bool;
+	private var damage									: float;
+	private var action									: W3DamageAction;
+	public var random_return_pitch 						: float;
+	public var return_yaw 								: float;
+
+	event OnSpawned( spawnData : SEntitySpawnData )
+	{
+		random_return_pitch = RandRangeF(67, 0);
+	}
+	
+	event OnProjectileInit()
+	{	
+		comp = (CMeshComponent)this.GetComponentByClassName('CMeshComponent');
+		rot = comp.GetLocalRotation();
+
+		rot.Roll += 90;
+		//rot.Pitch -= RandRange(45, -45);
+		rot.Yaw += 90;
+
+		return_yaw = rot.Yaw;
+
+		return_yaw += 180;
+
+		comp.SetRotation( rot );
+
+		//pos = comp.GetLocalPosition();
+		//pos.Y += 0.25;
+		//comp.SetPosition( pos );
+
+		AddTimer('trail', 0.00000000000000000000001, true);
+
+		if (this.HasTag('ACS_Leviathan_Projectile_Guarantee_Freeze'))
+		{
+			DestroyEffect('glow');
+			PlayEffectSingle('glow');
+		}
+
+		DealDamageProj();
+
+		this.SoundEvent('magic_eredin_icespike_tell_loop_start');
+	}
+
+	var last_spin_time : float;
+
+	function Can_Spin(): bool 
+	{
+		return theGame.GetEngineTimeAsSeconds() - last_spin_time > 0.25;
+	}
+
+	function Refresh_Spin_Cooldown() 
+	{
+		last_spin_time = theGame.GetEngineTimeAsSeconds();
+	}
+
+	timer function trail( dt : float , optional id : int)
+	{
+		//StopEffect('blue_trail');
+		PlayEffectSingle('blue_trail');
+
+		comp = (CMeshComponent)this.GetComponentByClassName('CMeshComponent');
+		rot = comp.GetLocalRotation();
+		
+		if (FactsQuerySum("ACS_Leviathan_Axe_Returning") > 0)
+		{
+			rot.Roll -= 7.5;
+
+			if (rot.Pitch != random_return_pitch)
+			{
+				if (random_return_pitch > 0)
+				{
+					rot.Pitch += 0.125;
+				}
+				else if (random_return_pitch < 0)
+				{
+					rot.Pitch -= 0.125;
+				}
+				else 
+				{
+					rot.Pitch = random_return_pitch;
+				}
+			}
+			else 
+			{
+				rot.Pitch = random_return_pitch;
+			}
+
+			if (rot.Yaw != return_yaw)
+			{
+				rot.Yaw += 90;
+			}
+			else
+			{
+				rot.Yaw = return_yaw;
+			}
+		}
+		else
+		{
+			rot.Roll += 7.5;
+		}
+			
+		comp.SetRotation( rot );
+
+		if (Can_Spin())
+		{
+			Refresh_Spin_Cooldown();
+
+			DealDamageProj();
+		}
+
+		if (FactsQuerySum("ACS_Leviathan_Axe_Returning") > 0)
+		{
+			PlayerDistanceCheck();
+		}
+		else
+		{
+			GetACSStorage().acs_recordLeviathanPosition(this.GetWorldPosition());
+
+		}
+	}
+
+	var curvature_reached : bool;
+
+	function PlayerDistanceCheck()
+	{
+		var targetDistance																						: float;
+		var targetPosition																						: Vector;
+		var ent 																								: CEntity;
+		var itemIds 																							: array<SItemUniqueId>;
+		var i 																									: int;
+
+		targetDistance = VecDistanceSquared2D( this.GetWorldPosition(), GetWitcherPlayer().GetBoneWorldPosition('r_hand') );
+
+		if (targetDistance <= 1 * 1)
+		{
+			this.SoundEvent("cmb_arrow_impact_dirt");
+			this.SoundEvent('magic_eredin_icespike_tell_loop_stop');
+			RemoveTimers();
+			StopProjectile();
+			PlayEffect('disappear');
+			DestroyAfter(0.4);
+
+			this.Teleport(thePlayer.GetWorldPosition() + Vector(0,0,-200));
+
+			if (!thePlayer.inv.HasItem('Leviathan'))
+			{
+				//thePlayer.inv.AddAnItem('Leviathan', 1);
+			}
+
+			itemIds = GetACSLeviathanTemporaryStorageUnit().GetInventory().GetItemsByTag( 'ACS_Designated_Leviathan' );
+
+			if (itemIds.Size() > 0)
+			{
+				for( i = 0; i < itemIds.Size() ; i+=1 )
+				{
+					if( GetACSLeviathanTemporaryStorageUnit().GetInventory().ItemHasTag( itemIds[i], 'ACS_Designated_Leviathan' ) )
+					{
+						GetACSLeviathanTemporaryStorageUnit().GetInventory().RemoveItemTag( itemIds[i], 'ACS_Designated_Leviathan' );
+
+						GetACSLeviathanTemporaryStorageUnit().GetInventory().GiveItemTo( thePlayer.GetInventory(), itemIds[i], 1, false, true, false);
+					}
+				}
+			}
+
+			GetACSLeviathanTemporaryStorageUnit().Destroy();
+
+			if (FactsQuerySum("ACS_Leviathan_Axe_Thrown") > 0)
+			{
+				FactsRemove("ACS_Leviathan_Axe_Thrown");
+			}
+
+			if (FactsQuerySum("ACS_Leviathan_Axe_Returning") > 0)
+			{
+				FactsRemove("ACS_Leviathan_Axe_Returning");
+			}
+
+			if (FactsQuerySum("ACS_Leviathan_Axe_Returning_Anim_Played") > 0)
+			{
+				FactsRemove("ACS_Leviathan_Axe_Returning_Anim_Played");
+			}
+
+			thePlayer.EquipItem( thePlayer.inv.GetItemId('Leviathan'));
+
+			if ( thePlayer.IsActionAllowed(EIAB_DrawWeapon) && thePlayer.GetBIsInputAllowed() && thePlayer.GetWeaponHolster().IsMeleeWeaponReady() )
+			{
+				thePlayer.GetInventory().MountItem( thePlayer.inv.GetItemId('Leviathan'), true );  
+
+				thePlayer.GetWeaponHolster().OnWeaponDrawReady();
+			}
+
+			GetACSWatcher().ACS_Leviathan_Release_Savelock();
+
+			return;
+		}
+
+		//targetPosition = GetWitcherPlayer().GetWorldPosition();
+
+		//targetPosition.Z += 1.25;
+
+		if (targetDistance <= 5 * 5)
+		{
+			if (FactsQuerySum("ACS_Leviathan_Axe_Returning_Anim_Played") <= 0)
+			{
+				thePlayer.RaiseEvent('LootHerb');
+
+				FactsAdd("ACS_Leviathan_Axe_Returning_Anim_Played", 1, -1);
+			}
+
+			targetPosition = GetWitcherPlayer().GetBoneWorldPosition('r_hand');
+		}
+		else if (targetDistance > 5 * 5 && targetDistance <= 10 * 10)
+		{
+			targetPosition = GetWitcherPlayer().GetBoneWorldPosition('r_hand') + GetWitcherPlayer().GetWorldRight() * 5;
+
+			targetPosition.Z += 1;
+		}
+		else if (targetDistance > 10 * 10)
+		{
+			targetPosition = GetWitcherPlayer().GetBoneWorldPosition('r_hand');
+		} 
+
+		this.ShootProjectileAtPosition( 0, 30, targetPosition, 500 );
+	}
+	
+	function DealDamageProj()
+	{
+		var entities	 		: array<CGameplayEntity>;
+		var i					: int;
+		
+		entities.Clear();
+
+		FindGameplayEntitiesInSphere( entities, GetWorldPosition(), 1.25, 100 );
+
+		for( i = 0; i < entities.Size(); i += 1 )
+		{
+			DealDamageToTarget( entities[i], effType, crit );
+		}
+	}
+
+	function DealDamageToTarget( victim : CGameplayEntity, eff : EEffectType, crit : bool )
+	{
+		var ent : CEntity;
+
+		actortarget = (CActor)victim;
+		
+		if ( actortarget 
+		&& actortarget != GetWitcherPlayer() 
+		&& GetAttitudeBetween( actortarget, GetWitcherPlayer() ) == AIA_Hostile 
+		&& actortarget.IsAlive() ) 
+		{
+			this.SoundEvent('magic_eredin_icespike_tell_sparks');
+			this.SoundEvent("cmb_play_hit_heavy");
+			this.SoundEvent("magic_eredin_frost_projectile");
+			this.SoundEvent("cmb_play_dismemberment_gore");
+
+			ent = theGame.CreateEntity( 
+			
+			(CEntityTemplate)LoadResource( "dlc\dlc_acs\data\fx\acs_ice_breathe_old.w2ent", true ), 
+				
+			TraceFloor(actortarget.GetWorldPosition()), thePlayer.GetWorldRotation() );
+
+			ent.PlayEffect('ice_spikes');
+			ent.PlayEffect('cone_ground_mutation_6_aard');
+
+			theGame.GetSurfacePostFX().AddSurfacePostFXGroup( TraceFloor( actortarget.GetWorldPosition() ), 1.f, 5, 1.f, 20.f, 0);
+
+			action = new W3DamageAction in this;
+
+			action.Initialize(GetWitcherPlayer(),victim,this,GetWitcherPlayer(),EHRT_Heavy,CPS_Undefined,false,true,false,false);
+
+			action.AddEffectInfo( EET_SlowdownFrost, 5 );
+
+			if (FactsQuerySum("ACS_Leviathan_Axe_Returning") > 0)
+			{
+				if (this.HasTag('ACS_Leviathan_Projectile_Guarantee_Freeze'))
+				{
+					if (actortarget.UsesEssence())
+					{
+						damage = actortarget.GetStatMax( BCS_Essence ) * 0.25;
+					}
+					else if (actortarget.UsesVitality())
+					{
+						damage = actortarget.GetStatMax( BCS_Vitality ) * 0.25;
+					}
+
+					action.AddEffectInfo( EET_Frozen, 3 );
+
+					action.AddDamage(theGame.params.DAMAGE_NAME_DIRECT, damage );
+				}
+				else
+				{
+					if (actortarget.UsesEssence())
+					{
+						damage = actortarget.GetStatMax( BCS_Essence ) * 0.125;
+					}
+					else if (actortarget.UsesVitality())
+					{
+						damage = actortarget.GetStatMax( BCS_Vitality ) * 0.125;
+					}
+
+					action.AddDamage(theGame.params.DAMAGE_NAME_FROST, damage );
+				}
+
+				action.SetForceExplosionDismemberment();
+			}
+			else
+			{
+				if (this.HasTag('ACS_Leviathan_Projectile_Guarantee_Freeze'))
+				{
+					if (actortarget.UsesEssence())
+					{
+						damage = actortarget.GetStatMax( BCS_Essence ) * 0.125;
+					}
+					else if (actortarget.UsesVitality())
+					{
+						damage = actortarget.GetStatMax( BCS_Vitality ) * 0.125;
+					}
+
+					action.AddEffectInfo( EET_Frozen, 3 );
+
+					ent.PlayEffect('ice_line');
+
+					ent.PlayEffect('cone_ground_mutation_6_aard');
+
+					ent.PlayEffect('blast_ground_mutation_6_aard');
+
+					action.SetForceExplosionDismemberment();
+
+					this.SoundEvent("magic_eredin_icespike_tell_explosion");
+
+					action.AddDamage(theGame.params.DAMAGE_NAME_DIRECT, damage );
+				}
+				else
+				{
+					if (actortarget.UsesEssence())
+					{
+						damage = actortarget.GetStatMax( BCS_Essence ) * 0.0625;
+					}
+					else if (actortarget.UsesVitality())
+					{
+						damage = actortarget.GetStatMax( BCS_Vitality ) * 0.0625;
+					}
+
+					action.AddDamage(theGame.params.DAMAGE_NAME_FROST, damage );
+				}
+			}
+
+			ent.DestroyAfter(10);
+
+			action.SetCanPlayHitParticle(true);
+
+			theGame.damageMgr.ProcessAction( action );
+
+			delete action;
+		}
+	}
+
+	function FreezeAura( victim : CGameplayEntity )
+	{
+		var ent : CEntity;
+
+		actortarget = (CActor)victim;
+		
+		if ( actortarget 
+		&& actortarget != GetWitcherPlayer() 
+		&& GetAttitudeBetween( actortarget, GetWitcherPlayer() ) == AIA_Hostile 
+		&& actortarget.IsAlive() ) 
+		{
+			action = new W3DamageAction in this;
+
+			action.Initialize(GetWitcherPlayer(),victim,this,GetWitcherPlayer(),EHRT_None,CPS_Undefined,false,true,false,false);
+
+			action.AddDamage(theGame.params.DAMAGE_NAME_FROST, actortarget.GetCurrentHealth() * 0.0000001 );
+
+			action.AddEffectInfo( EET_SlowdownFrost, 5 );
+
+			action.SetCanPlayHitParticle(false);
+
+			action.SetSuppressHitSounds(true);
+
+			theGame.damageMgr.ProcessAction( action );
+
+			delete action;
+		}
+	}
+		
+	event OnProjectileCollision( pos, normal : Vector, collidingComponent : CComponent, hitCollisionsGroups : array< name >, actorIndex : int, shapeIndex : int )
+	{	
+		if(collidingComponent)
+		{
+			victim = (CGameplayEntity)collidingComponent.GetEntity();
+		}
+		
+		if (FactsQuerySum("ACS_Leviathan_Axe_Returning") > 0)
+		{
+			if( collidingComponent && !hitCollisionsGroups.Contains( 'Static' ) )
+			{
+				if ( victim 
+				&& !collidedEntities.Contains(victim) 
+				&& victim != GetWitcherPlayer() 
+				&& ( GetAttitudeBetween( victim, GetWitcherPlayer() ) == AIA_Hostile) 
+				&& victim.IsAlive() )
+				{
+					actor = (CActor)victim;
+					
+					collidedEntities.PushBack(victim);
+					
+					DealDamageProj();
+
+					theGame.GetSurfacePostFX().AddSurfacePostFXGroup( TraceFloor( this.GetWorldPosition() ), 1.f, 20, 1.f, 20.f, 0);
+				}
+			}
+			else
+			if ( ( hitCollisionsGroups.Contains( 'Terrain' ) 
+			|| hitCollisionsGroups.Contains( 'Static' ) 
+			|| hitCollisionsGroups.Contains( 'Foliage' ) 
+			|| hitCollisionsGroups.Contains( 'Water' )
+			) )
+			{
+				DealDamageProj();
+
+				this.SoundEvent('magic_eredin_icespike_tell_sparks');
+				this.SoundEvent('magic_eredin_icespike_tell_sparks');
+				this.SoundEvent('magic_eredin_icespike_tell_sparks');
+				this.SoundEvent('magic_eredin_frost_projectile');
+				this.SoundEvent('magic_eredin_frost_projectile');
+				this.SoundEvent('magic_eredin_frost_projectile');
+				this.SoundEvent('magic_eredin_frost_projectile');
+
+				theGame.GetSurfacePostFX().AddSurfacePostFXGroup( TraceFloor( this.GetWorldPosition() ), 1.f, 20, 1.f, 20.f, 0);
+			}
+		}
+		else
+		{
+			if( collidingComponent && !hitCollisionsGroups.Contains( 'Static' ) )
+			{		
+				if ( victim 
+				&& !collidedEntities.Contains(victim) 
+				&& victim != GetWitcherPlayer() 
+				&& ( GetAttitudeBetween( victim, GetWitcherPlayer() ) == AIA_Hostile) 
+				&& victim.IsAlive() )
+				{
+					actor = (CActor)victim;
+					
+					collidedEntities.PushBack(victim);
+					
+					if ( hitCollisionsGroups.Contains( 'Ragdoll' ) )
+					{
+						bone = ((CMovingPhysicalAgentComponent)actor.GetMovingAgentComponent()).GetRagdollBoneName(actorIndex);
+						
+						if ((StrContains(StrLower(NameToString(bone)), "head" )))
+						{
+							comp = (CMeshComponent)this.GetComponentByClassName('CMeshComponent');
+							rot = comp.GetLocalRotation();
+							rot.Roll = RandRangeF(90, 45);
+							comp.SetRotation( rot );
+
+							arrowHitPos = pos;
+							arrowHitPos += RotForward(  this.GetWorldRotation() ) * 0.125f; 
+							
+							stopped = true;
+							this.SoundEvent('magic_eredin_icespike_tell_loop_stop');
+							StopProjectile();
+							RemoveTimer('trail');
+						
+							res = this.CreateAttachmentAtBoneWS(actor, bone, arrowHitPos, this.GetWorldRotation());
+
+							AttachIceFX();
+
+							if ( !actor.HasBuff( EET_Knockdown ) 
+							&& !actor.HasBuff( EET_HeavyKnockdown ) 
+							&& !actor.GetIsRecoveringFromKnockdown() 
+							&& !actor.HasBuff( EET_Ragdoll ) )
+							{
+								effType = EET_HeavyKnockdown;
+							}
+												
+							crit = true;
+						}
+						else if ( 
+						StrContains( StrLower( NameToString( bone ) ), "torso" ) 
+						|| StrContains( StrLower( NameToString( bone ) ), "pelvis" ) 
+						|| StrContains( StrLower( NameToString( bone ) ), "neck" ) 
+						|| StrContains( StrLower( NameToString( bone ) ), "l_foot" )
+						|| StrContains( StrLower( NameToString( bone ) ), "r_shoulder" )
+						|| StrContains( StrLower( NameToString( bone ) ), "l_shoulder" )
+						|| StrContains( StrLower( NameToString( bone ) ), "torso2" )
+						|| StrContains( StrLower( NameToString( bone ) ), "torso3" )
+						|| StrContains( StrLower( NameToString( bone ) ), "spine" )
+						|| StrContains( StrLower( NameToString( bone ) ), "spine1" )
+						|| StrContains( StrLower( NameToString( bone ) ), "spine2" )	
+						|| StrContains( StrLower( NameToString( bone ) ), "pelvis_ncl1_1" )		
+						|| StrContains( StrLower( NameToString( bone ) ), "torso_ncl1_1" )		
+						|| StrContains( StrLower( NameToString( bone ) ), "r_shoulder_ncl1_1" )		
+						|| StrContains( StrLower( NameToString( bone ) ), "r_shoulderRoll_ncl1_1" )		
+						|| StrContains( StrLower( NameToString( bone ) ), "r_bicep_ncl1_1" )		
+						|| StrContains( StrLower( NameToString( bone ) ), "torso3_ncl1_1" )	
+						|| StrContains( StrLower( NameToString( bone ) ), "torso2_ncl1_1" )		
+						|| StrContains( StrLower( NameToString( bone ) ), "l_shoulder_ncl1_1" )		
+						|| StrContains( StrLower( NameToString( bone ) ), "l_shoulderRoll_ncl1_1" )			
+						|| StrContains( StrLower( NameToString( bone ) ), "hroll_ncl1_1" )		
+						|| StrContains( StrLower( NameToString( bone ) ), "head_ncl1_1" )		
+						) 
+						{
+							comp = (CMeshComponent)this.GetComponentByClassName('CMeshComponent');
+							rot = comp.GetLocalRotation();
+							rot.Roll = RandRangeF(90, 45);
+							comp.SetRotation( rot );
+
+							arrowHitPos = pos;
+							arrowHitPos -= RotForward(  this.GetWorldRotation() ) * -0.125f; 
+							
+							stopped = true;
+
+							this.SoundEvent('magic_eredin_icespike_tell_loop_stop');
+							StopProjectile();
+
+							RemoveTimer('trail');
+
+							res = this.CreateAttachmentAtBoneWS(actor, bone, arrowHitPos, this.GetWorldRotation());
+
+							AttachIceFX();
+
+							effType = EET_LongStagger;
+							
+							crit = false;
+						}
+						else if ((StrContains(StrLower(NameToString(bone)), "r_hand" )))
+						{
+							actor.DropItemFromSlot( 'r_weapon', true );
+						}
+						else
+						{
+							effType = EET_LongStagger;
+
+							crit = false;
+						}
+					}
+					else
+					{
+						comp = (CMeshComponent)this.GetComponentByClassName('CMeshComponent');
+						rot = comp.GetLocalRotation();
+						rot.Roll = RandRangeF(90, 45);
+						comp.SetRotation( rot );
+
+						arrowHitPos = pos;
+						arrowHitPos -= RotForward(  this.GetWorldRotation() ) * -0.125f; 
+						
+						stopped = true;
+						this.SoundEvent('magic_eredin_icespike_tell_loop_stop');
+						StopProjectile();
+						RemoveTimer('trail');
+
+						if ( actor.GetBoneIndex('head') != -1 )
+						{
+							res = this.CreateAttachmentAtBoneWS(actor, 'head', arrowHitPos, this.GetWorldRotation());
+						}
+						else
+						{
+							res = this.CreateAttachmentAtBoneWS(actor, 'k_head_g', arrowHitPos, this.GetWorldRotation());
+						}
+
+						AttachIceFX();
+					}
+
+					DealDamageToTarget( victim, effType, crit );
+				}
+			}
+			else
+			if ( ( hitCollisionsGroups.Contains( 'Terrain' ) 
+			|| hitCollisionsGroups.Contains( 'Static' ) 
+			|| hitCollisionsGroups.Contains( 'Foliage' ) 
+			|| hitCollisionsGroups.Contains( 'Water' )
+			) 
+			&& !stopped )
+			{
+				this.SoundEvent('magic_eredin_icespike_tell_loop_stop');
+				StopProjectile();
+				//DestroyAfter(0.4);
+				
+				this.SoundEvent('magic_eredin_icespike_tell_sparks');
+				this.SoundEvent('magic_eredin_icespike_tell_sparks');
+				this.SoundEvent('magic_eredin_icespike_tell_sparks');
+				this.SoundEvent('magic_eredin_icespike_tell_sparks');
+				this.SoundEvent('magic_eredin_icespike_tell_sparks');
+				this.SoundEvent('magic_eredin_frost_projectile');
+				this.SoundEvent('magic_eredin_frost_projectile');
+				this.SoundEvent('magic_eredin_frost_projectile');
+				this.SoundEvent('magic_eredin_frost_projectile');
+				this.SoundEvent('magic_eredin_frost_projectile');
+
+
+				RemoveTimer('trail');
+
+				CreateLeviathan();
+
+				comp = (CMeshComponent)this.GetComponentByClassName('CMeshComponent');
+				rot = comp.GetLocalRotation();
+				
+				rot.Roll = RandRangeF(180, 90);
+
+				comp.SetRotation( rot );
+				
+				arrowHitPos = pos;
+				arrowHitPos -= RotForward(  this.GetWorldRotation() ) * 0.25f; 
+				meshComponent = (CMeshComponent)GetComponentByClassName('CMeshComponent');
+				if( meshComponent )
+				{
+					boundingBox = meshComponent.GetBoundingBox();
+					arrowSize = boundingBox.Max - boundingBox.Min;
+				}
+				Teleport( arrowHitPos );
+				
+				res = true;
+			}	
+			else 
+			{
+				return false;
+			}
+		}
+	}
+
+	timer function freeze_aura( dt : float , optional id : int)
+	{
+		var entities	 		: array<CGameplayEntity>;
+		var i					: int;
+		
+		entities.Clear();
+
+		FindGameplayEntitiesInSphere( entities, GetWorldPosition(), 1.5, 100 );
+
+		for( i = 0; i < entities.Size(); i += 1 )
+		{
+			FreezeAura( entities[i] );
+		}
+	}
+
+	function AttachIceFX()
+	{
+		var ent 							: CEntity;
+
+		ent = theGame.CreateEntity( 
+			
+		(CEntityTemplate)LoadResource( "dlc\dlc_acs\data\fx\acs_ice_breathe_old.w2ent", true ), 
+				
+		TraceFloor( this.GetWorldPosition() ), thePlayer.GetWorldRotation() );
+
+		ent.PlayEffect('ice_spike_appear_bigger');
+
+		ent.PlayEffect('ice_spike_tell_bigger');
+
+		AddTimer('freeze_aura', 1, true);
+
+		ent.CreateAttachment(GetACSLeviathan(),'trail_point', Vector (0,0,0.7));
+
+		ent.AddTag('ACS_Leviathan_Additional_FX');
+	}
+
+	function CreateLeviathan()
+	{
+		var knife_temp							: CEntityTemplate;
+		var knife, ent 							: CEntity;
+
+		knife_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\entities\other\acs_leviathan_loot.w2ent", true );
+
+		knife = (CEntity)theGame.CreateEntity( knife_temp, this.GetWorldPosition() );
+
+		((W3LeviathanContainer)(knife)).GetInventory().AddAnItem( 'Leviathan' , 1 );
+
+		GetACSStorage().acs_recordLeviathanPosition(this.GetWorldPosition());
+
+		knife.AddTag('ACS_Leviathan_Container');
+
+	
+		ent = theGame.CreateEntity( 
+			
+		(CEntityTemplate)LoadResource( "dlc\dlc_acs\data\fx\acs_ice_breathe_old.w2ent", true ), 
+				
+		TraceFloor( this.GetWorldPosition() ), thePlayer.GetWorldRotation() );
+
+		ent.PlayEffect('ice_spikes');
+
+		ent.PlayEffect('cone_ground_mutation_6_aard');
+
+		if (this.HasTag('ACS_Leviathan_Projectile_Guarantee_Freeze'))
+		{
+			ent.PlayEffect('blast_ground_mutation_6_aard');
+			this.SoundEvent("magic_eredin_icespike_tell_explosion");
+		}
+
+		ent.DestroyAfter(10);
+
+		theGame.GetSurfacePostFX().AddSurfacePostFXGroup( TraceFloor( this.GetWorldPosition() ), 1.f, 20, 1.f, 20.f, 0);
+
+		AttachIceFX();
+	}
+}
+
+class W3LeviathanContainer extends W3Container
+{
+	editable var animationForAllInteractions 	: bool;							default animationForAllInteractions = true;
+	editable var interactionName				: string;						default interactionName = "Container";
+	editable var holsterWeaponAtTheBeginning	: bool;							default holsterWeaponAtTheBeginning = true;
+	editable var interactionAnim				: EPlayerExplorationAction;		default interactionAnim	= PEA_None;
+	editable var slotAnimName 					: name;							default slotAnimName = '';
+	editable var interactionAnimTime			: float;						default interactionAnimTime	= 4.0f;
+	
+	
+	editable var desiredPlayerToEntityDistance	: float;						default desiredPlayerToEntityDistance = -1;
+	editable var matchPlayerHeadingWithHeadingOfTheEntity	: bool;				default matchPlayerHeadingWithHeadingOfTheEntity = true;
+	
+	editable var attachThisObjectOnAnimEvent	: bool;							default attachThisObjectOnAnimEvent = false;
+	editable var attachSlotName					: name; 						default attachSlotName = 'r_weapon';
+	editable var attachAnimName 				: name; 						default attachAnimName = 'attach_item';
+	editable var detachAnimName 				: name; 						default detachAnimName = 'detach_item';
+	
+	
+	
+	hint interactionAnim = "Name of the animation played on interaction.";
+	hint interactionAnimTime = "Duration of the animation played on interaction.";
+	hint animationForAllInteractions = "Should the animation be played only for interaction with Examine action assigned.";
+	hint attachThisObjectOnAnimEvent = "";
+	hint desiredPlayerToEntityDistance = "if set to < 0 palyer will stay in position where interaction was pressed";
+
+	event OnSpawned( spawnData : SEntitySpawnData )
+	{
+		super.OnSpawned( spawnData );
+
+		AddTimer( 'ACS_Leviathan_Container_Destroy', 0.00001, true );		
+	}
+	
+	event OnDetaching()
+	{
+		if ( isPlayingInteractionAnim )
+		{
+			OnPlayerActionEnd();
+		}		
+	}	
+	
+	event OnInteraction( actionName : string, activator : CEntity  )
+	{
+		var itemIds 																							: array<SItemUniqueId>;
+		var i 																									: int;
+
+		super.OnInteraction( actionName, activator );
+		
+		if ( activator == thePlayer && thePlayer.IsActionAllowed( EIAB_InteractionAction ) && thePlayer.CanPerformPlayerAction(true))
+		{
+			if( ( animationForAllInteractions == true || actionName == interactionName ) && !lockedByKey )
+			{
+				PlayInteractionAnimation();
+			}
+
+			itemIds = GetACSLeviathanTemporaryStorageUnit().GetInventory().GetItemsByTag( 'ACS_Designated_Leviathan' );
+
+			if (itemIds.Size() > 0)
+			{
+				for( i = 0; i < itemIds.Size() ; i+=1 )
+				{
+					if( GetACSLeviathanTemporaryStorageUnit().GetInventory().ItemHasTag( itemIds[i], 'ACS_Designated_Leviathan' ) )
+					{
+						GetACSLeviathanTemporaryStorageUnit().GetInventory().RemoveItemTag( itemIds[i], 'ACS_Designated_Leviathan' );
+
+						GetACSLeviathanTemporaryStorageUnit().GetInventory().GiveItemTo( thePlayer.GetInventory(), itemIds[i], 1, false, true, false);
+					}
+				}
+			}
+
+			GetACSLeviathanTemporaryStorageUnit().Destroy();
+
+			thePlayer.EquipItem( thePlayer.inv.GetItemId('Leviathan'));
+
+			if ( thePlayer.IsActionAllowed(EIAB_DrawWeapon) && thePlayer.GetBIsInputAllowed() && thePlayer.GetWeaponHolster().IsMeleeWeaponReady() )
+			{
+				thePlayer.GetInventory().MountItem( thePlayer.inv.GetItemId('Leviathan'), true );  
+
+				thePlayer.GetWeaponHolster().OnWeaponDrawReady();
+			}
+
+			if (FactsQuerySum("ACS_Leviathan_Axe_Thrown") > 0)
+			{
+				FactsRemove("ACS_Leviathan_Axe_Thrown");
+			}
+
+			if (FactsQuerySum("ACS_Leviathan_Axe_Returning") > 0)
+			{
+				FactsRemove("ACS_Leviathan_Axe_Returning");
+			}
+
+			thePlayer.RaiseEvent('LootHerb');
+
+			GetACSLeviathanAdditionalFX().StopAllEffects();
+
+			GetACSLeviathanAdditionalFX().BreakAttachment();
+
+			GetACSLeviathanAdditionalFX().DestroyAfter(2);
+
+			GetACSLeviathanAdditionalFX().RemoveTag('ACS_Leviathan_Additional_FX');
+
+			GetACSLeviathan().SoundEvent("cmb_arrow_impact_dirt");
+
+			GetACSLeviathan().Teleport(thePlayer.GetWorldPosition() + Vector(0,0,-200));
+
+			GetACSLeviathan().PlayEffect('disappear');
+			
+			GetACSLeviathan().DestroyAfter(0.4);
+		}
+		
+	}
+	
+	function ProcessLoot ()
+	{
+	
+	}
+	
+	event OnStreamIn()
+	{
+		super.OnStreamIn();
+	}	
+	
+	public function OnContainerClosed()
+	{
+		var effectName : name;
+
+		if ( !HasQuestItem() )
+		{
+			StopEffect( 'quest_highlight_fx' );	
+		}
+
+		if ( isPlayingInteractionAnim )
+		{
+			thePlayer.PlayerStopAction( interactionAnim );	
+		}
+		
+		effectName = this.GetAutoEffect();
+		if ( effectName != '' )
+		{
+			this.StopEffect( effectName );
+		}
+
+		super.OnContainerClosed();
+	}
+	
+	function PlayInteractionAnimation()
+	{
+		if ( interactionAnim == PEA_SlotAnimation && !IsNameValid(slotAnimName) )
+		{
+			super.ProcessLoot();
+				
+			return;
+		}
+		
+		if ( interactionAnim != PEA_None )
+		{
+			if ( this.attachThisObjectOnAnimEvent )
+			{
+				thePlayer.AddAnimEventChildCallback(this,attachAnimName,'OnAnimEvent_Custom');
+				thePlayer.AddAnimEventChildCallback(this,detachAnimName,'OnAnimEvent_Custom');
+			}
+				
+			thePlayer.RegisterForPlayerAction(this, false);
+			
+			if ( ShouldBlockGameplayActionsOnInteraction() )
+			{
+				BlockGameplayActions(true);
+			}
+			
+			if ( !GetToPointAndStartAction() )
+				OnPlayerActionEnd();
+			
+			isPlayingInteractionAnim = true;
+			
+			if ( interactionAnim == PEA_SlotAnimation )
+				return;
+			
+			if ( interactionAnimTime < 1.0f )
+			{
+				interactionAnimTime = 1.0f;
+			}
+			if(skipInventoryPanel)
+			{
+				AddTimer( 'TimerDeactivateAnimation', interactionAnimTime, false );			
+			}
+			
+		}
+		else
+		{
+			super.ProcessLoot();
+		}
+	}
+	
+	function BlockGameplayActions( lock : bool )
+	{
+		var exceptions : array< EInputActionBlock >;		
+		exceptions.PushBack( EIAB_ExplorationFocus );
+	
+		if ( lock && holsterWeaponAtTheBeginning )
+			thePlayer.OnEquipMeleeWeapon(PW_None,true);
+			
+		if ( lock )
+			thePlayer.BlockAllActions('W3AnimationInteractionEntity', true, exceptions);
+		else
+			thePlayer.BlockAllActions('W3AnimationInteractionEntity', false);
+	}
+	
+	function ShouldBlockGameplayActionsOnInteraction() : bool
+	{
+		return true;
+	}
+	
+	function GetToPointAndStartAction() : bool
+	{
+		var movementAdjustor 				: CMovementAdjustor = thePlayer.GetMovingAgentComponent().GetMovementAdjustor();
+		var ticket 							: SMovementAdjustmentRequestTicket = movementAdjustor.CreateNewRequest( 'InteractionEntity' );
+		
+		movementAdjustor.AdjustmentDuration( ticket, 0.5 );
+		
+		if ( matchPlayerHeadingWithHeadingOfTheEntity )
+			movementAdjustor.RotateTowards( ticket, this );
+		if ( desiredPlayerToEntityDistance >= 0 )
+			movementAdjustor.SlideTowards( ticket, this, desiredPlayerToEntityDistance );
+		
+		return thePlayer.PlayerStartAction( interactionAnim, slotAnimName );
+	}
+	
+	private var objectAttached : bool;
+	private var objectCachedPos : Vector;
+	private var objectCachedRot	: EulerAngles;
+	
+	private function AttachObject()
+	{
+		if ( objectAttached )
+			return;
+			
+		objectCachedPos = this.GetWorldPosition();
+		objectCachedRot = this.GetWorldRotation();
+		this.CreateAttachment(thePlayer,attachSlotName);
+		objectAttached = true;
+	}
+	
+	private function DetachObject()
+	{
+		if ( !objectAttached )
+			return;
+			
+		this.BreakAttachment();
+		this.TeleportWithRotation(objectCachedPos,objectCachedRot);
+		objectAttached = false;
+	}
+	
+	
+	
+	
+	event OnPlayerActionStartFinished()
+	{
+		if ( !skipInventoryPanel )
+		{
+			ShowLoot();
+		}
+	}
+	
+	
+	event OnPlayerActionEnd()
+	{
+		isPlayingInteractionAnim = false;
+		thePlayer.UnregisterForPlayerAction(this, false);
+		
+		thePlayer.RemoveAnimEventChildCallback(this,attachAnimName);
+		thePlayer.RemoveAnimEventChildCallback(this,detachAnimName);
+		
+		if ( ShouldBlockGameplayActionsOnInteraction() )
+		{
+			BlockGameplayActions(false);
+		}
+		DetachObject();
+	}
+	
+	event OnAnimEvent_Custom( animEventName : name, animEventType : EAnimationEventType, animInfo : SAnimationEventAnimInfo )
+	{
+		if ( animEventName == attachAnimName && attachThisObjectOnAnimEvent )
+		{
+			AttachObject();
+		}
+		else if ( animEventName == detachAnimName )
+		{
+			DetachObject();
+		}
+	}
+	
+	
+	
+	
+	timer function TimerDeactivateAnimation( td : float , id : int)
+	{
+		TakeAllItems();
+		OnContainerClosed();		
+	}
+
+	timer function ACS_Leviathan_Container_Destroy( td : float , id : int)
+	{
+		if (thePlayer.inv.HasItem('Leviathan')
+		|| FactsQuerySum("ACS_Leviathan_Axe_Returning") > 0)
+		{		
+			this.Destroy();
+		}
+		
 	}
 }
 
@@ -1053,7 +2123,7 @@ class ACSBladeProjectile extends W3AdvancedProjectile
 	{
 		var entities	 		: array<CGameplayEntity>;
 		var i					: int;
-		
+		entities.Clear();
 		FindGameplayEntitiesInSphere( entities, GetWorldPosition(), 2.5, 100 );
 		for( i = 0; i < entities.Size(); i += 1 )
 		{
@@ -1065,7 +2135,7 @@ class ACSBladeProjectile extends W3AdvancedProjectile
 	{
 		var entities	 		: array<CGameplayEntity>;
 		var i					: int;
-		
+		entities.Clear();
 		FindGameplayEntitiesInSphere( entities, GetWorldPosition(), 1, 100 );
 		for( i = 0; i < entities.Size(); i += 1 )
 		{
@@ -2489,7 +3559,7 @@ class ACSCrossbowProjectile extends W3AdvancedProjectile
 
 			dmg = new W3DamageAction in theGame.damageMgr;
 			
-			dmg.Initialize(GetWitcherPlayer(), victim, GetWitcherPlayer(), GetWitcherPlayer().GetName(), EHRT_None, CPS_SpellPower, true, false, false, false);
+			dmg.Initialize(GetWitcherPlayer(), victim, GetWitcherPlayer(), GetWitcherPlayer().GetName(), EHRT_None, CPS_Undefined, true, false, false, false);
 			
 			dmg.SetHitReactionType( EHRT_Light );
 
@@ -3679,7 +4749,7 @@ class W3ACSSwordProjectileGiant extends W3AdvancedProjectile
 	{
 		var entities	 		: array<CGameplayEntity>;
 		var i					: int;
-		
+		entities.Clear();
 		FindGameplayEntitiesInSphere( entities, GetWorldPosition(), 3, 100 );
 		for( i = 0; i < entities.Size(); i += 1 )
 		{
@@ -4717,7 +5787,7 @@ class W3BatSwarmGather extends W3AdvancedProjectile
 		var entities	 		: array<CGameplayEntity>;
 		var i					: int;
 		var surface				: CGameplayFXSurfacePost;
-		
+		entities.Clear();
 		FindGameplayEntitiesInSphere( entities, GetWorldPosition(), range, 100 );
 		for( i = 0; i < entities.Size(); i += 1 )
 		{
@@ -4800,7 +5870,7 @@ class W3BatSwarmAttack extends CProjectileTrajectory
 		var entities	 		: array<CGameplayEntity>;
 		var i					: int;
 		var surface				: CGameplayFXSurfacePost;
-		
+		entities.Clear();
 		FindGameplayEntitiesInSphere( entities, GetWorldPosition(), range, 100 );
 		for( i = 0; i < entities.Size(); i += 1 )
 		{
@@ -4845,7 +5915,7 @@ class W3BatSwarmAttack extends CProjectileTrajectory
 		{
 			action = new W3DamageAction in this;
 
-			action.Initialize((CGameplayEntity)caster,victim,this,caster.GetName(),EHRT_Heavy,CPS_SpellPower,false,true,false,false);
+			action.Initialize((CGameplayEntity)caster,victim,this,caster.GetName(),EHRT_Heavy,CPS_Undefined,false,true,false,false);
 
 			action.SetForceExplosionDismemberment();
 
@@ -4949,7 +6019,7 @@ class W3ACSEredinFrostLine extends W3TraceGroundProjectile
 			}
 
 			action = new W3DamageAction in this;
-			action.Initialize((CGameplayEntity)caster,victim,this,caster.GetName(),EHRT_Heavy,CPS_SpellPower,false,true,false,false);
+			action.Initialize((CGameplayEntity)caster,victim,this,caster.GetName(),EHRT_Heavy,CPS_Undefined,false,true,false,false);
 			action.AddDamage(theGame.params.DAMAGE_NAME_FROST, damage );
 			action.AddEffectInfo( EET_SlowdownFrost, 2.0 );
 			action.SetCanPlayHitParticle(false);
@@ -5003,7 +6073,7 @@ class W3ACSFireLine extends W3TraceGroundProjectile
 			}
 
 			action = new W3DamageAction in this;
-			action.Initialize((CGameplayEntity)caster,victim,this,caster.GetName(),EHRT_Light,CPS_SpellPower,false,true,false,false);
+			action.Initialize((CGameplayEntity)caster,victim,this,caster.GetName(),EHRT_Light,CPS_Undefined,false,true,false,false);
 			action.AddDamage(theGame.params.DAMAGE_NAME_FIRE, damage );		
 			action.AddEffectInfo(EET_Burning, 1.0);
 			action.SetCanPlayHitParticle(false);
@@ -5060,7 +6130,7 @@ class W3ACSViyBaseEffectFireLine extends W3TraceGroundProjectile
 			}
 
 			action = new W3DamageAction in this;
-			action.Initialize((CGameplayEntity)caster,victim,this,caster.GetName(),EHRT_Light,CPS_SpellPower,false,true,false,false);
+			action.Initialize((CGameplayEntity)caster,victim,this,caster.GetName(),EHRT_Light,CPS_Undefined,false,true,false,false);
 			action.AddDamage(theGame.params.DAMAGE_NAME_FIRE, damage );		
 			action.AddEffectInfo(EET_Burning, 1.0);
 			action.SetCanPlayHitParticle(false);
@@ -5241,7 +6311,7 @@ class W3ACSRootAttack extends CGameplayEntity
 	{
 		var entities	 		: array<CGameplayEntity>;
 		var i					: int;
-		
+		entities.Clear();
 		FindGameplayEntitiesInSphere( entities, GetWorldPosition(), 5, 100 );
 		for( i = 0; i < entities.Size(); i += 1 )
 		{
@@ -5325,6 +6395,8 @@ class W3ACSBloodTentacles extends CGameplayEntity
 	{
 		var entities	 		: array<CGameplayEntity>;
 		var i					: int;
+
+		entities.Clear();
 
 		if (this.HasTag('ACS_Transformation_Red_Miasmal_Ability')
 		)
@@ -5823,7 +6895,7 @@ class W3ACSEnemyKnifeProjectile extends W3AdvancedProjectile
 				
 				DealDamageToTarget( victim, effType, crit );
 
-				RemoveTimer('playredtrail');
+				RemoveTimer('redtrail');
 			}
 		}
 		else
@@ -5841,7 +6913,7 @@ class W3ACSEnemyKnifeProjectile extends W3AdvancedProjectile
 
 			CreateKnife();
 
-			RemoveTimer('playredtrail');
+			RemoveTimer('redtrail');
 			
 			arrowHitPos = pos;
 			meshComponent = (CMeshComponent)GetComponentByClassName('CMeshComponent');
@@ -5860,6 +6932,19 @@ class W3ACSEnemyKnifeProjectile extends W3AdvancedProjectile
 		}
 	}
 
+	function CreateKnife()
+	{
+		var knife_temp							: CEntityTemplate;
+		var knife 								: CEntity;
+
+		knife_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\entities\other\acs_knife_loot_old.w2ent", true );
+
+		knife = (CEntity)theGame.CreateEntity( knife_temp, this.GetWorldPosition() );
+
+		((W3AnimatedContainer)(knife)).GetInventory().AddAnItem( 'ACS_Knife' , 1 );
+	}
+
+	/*
 	function CreateKnife()
 	{
 		var knife_temp							: CEntityTemplate;
@@ -5894,6 +6979,7 @@ class W3ACSEnemyKnifeProjectile extends W3AdvancedProjectile
 
 		knife.DestroyAfter(0.5);
 	}
+	*/
 }
 
 class W3ACSBearFireball extends W3AdvancedProjectile
@@ -5974,7 +7060,7 @@ class W3ACSBearFireball extends W3AdvancedProjectile
 		var action : W3DamageAction;
 		
 		action = new W3DamageAction in theGame;
-		action.Initialize((CGameplayEntity)caster,victim,this,caster.GetName(),EHRT_Light,CPS_SpellPower,false,true,false,false);
+		action.Initialize((CGameplayEntity)caster,victim,this,caster.GetName(),EHRT_Light,CPS_Undefined,false,true,false,false);
 		
 		if ( victim == GetWitcherPlayer() )
 		{
@@ -6347,6 +7433,8 @@ class W3BearSummonMeteorProjectile extends W3ACSBearFireball
 		var landPos			: Vector;
 		
 		landPos = this.GetWorldPosition();
+
+		entities.Clear();
 		
 		FindGameplayEntitiesInSphere( entities, this.GetWorldPosition(), 4, 10, '', FLAG_ExcludeTarget, this );
 		
@@ -7419,7 +8507,7 @@ class W3ACSCaranthirIceMeteorProjectile extends W3MeteorProjectile
 		var action : W3DamageAction;
 		
 		action = new W3DamageAction in theGame;
-		action.Initialize((CGameplayEntity)caster,victim,this,caster.GetName(),EHRT_Heavy,CPS_SpellPower,false,true,false,false);
+		action.Initialize((CGameplayEntity)caster,victim,this,caster.GetName(),EHRT_Heavy,CPS_Undefined,false,true,false,false);
 
 		if ( victim == GetACSCanaris() 
 		|| victim == GetACSCanarisMinion()
@@ -7450,7 +8538,7 @@ class W3ACSCaranthirIceSpike extends W3DurationObstacle
 	var destructionComp	: CDestructionSystemComponent;
 	var entitiesInRange : array< CGameplayEntity >;
 	
-	default explodeAfter = 2.0;
+	default explodeAfter = 10.0;
 	default damageRadius = 2.5;
 	default damageVal = 50;
 	default effectDuration = 4.0;
@@ -7740,7 +8828,7 @@ class W3ACSZombieSpawnerProjectile extends W3AdvancedProjectile
 		}
 		
 		action = new W3DamageAction in theGame;
-		action.Initialize((CGameplayEntity)caster,victim,this,caster.GetName(),EHRT_Light,CPS_SpellPower,false,true,false,false);
+		action.Initialize((CGameplayEntity)caster,victim,this,caster.GetName(),EHRT_Light,CPS_Undefined,false,true,false,false);
 		action.AddDamage(theGame.params.DAMAGE_NAME_POISON, damage );
 		action.AddEffectInfo(EET_Poison, 2.0);
 		action.SetCanPlayHitParticle(false);
@@ -7998,7 +9086,7 @@ class W3ACSPoisonProjectile extends W3AdvancedProjectile
 		}
 		
 		action = new W3DamageAction in theGame;
-		action.Initialize((CGameplayEntity)caster,victim,this,caster.GetName(),EHRT_Light,CPS_SpellPower,false,true,false,false);
+		action.Initialize((CGameplayEntity)caster,victim,this,caster.GetName(),EHRT_Light,CPS_Undefined,false,true,false,false);
 		action.AddDamage(theGame.params.DAMAGE_NAME_POISON, damage );
 		action.AddEffectInfo(EET_Poison, 2.0);
 		action.SetCanPlayHitParticle(false);
@@ -8147,11 +9235,11 @@ class W3ACSIceSpearProjectile extends W3AdvancedProjectile
 
 			if(RandF() < 0.25)
 			{
-				action.Initialize( ( CGameplayEntity)caster, victim, this, caster.GetName(), EHRT_Light, CPS_SpellPower, false, true, false, false );
+				action.Initialize( ( CGameplayEntity)caster, victim, this, caster.GetName(), EHRT_Light, CPS_Undefined, false, true, false, false );
 			}
 			else
 			{
-				action.Initialize( ( CGameplayEntity)caster, victim, this, caster.GetName(), EHRT_None, CPS_SpellPower, false, true, false, false );
+				action.Initialize( ( CGameplayEntity)caster, victim, this, caster.GetName(), EHRT_None, CPS_Undefined, false, true, false, false );
 			}
 
 			if (((CActor)victim).UsesEssence())
@@ -8180,7 +9268,7 @@ class W3ACSIceSpearProjectile extends W3AdvancedProjectile
 		}
 		else
 		{
-			action.Initialize( ( CGameplayEntity)caster, victim, this, caster.GetName(), EHRT_Light, CPS_SpellPower, false, true, false, false );
+			action.Initialize( ( CGameplayEntity)caster, victim, this, caster.GetName(), EHRT_Light, CPS_Undefined, false, true, false, false );
 
 			if (((CActor)victim).UsesEssence())
 			{
@@ -8302,7 +9390,7 @@ class W3ACSFireballProjectile extends W3AdvancedProjectile
 		var action : W3DamageAction;
 		
 		action = new W3DamageAction in theGame;
-		action.Initialize((CGameplayEntity)caster,victim,this,caster.GetName(),EHRT_None,CPS_SpellPower,false,true,false,false);
+		action.Initialize((CGameplayEntity)caster,victim,this,caster.GetName(),EHRT_None,CPS_Undefined,false,true,false,false);
 		
 		if ( victim == thePlayer )
 		{
@@ -8551,6 +9639,8 @@ class W3ACSBoulderProjectile extends W3AdvancedProjectile
 		var entities	 		: array<CGameplayEntity>;
 		var i					: int;
 		
+		entities.Clear();
+
 		FindGameplayEntitiesInSphere( entities, GetWorldPosition(), 1.5, 20 );
 		for( i = 0; i < entities.Size(); i += 1 )
 		{
@@ -8567,11 +9657,11 @@ class W3ACSBoulderProjectile extends W3AdvancedProjectile
 
 		if(RandF() < 0.5)
 		{
-			action.Initialize((CGameplayEntity)caster,victim,this,caster.GetName(),EHRT_Heavy,CPS_SpellPower,false,true,false,false);
+			action.Initialize((CGameplayEntity)caster,victim,this,caster.GetName(),EHRT_Heavy,CPS_Undefined,false,true,false,false);
 		}
 		else
 		{
-			action.Initialize((CGameplayEntity)caster,victim,this,caster.GetName(),EHRT_None,CPS_SpellPower,false,true,false,false);
+			action.Initialize((CGameplayEntity)caster,victim,this,caster.GetName(),EHRT_None,CPS_Undefined,false,true,false,false);
 		}
 
 		if ( projEfect != EET_Undefined )
@@ -8826,7 +9916,7 @@ class W3ACSChaosMeteorProjectile extends W3MeteorProjectile
 		var action : W3DamageAction;
 		
 		action = new W3DamageAction in theGame;
-		action.Initialize((CGameplayEntity)caster,victim,this,caster.GetName(),EHRT_Heavy,CPS_SpellPower,false,true,false,false);
+		action.Initialize((CGameplayEntity)caster,victim,this,caster.GetName(),EHRT_Heavy,CPS_Undefined,false,true,false,false);
 
 		if ( victim == thePlayer
 		|| victim == GetACSTransformationVampiress()
@@ -9251,6 +10341,8 @@ class W3ACSChaosWoodProjectile extends W3AdvancedProjectile
 		var entities	 		: array<CGameplayEntity>;
 		var i					: int;
 		
+		entities.Clear();
+
 		FindGameplayEntitiesInSphere( entities, GetWorldPosition(), 3, 100 );
 		for( i = 0; i < entities.Size(); i += 1 )
 		{
@@ -9268,11 +10360,11 @@ class W3ACSChaosWoodProjectile extends W3AdvancedProjectile
 
 		if(RandF() < 0.5)
 		{
-			action.Initialize((CGameplayEntity)caster,victim,this,caster.GetName(),EHRT_Heavy,CPS_SpellPower,false,true,false,false);
+			action.Initialize((CGameplayEntity)caster,victim,this,caster.GetName(),EHRT_Heavy,CPS_Undefined,false,true,false,false);
 		}
 		else
 		{
-			action.Initialize((CGameplayEntity)caster,victim,this,caster.GetName(),EHRT_None,CPS_SpellPower,false,true,false,false);
+			action.Initialize((CGameplayEntity)caster,victim,this,caster.GetName(),EHRT_None,CPS_Undefined,false,true,false,false);
 		}
 
 		if ( projEfect != EET_Undefined )
@@ -9430,6 +10522,8 @@ class W3ChaosIceExplosion extends CGameplayEntity
 		var entities	 		: array<CGameplayEntity>;
 		var i					: int;
 		
+		entities.Clear();
+
 		FindGameplayEntitiesInSphere( entities, GetWorldPosition(), 5, 100 );
 		for( i = 0; i < entities.Size(); i += 1 )
 		{
@@ -9497,7 +10591,7 @@ class W3ACSChasoVacuumOrb extends W3DurationObstacle
 	var h 					: float;
 	default h				= 1;
 	
-	default explodeAfter = 2.0;
+	default explodeAfter = 10.0;
 	default damageRadius = 5;
 	default damageVal = 50;
 	default effectDuration = 4.0;
@@ -9940,6 +11034,8 @@ class W3ACSChaosOrbSmall extends W3AdvancedProjectile
 
 		this.PlayEffect('blast');
 		
+		entities.Clear();
+
 		FindGameplayEntitiesInSphere( entities, GetWorldPosition(), 3, 100 );
 		for( i = 0; i < entities.Size(); i += 1 )
 		{
@@ -9955,7 +11051,7 @@ class W3ACSChaosOrbSmall extends W3AdvancedProjectile
 		
 		action = new W3DamageAction in this;
 
-		action.Initialize( ( CGameplayEntity)caster, victim, this, caster.GetName(), EHRT_Light, CPS_SpellPower, false, true, false, false );
+		action.Initialize( ( CGameplayEntity)caster, victim, this, caster.GetName(), EHRT_Light, CPS_Undefined, false, true, false, false );
 
 		if ( ((CActor)victim) == thePlayer
 		|| ((CActor)victim) == GetACSTransformationVampiress()
@@ -10278,7 +11374,7 @@ statemachine class W3ACSChaosArena extends CGameplayEntity
 		if(maxResults <= 0)
 			maxResults = 1000000;
 			
-		
+		entities.Clear();
 		FindGameplayEntitiesInSphere(entities, GetWorldPosition(), range, maxResults, tag, queryFlags, this);
 		
 		
@@ -10658,6 +11754,7 @@ class CACSTransformationToadPoisonProjectile extends W3AdvancedProjectile
 		var entities	 		: array<CGameplayEntity>;
 		var i					: int;
 
+		entities.Clear();
 		FindGameplayEntitiesInSphere( entities, GetWorldPosition(), 4, 100 );
 		for( i = 0; i < entities.Size(); i += 1 )
 		{
@@ -10683,7 +11780,7 @@ class CACSTransformationToadPoisonProjectile extends W3AdvancedProjectile
 		}
 		
 		action = new W3DamageAction in theGame;
-		action.Initialize((CGameplayEntity)caster,victim,this,caster.GetName(),EHRT_Light,CPS_SpellPower,false,true,false,false);
+		action.Initialize((CGameplayEntity)caster,victim,this,caster.GetName(),EHRT_Light,CPS_Undefined,false,true,false,false);
 		action.AddDamage(theGame.params.DAMAGE_NAME_POISON, projDMG * 0.25 );
 		action.AddEffectInfo(EET_Poison, 2.0);
 		action.AddEffectInfo(EET_Stagger, 2.0);
@@ -10936,6 +12033,8 @@ statemachine class CACSEverstormLightning extends CGameplayEntity
 
 		this.PushState('Lightning_Strike_Engage');
 		
+		entities.Clear();
+
 		FindGameplayEntitiesInSphere( entities, GetWorldPosition(), 5, 100 );
 		for( i = 0; i < entities.Size(); i += 1 )
 		{
@@ -11171,6 +12270,499 @@ state Lightning_Strike_Engage in CACSEverstormLightning
 	}
 }
 
+class W3ACSIceStaffIceLineSpikesProjectile extends W3TraceGroundProjectile
+{
+	private var action 						: W3DamageAction;
+	private var damage						: float;
+
+	event OnProjectileCollision( pos, normal : Vector, collidingComponent : CComponent, hitCollisionsGroups : array< name >, actorIndex : int, shapeIndex : int )
+	{
+		if ( !isActive )
+		{
+			return true;
+		}
+		
+		if(collidingComponent)
+			victim = (CGameplayEntity)collidingComponent.GetEntity();
+		else
+			victim = NULL;
+		
+		super.OnProjectileCollision(pos, normal, collidingComponent, hitCollisionsGroups, actorIndex, shapeIndex);
+		
+		if ( victim && !collidedEntities.Contains(victim) )
+		{
+			action = new W3DamageAction in this;
+			action.Initialize((CGameplayEntity)caster,victim,this,caster.GetName(),EHRT_None,CPS_Undefined,false,true,false,false);
+			action.AddEffectInfo(EET_SlowdownFrost);
+
+			if (((CActor)victim).UsesEssence())
+			{
+				damage = ((CActor)victim).GetStat( BCS_Essence ) * 0.00625;
+			}
+			else if (((CActor)victim).UsesVitality())
+			{
+				damage = ((CActor)victim).GetStat( BCS_Vitality ) * 0.00625;
+			}
+
+			action.AddDamage(theGame.params.DAMAGE_NAME_FROST, damage );	
+
+			if (victim == thePlayer)
+			{
+				action.ClearDamage();
+			}
+
+			theGame.damageMgr.ProcessAction( action );
+			collidedEntities.PushBack(victim);
+			
+			delete action;
+		}
+	}
+}
+
+class W3ACSIceStaffFrostLine extends W3TraceGroundProjectile
+{
+	private var action 						: W3DamageAction;
+	private var damage						: float;
+	
+	event OnProjectileCollision( pos, normal : Vector, collidingComponent : CComponent, hitCollisionsGroups : array< name >, actorIndex : int, shapeIndex : int )
+	{
+		if ( !isActive )
+		{
+			return true;
+		}
+		
+		if(collidingComponent)
+		{
+			victim = (CGameplayEntity)collidingComponent.GetEntity();
+		}
+		else
+		{
+			victim = NULL;
+		}
+
+		if (victim = thePlayer)
+		{
+			return false;
+		}
+			
+		super.OnProjectileCollision(pos, normal, collidingComponent, hitCollisionsGroups, actorIndex, shapeIndex);
+		
+		if ( victim && !collidedEntities.Contains(victim) )
+		{
+			if (((CActor)victim).UsesEssence())
+			{
+				damage = ((CActor)victim).GetStat( BCS_Essence ) * 0.0125;
+			}
+			else if (((CActor)victim).UsesVitality())
+			{
+				damage = ((CActor)victim).GetStat( BCS_Vitality ) * 0.0125;
+			}
+
+			action = new W3DamageAction in this;
+			action.Initialize((CGameplayEntity)caster,victim,this,caster.GetName(),EHRT_Heavy,CPS_Undefined,false,true,false,false);
+			action.AddDamage(theGame.params.DAMAGE_NAME_FROST, damage );
+			action.AddEffectInfo( EET_SlowdownFrost, 2.0 );
+			action.SetCanPlayHitParticle(false);
+			theGame.damageMgr.ProcessAction( action );
+			collidedEntities.PushBack(victim);
+
+			/*
+			if ( deactivateOnCollisionWithVictim )
+			{
+				isActive = false;
+			}
+			*/
+
+			delete action;
+		}
+	}
+}
+
+class W3ACSIceStaffIceSpearProjectile extends W3AdvancedProjectile
+{
+	editable var initFxName 				: name;
+	editable var onCollisionFxName 			: name;
+	editable var spawnEntityTemplate 		: CEntityTemplate;
+	editable var customDuration				: float;
+	editable var onCollisionVictimFxName	: name;
+	editable var immediatelyStopVictimFX	: bool;
+	
+	private var projectileHitGround : bool;
+	
+	default projDMG = 40.f;
+	default projEfect = EET_SlowdownFrost;
+	default customDuration = 2.0;
+		
+
+	event OnProjectileInit()
+	{
+		this.PlayEffect(initFxName);
+		projectileHitGround = false;
+		isActive = true;
+	}
+	
+	event OnProjectileCollision( pos, normal : Vector, collidingComponent : CComponent, hitCollisionsGroups : array< name >, actorIndex : int, shapeIndex : int )
+	{
+		if ( !isActive )
+		{
+			return true;
+		}
+		
+		if ( collidingComponent )
+			victim = ( CGameplayEntity )collidingComponent.GetEntity();
+		else
+			victim = NULL;
+		
+		super.OnProjectileCollision( pos, normal, collidingComponent, hitCollisionsGroups, actorIndex, shapeIndex );
+		
+		if ( victim && !projectileHitGround && !collidedEntities.Contains( victim ) )
+		{
+			VictimCollision();
+		}
+		else if ( !victim && !ignore ) 
+		{
+			ProjectileHitGround();
+		}
+	}
+	
+	protected function DestroyRequest()
+	{
+		StopEffect( initFxName );
+		PlayEffect( onCollisionFxName );
+		DestroyAfter( 2.f );
+	}
+	
+	protected function PlayCollisionEffect()
+	{
+		PlayEffect(onCollisionFxName);
+	}
+	
+	protected function VictimCollision()
+	{
+		DealDamageToVictim();
+		PlayCollisionEffect();
+		DeactivateProjectile();
+	}
+	
+	protected function DealDamageToVictim()
+	{
+		var targetSlowdown 	: CActor;		
+		var action : W3DamageAction;
+		var damage : float;
+		
+		action = new W3DamageAction in this;
+
+		if ( victim == thePlayer )
+		{
+			return;
+		}
+
+		if(RandF() < 0.25)
+		{
+			action.Initialize( ( CGameplayEntity)caster, victim, this, caster.GetName(), EHRT_Light, CPS_Undefined, false, true, false, false );
+		}
+		else
+		{
+			action.Initialize( ( CGameplayEntity)caster, victim, this, caster.GetName(), EHRT_None, CPS_Undefined, false, true, false, false );
+		}
+
+		if (((CActor)victim).UsesEssence())
+		{
+			damage = ((CActor)victim).GetStat( BCS_Essence ) * 0.125;
+		}
+		else if (((CActor)victim).UsesVitality())
+		{
+			damage = ((CActor)victim).GetStat( BCS_Vitality ) * 0.125;
+		}
+
+		thePlayer.GainStat( BCS_Focus, thePlayer.GetStatMax( BCS_Focus) * 0.0125 );
+
+		action.AddEffectInfo( EET_Frozen, 0.5 );
+
+		action.AddDamage( theGame.params.DAMAGE_NAME_ELEMENTAL , damage );
+		
+		if ( projEfect != EET_Undefined )
+		{
+			if ( customDuration > 0 )
+				action.AddEffectInfo( projEfect, customDuration );
+			else
+				action.AddEffectInfo( projEfect );
+		}
+
+		thePlayer.GainStat( BCS_Focus, thePlayer.GetStatMax( BCS_Focus) * 0.05 );
+
+		action.SetCanPlayHitParticle(false);
+		theGame.damageMgr.ProcessAction( action );
+		delete action;	
+		
+		if ( IsNameValid( onCollisionVictimFxName ) )
+			victim.PlayEffect( onCollisionVictimFxName );
+		if ( immediatelyStopVictimFX )
+			victim.StopEffect( onCollisionVictimFxName );
+	}
+	
+	protected function DeactivateProjectile()
+	{
+		isActive = false;
+		this.StopEffect( initFxName );
+		this.DestroyAfter( 5.f );
+	}
+	
+	protected function ProjectileHitGround()
+	{
+		var ent : CEntity;
+		var damageAreaEntity : CDamageAreaEntity;
+		
+		this.PlayEffect( onCollisionFxName );
+		if ( spawnEntityTemplate )
+		{
+			
+			ent = theGame.CreateEntity( spawnEntityTemplate, this.GetWorldPosition(), this.GetWorldRotation() );
+			damageAreaEntity = (CDamageAreaEntity)ent;
+			if ( damageAreaEntity )
+			{
+				damageAreaEntity.owner = (CActor)caster;
+				this.StopEffect( initFxName );
+				projectileHitGround = true;
+			}
+		}
+		DeactivateProjectile();
+	}
+}
+
+class W3ACSIceStaffIceSpike extends W3DurationObstacle
+{
+	editable var explodeAfter : float;
+	editable var damageRadius : float;
+	editable var damageVal : float;
+	editable var effectDuration : float;
+	
+	var meshComp : CMeshComponent;
+	var destructionComp	: CDestructionSystemComponent;
+	var entitiesInRange : array< CGameplayEntity >;
+	
+	default explodeAfter = 10.0;
+	default damageRadius = 4;
+	default damageVal = 50;
+	default effectDuration = 4.0;
+	
+	event OnSpawned( spawnData : SEntitySpawnData )
+	{
+		destructionComp = (CDestructionSystemComponent)GetComponentByClassName( 'CDestructionSystemComponent' );
+		meshComp = (CMeshComponent)GetComponentByClassName( 'CMeshComponent' );
+		if( meshComp )
+		{
+			meshComp.SetVisible( false );
+		}
+
+		Appear();
+	}
+	
+	function Appear()
+	{
+		meshComp.SetVisible( true );
+		PlayEffect( 'appear' );
+		PlayEffect( 'tell' );
+
+		if (GetWitcherPlayer().IsItemEquippedByName('acs_ice_bats_item'))
+		{
+			AddTimer( 'Explode', 0.5, false );
+
+			DestroyAfter( 5 );
+		}
+		else
+		{
+			AddTimer( 'Explode', 1.5, false );
+
+			DestroyAfter( 5 );
+		}
+	}
+
+	function IceSpikeGetNPCsAndPlayersInRange(range : float, optional maxResults : int, optional tag : name, optional queryFlags : int) : array <CActor>
+	{
+		var i : int;
+		var actors : array<CActor>;
+		var entities : array<CGameplayEntity>;
+		var actorEnt : CActor;
+	
+		
+		if((queryFlags & FLAG_Attitude_Neutral) == 0 && (queryFlags & FLAG_Attitude_Hostile) == 0 && (queryFlags & FLAG_Attitude_Friendly) == 0)
+			queryFlags = queryFlags | FLAG_Attitude_Neutral | FLAG_Attitude_Hostile | FLAG_Attitude_Friendly;
+
+		
+		if(maxResults <= 0)
+			maxResults = 1000000;
+			
+		entities.Clear();
+		FindGameplayEntitiesInSphere(entities, GetWorldPosition(), range, maxResults, tag, FLAG_ExcludePlayer + queryFlags);
+		entities.Remove( this );
+		entities.Remove( thePlayer );
+		
+		for(i=0; i<entities.Size(); i+=1)
+		{
+			actorEnt = (CActor)entities[i];
+
+			if(!actorEnt)
+			{
+				entities.Remove( actorEnt );
+			}
+			else
+			{
+				actors.PushBack(actorEnt);
+			}	
+		}
+		
+		return actors;
+	}
+
+	timer function Explode( deltaTime : float, optional id : int )
+	{
+		var damage : W3DamageAction;
+		var i : int;
+		var actor : CActor;
+		var actors : array<CActor>;
+
+		StopAllEffects();
+		PlayEffect( 'explosion' );
+		meshComp.SetVisible( false );
+		
+		GCameraShake( 0.5, true, GetWorldPosition(), 20.0f );
+
+		actors.Clear();
+
+		actors = IceSpikeGetNPCsAndPlayersInRange( 4, 20, , FLAG_ExcludePlayer + FLAG_OnlyAliveActors);
+
+		actors.Remove(thePlayer);
+
+		for( i = 0; i < actors.Size(); i += 1 )
+		{
+			damage = new W3DamageAction in this;
+			damage.Initialize( thePlayer, actors[i], NULL, this, EHRT_Light, CPS_Undefined, false, false, false, true );
+
+			if (((CActor) actors[i]).UsesVitality()) 
+			{ 
+				if ( ((CActor) actors[i]).GetStat( BCS_Vitality ) >= ((CActor) actors[i]).GetStatMax( BCS_Vitality ) * 0.5 )
+				{
+					damageVal = ((CActor) actors[i]).GetStat( BCS_Vitality ) * 0.125; 
+				}
+				else if ( ((CActor)actors[i]).GetStat( BCS_Vitality ) < ((CActor)actors[i]).GetStatMax( BCS_Vitality ) * 0.5 )
+				{
+					damageVal = ( ((CActor) actors[i]).GetStatMax( BCS_Vitality ) - ((CActor)actors[i]).GetStat( BCS_Vitality ) ) * 0.125; 
+				}
+			} 
+			else if (((CActor) actors[i]).UsesEssence()) 
+			{ 
+				if (((CMovingPhysicalAgentComponent)(((CActor) actors[i]).GetMovingAgentComponent())).GetCapsuleHeight() >= 2
+				|| ((CActor) actors[i]).GetRadius() >= 0.7
+				)
+				{
+					if ( ((CActor) actors[i]).GetStat( BCS_Essence ) >= ((CActor) actors[i]).GetStatMax( BCS_Essence ) * 0.5 )
+					{
+						damageVal = ((CActor) actors[i]).GetStat( BCS_Essence ) * 0.125; 
+					}
+					else if ( ((CActor) actors[i]).GetStat( BCS_Essence ) < ((CActor) actors[i]).GetStatMax( BCS_Essence ) * 0.5 )
+					{
+						damageVal = ( ((CActor) actors[i]).GetStatMax( BCS_Essence ) - ((CActor) actors[i]).GetStat( BCS_Essence ) ) * 0.125; 
+					}
+				}
+				else
+				{
+					if ( ((CActor) actors[i]).GetStat( BCS_Essence ) >= ((CActor) actors[i]).GetStatMax( BCS_Essence ) * 0.5 )
+					{
+						damageVal = ((CActor) actors[i]).GetStat( BCS_Essence ) * 0.125; 
+					}
+					else if ( ((CActor)actors[i]).GetStat( BCS_Essence ) < ((CActor)actors[i]).GetStatMax( BCS_Essence ) * 0.5 )
+					{
+						damageVal = ( ((CActor) actors[i]).GetStatMax( BCS_Essence ) - ((CActor) actors[i]).GetStat( BCS_Essence ) ) * 0.125; 
+					}
+				}
+			}
+
+			damage.AddDamage( theGame.params.DAMAGE_NAME_FROST, damageVal );
+
+			damage.AddEffectInfo( EET_Frozen, 2 );
+			
+			theGame.damageMgr.ProcessAction( damage );
+
+			delete damage;
+		}
+	}
+}
+
+class W3ACSIceStaffIceMeteorProjectile extends W3MeteorProjectile
+{
+	var damage : float;
+
+	protected function DealDamageToVictim( victim : CGameplayEntity )
+	{
+		var action : W3DamageAction;
+		
+		action = new W3DamageAction in theGame;
+		action.Initialize((CGameplayEntity)caster,victim,this,caster.GetName(),EHRT_Heavy,CPS_Undefined,false,true,false,false);
+
+		if ( victim == thePlayer
+		)
+		{
+			projDMG = 0;
+
+			return;
+		}
+		else
+		{
+			if (((CActor)victim).UsesVitality()) 
+			{ 
+				if ( ((CActor)victim).GetStat( BCS_Vitality ) >= ((CActor)victim).GetStatMax( BCS_Vitality ) * 0.5 )
+				{
+					projDMG = ((CActor)victim).GetStat( BCS_Vitality ) * 0.25; 
+				}
+				else if ( ((CActor)victim).GetStat( BCS_Vitality ) < ((CActor)victim).GetStatMax( BCS_Vitality ) * 0.5 )
+				{
+					projDMG = ( ((CActor)victim).GetStatMax( BCS_Vitality ) - ((CActor)victim).GetStat( BCS_Vitality ) ) * 0.25; 
+				}
+			} 
+			else if (((CActor)victim).UsesEssence()) 
+			{ 
+				if (((CMovingPhysicalAgentComponent)(((CActor)victim).GetMovingAgentComponent())).GetCapsuleHeight() >= 2
+				|| ((CActor)victim).GetRadius() >= 0.7
+				)
+				{
+					if ( ((CActor)victim).GetStat( BCS_Essence ) >= ((CActor)victim).GetStatMax( BCS_Essence ) * 0.5 )
+					{
+						projDMG = ((CActor)victim).GetStat( BCS_Essence ) * 0.25; 
+					}
+					else if ( ((CActor)victim).GetStat( BCS_Essence ) < ((CActor)victim).GetStatMax( BCS_Essence ) * 0.5 )
+					{
+						projDMG = ( ((CActor)victim).GetStatMax( BCS_Essence ) - ((CActor)victim).GetStat( BCS_Essence ) ) * 0.25; 
+					}
+				}
+				else
+				{
+					if ( ((CActor)victim).GetStat( BCS_Essence ) >= ((CActor)victim).GetStatMax( BCS_Essence ) * 0.5 )
+					{
+						projDMG = ((CActor)victim).GetStat( BCS_Essence ) * 0.25; 
+					}
+					else if ( ((CActor)victim).GetStat( BCS_Essence ) < ((CActor)victim).GetStatMax( BCS_Essence ) * 0.5 )
+					{
+						projDMG = ( ((CActor)victim).GetStatMax( BCS_Essence ) - ((CActor)victim).GetStat( BCS_Essence ) ) * 0.25; 
+					}
+				}
+			}
+		}
+
+		action.AddDamage(theGame.params.DAMAGE_NAME_FROST, projDMG );
+
+		action.AddEffectInfo(EET_Frozen, 2);
+
+		action.SetForceExplosionDismemberment();
+
+		theGame.damageMgr.ProcessAction( action );
+
+		delete action;
+		
+		collidedEntities.PushBack(victim);
+	}
+}
+
 statemachine class W3ACSMageAttacks extends CGameplayEntity
 {
 	var pos : Vector;
@@ -11178,6 +12770,16 @@ statemachine class W3ACSMageAttacks extends CGameplayEntity
 
 	event OnSpawned( spawnData : SEntitySpawnData )
 	{
+		if ( !theSound.SoundIsBankLoaded("monster_golem_ice.bnk") )
+		{
+			theSound.SoundLoadBank( "monster_golem_ice.bnk", false );
+		}
+
+		if ( !theSound.SoundIsBankLoaded("monster_golem_dao.bnk") )
+		{
+			theSound.SoundLoadBank( "monster_golem_dao.bnk", false );
+		}
+
 		pos = this.GetWorldPosition();
 		rot = this.GetWorldRotation();
 
@@ -11240,6 +12842,12 @@ statemachine class W3ACSMageAttacks extends CGameplayEntity
 					thePlayer.PlayEffectSingle( 'hand_sand_fx_fire_l_ACS' );
 					thePlayer.StopEffect( 'hand_sand_fx_fire_l_ACS' );
 				}
+				else if (ACS_GetItem_MageStaff_Ice())
+				{
+					thePlayer.StopEffect( 'hand_sand_fx_ice_l_ACS' );
+					thePlayer.PlayEffectSingle( 'hand_sand_fx_ice_l_ACS' );
+					thePlayer.StopEffect( 'hand_sand_fx_ice_l_ACS' );
+				}
 
 				this.PushState('ACS_Mage_Attack_Blast_2');
 				stop_tag_check();
@@ -11273,6 +12881,12 @@ statemachine class W3ACSMageAttacks extends CGameplayEntity
 					thePlayer.PlayEffectSingle( 'hand_sand_fx_fire_ACS' );
 					thePlayer.StopEffect( 'hand_sand_fx_fire_ACS' );
 				}
+				else if (ACS_GetItem_MageStaff_Ice())
+				{
+					thePlayer.StopEffect( 'hand_sand_fx_ice_ACS' );
+					thePlayer.PlayEffectSingle( 'hand_sand_fx_ice_ACS' );
+					thePlayer.StopEffect( 'hand_sand_fx_ice_ACS' );
+				}
 
 				this.PushState('ACS_Mage_Attack_Gust_Left');
 				stop_tag_check();
@@ -11298,6 +12912,12 @@ statemachine class W3ACSMageAttacks extends CGameplayEntity
 					thePlayer.StopEffect( 'hand_sand_fx_fire_ACS' );
 					thePlayer.PlayEffectSingle( 'hand_sand_fx_fire_ACS' );
 					thePlayer.StopEffect( 'hand_sand_fx_fire_ACS' );
+				}
+				else if (ACS_GetItem_MageStaff_Ice())
+				{
+					thePlayer.StopEffect( 'hand_sand_fx_ice_ACS' );
+					thePlayer.PlayEffectSingle( 'hand_sand_fx_ice_ACS' );
+					thePlayer.StopEffect( 'hand_sand_fx_ice_ACS' );
 				}
 
 				this.PushState('ACS_Mage_Attack_Gust_Right');
@@ -11325,6 +12945,12 @@ statemachine class W3ACSMageAttacks extends CGameplayEntity
 					thePlayer.PlayEffectSingle( 'hand_sand_fx_fire_ACS' );
 					thePlayer.StopEffect( 'hand_sand_fx_fire_ACS' );
 				}
+				else if (ACS_GetItem_MageStaff_Ice())
+				{
+					thePlayer.StopEffect( 'hand_sand_fx_ice_ACS' );
+					thePlayer.PlayEffectSingle( 'hand_sand_fx_ice_ACS' );
+					thePlayer.StopEffect( 'hand_sand_fx_ice_ACS' );
+				}
 
 				this.PushState('ACS_Mage_Attack_Gust_Up');
 				stop_tag_check();
@@ -11350,6 +12976,12 @@ statemachine class W3ACSMageAttacks extends CGameplayEntity
 					thePlayer.StopEffect( 'hand_sand_fx_fire_ACS' );
 					thePlayer.PlayEffectSingle( 'hand_sand_fx_fire_ACS' );
 					thePlayer.StopEffect( 'hand_sand_fx_fire_ACS' );
+				}
+				else if (ACS_GetItem_MageStaff_Ice())
+				{
+					thePlayer.StopEffect( 'hand_sand_fx_ice_ACS' );
+					thePlayer.PlayEffectSingle( 'hand_sand_fx_ice_ACS' );
+					thePlayer.StopEffect( 'hand_sand_fx_ice_ACS' );
 				}
 
 				this.PushState('ACS_Mage_Attack_Mega_Gust');
@@ -11389,6 +13021,16 @@ statemachine class W3ACSMageAttacks extends CGameplayEntity
 					thePlayer.PlayEffectSingle( 'hand_sand_fx_fire_l_ACS' );
 					thePlayer.StopEffect( 'hand_sand_fx_fire_l_ACS' );
 				}
+				else if (ACS_GetItem_MageStaff_Ice())
+				{
+					thePlayer.StopEffect( 'hand_sand_fx_ice_ACS' );
+					thePlayer.PlayEffectSingle( 'hand_sand_fx_ice_ACS' );
+					thePlayer.StopEffect( 'hand_sand_fx_ice_ACS' );
+
+					thePlayer.StopEffect( 'hand_sand_fx_ice_l_ACS' );
+					thePlayer.PlayEffectSingle( 'hand_sand_fx_ice_l_ACS' );
+					thePlayer.StopEffect( 'hand_sand_fx_ice_l_ACS' );
+				}
 
 				this.PushState('ACS_Mage_Attack_Quicksand');
 				stop_tag_check();
@@ -11414,6 +13056,12 @@ statemachine class W3ACSMageAttacks extends CGameplayEntity
 					thePlayer.StopEffect( 'hand_sand_fx_fire_ACS' );
 					thePlayer.PlayEffectSingle( 'hand_sand_fx_fire_ACS' );
 					thePlayer.StopEffect( 'hand_sand_fx_fire_ACS' );
+				}
+				else if (ACS_GetItem_MageStaff_Ice())
+				{
+					thePlayer.StopEffect( 'hand_sand_fx_ice_ACS' );
+					thePlayer.PlayEffectSingle( 'hand_sand_fx_ice_ACS' );
+					thePlayer.StopEffect( 'hand_sand_fx_ice_ACS' );
 				}
 
 				this.PushState('ACS_Mage_Attack_SandCage');
@@ -11441,6 +13089,12 @@ statemachine class W3ACSMageAttacks extends CGameplayEntity
 					thePlayer.PlayEffectSingle( 'hand_sand_fx_fire_ACS' );
 					thePlayer.StopEffect( 'hand_sand_fx_fire_ACS' );
 				}
+				else if (ACS_GetItem_MageStaff_Ice())
+				{
+					thePlayer.StopEffect( 'hand_sand_fx_ice_ACS' );
+					thePlayer.PlayEffectSingle( 'hand_sand_fx_ice_ACS' );
+					thePlayer.StopEffect( 'hand_sand_fx_ice_ACS' );
+				}
 
 				this.PushState('ACS_Mage_Attack_Tornado');
 				stop_tag_check();
@@ -11465,7 +13119,7 @@ statemachine class W3ACSMageAttacks extends CGameplayEntity
 		if(maxResults <= 0)
 			maxResults = 1000000;
 			
-		
+		entities.Clear();
 		FindGameplayEntitiesInSphere(entities, GetWorldPosition(), range, maxResults, tag, FLAG_ExcludePlayer + queryFlags);
 		entities.Remove( this );
 		entities.Remove( thePlayer );
@@ -11487,9 +13141,14 @@ statemachine class W3ACSMageAttacks extends CGameplayEntity
 		return actors;
 	}
 
+	timer function ice_rift_stop_sound(deltaTime : float, id : int) 
+	{
+		thePlayer.SoundEvent("magic_caranthil_teleport_fx_stop");
+	}
+
 	timer function tornado_target_check(deltaTime : float, id : int) 
 	{
-		var i 																		: int;
+		var i, j 																	: int;
 		var victims 																: array< CActor >;
 		var fxEntities                                                              : array< CEntity >;
 		var aard_hit_ents															: array< CEntity >;
@@ -11499,7 +13158,7 @@ statemachine class W3ACSMageAttacks extends CGameplayEntity
 		var movingAgent																: CMovingAgentComponent;
 		var damage_value															: float;
 		var entities_trap															: array< CGameplayEntity >;
-		var victim 																	: CActor;
+		var victim, victim_erase													: CActor;
 		var actors																	: array< CActor >;
 		var actor																	: CActor;
 		var projDMG																	: float;
@@ -11509,9 +13168,19 @@ statemachine class W3ACSMageAttacks extends CGameplayEntity
 		FindGameplayEntitiesInRange(entities_trap, this, 20, 200 );
 		entities_trap.Remove( this );
 		entities_trap.Remove( thePlayer );
-		
+
 		if( entities_trap.Size()>0 )
-		{
+		{	
+			for( j=entities_trap.Size()-1; j>=0; j-=1 )
+			{
+				victim_erase = (CActor)entities_trap[j];
+
+				if (!victim_erase)
+				{
+					entities_trap.EraseFast( j );
+				}
+			}
+
 			for ( i = 0; i <= entities_trap.Size(); i+=1 )
 			{
 				if ( VecDistanceSquared2D( entities_trap[i].GetWorldPosition(), this.GetWorldPosition() ) <= 15 * 15 )
@@ -11523,15 +13192,13 @@ statemachine class W3ACSMageAttacks extends CGameplayEntity
 					}
 				
 					victim = (CActor)entities_trap[i];
-
+					
 					if ( ACS_AttitudeCheck_NoDistance( victim )  )
 					{
 						if ( victim == thePlayer
 						)
 						{
-							projDMG = 0;
-
-							return;
+							continue;
 						}
 
 						movingAgent = ((CActor)victim).GetMovingAgentComponent();
@@ -11585,6 +13252,13 @@ statemachine class W3ACSMageAttacks extends CGameplayEntity
 								damage_action.AddEffectInfo( EET_Burning, 3 );
 							}
 						}
+						else if (ACS_GetItem_MageStaff_Ice())
+						{
+							if (!((CActor)victim).HasBuff( EET_Frozen ) )
+							{
+								damage_action.AddEffectInfo( EET_Frozen, 3 );
+							}
+						}
 						
 						damage_action.SetForceExplosionDismemberment();
 						
@@ -11617,13 +13291,8 @@ state ACS_Mage_Attack_Cone in W3ACSMageAttacks
 	{
 		ACS_Mage_Attack_Cone_Entry();
 	}
-	
-	entry function ACS_Mage_Attack_Cone_Entry()
-	{	
-		ACS_Mage_Attack_Cone_Latent();
-	}
 
-	latent function ACS_Mage_Attack_Cone_Latent()
+	entry function ACS_Mage_Attack_Cone_Entry()
 	{
 		if (ACS_GetItem_MageStaff_Water())
 		{
@@ -11636,6 +13305,11 @@ state ACS_Mage_Attack_Cone in W3ACSMageAttacks
 		else if (ACS_GetItem_MageStaff_Fire())
 		{
 			parent.PlayEffect('cone_fire_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Ice())
+		{
+			parent.PlayEffect('cone_cs_mq1060_aard');
+			parent.PlayEffect('cone_ground_mutation_6_aard');
 		}
 
 		actors.Clear();
@@ -11710,6 +13384,12 @@ state ACS_Mage_Attack_Cone in W3ACSMageAttacks
 
 					ent.PlayEffect('warning_up_fire_ACS');
 				}
+				else if (ACS_GetItem_MageStaff_Ice())
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_FROST, damageMax );
+
+					ent.PlayEffect('ice_spikes');
+				}
 
 				ent.DestroyAfter(10);
 					
@@ -11736,18 +13416,120 @@ state ACS_Mage_Attack_Coil in W3ACSMageAttacks
 	private var i         																																						: int;
 	private var damageMax																																						: float;
 	private var ent 																																							: CEntity;
+	private var proj_1, proj_2, proj_3, proj_4, proj_5, proj_6, proj_7																											: W3ACSIceStaffIceSpearProjectile;
+	private var initpos_1, initpos_2, initpos_3, initpos_4, initpos_5, initpos_6, initpos_7, targetPositionNPC																	: Vector;
+
 
 	event OnEnterState(prevStateName : name)
 	{
-		ACS_Mage_Attack_Coil_Entry();
-	}
-	
-	entry function ACS_Mage_Attack_Coil_Entry()
-	{	
-		ACS_Mage_Attack_Coil_Latent();
+		if (ACS_GetItem_MageStaff_Ice())
+		{
+			ACS_Mage_Attack_Ice_Staff_Ice_Spear_Latent();
+		}
+		else
+		{
+			ACS_Mage_Attack_Coil_Latent();
+		}
 	}
 
-	latent function ACS_Mage_Attack_Coil_Latent()
+	entry function ACS_Mage_Attack_Ice_Staff_Ice_Spear_Latent()
+	{
+		parent.PlayEffect('cone_ground_mutation_6_aard');
+
+		initpos_1 = thePlayer.GetWorldPosition() + thePlayer.GetWorldForward() * 3;			
+		initpos_1.Z += 2;
+
+		initpos_2 = thePlayer.GetWorldPosition() + thePlayer.GetWorldRight() * 1 + thePlayer.GetWorldForward() * 3;			
+		initpos_2.Z += 1.5;
+
+		initpos_3 = thePlayer.GetWorldPosition() + thePlayer.GetWorldRight() * -1 + thePlayer.GetWorldForward() * 3;			
+		initpos_3.Z += 1.5;
+
+		initpos_4 = thePlayer.GetWorldPosition() + thePlayer.GetWorldRight() * 1 + thePlayer.GetWorldForward() * 3;			
+		initpos_4.Z += 2.5;
+
+		initpos_5 = thePlayer.GetWorldPosition() + thePlayer.GetWorldRight() * -1 + thePlayer.GetWorldForward() * 3;			
+		initpos_5.Z += 2.5;
+
+		initpos_6 = thePlayer.GetWorldPosition() + thePlayer.GetWorldForward() * 3;					
+		initpos_6.Z += 1;
+
+		initpos_7 = thePlayer.GetWorldPosition() + thePlayer.GetWorldForward() * 3;				
+		initpos_7.Z += 3;
+				
+		targetPositionNPC = thePlayer.GetWorldPosition() + thePlayer.GetWorldForward() * 50;
+
+		targetPositionNPC.Z += 1.5;
+				
+		proj_1 = (W3ACSIceStaffIceSpearProjectile)theGame.CreateEntity( 
+		(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\projectiles\ice_staff_ice_spear.w2ent", true ), initpos_1 );
+						
+		proj_1.Init(GetWitcherPlayer());
+		proj_1.PlayEffectSingle('fire_fx');
+		proj_1.PlayEffectSingle('explode');
+		proj_1.ShootProjectileAtPosition( 0, 15, targetPositionNPC, 500 );
+		proj_1.DestroyAfter(5);
+
+		proj_2 = (W3ACSIceStaffIceSpearProjectile)theGame.CreateEntity( 
+		(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\projectiles\ice_staff_ice_spear.w2ent", true ), initpos_2 );
+						
+		proj_2.Init(GetWitcherPlayer());
+		proj_2.PlayEffectSingle('fire_fx');
+		proj_2.PlayEffectSingle('explode');
+		proj_2.ShootProjectileAtPosition( 0, 15, targetPositionNPC, 500 );
+		proj_2.DestroyAfter(5);
+
+		proj_3 = (W3ACSIceStaffIceSpearProjectile)theGame.CreateEntity( 
+		(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\projectiles\ice_staff_ice_spear.w2ent", true ), initpos_3 );
+						
+		proj_3.Init(GetWitcherPlayer());
+		proj_3.PlayEffectSingle('fire_fx');
+		proj_3.PlayEffectSingle('explode');
+		proj_3.ShootProjectileAtPosition( 0, 15, targetPositionNPC, 500 );
+		proj_3.DestroyAfter(5);
+
+		proj_4 = (W3ACSIceStaffIceSpearProjectile)theGame.CreateEntity( 
+		(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\projectiles\ice_staff_ice_spear.w2ent", true ), initpos_4 );
+						
+		proj_4.Init(GetWitcherPlayer());
+		proj_4.PlayEffectSingle('fire_fx');
+		proj_4.PlayEffectSingle('explode');
+		proj_4.ShootProjectileAtPosition( 0, 15, targetPositionNPC, 500 );
+		proj_4.DestroyAfter(5);
+
+		proj_5 = (W3ACSIceStaffIceSpearProjectile)theGame.CreateEntity( 
+		(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\projectiles\ice_staff_ice_spear.w2ent", true ), initpos_5 );
+						
+		proj_5.Init(GetWitcherPlayer());
+		proj_5.PlayEffectSingle('fire_fx');
+		proj_5.PlayEffectSingle('explode');
+		proj_5.ShootProjectileAtPosition( 0, 15, targetPositionNPC, 500 );
+		proj_5.DestroyAfter(5);
+
+		proj_6 = (W3ACSIceStaffIceSpearProjectile)theGame.CreateEntity( 
+		(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\projectiles\ice_staff_ice_spear.w2ent", true ), initpos_6 );
+						
+		proj_6.Init(GetWitcherPlayer());
+		proj_6.PlayEffectSingle('fire_fx');
+		proj_6.PlayEffectSingle('explode');
+		proj_6.ShootProjectileAtPosition( 0, 15, targetPositionNPC, 500 );
+		proj_6.DestroyAfter(5);
+
+		proj_7 = (W3ACSIceStaffIceSpearProjectile)theGame.CreateEntity( 
+		(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\projectiles\ice_staff_ice_spear.w2ent", true ), initpos_7 );
+						
+		proj_7.Init(GetWitcherPlayer());
+		proj_7.PlayEffectSingle('fire_fx');
+		proj_7.PlayEffectSingle('explode');
+		proj_7.ShootProjectileAtPosition( 0, 15, targetPositionNPC, 500 );
+		proj_7.DestroyAfter(5);
+
+
+
+		parent.DestroyAfter(10);
+	}
+
+	entry function ACS_Mage_Attack_Coil_Latent()
 	{
 		if (ACS_GetItem_MageStaff_Water())
 		{
@@ -11875,18 +13657,89 @@ state ACS_Mage_Attack_Coil_With_Cone in W3ACSMageAttacks
 	private var i         																																						: int;
 	private var damageMax																																						: float;
 	private var ent 																																							: CEntity;
+	private var proj_1, proj_2, proj_3, proj_4, proj_5																															: W3ACSIceStaffIceSpearProjectile;
+	private var initpos, targetPositionNPC																																		: Vector;
 
 	event OnEnterState(prevStateName : name)
 	{
-		ACS_Mage_Attack_Coil_With_Cone_Entry();
-	}
-	
-	entry function ACS_Mage_Attack_Coil_With_Cone_Entry()
-	{	
-		ACS_Mage_Attack_Coil_With_Cone_Latent();
+		if (ACS_GetItem_MageStaff_Ice())
+		{
+			ACS_Mage_Attack_Ice_Staff_Ice_Spear_Rapid_Fire_Latent();
+		}
+		else
+		{
+			ACS_Mage_Attack_Coil_With_Cone_Latent();
+		}
 	}
 
-	latent function ACS_Mage_Attack_Coil_With_Cone_Latent()
+	entry function ACS_Mage_Attack_Ice_Staff_Ice_Spear_Rapid_Fire_Latent()
+	{
+		parent.PlayEffect('cone_ground_mutation_6_aard');
+
+		initpos = thePlayer.GetWorldPosition() + thePlayer.GetWorldForward() * 3;			
+		initpos.Z += 1.5;
+
+		targetPositionNPC = thePlayer.GetWorldPosition() + thePlayer.GetWorldForward() * 50;
+		
+		targetPositionNPC.Z += 1.5;
+				
+		proj_1 = (W3ACSIceStaffIceSpearProjectile)theGame.CreateEntity( 
+		(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\projectiles\ice_staff_ice_spear.w2ent", true ), initpos );
+						
+		proj_1.Init(GetWitcherPlayer());
+		proj_1.PlayEffectSingle('fire_fx');
+		proj_1.PlayEffectSingle('explode');
+		proj_1.ShootProjectileAtPosition( 0, 15, targetPositionNPC, 500 );
+		proj_1.DestroyAfter(5);
+
+		Sleep(0.15);
+
+		proj_2 = (W3ACSIceStaffIceSpearProjectile)theGame.CreateEntity( 
+		(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\projectiles\ice_staff_ice_spear.w2ent", true ), initpos );
+						
+		proj_2.Init(GetWitcherPlayer());
+		proj_2.PlayEffectSingle('fire_fx');
+		proj_2.PlayEffectSingle('explode');
+		proj_2.ShootProjectileAtPosition( 0, 15, targetPositionNPC, 500 );
+		proj_2.DestroyAfter(5);
+
+		Sleep(0.15);
+
+		proj_3 = (W3ACSIceStaffIceSpearProjectile)theGame.CreateEntity( 
+		(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\projectiles\ice_staff_ice_spear.w2ent", true ), initpos );
+						
+		proj_3.Init(GetWitcherPlayer());
+		proj_3.PlayEffectSingle('fire_fx');
+		proj_3.PlayEffectSingle('explode');
+		proj_3.ShootProjectileAtPosition( 0, 15, targetPositionNPC, 500 );
+		proj_3.DestroyAfter(5);
+
+		Sleep(0.15);
+
+		proj_4 = (W3ACSIceStaffIceSpearProjectile)theGame.CreateEntity( 
+		(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\projectiles\ice_staff_ice_spear.w2ent", true ), initpos );
+						
+		proj_4.Init(GetWitcherPlayer());
+		proj_4.PlayEffectSingle('fire_fx');
+		proj_4.PlayEffectSingle('explode');
+		proj_4.ShootProjectileAtPosition( 0, 15, targetPositionNPC, 500 );
+		proj_4.DestroyAfter(5);
+
+		Sleep(0.15);
+
+		proj_5 = (W3ACSIceStaffIceSpearProjectile)theGame.CreateEntity( 
+		(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\projectiles\ice_staff_ice_spear.w2ent", true ), initpos );
+						
+		proj_5.Init(GetWitcherPlayer());
+		proj_5.PlayEffectSingle('fire_fx');
+		proj_5.PlayEffectSingle('explode');
+		proj_5.ShootProjectileAtPosition( 0, 15, targetPositionNPC, 500 );
+		proj_5.DestroyAfter(5);
+
+		parent.DestroyAfter(10);
+	}
+
+	entry function ACS_Mage_Attack_Coil_With_Cone_Latent()
 	{
 		if (ACS_GetItem_MageStaff_Water())
 		{
@@ -12024,11 +13877,6 @@ state ACS_Mage_Attack_Blast_1 in W3ACSMageAttacks
 		ACS_Mage_Attack_Blast_1_Entry();
 	}
 	
-	entry function ACS_Mage_Attack_Blast_1_Entry()
-	{	
-		ACS_Mage_Attack_Blast_1_Latent();
-	}
-
 	latent function dolphin_spawn_blast_v1_1()
 	{
 		var actor															: CActor; 
@@ -12185,7 +14033,7 @@ state ACS_Mage_Attack_Blast_1 in W3ACSMageAttacks
 		ent.DestroyAfter(10);
 	}
 
-	latent function ACS_Mage_Attack_Blast_1_Latent()
+	entry function ACS_Mage_Attack_Blast_1_Entry()
 	{
 		if (ACS_GetItem_MageStaff_Water())
 		{
@@ -12195,14 +14043,26 @@ state ACS_Mage_Attack_Blast_1 in W3ACSMageAttacks
 			dolphin_spawn_blast_v1_4();
 
 			parent.PlayEffect('attack_fx1_water_ACS');
+
+			parent.PlayEffect('blast_water_aard');
 		}
 		else if (ACS_GetItem_MageStaff_Sand())
 		{
 			parent.PlayEffect('attack_fx1_sand_ACS');
+
+			parent.PlayEffect('blast_ground_aard');
 		}
 		else if (ACS_GetItem_MageStaff_Fire())
 		{
 			parent.PlayEffect('attack_fx1_fire_ACS');
+
+			parent.PlayEffect('blast_lv1_aard_fire');
+		}
+		else if (ACS_GetItem_MageStaff_Ice())
+		{
+			parent.PlayEffect('blast_ground_mutation_6_aard');
+
+			parent.PlayEffect('blast_lv1_aard');
 		}
 
 		actors.Clear();
@@ -12300,6 +14160,24 @@ state ACS_Mage_Attack_Blast_1 in W3ACSMageAttacks
 						dmg.AddEffectInfo( EET_Burning, 0.5 );
 					}
 				}
+				else if (ACS_GetItem_MageStaff_Ice())
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_FROST, damageMax );
+
+					actortarget.SoundEvent("cmb_play_hit_heavy");
+					GetWitcherPlayer().SoundEvent("cmb_play_hit_heavy");
+
+					ent.PlayEffect('ice_line');
+
+					ent.PlayEffect('ice_spikes');
+
+					ent.PlayEffect('blast_ground_mutation_6_aard');
+
+					if (!actortarget.HasBuff(EET_Frozen))
+					{
+						dmg.AddEffectInfo( EET_Frozen, 0.5 );
+					}
+				}
 
 				ent.DestroyAfter(10);
 
@@ -12332,11 +14210,6 @@ state ACS_Mage_Attack_Blast_2 in W3ACSMageAttacks
 	event OnEnterState(prevStateName : name)
 	{
 		ACS_Mage_Attack_Blast_2_Entry();
-	}
-	
-	entry function ACS_Mage_Attack_Blast_2_Entry()
-	{	
-		ACS_Mage_Attack_Blast_2_Latent();
 	}
 
 	latent function dolphin_spawn_blast_v2_1()
@@ -12495,8 +14368,8 @@ state ACS_Mage_Attack_Blast_2 in W3ACSMageAttacks
 		ent.DestroyAfter(10);
 	}
 
-	latent function ACS_Mage_Attack_Blast_2_Latent()
-	{
+	entry function ACS_Mage_Attack_Blast_2_Entry()
+	{	
 		if (ACS_GetItem_MageStaff_Water())
 		{
 			dolphin_spawn_blast_v2_1();
@@ -12505,14 +14378,38 @@ state ACS_Mage_Attack_Blast_2 in W3ACSMageAttacks
 			dolphin_spawn_blast_v2_4();
 
 			parent.PlayEffect('attack_special_water_ACS');
+
+			parent.PlayEffect('blast_water_aard');
+
+			parent.PlayEffect('blast_lv1_damage_aard');
+
+			parent.PlayEffect('blast_lv1_power_aard');
 		}
 		else if (ACS_GetItem_MageStaff_Sand())
 		{
 			parent.PlayEffect('attack_special_sand_ACS');
+
+			parent.PlayEffect('blast_ground_aard');
+
+			parent.PlayEffect('leaf_fx_aard');
 		}
 		else if (ACS_GetItem_MageStaff_Fire())
 		{
 			parent.PlayEffect('attack_special_fire_ACS');
+
+			parent.PlayEffect('blast_lv2_aard_fire');
+
+			parent.PlayEffect('leaf_fx_aard_fire');
+		}
+		else if (ACS_GetItem_MageStaff_Ice())
+		{
+			parent.PlayEffect('blast_lv2_aard');
+
+			parent.PlayEffect('blast_ground_mutation_6_aard');
+
+			parent.PlayEffect('blast_lv2_damage_aard');
+
+			parent.PlayEffect('blast_lv2_power_aard');
 		}
 
 		actors.Clear();
@@ -12609,6 +14506,24 @@ state ACS_Mage_Attack_Blast_2 in W3ACSMageAttacks
 						dmg.AddEffectInfo( EET_Burning, 0.5 );
 					}
 				}
+				else if (ACS_GetItem_MageStaff_Ice())
+				{
+					actortarget.SoundEvent("cmb_play_hit_heavy");
+					GetWitcherPlayer().SoundEvent("cmb_play_hit_heavy");
+
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_FROST, damageMax );
+
+					ent.PlayEffect('ice_line');
+
+					ent.PlayEffect('ice_spikes');
+
+					ent.PlayEffect('cone_ground_mutation_6_aard');
+
+					if (!actortarget.HasBuff(EET_Frozen))
+					{
+						dmg.AddEffectInfo( EET_Frozen, 0.5 );
+					}
+				}
 
 				ent.DestroyAfter(10);
 
@@ -12638,15 +14553,19 @@ state ACS_Mage_Attack_Blast_3 in W3ACSMageAttacks
 	private var i         																																						: int;
 	private var damageMax																																						: float;
 	private var ent 																																							: CEntity;
+	private var proj, proj_1, proj_2, proj_3, proj_4, proj_5, proj_6	 																										: W3ACSIceStaffFrostLine;
+	private var initpos, targetPositionNPC, targetPosition_1, targetPosition_2, targetPosition_3, targetPosition_4, targetPosition_5, targetPosition_6							: Vector;
 
 	event OnEnterState(prevStateName : name)
 	{
-		ACS_Mage_Attack_Blast_3_Entry();
-	}
-	
-	entry function ACS_Mage_Attack_Blast_3_Entry()
-	{	
-		ACS_Mage_Attack_Blast_3_Latent();
+		if (ACS_GetItem_MageStaff_Ice())
+		{
+			ACS_Mage_Attack_Ice_Staff_Frost_Line_Latent();
+		}
+		else
+		{
+			ACS_Mage_Attack_Blast_3_Latent();
+		}
 	}
 
 	latent function dolphin_spawn_blast_v3_1()
@@ -12805,7 +14724,175 @@ state ACS_Mage_Attack_Blast_3 in W3ACSMageAttacks
 		ent.DestroyAfter(10);
 	}
 
-	latent function ACS_Mage_Attack_Blast_3_Latent()
+	entry function ACS_Mage_Attack_Ice_Staff_Frost_Line_Latent()
+	{
+		parent.Teleport(parent.GetWorldPosition() + Vector(0,0,-1));
+
+		parent.PlayEffect('blast_lv3_aard');
+
+		parent.PlayEffect('blast_ground_mutation_6_aard');
+
+		parent.PlayEffect('ice_spikes');
+
+		parent.PlayEffect('ice_line');
+
+		initpos = parent.GetWorldPosition();		
+
+		actors.Clear();
+
+		actors = parent.MageAttackGetNPCsAndPlayersInRange( 7, 20, , FLAG_ExcludePlayer + FLAG_OnlyAliveActors);
+
+		actors.Remove(thePlayer);
+
+		if( actors.Size() > 0 )
+		{
+			thePlayer.DrainFocus( thePlayer.GetStatMax( BCS_Focus) * 0.05 );
+
+			for( i = 0; i < actors.Size(); i += 1 )
+			{
+				actortarget = (CActor)actors[i];
+
+				if (actortarget.HasTag('acs_snow_entity')
+				|| actortarget.HasTag('smokeman') 
+				|| actortarget.HasTag('ACS_Tentacle_1') 
+				|| actortarget.HasTag('ACS_Tentacle_2') 
+				|| actortarget.HasTag('ACS_Tentacle_3') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_1') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_2') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_3') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_6')
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_5')
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_4')
+				|| actortarget.HasTag('ACS_Vampire_Monster_Boss_Bar') 
+				|| actortarget.HasTag('ACS_Chaos_Cloud') 
+				|| actortarget.HasTag('ACS_Transformation_Vampire_Monster_Camera_Dummy') 
+				|| actortarget.HasTag('ACS_Mage_Staff_Dolphin') 
+				|| actortarget == thePlayer
+				)
+				continue;
+
+				dmg = new W3DamageAction in theGame.damageMgr;
+				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Mage_Blast_3_Damage', EHRT_Heavy, CPS_Undefined, false, false, true, false);
+
+				dmg.SetProcessBuffsIfNoDamage(true);
+				dmg.SetCanPlayHitParticle(true);
+
+				if (actortarget.UsesVitality()) 
+				{ 
+					damageMax = (actortarget.GetStatMax( BCS_Vitality ) - actortarget.GetStat( BCS_Vitality )) * 0.1; 
+				} 
+				else if (actortarget.UsesEssence()) 
+				{ 
+					damageMax = (actortarget.GetStatMax( BCS_Essence ) - actortarget.GetStat( BCS_Essence )) * 0.1; 
+				} 
+
+				dmg.SetForceExplosionDismemberment();
+
+				ent = theGame.CreateEntity( 
+			
+				(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\fx\acs_ice_breathe_old.w2ent", true ), 
+				
+				actortarget.GetWorldPosition(), thePlayer.GetWorldRotation() );
+
+				dmg.AddDamage( theGame.params.DAMAGE_NAME_FROST, damageMax );
+
+				actortarget.SoundEvent("cmb_play_hit_heavy");
+				GetWitcherPlayer().SoundEvent("cmb_play_hit_heavy");
+				GetWitcherPlayer().SoundEvent("cmb_play_dismemberment_gore");
+				GetWitcherPlayer().SoundEvent("monster_dettlaff_monster_vein_hit_blood");
+
+				ent.PlayEffect('ice_line');
+
+				ent.PlayEffect('ice_spikes');
+
+				ent.PlayEffect('cone_ground_mutation_6_aard');
+
+				if (!actortarget.HasBuff(EET_Frozen))
+				{
+					dmg.AddEffectInfo( EET_Frozen, 0.5 );
+				}
+
+				ent.DestroyAfter(10);
+
+
+					
+				theGame.damageMgr.ProcessAction( dmg );
+										
+				delete dmg;
+				
+				
+			}
+		}
+
+		targetPosition_1 = parent.GetWorldPosition() + parent.GetWorldForward() * 50;
+
+		targetPosition_2 = parent.GetWorldPosition() + parent.GetWorldForward() * -50;
+
+		targetPosition_3 = parent.GetWorldPosition() + parent.GetWorldRight() * 50 + parent.GetWorldForward() * 50;
+
+		targetPosition_4 = parent.GetWorldPosition() + parent.GetWorldRight() * -50 + parent.GetWorldForward() * 50;
+
+		targetPosition_5 = parent.GetWorldPosition() + parent.GetWorldRight() * 50 + parent.GetWorldForward() * -50;
+
+		targetPosition_6 = parent.GetWorldPosition() + parent.GetWorldRight() * -50 + parent.GetWorldForward() * -50;
+
+		proj_1 = (W3ACSIceStaffFrostLine)theGame.CreateEntity( 
+		(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\projectiles\ice_staff_frost_line.w2ent", true ), initpos );
+						
+		proj_1.Init(GetWitcherPlayer());
+		proj_1.PlayEffectSingle('fire_line_big');
+		proj_1.ShootProjectileAtPosition(0,	20, targetPosition_1, 10 );
+		proj_1.DestroyAfter(5);
+
+
+		proj_2 = (W3ACSIceStaffFrostLine)theGame.CreateEntity( 
+		(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\projectiles\ice_staff_frost_line.w2ent", true ), initpos );
+						
+		proj_2.Init(GetWitcherPlayer());
+		proj_2.PlayEffectSingle('fire_line_big');
+		proj_2.ShootProjectileAtPosition(0,	20, targetPosition_2, 10 );
+		proj_2.DestroyAfter(5);
+
+
+		proj_3 = (W3ACSIceStaffFrostLine)theGame.CreateEntity( 
+		(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\projectiles\ice_staff_frost_line.w2ent", true ), initpos );
+						
+		proj_3.Init(GetWitcherPlayer());
+		proj_3.PlayEffectSingle('fire_line_big');
+		proj_3.ShootProjectileAtPosition(0,	20, targetPosition_3, 10 );
+		proj_3.DestroyAfter(5);
+
+
+		proj_4 = (W3ACSIceStaffFrostLine)theGame.CreateEntity( 
+		(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\projectiles\ice_staff_frost_line.w2ent", true ), initpos );
+						
+		proj_4.Init(GetWitcherPlayer());
+		proj_4.PlayEffectSingle('fire_line_big');
+		proj_4.ShootProjectileAtPosition(0,	20, targetPosition_4, 10 );
+		proj_4.DestroyAfter(5);
+
+
+		proj_5 = (W3ACSIceStaffFrostLine)theGame.CreateEntity( 
+		(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\projectiles\ice_staff_frost_line.w2ent", true ), initpos );
+						
+		proj_5.Init(GetWitcherPlayer());
+		proj_5.PlayEffectSingle('fire_line_big');
+		proj_5.ShootProjectileAtPosition(0,	20, targetPosition_5, 10 );
+		proj_5.DestroyAfter(5);
+
+
+		proj_6 = (W3ACSIceStaffFrostLine)theGame.CreateEntity( 
+		(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\projectiles\ice_staff_frost_line.w2ent", true ), initpos );
+						
+		proj_6.Init(GetWitcherPlayer());
+		proj_6.PlayEffectSingle('fire_line_big');
+		proj_6.ShootProjectileAtPosition(0,	20, targetPosition_6, 10 );
+		proj_6.DestroyAfter(5);
+				
+		parent.DestroyAfter(10);
+	}
+
+	entry function ACS_Mage_Attack_Blast_3_Latent()
 	{
 		if (ACS_GetItem_MageStaff_Water())
 		{
@@ -12966,16 +15053,13 @@ state ACS_Mage_Attack_Gust_Left in W3ACSMageAttacks
 	private var i         																																						: int;
 	private var damageMax																																						: float;
 	private var ent 																																							: CEntity;
+	private var proj_1	 																																						: W3ACSIceStaffIceLineSpikesProjectile;
+	private var initpos, targetPositionNPC																																		: Vector;
 
 
 	event OnEnterState(prevStateName : name)
 	{
 		ACS_Mage_Attack_Gust_Left_Entry();
-	}
-	
-	entry function ACS_Mage_Attack_Gust_Left_Entry()
-	{	
-		ACS_Mage_Attack_Gust_Left_Latent();
 	}
 
 	latent function dolphin_spawn_left()
@@ -13017,8 +15101,8 @@ state ACS_Mage_Attack_Gust_Left in W3ACSMageAttacks
 		ent.DestroyAfter(10);
 	}
 
-	latent function ACS_Mage_Attack_Gust_Left_Latent()
-	{
+	entry function ACS_Mage_Attack_Gust_Left_Entry()
+	{	
 		if (ACS_GetItem_MageStaff_Water())
 		{
 			dolphin_spawn_left();
@@ -13031,6 +15115,11 @@ state ACS_Mage_Attack_Gust_Left in W3ACSMageAttacks
 		else if (ACS_GetItem_MageStaff_Fire())
 		{
 			parent.PlayEffect('warning_up_left_fire_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Ice())
+		{
+			parent.PlayEffect('ice_appear');
+			parent.PlayEffect('ice_disappear');
 		}
 
 		Sleep(0.5);
@@ -13065,6 +15154,15 @@ state ACS_Mage_Attack_Gust_Left in W3ACSMageAttacks
 
 			parent.PlayEffect('diagonal_up_left_fire_ACS');
 			parent.PlayEffect('blood_diagonal_up_left_fire_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Ice())
+		{
+			thePlayer.StopEffect( 'hand_sand_fx_ice_ACS' );
+			thePlayer.PlayEffectSingle( 'hand_sand_fx_ice_ACS' );
+			thePlayer.StopEffect( 'hand_sand_fx_ice_ACS' );
+
+			parent.PlayEffect('ice_appear');
+			parent.PlayEffect('ice_disappear');
 		}
 
 		actors.Clear();
@@ -13163,6 +15261,31 @@ state ACS_Mage_Attack_Gust_Left in W3ACSMageAttacks
 						dmg.AddEffectInfo( EET_Burning, 0.5 );
 					}
 				}
+				else if (ACS_GetItem_MageStaff_Ice())
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_FROST, damageMax );
+
+					ent.PlayEffect('ice_spikes');
+					ent.PlayEffect('ice_line');
+					ent.PlayEffect('cone_ground_mutation_6_aard');
+
+					if (!actortarget.HasBuff(EET_Frozen))
+					{
+						dmg.AddEffectInfo( EET_Frozen, 0.5 );
+					}
+
+					initpos = actortarget.GetWorldPosition() + thePlayer.GetWorldRight() * 5;			
+							
+					targetPositionNPC = actortarget.GetWorldPosition() + thePlayer.GetWorldRight() * -5;
+
+					proj_1 = (W3ACSIceStaffIceLineSpikesProjectile)theGame.CreateEntity( 
+					(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\projectiles\ice_staff_ice_line_spikes.w2ent", true ), initpos );
+									
+					proj_1.Init(GetWitcherPlayer());
+					proj_1.PlayEffectSingle('fire_line_big');
+					proj_1.ShootProjectileAtPosition(0,	15, targetPositionNPC, 10 );
+					proj_1.DestroyAfter(5);
+				}
 
 				ent.DestroyAfter(10);
 
@@ -13191,16 +15314,13 @@ state ACS_Mage_Attack_Gust_Right in W3ACSMageAttacks
 	private var i         																																						: int;
 	private var damageMax																																						: float;
 	private var ent 																																							: CEntity;
+	private var proj_1	 																																						: W3ACSIceStaffIceLineSpikesProjectile;
+	private var initpos, targetPositionNPC																																		: Vector;
 
 
 	event OnEnterState(prevStateName : name)
 	{
 		ACS_Mage_Attack_Gust_Right_Entry();
-	}
-	
-	entry function ACS_Mage_Attack_Gust_Right_Entry()
-	{	
-		ACS_Mage_Attack_Gust_Right_Latent();
 	}
 
 	latent function dolphin_spawn_right()
@@ -13242,7 +15362,7 @@ state ACS_Mage_Attack_Gust_Right in W3ACSMageAttacks
 		ent.DestroyAfter(10);
 	}
 
-	latent function ACS_Mage_Attack_Gust_Right_Latent()
+	entry function ACS_Mage_Attack_Gust_Right_Entry()
 	{
 		if (ACS_GetItem_MageStaff_Water())
 		{
@@ -13256,6 +15376,11 @@ state ACS_Mage_Attack_Gust_Right in W3ACSMageAttacks
 		else if (ACS_GetItem_MageStaff_Fire())
 		{
 			parent.PlayEffect('warning_up_right_fire_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Ice())
+		{
+			parent.PlayEffect('ice_appear');
+			parent.PlayEffect('ice_disappear');
 		}
 
 		Sleep(0.5);
@@ -13290,6 +15415,15 @@ state ACS_Mage_Attack_Gust_Right in W3ACSMageAttacks
 
 			parent.PlayEffect('diagonal_up_right_fire_ACS');
 			parent.PlayEffect('blood_diagonal_up_right_fire_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Ice())
+		{
+			thePlayer.StopEffect( 'hand_sand_fx_ice_ACS' );
+			thePlayer.PlayEffectSingle( 'hand_sand_fx_ice_ACS' );
+			thePlayer.StopEffect( 'hand_sand_fx_ice_ACS' );
+
+			parent.PlayEffect('ice_appear');
+			parent.PlayEffect('ice_disappear');
 		}
 
 		actors.Clear();
@@ -13389,6 +15523,31 @@ state ACS_Mage_Attack_Gust_Right in W3ACSMageAttacks
 						dmg.AddEffectInfo( EET_Burning, 0.5 );
 					}
 				}
+				else if (ACS_GetItem_MageStaff_Ice())
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_FROST, damageMax );
+
+					ent.PlayEffect('ice_spikes');
+					ent.PlayEffect('ice_line');
+					ent.PlayEffect('cone_ground_mutation_6_aard');
+
+					if (!actortarget.HasBuff(EET_Frozen))
+					{
+						dmg.AddEffectInfo( EET_Frozen, 0.5 );
+					}
+
+					initpos = actortarget.GetWorldPosition() + thePlayer.GetWorldRight() * -5;			
+							
+					targetPositionNPC = actortarget.GetWorldPosition() + thePlayer.GetWorldRight() * 5;
+
+					proj_1 = (W3ACSIceStaffIceLineSpikesProjectile)theGame.CreateEntity( 
+					(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\projectiles\ice_staff_ice_line_spikes.w2ent", true ), initpos );
+									
+					proj_1.Init(GetWitcherPlayer());
+					proj_1.PlayEffectSingle('fire_line_big');
+					proj_1.ShootProjectileAtPosition(0,	15, targetPositionNPC, 10 );
+					proj_1.DestroyAfter(5);
+				}
 
 				ent.DestroyAfter(10);
 
@@ -13416,16 +15575,13 @@ state ACS_Mage_Attack_Gust_Up in W3ACSMageAttacks
 	private var i         																																						: int;
 	private var damageMax																																						: float;
 	private var ent 																																							: CEntity;
+	private var proj, proj_1, proj_2, proj_3, proj_4, proj_5, proj_6	 																										: W3ACSIceStaffIceLineSpikesProjectile;
+	private var initpos_1, initpos_2, initpos_3, initpos_4, initpos_5, initpos_6, targetPositionNPC																				: Vector;
 
 
 	event OnEnterState(prevStateName : name)
 	{
 		ACS_Mage_Attack_Gust_Up_Entry();
-	}
-	
-	entry function ACS_Mage_Attack_Gust_Up_Entry()
-	{	
-		ACS_Mage_Attack_Gust_Up_Latent();
 	}
 
 	latent function dolphin_spawn_up_1()
@@ -13506,8 +15662,8 @@ state ACS_Mage_Attack_Gust_Up in W3ACSMageAttacks
 		ent.DestroyAfter(10);
 	}
 
-	latent function ACS_Mage_Attack_Gust_Up_Latent()
-	{
+	entry function ACS_Mage_Attack_Gust_Up_Entry()
+	{	
 		if (ACS_GetItem_MageStaff_Water())
 		{
 			dolphin_spawn_up_1();
@@ -13521,6 +15677,11 @@ state ACS_Mage_Attack_Gust_Up in W3ACSMageAttacks
 		else if (ACS_GetItem_MageStaff_Fire())
 		{
 			parent.PlayEffect('warning_up_fire_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Ice())
+		{
+			parent.PlayEffect('ice_appear');
+			parent.PlayEffect('ice_disappear');
 		}
 
 		Sleep(0.5);
@@ -13555,6 +15716,79 @@ state ACS_Mage_Attack_Gust_Up in W3ACSMageAttacks
 
 			parent.PlayEffect('up_fire_ACS');
 			parent.PlayEffect('blood_up_fire_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Ice())
+		{
+			thePlayer.StopEffect( 'hand_sand_fx_ice_ACS' );
+			thePlayer.PlayEffectSingle( 'hand_sand_fx_ice_ACS' );
+			thePlayer.StopEffect( 'hand_sand_fx_ice_ACS' );
+
+			targetPositionNPC = parent.GetWorldPosition();
+
+			initpos_1 = parent.GetWorldPosition() + parent.GetWorldForward() * 5.5;
+
+			initpos_2 = parent.GetWorldPosition() + parent.GetWorldForward() * -5.5;
+
+			initpos_3 = parent.GetWorldPosition() + parent.GetWorldRight() * 5.5 + parent.GetWorldForward() * 5.5;
+
+			initpos_4 = parent.GetWorldPosition() + parent.GetWorldRight() * -5.5 + parent.GetWorldForward() * 5.5;
+
+			initpos_5 = parent.GetWorldPosition() + parent.GetWorldRight() * 5.5 + parent.GetWorldForward() * -5.5;
+
+			initpos_6 = parent.GetWorldPosition() + parent.GetWorldRight() * -5.5 + parent.GetWorldForward() * -5.5;
+
+			proj_1 = (W3ACSIceStaffIceLineSpikesProjectile)theGame.CreateEntity( 
+			(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\projectiles\ice_staff_ice_line_spikes_big.w2ent", true ), initpos_1 );
+							
+			proj_1.Init(GetWitcherPlayer());
+			proj_1.PlayEffectSingle('fire_line');
+			proj_1.ShootProjectileAtPosition(0,	15, targetPositionNPC, 5.5 );
+			proj_1.DestroyAfter(5);
+
+
+			proj_2 = (W3ACSIceStaffIceLineSpikesProjectile)theGame.CreateEntity( 
+			(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\projectiles\ice_staff_ice_line_spikes_big.w2ent", true ), initpos_2 );
+							
+			proj_2.Init(GetWitcherPlayer());
+			proj_2.PlayEffectSingle('fire_line');
+			proj_2.ShootProjectileAtPosition(0,	15, targetPositionNPC, 5.5 );
+			proj_2.DestroyAfter(5);
+
+
+			proj_3 = (W3ACSIceStaffIceLineSpikesProjectile)theGame.CreateEntity( 
+			(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\projectiles\ice_staff_ice_line_spikes_big.w2ent", true ), initpos_3 );
+							
+			proj_3.Init(GetWitcherPlayer());
+			proj_3.PlayEffectSingle('fire_line');
+			proj_3.ShootProjectileAtPosition(0,	15, targetPositionNPC, 5.5 );
+			proj_3.DestroyAfter(5);
+
+
+			proj_4 = (W3ACSIceStaffIceLineSpikesProjectile)theGame.CreateEntity( 
+			(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\projectiles\ice_staff_ice_line_spikes_big.w2ent", true ), initpos_4 );
+							
+			proj_4.Init(GetWitcherPlayer());
+			proj_4.PlayEffectSingle('fire_line');
+			proj_4.ShootProjectileAtPosition(0,	15, targetPositionNPC, 5.5 );
+			proj_4.DestroyAfter(5);
+
+
+			proj_5 = (W3ACSIceStaffIceLineSpikesProjectile)theGame.CreateEntity( 
+			(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\projectiles\ice_staff_ice_line_spikes_big.w2ent", true ), initpos_5 );
+							
+			proj_5.Init(GetWitcherPlayer());
+			proj_5.PlayEffectSingle('fire_line');
+			proj_5.ShootProjectileAtPosition(0,	15, targetPositionNPC, 5.5 );
+			proj_5.DestroyAfter(5);
+
+
+			proj_6 = (W3ACSIceStaffIceLineSpikesProjectile)theGame.CreateEntity( 
+			(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\projectiles\ice_staff_ice_line_spikes_big.w2ent", true ), initpos_6 );
+							
+			proj_6.Init(GetWitcherPlayer());
+			proj_6.PlayEffectSingle('fire_line');
+			proj_6.ShootProjectileAtPosition(0,	15, targetPositionNPC, 5.5 );
+			proj_6.DestroyAfter(5);
 		}
 
 		actors.Clear();
@@ -13653,6 +15887,20 @@ state ACS_Mage_Attack_Gust_Up in W3ACSMageAttacks
 						dmg.AddEffectInfo( EET_Burning, 0.5 );
 					}
 				}
+				else if (ACS_GetItem_MageStaff_Ice())
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_FROST, damageMax );
+
+					ent.PlayEffect('ice_spikes');
+					ent.PlayEffect('ice_line');
+
+					ent.PlayEffect('blast_ground_mutation_6_aard');
+
+					if (!actortarget.HasBuff(EET_Frozen))
+					{
+						dmg.AddEffectInfo( EET_Frozen, 0.5 );
+					}
+				}
 
 				ent.DestroyAfter(10);
 
@@ -13682,16 +15930,13 @@ state ACS_Mage_Attack_Mega_Gust in W3ACSMageAttacks
 	private var i         																																						: int;
 	private var damageMax																																						: float;
 	private var ent 																																							: CEntity;
-
+	private var entity : CEntity;
+	private var iceSpike : W3ACSIceStaffIceSpike;
+	private var pos : Vector;
 
 	event OnEnterState(prevStateName : name)
 	{
 		ACS_Mage_Attack_Mega_Gust_Entry();
-	}
-	
-	entry function ACS_Mage_Attack_Mega_Gust_Entry()
-	{	
-		ACS_Mage_Attack_Mega_Gust_Latent();
 	}
 
 	latent function dolphin_spawn_mega_1()
@@ -13850,7 +16095,7 @@ state ACS_Mage_Attack_Mega_Gust in W3ACSMageAttacks
 		ent.DestroyAfter(10);
 	}
 
-	latent function ACS_Mage_Attack_Mega_Gust_Latent()
+	entry function ACS_Mage_Attack_Mega_Gust_Entry()
 	{
 		if (ACS_GetItem_MageStaff_Water())
 		{
@@ -13874,6 +16119,16 @@ state ACS_Mage_Attack_Mega_Gust in W3ACSMageAttacks
 			parent.PlayEffect('warning_up_fire_ACS');
 			parent.PlayEffect('warning_up_left_fire_ACS');
 			parent.PlayEffect('warning_up_right_fire_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Ice())
+		{
+			parent.Teleport(parent.GetWorldPosition() + Vector(0,0,-0.5));
+
+			parent.PlayEffect('ice_line');
+
+			parent.PlayEffect('ice_spikes');
+
+			parent.PlayEffect('ice_marker_fx');
 		}
 
 		Sleep(1.5);
@@ -13911,6 +16166,25 @@ state ACS_Mage_Attack_Mega_Gust in W3ACSMageAttacks
 			parent.PlayEffect('teleport_in_fire_ACS');
 			parent.PlayEffect('teleport_out_fire_ACS');
 			parent.PlayEffect('quicksand_yrden_fire_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Ice())
+		{
+			thePlayer.StopEffect( 'hand_sand_fx_ice_ACS' );
+			thePlayer.PlayEffectSingle( 'hand_sand_fx_ice_ACS' );
+			thePlayer.StopEffect( 'hand_sand_fx_ice_ACS' );
+
+			parent.PlayEffect('ice_appear');
+			parent.PlayEffect('ice_disappear');
+
+			parent.PlayEffect('blast_lv3_aard');
+
+			parent.PlayEffect('blast_lv3_damage_aard');
+
+			parent.PlayEffect('blast_lv3_power_aard');
+
+			parent.PlayEffect('blast_ground_aard');
+
+			parent.PlayEffect('blast_ground_mutation_6_aard');
 		}
 
 		actors.Clear();
@@ -14018,6 +16292,29 @@ state ACS_Mage_Attack_Mega_Gust in W3ACSMageAttacks
 						dmg.AddEffectInfo( EET_Burning, 0.5 );
 					}
 				}
+				else if (ACS_GetItem_MageStaff_Ice())
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_FROST, damageMax );
+
+					GetWitcherPlayer().SoundEvent("magic_eredin_icespike_tell_explosion");
+
+					ent.PlayEffect('ice_line');
+
+					ent.PlayEffect('ice_spikes');
+
+					ent.PlayEffect('ice_explode');
+
+					ent.PlayEffect('ice_explode_2');
+
+					ent.PlayEffect('blast_ground_mutation_6_aard');
+
+					ent.PlayEffect('cone_ground_mutation_6_aard');
+
+					if (!actortarget.HasBuff(EET_Frozen))
+					{
+						dmg.AddEffectInfo( EET_Frozen, 0.5 );
+					}
+				}
 
 				ent.DestroyAfter(10);
 				
@@ -14046,15 +16343,22 @@ state ACS_Mage_Attack_Quicksand in W3ACSMageAttacks
 	private var damageMax																																						: float;
 	private var ent 																																							: CEntity;
 	private var animcomp 																																						: CAnimatedComponent;
+	private var proj_1																																							: W3ACSIceStaffIceMeteorProjectile;
+	private var initpos, targetPositionNPC																																		: Vector;
+	private var entity, entity_2 : CEntity;
+	private var iceSpike, iceSpike_2 : W3ACSIceStaffIceSpike;
+	private var pos, pos_2 : Vector;
 
 	event OnEnterState(prevStateName : name)
 	{
-		ACS_Mage_Attack_Quicksand_Entry();
-	}
-	
-	entry function ACS_Mage_Attack_Quicksand_Entry()
-	{	
-		ACS_Mage_Attack_Quicksand_Latent();
+		if (ACS_GetItem_MageStaff_Ice())
+		{
+			ACS_Mage_Attack_Ice_Spikes_Latent();
+		}
+		else
+		{
+			ACS_Mage_Attack_Quicksand_Latent();
+		}
 	}
 
 	latent function dolphin_spawn_quicksand_1()
@@ -14213,7 +16517,91 @@ state ACS_Mage_Attack_Quicksand in W3ACSMageAttacks
 		ent.DestroyAfter(20);
 	}
 
-	latent function ACS_Mage_Attack_Quicksand_Latent()
+	entry function ACS_Mage_Attack_Ice_Spikes_Latent()
+	{
+		parent.PlayEffect('ice_appear');
+
+		parent.PlayEffect('ice_disappear');
+
+		parent.PlayEffect('blast_ground_mutation_6_aard');
+
+		parent.PlayEffect('cone_ground_mutation_6_aard');
+
+		parent.PlayEffect('ice_marker_fx');
+
+		actors.Clear();
+
+		actors = parent.MageAttackGetNPCsAndPlayersInRange( 15, 20, , FLAG_ExcludePlayer + FLAG_OnlyAliveActors);
+
+		actors.Remove(thePlayer);
+
+		//actors.Clear();
+
+		//actors = GetWitcherPlayer().GetNPCsAndPlayersInCone(12.5, VecHeading(GetWitcherPlayer().GetHeadingVector()), 60, 50, , FLAG_ExcludePlayer + FLAG_Attitude_Hostile + FLAG_OnlyAliveActors );
+
+		if( actors.Size() > 0 )
+		{
+			for( i = 0; i < actors.Size(); i += 1 )
+			{
+				actortarget = (CActor)actors[i];
+
+				if (actortarget.HasTag('acs_snow_entity')
+				|| actortarget.HasTag('smokeman') 
+				|| actortarget.HasTag('ACS_Tentacle_1') 
+				|| actortarget.HasTag('ACS_Tentacle_2') 
+				|| actortarget.HasTag('ACS_Tentacle_3') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_1') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_2') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_3') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_6')
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_5')
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_4')
+				|| actortarget.HasTag('ACS_Vampire_Monster_Boss_Bar') 
+				|| actortarget.HasTag('ACS_Chaos_Cloud') 
+				|| actortarget.HasTag('ACS_Transformation_Vampire_Monster_Camera_Dummy') 
+				|| actortarget.HasTag('ACS_Mage_Staff_Dolphin') 
+				|| actortarget == thePlayer
+				)
+				continue;
+
+				ent = theGame.CreateEntity( 
+			
+				(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\fx\acs_ice_breathe_old.w2ent", true ), 
+				
+				actortarget.GetWorldPosition(), thePlayer.GetWorldRotation() );
+
+				pos_2 = actortarget.GetWorldPosition();
+				pos_2.Z += 1.1;
+
+				entity_2 = (W3ACSIceStaffIceSpike)theGame.CreateEntity( 
+				(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\projectiles\ice_staff_ice_spike.w2ent", true ), pos_2, actortarget.GetWorldRotation() );
+
+				ent.PlayEffect('ice_disappear');
+
+				ent.PlayEffect('ice_appear');
+
+				ent.PlayEffect('ice_line');
+
+				ent.PlayEffect('ice_spikes');
+
+				ent.DestroyAfter(10);
+			}
+		}
+
+		Sleep(2);
+
+		ACSGetEquippedSword().DestroyEffect( 'fx_staff_cast' );
+		ACSGetEquippedSword().PlayEffectSingle( 'fx_staff_cast' );
+		ACSGetEquippedSword().StopEffect( 'fx_staff_cast' );
+
+		ACSGetEquippedSword().DestroyEffect( 'fx_staff_gameplay' );
+		ACSGetEquippedSword().PlayEffectSingle( 'fx_staff_gameplay' );
+		ACSGetEquippedSword().StopEffect( 'fx_staff_gameplay' );
+
+		parent.DestroyAfter(10);
+	}
+
+	entry function ACS_Mage_Attack_Quicksand_Latent()
 	{
 		if (ACS_GetItem_MageStaff_Water())
 		{
@@ -14231,6 +16619,14 @@ state ACS_Mage_Attack_Quicksand in W3ACSMageAttacks
 		else if (ACS_GetItem_MageStaff_Fire())
 		{
 			parent.PlayEffect('trap_pre_fire_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Ice())
+		{
+			parent.Teleport(parent.GetWorldPosition() + Vector(0,0,-1));
+
+			parent.PlayEffect('ice_line');
+
+			parent.PlayEffect('ice_spikes');
 		}
 
 		Sleep(1);
@@ -14270,6 +16666,7 @@ state ACS_Mage_Attack_Quicksand in W3ACSMageAttacks
 			parent.PlayEffect('quicksand_fire_ACS');
 			parent.StopEffect('quicksand_fire_ACS');
 		}
+
 
 		actors.Clear();
 
@@ -14371,6 +16768,39 @@ state ACS_Mage_Attack_Quicksand in W3ACSMageAttacks
 						dmg.AddEffectInfo( EET_Burning, 3 );
 					}
 				}
+				else if (ACS_GetItem_MageStaff_Ice())
+				{
+					initpos = actortarget.GetWorldPosition();			
+					initpos.Z += 20;
+							
+					targetPositionNPC = actortarget.GetWorldPosition();
+					//targetPositionNPC.Z += 1.1;
+							
+					proj_1 = (W3ACSIceStaffIceMeteorProjectile)theGame.CreateEntity( 
+					(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\projectiles\ice_staff_meteorite.w2ent", true ), initpos );
+									
+					proj_1.Init(GetWitcherPlayer());
+					proj_1.PlayEffectSingle('smoke');
+					proj_1.ShootProjectileAtPosition( 0, 20, targetPositionNPC, 500 );
+					proj_1.DestroyAfter(10);
+
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_FROST, damageMax * 0.125 );
+
+					ent.PlayEffect('ice_line');
+
+					ent.PlayEffect('ice_spikes');
+
+					ent.PlayEffect('ice_marker_2');
+
+					ent.PlayEffect('blast_ground_mutation_6_aard');
+
+					ent.PlayEffect('cone_ground_mutation_6_aard');
+
+					if (!actortarget.HasBuff(EET_Frozen))
+					{
+						dmg.AddEffectInfo( EET_Frozen, 3 );
+					}
+				}
 
 				ent.DestroyAfter(30);
 				
@@ -14399,15 +16829,22 @@ state ACS_Mage_Attack_SandCage in W3ACSMageAttacks
 	private var damageMax																																						: float;
 	private var ent 																																							: CEntity;
 	private var animcomp 																																						: CAnimatedComponent;
-
+	private var entity, entity_2 : CEntity;
+	private var iceSpike, iceSpike_2 : W3ACSIceStaffIceSpike;
+	private var pos, pos_2 : Vector;
+	private var proj_1																																							: W3ACSIceStaffIceMeteorProjectile;
+	private var initpos, targetPositionNPC																																		: Vector;
+	
 	event OnEnterState(prevStateName : name)
 	{
-		ACS_Mage_Attack_SandCage_Entry();
-	}
-	
-	entry function ACS_Mage_Attack_SandCage_Entry()
-	{	
-		ACS_Mage_Attack_SandCage_Latent();
+		if (ACS_GetItem_MageStaff_Ice())
+		{
+			ACS_Mage_Attack_Ice_Meteors_Latent();
+		}
+		else
+		{
+			ACS_Mage_Attack_SandCage_Latent();
+		}
 	}
 
 	latent function dolphin_spawn_sandcage_1()
@@ -14566,7 +17003,146 @@ state ACS_Mage_Attack_SandCage in W3ACSMageAttacks
 		ent.DestroyAfter(10);
 	}
 
-	latent function ACS_Mage_Attack_SandCage_Latent()
+	entry function ACS_Mage_Attack_Ice_Meteors_Latent()
+	{
+		parent.Teleport(parent.GetWorldPosition() + Vector(0,0,-1));
+
+		parent.PlayEffect('ice_line');
+
+		parent.PlayEffect('ice_spikes');
+
+		parent.PlayEffect('blast_ground_mutation_6_aard');
+
+		parent.PlayEffect('cone_ground_mutation_6_aard');
+
+		parent.PlayEffect('ice_marker_fx');
+
+		Sleep(1);
+
+		thePlayer.StopEffect( 'hand_sand_fx_ice_ACS' );
+		thePlayer.PlayEffectSingle( 'hand_sand_fx_ice_ACS' );
+		thePlayer.StopEffect( 'hand_sand_fx_ice_ACS' );
+
+		ACSGetEquippedSword().DestroyEffect( 'fx_staff_cast' );
+		ACSGetEquippedSword().PlayEffectSingle( 'fx_staff_cast' );
+		ACSGetEquippedSword().StopEffect( 'fx_staff_cast' );
+
+		ACSGetEquippedSword().DestroyEffect( 'fx_staff_gameplay' );
+		ACSGetEquippedSword().PlayEffectSingle( 'fx_staff_gameplay' );
+		ACSGetEquippedSword().StopEffect( 'fx_staff_gameplay' );
+
+		parent.PlayEffect('ice_appear');
+
+		parent.PlayEffect('ice_disappear');
+
+		actors.Clear();
+
+		actors = parent.MageAttackGetNPCsAndPlayersInRange( 15, 20, , FLAG_ExcludePlayer + FLAG_OnlyAliveActors);
+
+		actors.Remove(thePlayer);
+
+		//actors.Clear();
+
+		//actors = GetWitcherPlayer().GetNPCsAndPlayersInCone(12.5, VecHeading(GetWitcherPlayer().GetHeadingVector()), 60, 50, , FLAG_ExcludePlayer + FLAG_Attitude_Hostile + FLAG_OnlyAliveActors );
+
+		if( actors.Size() > 0 )
+		{
+			for( i = 0; i < actors.Size(); i += 1 )
+			{
+				actortarget = (CActor)actors[i];
+
+				if (actortarget.HasTag('acs_snow_entity')
+				|| actortarget.HasTag('smokeman') 
+				|| actortarget.HasTag('ACS_Tentacle_1') 
+				|| actortarget.HasTag('ACS_Tentacle_2') 
+				|| actortarget.HasTag('ACS_Tentacle_3') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_1') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_2') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_3') 
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_6')
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_5')
+				|| actortarget.HasTag('ACS_Necrofiend_Tentacle_4')
+				|| actortarget.HasTag('ACS_Vampire_Monster_Boss_Bar') 
+				|| actortarget.HasTag('ACS_Chaos_Cloud') 
+				|| actortarget.HasTag('ACS_Transformation_Vampire_Monster_Camera_Dummy') 
+				|| actortarget.HasTag('ACS_Mage_Staff_Dolphin') 
+				|| actortarget == thePlayer
+				)
+				continue;
+
+				animcomp = (CAnimatedComponent)actortarget.GetComponentByClassName('CAnimatedComponent');
+
+				animcomp.FreezePoseFadeIn(0.5f);
+
+				animcomp.UnfreezePoseFadeOut(30.f);
+
+				dmg = new W3DamageAction in theGame.damageMgr;
+				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Mage_Ice_Meteor_Damage', EHRT_Heavy, CPS_Undefined, false, false, true, false);
+
+				dmg.SetProcessBuffsIfNoDamage(true);
+				dmg.SetCanPlayHitParticle(true);
+
+				if (actortarget.UsesVitality()) 
+				{ 
+					damageMax = (actortarget.GetStatMax( BCS_Vitality ) - actortarget.GetStat( BCS_Vitality )) * 0.05; 
+				} 
+				else if (actortarget.UsesEssence()) 
+				{ 
+					damageMax = (actortarget.GetStatMax( BCS_Essence ) - actortarget.GetStat( BCS_Essence )) * 0.05; 
+				} 
+
+				dmg.SetForceExplosionDismemberment();
+
+				ent = theGame.CreateEntity( 
+			
+				(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\fx\acs_ice_breathe_old.w2ent", true ), 
+				
+				actortarget.GetWorldPosition(), thePlayer.GetWorldRotation() );
+
+				initpos = actortarget.GetWorldPosition();			
+				initpos.Z += 20;
+						
+				targetPositionNPC = actortarget.GetWorldPosition();
+				//targetPositionNPC.Z += 1.1;
+						
+				proj_1 = (W3ACSIceStaffIceMeteorProjectile)theGame.CreateEntity( 
+				(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\projectiles\ice_staff_meteorite.w2ent", true ), initpos );
+								
+				proj_1.Init(GetWitcherPlayer());
+				proj_1.PlayEffectSingle('smoke');
+				proj_1.ShootProjectileAtPosition( 0, 20, targetPositionNPC, 500 );
+				proj_1.DestroyAfter(10);
+
+				dmg.AddDamage( theGame.params.DAMAGE_NAME_FROST, damageMax * 0.0125 );
+
+				ent.PlayEffect('ice_line');
+
+				ent.PlayEffect('ice_spikes');
+
+				ent.PlayEffect('ice_marker_2');
+
+				ent.PlayEffect('blast_ground_mutation_6_aard');
+
+				ent.PlayEffect('cone_ground_mutation_6_aard');
+
+				if (!actortarget.HasBuff(EET_Frozen))
+				{
+					dmg.AddEffectInfo( EET_Frozen, 3 );
+				}
+
+				ent.DestroyAfter(30);
+				
+					
+				theGame.damageMgr.ProcessAction( dmg );
+										
+				delete dmg;
+			}
+		}
+
+		parent.DestroyAfter(30);
+	}
+
+	entry function ACS_Mage_Attack_SandCage_Latent()
 	{
 		if (ACS_GetItem_MageStaff_Water())
 		{
@@ -14735,16 +17311,11 @@ state ACS_Mage_Attack_Tornado in W3ACSMageAttacks
 	private var actors    																																						: array<CActor>;
 	private var i         																																						: int;
 	private var damageMax																																						: float;
-	private var ent 																																							: CEntity;
+	private var ent,ent_2 																																							: CEntity;
 
 	event OnEnterState(prevStateName : name)
 	{
 		ACS_Mage_Attack_Tornado_Entry();
-	}
-	
-	entry function ACS_Mage_Attack_Tornado_Entry()
-	{	
-		ACS_Mage_Attack_Tornado_Latent();
 	}
 
 	latent function dolphin_spawn_tornado_1()
@@ -14903,7 +17474,7 @@ state ACS_Mage_Attack_Tornado in W3ACSMageAttacks
 		ent.DestroyAfter(20);
 	}
 
-	latent function ACS_Mage_Attack_Tornado_Latent()
+	entry function ACS_Mage_Attack_Tornado_Entry()
 	{
 		if (ACS_GetItem_MageStaff_Water())
 		{
@@ -14921,6 +17492,22 @@ state ACS_Mage_Attack_Tornado in W3ACSMageAttacks
 		else if (ACS_GetItem_MageStaff_Fire())
 		{
 			parent.PlayEffect('trap_pre_fire_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Fire())
+		{
+			parent.PlayEffect('trap_pre_fire_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Ice())
+		{
+			parent.Teleport(parent.GetWorldPosition() + Vector(0,0,-1));
+
+			parent.PlayEffect('ice_line');
+
+			parent.PlayEffect('ice_spikes');
+
+			parent.PlayEffect('blast_ground_mutation_6_aard');
+
+			parent.PlayEffect('cone_ground_mutation_6_aard');
 		}
 
 		Sleep(2);
@@ -14959,6 +17546,33 @@ state ACS_Mage_Attack_Tornado in W3ACSMageAttacks
 
 			parent.PlayEffect('tornado_fire_ACS');
 			parent.PlayEffect('quicksand_fire_ACS');
+		}
+		else if (ACS_GetItem_MageStaff_Ice())
+		{
+			thePlayer.StopEffect( 'hand_sand_fx_ice_ACS' );
+			thePlayer.PlayEffectSingle( 'hand_sand_fx_ice_ACS' );
+			thePlayer.StopEffect( 'hand_sand_fx_ice_ACS' );
+
+			parent.PlayEffect('ice_appear');
+			parent.PlayEffect('ice_disappear');
+
+			ent.PlayEffect('blast_ground_mutation_6_aard');
+
+			ent_2 = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( 
+
+			"dlc\dlc_acs\data\fx\test_rift.w2ent"
+				
+			, true ), parent.GetWorldPosition() + Vector(0,0,10) );
+
+			ent_2.PlayEffect('test_rift_2');
+
+			ent_2.DestroyAfter(20);
+
+			thePlayer.SoundEvent("magic_caranthil_teleport_fx_stop");
+
+			thePlayer.SoundEvent("magic_caranthil_teleport_fx_start");
+
+			parent.AddTimer('ice_rift_stop_sound', 19, false);
 		}
 
 		parent.AddTimer('tornado_target_check', 0.1, true);
@@ -15046,6 +17660,15 @@ state ACS_Mage_Attack_Tornado in W3ACSMageAttacks
 					ent.PlayEffect('quicksand_yrden_fire_ACS');
 					ent.PlayEffect('quicksand_fire_ACS');
 					ent.PlayEffect('trap_pre_fire_ACS');
+				}
+				else if (ACS_GetItem_MageStaff_Ice())
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_FROST, damageMax );
+
+					ent.PlayEffect('ice_disappear');
+					ent.PlayEffect('ice_appear');
+					ent.PlayEffect('ice_line');
+					ent.PlayEffect('ice_spikes');
 				}
 
 				ent.DestroyAfter(10);

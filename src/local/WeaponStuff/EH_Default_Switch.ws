@@ -577,8 +577,6 @@ state DefaultSwitch_2_Engage in cACS_DefaultSwitch_2
 
 		silverswordentity = GetWitcherPlayer().GetInventory().GetItemEntityUnsafe(silverID);
 
-		ACS_StartAerondightEffectInit();
-
 		trail_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\fx\acs_sword_trail.w2ent" , true );
 
 		sword_trail_1 = (CEntity)theGame.CreateEntity( trail_temp, GetWitcherPlayer().GetWorldPosition() + Vector( 0, 0, -20 ) );

@@ -7561,13 +7561,8 @@ state BruxaDodgeBackCenter_HijackBack in cBruxaDodgeBackCenter
 	{
 		HijackBackEntry();
 	}
-	
-	entry function HijackBackEntry()
-	{
-		HijackBackLatent();	
-	}
 
-	latent function HijackBackLatent()
+	entry function HijackBackEntry()
 	{
 		//actors = GetActorsInRange(GetWitcherPlayer(), 10, 10, 'bruxa_bite_victim', true);
 
@@ -7996,13 +7991,8 @@ state BruxaDodgeBackLeft_HijackLeft in cBruxaDodgeBackLeft
 	{
 		HijackLeftEntry();
 	}
-	
-	entry function HijackLeftEntry()
-	{
-		HijackLeftLatent();	
-	}
 
-	latent function HijackLeftLatent()
+	entry function HijackLeftEntry()
 	{
 		actors.Clear();
 		
@@ -8542,11 +8532,6 @@ state BruxaDodgeBackRight_HijackRight in cBruxaDodgeBackRight
 	}
 	
 	entry function HijackRightEntry()
-	{
-		HijackRightLatent();	
-	}
-
-	latent function HijackRightLatent()
 	{
 		actors.Clear();
 		

@@ -326,8 +326,6 @@ state Engage in cACS_RangedWeaponSwitch
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SteelSword, steelID);
 
 		ACS_WeaponDestroyInit();
-		
-		ACS_StartAerondightEffectInit();
 
 		if ( GetWitcherPlayer().IsWeaponHeld( 'silversword' ) )
 		{
@@ -559,8 +557,6 @@ state Engage in cACS_RangedWeaponSwitch
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SteelSword, steelID);
 
 		ACS_WeaponDestroyInit();
-		
-		ACS_StartAerondightEffectInit();
 
 		if (RandF() < 0.5 )
 		{
@@ -615,8 +611,6 @@ state Engage in cACS_RangedWeaponSwitch
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SteelSword, steelID);
 
 		ACS_WeaponDestroyInit();
-		
-		ACS_StartAerondightEffectInit();
 
 		if ( GetWitcherPlayer().IsWeaponHeld( 'silversword' ) )
 		{
@@ -849,7 +843,7 @@ state Engage in cACS_RangedWeaponSwitch
 
 		ACS_WeaponDestroyInit();
 		
-		ACS_StartAerondightEffectInit();
+		
 
 		if (RandF() < 0.5 )
 		{
@@ -905,7 +899,7 @@ state Engage in cACS_RangedWeaponSwitch
 
 		ACS_WeaponDestroyInit();
 		
-		ACS_StartAerondightEffectInit();
+		
 
 		if ( GetWitcherPlayer().IsWeaponHeld( 'silversword' ) )
 		{
@@ -1138,7 +1132,7 @@ state Engage in cACS_RangedWeaponSwitch
 
 		ACS_WeaponDestroyInit();
 		
-		ACS_StartAerondightEffectInit();
+		
 
 		if (RandF() < 0.5 )
 		{
@@ -1195,7 +1189,7 @@ state Engage in cACS_RangedWeaponSwitch
 
 		ACS_WeaponDestroyInit();
 		
-		ACS_StartAerondightEffectInit();
+		
 
 		if ( GetWitcherPlayer().IsWeaponHeld( 'silversword' ) )
 		{
@@ -1428,7 +1422,7 @@ state Engage in cACS_RangedWeaponSwitch
 
 		ACS_WeaponDestroyInit();
 		
-		ACS_StartAerondightEffectInit();
+		
 
 		if (RandF() < 0.5 )
 		{
@@ -1484,7 +1478,7 @@ state Engage in cACS_RangedWeaponSwitch
 
 		ACS_WeaponDestroyInit();
 		
-		ACS_StartAerondightEffectInit();
+		
 
 		if ( GetWitcherPlayer().IsWeaponHeld( 'silversword' ) )
 		{
@@ -1717,7 +1711,7 @@ state Engage in cACS_RangedWeaponSwitch
 
 		ACS_WeaponDestroyInit();
 		
-		ACS_StartAerondightEffectInit();
+		
 
 		if (RandF() < 0.5 )
 		{
@@ -1780,7 +1774,7 @@ state Engage in cACS_RangedWeaponSwitch
 	{
 		ACS_WeaponDestroyInit();
 		
-		ACS_StartAerondightEffectInit();
+		
 
 		sword1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 
@@ -1826,7 +1820,7 @@ state Engage in cACS_RangedWeaponSwitch
 	{
 		ACS_WeaponDestroyInit();
 		
-		ACS_StartAerondightEffectInit();
+		
 
 		sword1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 
@@ -1872,7 +1866,7 @@ state Engage in cACS_RangedWeaponSwitch
 	{
 		ACS_WeaponDestroyInit();
 		
-		ACS_StartAerondightEffectInit();
+		
 
 		sword1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 
@@ -1918,7 +1912,7 @@ state Engage in cACS_RangedWeaponSwitch
 	{
 		ACS_WeaponDestroyInit();
 		
-		ACS_StartAerondightEffectInit();
+		
 
 		sword1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 
@@ -1964,7 +1958,7 @@ state Engage in cACS_RangedWeaponSwitch
 	{
 		ACS_WeaponDestroyInit();
 		
-		ACS_StartAerondightEffectInit();
+		
 
 		sword1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 

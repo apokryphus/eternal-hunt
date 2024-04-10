@@ -1625,7 +1625,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 		stupidArray_extra_arms.PushBack( 'Cutscene' );
 
 		//ACS_WeaponDestroyInit();
-		//ACS_StopAerondightEffectInit();
+		//
 
 		ACS_Sword_Trail_1().Destroy();
 		ACS_Sword_Trail_2().Destroy();
@@ -2016,8 +2016,6 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 		silversword = (CDrawableComponent)((GetWitcherPlayer().GetInventory().GetItemEntityUnsafe(silverID)).GetMeshComponent());
 		
 		ACS_WeaponDestroyInit();
-		
-		ACS_StartAerondightEffectInit();
 
 		trail_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\fx\acs_sword_trail.w2ent" , true );
 
@@ -2148,8 +2146,6 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SteelSword, steelID);
 
 		ACS_WeaponDestroyInit();
-		
-		ACS_StartAerondightEffectInit();
 
 		trail_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\fx\acs_sword_trail.w2ent" , true );
 
@@ -3111,8 +3107,6 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SteelSword, steelID);
 
 		ACS_WeaponDestroyInit();
-		
-		ACS_StartAerondightEffectInit();
 
 		trail_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\fx\acs_sword_trail.w2ent" , true );
 
@@ -3290,7 +3284,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 		
 		l_anchor.CreateAttachmentAtBoneWS( GetWitcherPlayer(), 'l_hand', bone_vec, bone_rot );
 		
-		ACS_StopAerondightEffectInit();
+		
 
 		ACS_HideSword();
 
@@ -3357,7 +3351,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 	{
 		ACS_WeaponDestroyInit();
 		
-		ACS_StopAerondightEffectInit();
+		
 
 		if ( ACS_Warglaives_Installed() && ACS_Warglaives_Enabled() )
 		{
@@ -5461,7 +5455,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 	{
 		ACS_WeaponDestroyInit();
 		
-		ACS_StopAerondightEffectInit();
+		
 
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SilverSword, silverID);
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SteelSword, steelID);
@@ -6437,8 +6431,6 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SteelSword, steelID);
 
 		ACS_WeaponDestroyInit();
-		
-		ACS_StartAerondightEffectInit();
 
 		trail_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\fx\acs_sword_trail.w2ent" , true );
 
@@ -7941,8 +7933,6 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 
 		ACS_WeaponDestroyInit();
 		
-		ACS_StartAerondightEffectInit();
-
 		trail_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\fx\acs_sword_trail.w2ent" , true );
 
 		sword_trail_1 = (CEntity)theGame.CreateEntity( trail_temp, GetWitcherPlayer().GetWorldPosition() + Vector( 0, 0, -20 ) );
@@ -8077,8 +8067,6 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SteelSword, steelID);
 		
 		ACS_WeaponDestroyInit();
-		
-		ACS_StartAerondightEffectInit();
 
 		trail_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\fx\acs_sword_trail.w2ent" , true );
 
@@ -8302,8 +8290,6 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SteelSword, steelID);
 
 		ACS_WeaponDestroyInit();
-		
-		ACS_StartAerondightEffectInit();
 
 		trail_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\fx\acs_sword_trail.w2ent" , true );
 
@@ -8420,13 +8406,8 @@ state Claw_Equip_Standalone_Engage in cClawEquipStandalone
 		super.OnEnterState(prevStateName);
 		ClawEquipStandalone_Entry();
 	}
-	
+
 	entry function ClawEquipStandalone_Entry()
-	{
-		ClawEquipStandalone_Latent();
-	}
-	
-	latent function ClawEquipStandalone_Latent()
 	{
 		ACS_Sword_Trail_1().Destroy();
 		ACS_Sword_Trail_2().Destroy();
@@ -8903,11 +8884,6 @@ state Blood_Armor_Standalone_Engage in cBloodArmorStandalone
 	}
 	
 	entry function Blood_Armor_Standalone_Entry()
-	{
-		Blood_Armor_Standalone_Latent();
-	}
-	
-	latent function Blood_Armor_Standalone_Latent()
 	{
 		ACS_Vampire_Arms_1_Get().Destroy();
 
