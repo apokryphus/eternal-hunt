@@ -60,10 +60,10 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 
 		GetWitcherPlayer().RaiseEvent( 'Dodge' );
 
-		if (ACS_Bruxa_Camo_Trail())
+		if (ACSGetCEntity('ACS_Bruxa_Camo_Trail'))
 		{
-			ACS_Bruxa_Camo_Trail().StopEffect('smoke');
-			ACS_Bruxa_Camo_Trail().PlayEffectSingle('smoke');
+			ACSGetCEntity('ACS_Bruxa_Camo_Trail').StopEffect('smoke');
+			ACSGetCEntity('ACS_Bruxa_Camo_Trail').PlayEffectSingle('smoke');
 		}
 
 		if (ACS_Armor_Equipped_Check())
@@ -97,62 +97,63 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 			else
 			{
 				if (
-				GetWitcherPlayer().HasTag('vampire_claws_equipped')
+				GetWitcherPlayer().HasTag('acs_vampire_claws_equipped')
+				|| GetWitcherPlayer().HasTag('acs_sorc_fists_equipped')
 				)
 				{
 					vampire_dodges();
 				}
 				else if (
-				GetWitcherPlayer().HasTag('aard_sword_equipped')
+				GetWitcherPlayer().HasTag('acs_aard_sword_equipped')
 				)
 				{
 					aard_sword_dodges();
 				}
 				else if (
-				GetWitcherPlayer().HasTag('yrden_sword_equipped')
+				GetWitcherPlayer().HasTag('acs_yrden_sword_equipped')
 				)
 				{
 					yrden_sword_dodges();
 				}
 				else if (
-				GetWitcherPlayer().HasTag('yrden_secondary_sword_equipped')
+				GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped')
 				)
 				{
 					yrden_secondary_sword_dodges();
 				}
 				else if (
-				GetWitcherPlayer().HasTag('axii_secondary_sword_equipped')
+				GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped')
 				)
 				{
 					axii_secondary_sword_dodges();
 				}
 				else if (
-				GetWitcherPlayer().HasTag('axii_sword_equipped')
+				GetWitcherPlayer().HasTag('acs_axii_sword_equipped')
 				)
 				{
 					axii_sword_dodges();
 				}
 				else if (
-				GetWitcherPlayer().HasTag('quen_secondary_sword_equipped')
+				GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped')
 				)
 				{
 					quen_secondary_sword_dodges();
 				}
 				else if (
-				GetWitcherPlayer().HasTag('aard_secondary_sword_equipped')
+				GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped')
 				)
 				{
 					aard_secondary_sword_dodges();
 				}
 				else if (
-				GetWitcherPlayer().HasTag('quen_sword_equipped')
+				GetWitcherPlayer().HasTag('acs_quen_sword_equipped')
 				)
 				{
 					quen_sword_dodges();
 				}
 				else if (
-				GetWitcherPlayer().HasTag('igni_sword_equipped') 
-				|| GetWitcherPlayer().HasTag('igni_secondary_sword_equipped')
+				GetWitcherPlayer().HasTag('acs_igni_sword_equipped') 
+				|| GetWitcherPlayer().HasTag('acs_igni_secondary_sword_equipped')
 				)
 				{
 					ignii_sword_dodges();
@@ -211,7 +212,7 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 	latent function WeaponRespawn()
 	{
 		if (GetWitcherPlayer().HasTag('ACS_HideWeaponOnDodge') 
-		&& !GetWitcherPlayer().HasTag('blood_sucking')
+		&& !GetWitcherPlayer().HasTag('acs_blood_sucking')
 		)
 		{
 			ACS_Weapon_Respawn();
@@ -5794,8 +5795,8 @@ function ACS_BruxaDodgeSlideBackInitForWeaponSwitching()
 	{
 		if (!GetWitcherPlayer().IsCiri()
 		&& !GetWitcherPlayer().IsPerformingFinisher()
-		&& !GetWitcherPlayer().HasTag('in_wraith')
-		&& !GetWitcherPlayer().HasTag('blood_sucking')
+		&& !GetWitcherPlayer().HasTag('acs_in_wraith')
+		&& !GetWitcherPlayer().HasTag('acs_blood_sucking')
 		&& ACS_BuffCheck()
 		&& GetWitcherPlayer().IsActionAllowed(EIAB_Dodge)
 		&& !GetWitcherPlayer().IsInAir()
@@ -5873,7 +5874,7 @@ state BruxaDodgeSlideBackInitForWeaponSwitching_Engage in cBruxaDodgeSlideBackIn
 			movementAdjustor.RotateTowards( ticket, actor );
 		}
 		
-		if (GetWitcherPlayer().HasTag('aard_sword_equipped'))
+		if (GetWitcherPlayer().HasTag('acs_aard_sword_equipped'))
 		{
 			if (!GetWitcherPlayer().HasTag('ACS_Camo_Active')
 			&& ACS_DodgeEffects_Enabled())
@@ -5904,7 +5905,7 @@ state BruxaDodgeSlideBackInitForWeaponSwitching_Engage in cBruxaDodgeSlideBackIn
 			}
 		}
 		else if (
-		GetWitcherPlayer().HasTag('yrden_sword_equipped')
+		GetWitcherPlayer().HasTag('acs_yrden_sword_equipped')
 		)
 		{
 			if (theInput.GetActionValue('GI_AxisLeftY') < -0.5 )
@@ -5929,7 +5930,7 @@ state BruxaDodgeSlideBackInitForWeaponSwitching_Engage in cBruxaDodgeSlideBackIn
 			}
 		}
 		else if (
-		GetWitcherPlayer().HasTag('yrden_secondary_sword_equipped')
+		GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped')
 		)
 		{
 			if (theInput.GetActionValue('GI_AxisLeftY') < -0.5 )
@@ -5954,7 +5955,7 @@ state BruxaDodgeSlideBackInitForWeaponSwitching_Engage in cBruxaDodgeSlideBackIn
 			}
 		}
 		else if (
-		GetWitcherPlayer().HasTag('quen_secondary_sword_equipped')
+		GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped')
 		)
 		{
 			if (theInput.GetActionValue('GI_AxisLeftY') < -0.5 )
@@ -5986,7 +5987,7 @@ state BruxaDodgeSlideBackInitForWeaponSwitching_Engage in cBruxaDodgeSlideBackIn
 			}
 		}
 		else if (
-		GetWitcherPlayer().HasTag('aard_secondary_sword_equipped')
+		GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped')
 		)
 		{
 			if (theInput.GetActionValue('GI_AxisLeftY') < -0.5 )
@@ -6011,7 +6012,7 @@ state BruxaDodgeSlideBackInitForWeaponSwitching_Engage in cBruxaDodgeSlideBackIn
 			}
 		}
 		else if (
-		GetWitcherPlayer().HasTag('axii_secondary_sword_equipped')
+		GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped')
 		)
 		{
 			if (theInput.GetActionValue('GI_AxisLeftY') < -0.5 )
@@ -6036,7 +6037,7 @@ state BruxaDodgeSlideBackInitForWeaponSwitching_Engage in cBruxaDodgeSlideBackIn
 			}
 		}
 		else if (
-		GetWitcherPlayer().HasTag('axii_sword_equipped')
+		GetWitcherPlayer().HasTag('acs_axii_sword_equipped')
 		)
 		{
 			if (theInput.GetActionValue('GI_AxisLeftY') < -0.5 )
@@ -6061,11 +6062,11 @@ state BruxaDodgeSlideBackInitForWeaponSwitching_Engage in cBruxaDodgeSlideBackIn
 			}
 		}
 		else if (
-		GetWitcherPlayer().HasTag('quen_sword_equipped')
-		|| GetWitcherPlayer().HasTag('igni_sword_equipped')
-		|| GetWitcherPlayer().HasTag('igni_sword_equipped_TAG')
-		|| GetWitcherPlayer().HasTag('igni_secondary_sword_equipped')
-		|| GetWitcherPlayer().HasTag('igni_secondary_sword_equipped_TAG')
+		GetWitcherPlayer().HasTag('acs_quen_sword_equipped')
+		|| GetWitcherPlayer().HasTag('acs_igni_sword_equipped')
+		|| GetWitcherPlayer().HasTag('acs_igni_sword_equipped_TAG')
+		|| GetWitcherPlayer().HasTag('acs_igni_secondary_sword_equipped')
+		|| GetWitcherPlayer().HasTag('acs_igni_secondary_sword_equipped_TAG')
 		)
 		{
 			if (theInput.GetActionValue('GI_AxisLeftY') < -0.5 )
@@ -7369,11 +7370,11 @@ function ACS_BruxaDodgeBackCenterInit()
 	{
 		if (!GetWitcherPlayer().IsCiri()
 		&& !GetWitcherPlayer().IsPerformingFinisher()
-		&& !GetWitcherPlayer().HasTag('in_wraith')
+		&& !GetWitcherPlayer().HasTag('acs_in_wraith')
 		&& ACS_BuffCheck()
 		)
 		{	
-			if (!GetWitcherPlayer().HasTag('blood_sucking') && GetWitcherPlayer().IsActionAllowed(EIAB_Dodge) )
+			if (!GetWitcherPlayer().HasTag('acs_blood_sucking') && GetWitcherPlayer().IsActionAllowed(EIAB_Dodge) )
 			{
 				if (ACS_can_dodge())
 				{
@@ -7422,7 +7423,7 @@ function ACS_BruxaDodgeBackCenterInit()
 				}
 				*/
 			}
-			else if ( GetWitcherPlayer().HasTag('blood_sucking') 
+			else if ( GetWitcherPlayer().HasTag('acs_blood_sucking') 
 			//&& ACS_Hijack_Enabled() 
 			)
 			{
@@ -7809,11 +7810,11 @@ function ACS_BruxaDodgeBackLeftInit()
 	{
 		if (!GetWitcherPlayer().IsCiri()
 		&& !GetWitcherPlayer().IsPerformingFinisher()
-		&& !GetWitcherPlayer().HasTag('in_wraith')
+		&& !GetWitcherPlayer().HasTag('acs_in_wraith')
 		&& ACS_BuffCheck()
 		)
 		{
-			if (!GetWitcherPlayer().HasTag('blood_sucking') && GetWitcherPlayer().IsActionAllowed(EIAB_Dodge) )
+			if (!GetWitcherPlayer().HasTag('acs_blood_sucking') && GetWitcherPlayer().IsActionAllowed(EIAB_Dodge) )
 			{
 				if (ACS_can_dodge())
 				{
@@ -7864,7 +7865,7 @@ function ACS_BruxaDodgeBackLeftInit()
 				}
 				*/
 			}
-			else if ( GetWitcherPlayer().HasTag('blood_sucking') 
+			else if ( GetWitcherPlayer().HasTag('acs_blood_sucking') 
 			//&& ACS_Hijack_Enabled() 
 			)
 			{
@@ -8348,11 +8349,11 @@ function ACS_BruxaDodgeBackRightInit()
 	{
 		if (!GetWitcherPlayer().IsCiri()
 		&& !GetWitcherPlayer().IsPerformingFinisher()
-		&& !GetWitcherPlayer().HasTag('in_wraith')
+		&& !GetWitcherPlayer().HasTag('acs_in_wraith')
 		&& ACS_BuffCheck()
 		)
 		{
-			if (!GetWitcherPlayer().HasTag('blood_sucking') && GetWitcherPlayer().IsActionAllowed(EIAB_Dodge) )
+			if (!GetWitcherPlayer().HasTag('acs_blood_sucking') && GetWitcherPlayer().IsActionAllowed(EIAB_Dodge) )
 			{
 				if (ACS_can_dodge())
 				{
@@ -8403,7 +8404,7 @@ function ACS_BruxaDodgeBackRightInit()
 				}
 				*/
 			}
-			else if ( GetWitcherPlayer().HasTag('blood_sucking') 
+			else if ( GetWitcherPlayer().HasTag('acs_blood_sucking') 
 			//&& ACS_Hijack_Enabled() 
 			)
 			{

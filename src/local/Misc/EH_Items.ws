@@ -1820,7 +1820,7 @@ class W3ACSKestralSkull extends CGameplayEntity
 				{
 					actortarget = (CActor)entities[i];
 
-					if (actortarget == GetACSTransformationBlackWolf()
+					if (actortarget == ACSGetCActor('ACS_Transformation_Black_Wolf')
 					|| actortarget.HasTag('acs_snow_entity')
 					|| actortarget.HasTag('smokeman') 
 					|| actortarget.HasTag('ACS_Tentacle_1') 
@@ -2793,7 +2793,7 @@ class W3ACSPhoenix extends CGameplayEntity
 				{
 					actortarget = (CActor)entities[i];
 
-					if (actortarget == GetACSTransformationBlackWolf()
+					if (actortarget == ACSGetCActor('ACS_Transformation_Black_Wolf')
 					|| actortarget.HasTag('acs_snow_entity')
 					|| actortarget.HasTag('smokeman') 
 					|| actortarget.HasTag('ACS_Tentacle_1') 
@@ -3673,11 +3673,11 @@ class W3ACSKillCountBookItem extends W3QuestUsableItem
 
 			GetACSWatcher().RemoveTimer('KillCountMenuDisplayDelay');
 
-			GetACSBook().BreakAttachment();
+			ACSGetCEntity('ACS_Book').BreakAttachment();
 
-			GetACSBook().Teleport( GetWitcherPlayer().GetWorldPosition() + Vector( 0, 0, -200 ) );
+			ACSGetCEntity('ACS_Book').Teleport( GetWitcherPlayer().GetWorldPosition() + Vector( 0, 0, -200 ) );
 
-			GetACSBook().DestroyAfter(0.00125);
+			ACSGetCEntity('ACS_Book').DestroyAfter(0.00125);
 		}
 	}
 }
@@ -3693,7 +3693,7 @@ function ACS_Create_Book()
 	var meshcomp														: CComponent;
 	var animcomp 														: CAnimatedComponent;
 
-	GetACSBook().Destroy();
+	ACSGetCEntity('ACS_Book').Destroy();
 
 	temp = (CEntityTemplate)LoadResource(
 
@@ -3715,14 +3715,6 @@ function ACS_Create_Book()
 	ent.CreateAttachment( GetWitcherPlayer(), 'l_weapon', attach_vec, attach_rot );
 
 	ent.AddTag('ACS_Book');
-}
-
-function GetACSBook() : CEntity
-{
-	var entity 			 : CEntity;
-	
-	entity = (CEntity)theGame.GetEntityByTag( 'ACS_Book' );
-	return entity;
 }
 
 class W3ACSSchoolMedallionItem extends W3QuestUsableItem
@@ -3853,15 +3845,15 @@ class W3ACSPirateAmuletItem extends W3QuestUsableItem
 			}
 			else
 			{
-				if (!GetACSMelusine()
-				|| !GetACSMelusine().IsAlive())
+				if (!ACSGetCActor('ACS_Melusine')
+				|| !ACSGetCActor('ACS_Melusine').IsAlive())
 				{
 					if (GetWeatherConditionName() != 'WT_Rain_Storm')
 					{
 						RequestWeatherChangeTo('WT_Rain_Storm', 5.0, false);
 					}
 
-					ACS_Lightning_Strike_No_Condition();
+					GetACSWatcher().Lightning_Strike_No_Condition();
 
 					GetACSWatcher().RemoveTimer('MelusineSpawnDelay');
 					GetACSWatcher().AddTimer('MelusineSpawnDelay', RandRangeF(10,5), false);

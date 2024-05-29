@@ -402,7 +402,7 @@ class W3ACSPetard extends CThrowable
 		&& victim == GetWitcherPlayer() 
 		&& 
 		(GetWitcherPlayer().IsCurrentlyDodging() 
-		|| GetWitcherPlayer().HasTag('blood_sucking')
+		|| GetWitcherPlayer().HasTag('acs_blood_sucking')
 		|| GetWitcherPlayer().HasTag('ACS_IsPerformingFinisher')
 		|| GetWitcherPlayer().IsCurrentlyDodging()
 		|| GetWitcherPlayer().GetImmortalityMode() == AIM_Invulnerable

@@ -34,7 +34,7 @@ state Engage in cACS_RangedWeaponSwitch
 		{
 			if (GetWitcherPlayer().HasTag('acs_bow_active'))
 			{
-				if (!GetWitcherPlayer().HasTag('igni_bow_equipped'))
+				if (!GetWitcherPlayer().HasTag('acs_igni_bow_equipped'))
 				{
 					IgniBow();
 
@@ -164,12 +164,12 @@ state Engage in cACS_RangedWeaponSwitch
 
 	latent function WeaponSummonEffect()
 	{
-		if (GetWitcherPlayer().HasTag('igni_bow_equipped')
-		&& !GetWitcherPlayer().HasTag('igni_bow_effect_played'))
+		if (GetWitcherPlayer().HasTag('acs_igni_bow_equipped')
+		&& !GetWitcherPlayer().HasTag('acs_igni_bow_effect_played'))
 		{
 			igni_bow_summon();
 
-			GetWitcherPlayer().AddTag('igni_bow_effect_played');
+			GetWitcherPlayer().AddTag('acs_igni_bow_effect_played');
 		}
 		else if (GetWitcherPlayer().HasTag('axii_bow_equipped')
 		&& !GetWitcherPlayer().HasTag('axii_bow_effect_played'))
@@ -237,7 +237,9 @@ state Engage in cACS_RangedWeaponSwitch
 	}
 
 	latent function BowSwitch()
-	{		
+	{
+		var stupidArray 							: array< name >;
+		
 		if (!GetWitcherPlayer().HasAbility('ForceDismemberment'))
 		{
 			GetWitcherPlayer().AddAbility('ForceDismemberment');
@@ -253,26 +255,51 @@ state Engage in cACS_RangedWeaponSwitch
 		{
 			if (ACS_SCAAR_Installed() && ACS_SCAAR_Enabled() && !ACS_E3ARP_Enabled())
 			{
-				GetWitcherPlayer().ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+				if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
+				{
+					
+					
+					stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
+				}
 			}
 			else if (ACS_E3ARP_Installed() && ACS_E3ARP_Enabled() && !ACS_SCAAR_Enabled())
 			{
-				GetWitcherPlayer().ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+				if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
+				{
+					
+					
+					stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
+				}
 			}
 			else
 			{
-				GetWitcherPlayer().ActivateAndSyncBehavior( 'acs_bow_beh' );
+				if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
+				{
+					
+					
+					stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
+				}
 			}
 					
-			if ( GetWitcherPlayer().IsInCombat() && GetWitcherPlayer().GetCurrentStateName() != 'Combat') 
+			if (stupidArray.Size() > 0)
 			{
-				//GetWitcherPlayer().GotoState( 'Combat' );
+				thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+				thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+				thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0 );
+				thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+				thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+				thePlayer.RaiseForceEvent( 'Climb' );
+
+				thePlayer.ActivateBehaviors(stupidArray);
 			}
 		}
 	}
 
 	latent function CrossbowSwitch()
-	{		
+	{	
+		var stupidArray 							: array< name >;
+
 		if (!GetWitcherPlayer().HasAbility('ForceDismemberment'))
 		{
 			GetWitcherPlayer().AddAbility('ForceDismemberment');
@@ -288,20 +315,43 @@ state Engage in cACS_RangedWeaponSwitch
 		{
 			if (ACS_SCAAR_Installed() && ACS_SCAAR_Enabled() && !ACS_E3ARP_Enabled())
 			{
-				GetWitcherPlayer().ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+				if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
+				{
+					
+					
+					stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
+				}
 			}
 			else if (ACS_E3ARP_Installed() && ACS_E3ARP_Enabled() && !ACS_SCAAR_Enabled())
 			{
-				GetWitcherPlayer().ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+				if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
+				{
+					
+					
+					stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
+				}
 			}
 			else
 			{
-				GetWitcherPlayer().ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+				if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
+				{
+					
+					
+					stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
+				}
 			}
 					
-			if ( GetWitcherPlayer().IsInCombat() && GetWitcherPlayer().GetCurrentStateName() != 'Combat') 
+			if (stupidArray.Size() > 0)
 			{
-				//GetWitcherPlayer().GotoState( 'Combat' );
+				thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+				thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+				thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0 );
+				thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+				thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+				thePlayer.RaiseForceEvent( 'Climb' );
+
+				thePlayer.ActivateBehaviors(stupidArray);
 			}
 		}
 	}
@@ -317,7 +367,7 @@ state Engage in cACS_RangedWeaponSwitch
 			IgniBowStatic();
 		}
 		
-		GetWitcherPlayer().AddTag('igni_bow_equipped');
+		GetWitcherPlayer().AddTag('acs_igni_bow_equipped');
 	}
 
 	latent function IgniBowEvolving()
@@ -345,7 +395,7 @@ state Engage in cACS_RangedWeaponSwitch
 				attach_vec.Z = -0.045;
 					
 				sword1.CreateAttachment( GetWitcherPlayer(), 'l_weapon', attach_vec, attach_rot );
-				sword1.AddTag('igni_bow_1');
+				sword1.AddTag('acs_igni_bow_1');
 			}
 			else if ( GetWitcherPlayer().GetInventory().GetItemLevel( silverID ) <= 11 && GetWitcherPlayer().GetInventory().GetItemLevel(silverID) <= 20 && GetWitcherPlayer().GetInventory().GetItemQuality( silverID ) > 1 )
 			{
@@ -363,7 +413,7 @@ state Engage in cACS_RangedWeaponSwitch
 				attach_vec.Z = -0.045;
 					
 				sword1.CreateAttachment( GetWitcherPlayer(), 'l_weapon', attach_vec, attach_rot );
-				sword1.AddTag('igni_bow_1');
+				sword1.AddTag('acs_igni_bow_1');
 			}
 			else if ( GetWitcherPlayer().GetInventory().GetItemLevel( silverID ) >= 21 && GetWitcherPlayer().GetInventory().GetItemQuality( silverID ) >= 2 ) 
 			{
@@ -381,7 +431,7 @@ state Engage in cACS_RangedWeaponSwitch
 				attach_vec.Z = -0.045;
 					
 				sword1.CreateAttachment( GetWitcherPlayer(), 'l_weapon', attach_vec, attach_rot );
-				sword1.AddTag('igni_bow_1');
+				sword1.AddTag('acs_igni_bow_1');
 				
 				/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				
@@ -399,7 +449,7 @@ state Engage in cACS_RangedWeaponSwitch
 				attach_vec.Z = -0.045;
 					
 				sword2.CreateAttachment( GetWitcherPlayer(), 'l_weapon', attach_vec, attach_rot );
-				sword2.AddTag('igni_bow_2');
+				sword2.AddTag('acs_igni_bow_2');
 			}
 			else
 			{
@@ -417,7 +467,7 @@ state Engage in cACS_RangedWeaponSwitch
 				attach_vec.Z = -0.045;
 					
 				sword1.CreateAttachment( GetWitcherPlayer(), 'l_weapon', attach_vec, attach_rot );
-				sword1.AddTag('igni_bow_1');
+				sword1.AddTag('acs_igni_bow_1');
 				
 				/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				
@@ -435,7 +485,7 @@ state Engage in cACS_RangedWeaponSwitch
 				attach_vec.Z = -0.045;
 					
 				sword2.CreateAttachment( GetWitcherPlayer(), 'l_weapon', attach_vec, attach_rot );
-				sword2.AddTag('igni_bow_2');
+				sword2.AddTag('acs_igni_bow_2');
 			}
 		}
 		else if ( GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) )
@@ -456,7 +506,7 @@ state Engage in cACS_RangedWeaponSwitch
 				attach_vec.Z = -0.045;
 					
 				sword1.CreateAttachment( GetWitcherPlayer(), 'l_weapon', attach_vec, attach_rot );
-				sword1.AddTag('igni_bow_1');
+				sword1.AddTag('acs_igni_bow_1');
 			}
 			else if ( GetWitcherPlayer().GetInventory().GetItemLevel( steelID ) >= 11 && GetWitcherPlayer().GetInventory().GetItemLevel( steelID ) <= 20 && GetWitcherPlayer().GetInventory().GetItemQuality( steelID ) > 1 )
 			{
@@ -474,7 +524,7 @@ state Engage in cACS_RangedWeaponSwitch
 				attach_vec.Z = -0.045;
 					
 				sword1.CreateAttachment( GetWitcherPlayer(), 'l_weapon', attach_vec, attach_rot );
-				sword1.AddTag('igni_bow_1');
+				sword1.AddTag('acs_igni_bow_1');
 			}
 			else if ( GetWitcherPlayer().GetInventory().GetItemLevel( steelID ) >= 21 && GetWitcherPlayer().GetInventory().GetItemQuality( steelID ) >= 2 )
 			{
@@ -492,7 +542,7 @@ state Engage in cACS_RangedWeaponSwitch
 				attach_vec.Z = -0.045;
 					
 				sword1.CreateAttachment( GetWitcherPlayer(), 'l_weapon', attach_vec, attach_rot );
-				sword1.AddTag('igni_bow_1');
+				sword1.AddTag('acs_igni_bow_1');
 				
 				/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				
@@ -510,7 +560,7 @@ state Engage in cACS_RangedWeaponSwitch
 				attach_vec.Z = -0.045;
 					
 				sword2.CreateAttachment( GetWitcherPlayer(), 'l_weapon', attach_vec, attach_rot );
-				sword2.AddTag('igni_bow_2');
+				sword2.AddTag('acs_igni_bow_2');
 			}
 			else
 			{
@@ -528,7 +578,7 @@ state Engage in cACS_RangedWeaponSwitch
 				attach_vec.Z = -0.045;
 					
 				sword1.CreateAttachment( GetWitcherPlayer(), 'l_weapon', attach_vec, attach_rot );
-				sword1.AddTag('igni_bow_1');
+				sword1.AddTag('acs_igni_bow_1');
 				
 				/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				
@@ -546,7 +596,7 @@ state Engage in cACS_RangedWeaponSwitch
 				attach_vec.Z = -0.045;
 					
 				sword2.CreateAttachment( GetWitcherPlayer(), 'l_weapon', attach_vec, attach_rot );
-				sword2.AddTag('igni_bow_2');
+				sword2.AddTag('acs_igni_bow_2');
 			}
 		}
 	}
@@ -588,7 +638,7 @@ state Engage in cACS_RangedWeaponSwitch
 		attach_vec.Z = -0.045;
 			
 		sword1.CreateAttachment( GetWitcherPlayer(), 'l_weapon', attach_vec, attach_rot );
-		sword1.AddTag('igni_bow_1');
+		sword1.AddTag('acs_igni_bow_1');
 	}
 
 	latent function AxiiBow()

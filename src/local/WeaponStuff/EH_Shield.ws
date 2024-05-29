@@ -205,24 +205,24 @@ state BruxaCamoDecoy in cACS_Shield_Summon
 		GetWitcherPlayer().DestroyEffect('shadowdash');
 		GetWitcherPlayer().PlayEffectSingle('shadowdash');
 
-		if (GetACSHelm1())
+		if (ACSGetCEntity('acs_helm_1'))
 		{
-			GetACSHelm1().PlayEffectSingle('shadowdash');
+			ACSGetCEntity('acs_helm_1').PlayEffectSingle('shadowdash');
 		}
 
-		if (GetACSHelm2())
+		if (ACSGetCEntity('acs_helm_2'))
 		{
-			GetACSHelm2().PlayEffectSingle('shadowdash');
+			ACSGetCEntity('acs_helm_2').PlayEffectSingle('shadowdash');
 		}
 
-		if (GetACSHelm3())
+		if (ACSGetCEntity('acs_helm_3'))
 		{
-			GetACSHelm3().PlayEffectSingle('shadowdash');
+			ACSGetCEntity('acs_helm_3').PlayEffectSingle('shadowdash');
 		}
 
-		if (GetACSHelm4())
+		if (ACSGetCEntity('acs_helm_4'))
 		{
-			GetACSHelm4().PlayEffectSingle('shadowdash');
+			ACSGetCEntity('acs_helm_4').PlayEffectSingle('shadowdash');
 		}
 
 		GetWitcherPlayer().SoundEvent("monster_bruxa_combat_disappear");
@@ -230,25 +230,25 @@ state BruxaCamoDecoy in cACS_Shield_Summon
 		GetWitcherPlayer().SoundEvent( "expl_focus_start" );
 
 		/*
-		ACS_Vampire_Arms_1_Get().Destroy();
+		ACSGetCEntity('acs_vampire_extra_arms_1').Destroy();
 
-		ACS_Vampire_Arms_2_Get().Destroy();
+		ACSGetCEntity('acs_vampire_extra_arms_2').Destroy();
 
-		ACS_Vampire_Arms_3_Get().Destroy();
+		ACSGetCEntity('acs_vampire_extra_arms_3').Destroy();
 
-		ACS_Vampire_Arms_4_Get().Destroy();
+		ACSGetCEntity('acs_vampire_extra_arms_4').Destroy();
 
-		ACS_Vampire_Arms_Anchor_L_Get().Destroy();
+		ACSGetCEntity('acs_extra_arms_anchor_l').Destroy();
 
-		ACS_Vampire_Arms_Anchor_R_Get().Destroy();
+		ACSGetCEntity('acs_extra_arms_anchor_r').Destroy();
 
-		ACS_Vampire_Head_Anchor_Get().Destroy();
+		ACSGetCEntity('acs_vampire_head_anchor').Destroy();
 
-		ACS_Vampire_Head_Get().Destroy();
+		ACSGetCEntity('acs_vampire_head').Destroy();
 
-		ACS_Vampire_Back_Claw_Get().Destroy();
+		ACSGetCEntity('acs_vampire_back_claw').Destroy();
 
-		ACS_Vampire_Claw_Anchor_Get().Destroy();
+		ACSGetCEntity('acs_vampire_claw_anchor').Destroy();
 		*/
 
 		//ACS_Blood_Armor_Destroy();
@@ -269,11 +269,11 @@ state BruxaCamoDecoy in cACS_Shield_Summon
 		SetHightlightCatViewFx( Vector(0.5f,0.2f,0.2f,1.f),0.05f,10);
 		SetFogDensityCatViewFx( 0.25 );
 
-		ACS_Bruxa_Camo_Trail().Destroy();
+		ACSGetCEntity('ACS_Bruxa_Camo_Trail').Destroy();
 
-		ACS_Bruxa_Camo_Sonar().Destroy();
+		ACSGetCEntity('ACS_Bruxa_Camo_Sonar').Destroy();
 
-		ACS_Bruxa_Camo_Sonar_2().Destroy();
+		ACSGetCEntity('ACS_Bruxa_Camo_Sonar_2').Destroy();
 
 		vfxEnt_1 = theGame.CreateEntity( (CEntityTemplate)LoadResource(
 			//"dlc\dlc_acs\data\fx\acs_sonar.w2ent"
@@ -410,15 +410,6 @@ state BruxaCamoDecoy in cACS_Shield_Summon
 	}
 }
 
-function ACS_Bruxa_Camo_Trail() : CEntity
-{
-	var ent 			 : CEntity;
-	
-	ent = (CEntity)theGame.GetEntityByTag( 'ACS_Bruxa_Camo_Trail' );
-
-	return ent;
-}
-
 function ACS_Bruxa_Camo_Sonar_NPC_Play_Effect()
 {	
 	var ents 											: array<CEntity>;
@@ -506,24 +497,6 @@ function ACS_Bruxa_Camo_Sonar_Destroy()
 	}
 }
 
-function ACS_Bruxa_Camo_Sonar() : CEntity
-{
-	var ent 			 : CEntity;
-	
-	ent = (CEntity)theGame.GetEntityByTag( 'ACS_Bruxa_Camo_Sonar' );
-
-	return ent;
-}
-
-function ACS_Bruxa_Camo_Sonar_2() : CEntity
-{
-	var ent 			 : CEntity;
-	
-	ent = (CEntity)theGame.GetEntityByTag( 'ACS_Bruxa_Camo_Sonar_2' );
-
-	return ent;
-}
-
 function ACS_Focus_Sound_Red_Destroy()
 {	
 	var ents 											: array<CEntity>;
@@ -537,15 +510,6 @@ function ACS_Focus_Sound_Red_Destroy()
 	{
 		ents[i].Destroy();
 	}
-}
-
-function ACS_Focus_Sound_Red() : CEntity
-{
-	var ent 			 : CEntity;
-	
-	ent = (CEntity)theGame.GetEntityByTag( 'ACS_Focus_Sound_Red' );
-
-	return ent;
 }
 
 state Yrden_Revive_Normal in cACS_Shield_Summon
@@ -995,7 +959,7 @@ state Axii_Shield in cACS_Shield_Summon
 
 		//GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync( ' ', 'PLAYER_SLOT', settings_interrupt );
 
-		if (GetWitcherPlayer().HasTag('axii_sword_equipped'))
+		if (GetWitcherPlayer().HasTag('acs_axii_sword_equipped'))
 		{
 			GetWitcherPlayer().AddBuffImmunity	( EET_Stagger,					'acs_shield', false);
 			GetWitcherPlayer().AddBuffImmunity	( EET_LongStagger,				'acs_shield', false);
@@ -1105,7 +1069,7 @@ state Axii_Persistent_Shield in cACS_Shield_Summon
 		
 		, true );
 
-		if (GetWitcherPlayer().HasTag('axii_sword_equipped'))
+		if (GetWitcherPlayer().HasTag('acs_axii_sword_equipped'))
 		{
 			if(!GetWitcherPlayer().HasTag('ACS_Shielded'))
 			{
@@ -1263,16 +1227,16 @@ state Axii_Shield_Entity in cACS_Shield_Summon
 
 	latent function shield_entity_spawn_anim()
 	{
-		shieldAnimatedComponent = (CAnimatedComponent)ACS_Shield_Entity().GetComponentByClassName( 'CAnimatedComponent' );	
+		shieldAnimatedComponent = (CAnimatedComponent)ACSGetCActor('ACS_Shield_Entity').GetComponentByClassName( 'CAnimatedComponent' );	
 
-		shieldMovementAdjustor = ((CMovingPhysicalAgentComponent)ACS_Shield_Entity().GetMovingAgentComponent()).GetMovementAdjustor();
+		shieldMovementAdjustor = ((CMovingPhysicalAgentComponent)ACSGetCActor('ACS_Shield_Entity').GetMovingAgentComponent()).GetMovementAdjustor();
 
 		shieldMovementAdjustor.CancelAll();
 			
 		shieldTicket = shieldMovementAdjustor.CreateNewRequest( 'ACS_Shield_Movement_Adjust' );
 
 		//shieldMovementAdjustor.AdjustmentDuration( shieldTicket, 0.1 );
-		//shieldMovementAdjustor.ShouldStartAt(shieldTicket, ACS_Shield_Entity().GetWorldPosition());
+		//shieldMovementAdjustor.ShouldStartAt(shieldTicket, ACSGetCActor('ACS_Shield_Entity').GetWorldPosition());
 		shieldMovementAdjustor.MaxRotationAdjustmentSpeed( shieldTicket, 50000 );
 		shieldMovementAdjustor.MaxLocationAdjustmentSpeed( shieldTicket, 50000 );
 		//shieldMovementAdjustor.AdjustLocationVertically( shieldTicket, true );
@@ -1308,14 +1272,6 @@ state Axii_Shield_Entity in cACS_Shield_Summon
 	}
 }
 
-function ACS_Shield() : CEntity
-{
-	var shield 				 : CEntity;
-	
-	shield = (CEntity)theGame.GetEntityByTag( 'ACS_Shield' );
-	return shield;
-}
-
 function ACS_Axii_Shield_Entity_Destroy()
 {
 	GetWitcherPlayer().RemoveBuffImmunity( EET_Stagger,					'acs_shield_entity');
@@ -1325,7 +1281,7 @@ function ACS_Axii_Shield_Entity_Destroy()
 	GetWitcherPlayer().RemoveBuffImmunity( EET_KnockdownTypeApplicator,	'acs_shield_entity');
 
 	shield_entity_despawn_anim();
-	ACS_Shield_Entity().DestroyAfter(2);
+	ACSGetCActor('ACS_Shield_Entity').DestroyAfter(2);
 
 	GetWitcherPlayer().RemoveTag('ACS_Shielded_Entity');
 }
@@ -1333,7 +1289,7 @@ function ACS_Axii_Shield_Entity_Destroy()
 function ACS_Axii_Shield_Destroy()
 {
 	shield_entity_despawn_anim();
-	ACS_Shield_Entity().DestroyAfter(2);
+	ACSGetCActor('ACS_Shield_Entity').DestroyAfter(2);
 
 	GetWitcherPlayer().RemoveTag('ACS_Shielded');
 	GetWitcherPlayer().RemoveTag('ACS_Shielded_Entity');
@@ -1350,23 +1306,23 @@ function ACS_Axii_Shield_Destroy_DELAY()
 	GetWitcherPlayer().UnblockAction( EIAB_Dodge,			'acs_shield');
 	GetWitcherPlayer().UnblockAction( EIAB_Roll,				'acs_shield');
 
-	ACS_Shield().StopEffect('appear');
+	ACSGetCEntity('ACS_Shield').StopEffect('appear');
 
 	if (
-	!GetWitcherPlayer().HasTag('axii_sword_equipped') 
+	!GetWitcherPlayer().HasTag('acs_axii_sword_equipped') 
 	||GetWitcherPlayer().IsCurrentlyDodging()
 	||GetWitcherPlayer().IsPerformingFinisher()
 	|| !GetWitcherPlayer().IsInCombat())
 	{
-		ACS_Shield().PlayEffectSingle('disappear_fast');
-		//ACS_Shield().StopEffect('disappear');
-		ACS_Shield().DestroyAfter(0.25);
+		ACSGetCEntity('ACS_Shield').PlayEffectSingle('disappear_fast');
+		//ACSGetCEntity('ACS_Shield').StopEffect('disappear');
+		ACSGetCEntity('ACS_Shield').DestroyAfter(0.25);
 	}
 	else
 	{
-		ACS_Shield().PlayEffectSingle('disappear');
-		//ACS_Shield().StopEffect('disappear');
-		ACS_Shield().DestroyAfter(0.75);
+		ACSGetCEntity('ACS_Shield').PlayEffectSingle('disappear');
+		//ACSGetCEntity('ACS_Shield').StopEffect('disappear');
+		ACSGetCEntity('ACS_Shield').DestroyAfter(0.75);
 	}
 
 	GetWitcherPlayer().RemoveTag('ACS_Shielded');
@@ -1390,12 +1346,12 @@ function ACS_Axii_Shield_Destroy_IMMEDIATE()
 	GetWitcherPlayer().UnblockAction( EIAB_Dodge,			'acs_shield');
 	GetWitcherPlayer().UnblockAction( EIAB_Roll,				'acs_shield');
 
-	ACS_Shield().StopEffect('appear');
+	ACSGetCEntity('ACS_Shield').StopEffect('appear');
 
-	ACS_Shield().PlayEffectSingle('disappear_fast');
-	//ACS_Shield().StopEffect('disappear');
+	ACSGetCEntity('ACS_Shield').PlayEffectSingle('disappear_fast');
+	//ACSGetCEntity('ACS_Shield').StopEffect('disappear');
 	
-	ACS_Shield().Destroy();
+	ACSGetCEntity('ACS_Shield').Destroy();
 
 	GetWitcherPlayer().RemoveTag('ACS_Shielded');
 
@@ -1413,15 +1369,15 @@ function shield_entity_despawn_anim()
 	var shieldMovementAdjustor						: CMovementAdjustor; 
 	var shieldTicket 								: SMovementAdjustmentRequestTicket; 
 
-	shieldAnimatedComponent = (CAnimatedComponent)ACS_Shield_Entity().GetComponentByClassName( 'CAnimatedComponent' );	
+	shieldAnimatedComponent = (CAnimatedComponent)ACSGetCActor('ACS_Shield_Entity').GetComponentByClassName( 'CAnimatedComponent' );	
 
-	shieldMovementAdjustor = ((CMovingPhysicalAgentComponent)ACS_Shield_Entity().GetMovingAgentComponent()).GetMovementAdjustor();
+	shieldMovementAdjustor = ((CMovingPhysicalAgentComponent)ACSGetCActor('ACS_Shield_Entity').GetMovingAgentComponent()).GetMovementAdjustor();
 
 	shieldMovementAdjustor.CancelAll();
 			
 	shieldTicket = shieldMovementAdjustor.CreateNewRequest( 'ACS_Shield_Movement_Adjust' );
 
-	//shieldMovementAdjustor.ShouldStartAt(shieldTicket, ACS_Shield_Entity().GetWorldPosition());
+	//shieldMovementAdjustor.ShouldStartAt(shieldTicket, ACSGetCActor('ACS_Shield_Entity').GetWorldPosition());
 	shieldMovementAdjustor.MaxRotationAdjustmentSpeed( shieldTicket, 50000 );
 	shieldMovementAdjustor.MaxLocationAdjustmentSpeed( shieldTicket, 50000 );
 	//shieldMovementAdjustor.AdjustLocationVertically( shieldTicket, true );
@@ -1430,16 +1386,8 @@ function shield_entity_despawn_anim()
 
 	shieldAnimatedComponent.PlaySlotAnimationAsync ( 'monster_lessun_taunt_scream', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.2f, 0.5f));
 
-	ACS_Shield_Entity().PlayEffectSingle('hym_despawn');
-	ACS_Shield_Entity().StopEffect('hym_despawn');
-}
-
-function ACS_Shield_Entity() : CActor
-{
-	var shield_entity 			 : CActor;
-	
-	shield_entity = (CActor)theGame.GetEntityByTag( 'ACS_Shield_Entity' );
-	return shield_entity;
+	ACSGetCActor('ACS_Shield_Entity').PlayEffectSingle('hym_despawn');
+	ACSGetCActor('ACS_Shield_Entity').StopEffect('hym_despawn');
 }
 
 function ACS_Revenant() : CNewNPC
@@ -1478,24 +1426,24 @@ function Bruxa_Camo_Decoy_Deactivate()
 	{
 		GetWitcherPlayer().StopEffect('shadowdash');
 
-		if (GetACSHelm1())
+		if (ACSGetCEntity('acs_helm_1'))
 		{
-			GetACSHelm1().StopEffect('shadowdash');
+			ACSGetCEntity('acs_helm_1').StopEffect('shadowdash');
 		}
 
-		if (GetACSHelm2())
+		if (ACSGetCEntity('acs_helm_2'))
 		{
-			GetACSHelm2().StopEffect('shadowdash');
+			ACSGetCEntity('acs_helm_2').StopEffect('shadowdash');
 		}
 
-		if (GetACSHelm3())
+		if (ACSGetCEntity('acs_helm_3'))
 		{
-			GetACSHelm3().StopEffect('shadowdash');
+			ACSGetCEntity('acs_helm_3').StopEffect('shadowdash');
 		}
 
-		if (GetACSHelm4())
+		if (ACSGetCEntity('acs_helm_4'))
 		{
-			GetACSHelm4().StopEffect('shadowdash');
+			ACSGetCEntity('acs_helm_4').StopEffect('shadowdash');
 		}
 
 		GetWitcherPlayer().SoundEvent("monster_bruxa_combat_appear");
@@ -1518,11 +1466,11 @@ function Bruxa_Camo_Decoy_Deactivate()
 
 		GetACSWatcher().ACS_Vampire_Back_Claw_Reattach();
 
-		ACS_Bruxa_Camo_Sonar().Destroy();
+		ACSGetCEntity('ACS_Bruxa_Camo_Sonar').Destroy();
 
-		ACS_Bruxa_Camo_Sonar_2().Destroy();
+		ACSGetCEntity('ACS_Bruxa_Camo_Sonar_2').Destroy();
 
-		ACS_Bruxa_Camo_Trail().Destroy();
+		ACSGetCEntity('ACS_Bruxa_Camo_Trail').Destroy();
 
 		ACS_Bruxa_Camo_Sonar_NPC_Destroy();
 
@@ -1560,25 +1508,25 @@ state Bruxa_Camo_Decoy_Deactivate_Claw_Equip_Standalone_Engage in cBruxa_Camo_De
 	entry function ClawEquipStandalone_Entry()
 	{
 		/*
-		ACS_Vampire_Arms_1_Get().Destroy();
+		ACSGetCEntity('acs_vampire_extra_arms_1').Destroy();
 
-		ACS_Vampire_Arms_2_Get().Destroy();
+		ACSGetCEntity('acs_vampire_extra_arms_2').Destroy();
 
-		ACS_Vampire_Arms_3_Get().Destroy();
+		ACSGetCEntity('acs_vampire_extra_arms_3').Destroy();
 
-		ACS_Vampire_Arms_4_Get().Destroy();
+		ACSGetCEntity('acs_vampire_extra_arms_4').Destroy();
 
-		ACS_Vampire_Arms_Anchor_L_Get().Destroy();
+		ACSGetCEntity('acs_extra_arms_anchor_l').Destroy();
 
-		ACS_Vampire_Arms_Anchor_R_Get().Destroy();
+		ACSGetCEntity('acs_extra_arms_anchor_r').Destroy();
 
-		ACS_Vampire_Head_Anchor_Get().Destroy();
+		ACSGetCEntity('acs_vampire_head_anchor').Destroy();
 
-		ACS_Vampire_Head_Get().Destroy();
+		ACSGetCEntity('acs_vampire_head').Destroy();
 
-		ACS_Vampire_Back_Claw_Get().Destroy();
+		ACSGetCEntity('acs_vampire_back_claw').Destroy();
 
-		ACS_Vampire_Claw_Anchor_Get().Destroy();
+		ACSGetCEntity('acs_vampire_claw_anchor').Destroy();
 		*/
 
 		ACS_Blood_Armor_Destroy_IMMEDIATE();
@@ -1725,13 +1673,13 @@ state Bruxa_Camo_Decoy_Deactivate_Claw_Equip_Standalone_Engage in cBruxa_Camo_De
 
 			animatedComponent_extra_arms = (CAnimatedComponent)extra_arms_2.GetComponentByClassName( 'CAnimatedComponent' );	
 
-			ACS_Vampire_Arms_1_Get().GetRootAnimatedComponent().PlaySkeletalAnimationAsync( '__cutsceneAnimation', true );
+			ACSGetCEntity('acs_vampire_extra_arms_1').GetRootAnimatedComponent().PlaySkeletalAnimationAsync( '__cutsceneAnimation', true );
 
-			ACS_Vampire_Arms_2_Get().GetRootAnimatedComponent().PlaySkeletalAnimationAsync( '__cutsceneAnimation', true );
+			ACSGetCEntity('acs_vampire_extra_arms_2').GetRootAnimatedComponent().PlaySkeletalAnimationAsync( '__cutsceneAnimation', true );
 
-			ACS_Vampire_Arms_3_Get().GetRootAnimatedComponent().PlaySkeletalAnimationAsync( '__cutsceneAnimation', true );
+			ACSGetCEntity('acs_vampire_extra_arms_3').GetRootAnimatedComponent().PlaySkeletalAnimationAsync( '__cutsceneAnimation', true );
 
-			ACS_Vampire_Arms_4_Get().GetRootAnimatedComponent().PlaySkeletalAnimationAsync( '__cutsceneAnimation', true );
+			ACSGetCEntity('acs_vampire_extra_arms_4').GetRootAnimatedComponent().PlaySkeletalAnimationAsync( '__cutsceneAnimation', true );
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1863,7 +1811,7 @@ function ACS_Revenant_Destroy()
 		revenantTicket = revenantMovementAdjustor.CreateNewRequest( 'ACS_Revenant_Movement_Adjust' );
 
 		revenantMovementAdjustor.AdjustmentDuration( revenantTicket, 0.25 );
-		//shieldMovementAdjustor.ShouldStartAt(shieldTicket, ACS_Shield_Entity().GetWorldPosition());
+		//shieldMovementAdjustor.ShouldStartAt(shieldTicket, ACSGetCActor('ACS_Shield_Entity').GetWorldPosition());
 		revenantMovementAdjustor.MaxRotationAdjustmentSpeed( revenantTicket, 50000 );
 		revenantMovementAdjustor.MaxLocationAdjustmentSpeed( revenantTicket, 50000 );
 		//shieldMovementAdjustor.AdjustLocationVertically( shieldTicket, true );
@@ -1910,7 +1858,7 @@ function ACS_Skele_Destroy()
 		skeleTicket = skeleMovementAdjustor.CreateNewRequest( 'ACS_Skele_Movement_Adjust' );
 
 		skeleMovementAdjustor.AdjustmentDuration( skeleTicket, 0.25 );
-		//shieldMovementAdjustor.ShouldStartAt(shieldTicket, ACS_Shield_Entity().GetWorldPosition());
+		//shieldMovementAdjustor.ShouldStartAt(shieldTicket, ACSGetCActor('ACS_Shield_Entity').GetWorldPosition());
 		skeleMovementAdjustor.MaxRotationAdjustmentSpeed( skeleTicket, 50000 );
 		skeleMovementAdjustor.MaxLocationAdjustmentSpeed( skeleTicket, 50000 );
 		//shieldMovementAdjustor.AdjustLocationVertically( shieldTicket, true );

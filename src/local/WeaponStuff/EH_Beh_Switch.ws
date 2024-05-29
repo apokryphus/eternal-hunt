@@ -3,29 +3,29 @@ latent function ACS_BehSwitch(prevStateName : name)
 	var stupidArray 	: array< name >;
 
 	stupidArray.Clear();
-
+	
 	if (ACS_SCAAR_Installed() && ACS_SCAAR_Enabled() && !ACS_E3ARP_Enabled())
 	{
 		if (ACS_SwordWalk_Enabled())
 		{
 			if (ACS_PassiveTaunt_Enabled())
 			{
-				stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' );
+				stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' );
 			}
 			else
 			{
-				stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk' );
+				stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk' );
 			}
 		}
 		else
 		{
 			if (ACS_PassiveTaunt_Enabled())
 			{
-				stupidArray.PushBack( 'igni_primary_beh_SCAAR_passive_taunt' );
+				stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_passive_taunt' );
 			}
 			else
 			{
-				stupidArray.PushBack( 'igni_primary_beh_SCAAR' );
+				stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR' );
 			}
 		}
 	}
@@ -35,22 +35,22 @@ latent function ACS_BehSwitch(prevStateName : name)
 		{
 			if (ACS_PassiveTaunt_Enabled())
 			{
-				stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' );
+				stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' );
 			}
 			else
 			{
-				stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk' );
+				stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk' );
 			}
 		}
 		else
 		{
 			if (ACS_PassiveTaunt_Enabled())
 			{
-				stupidArray.PushBack( 'igni_primary_beh_E3ARP_passive_taunt' );
+				stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_passive_taunt' );
 			}
 			else
 			{
-				stupidArray.PushBack( 'igni_primary_beh_E3ARP' );
+				stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP' );
 			}
 		}
 	}
@@ -60,26 +60,26 @@ latent function ACS_BehSwitch(prevStateName : name)
 		{
 			if (ACS_PassiveTaunt_Enabled())
 			{
-				stupidArray.PushBack( 'igni_primary_beh_swordwalk_passive_taunt' );
+				stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_swordwalk_passive_taunt' );
 			}
 			else
 			{
-				stupidArray.PushBack( 'igni_primary_beh_swordwalk' );
+				stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_swordwalk' );
 			}
 		}
 		else
 		{
 			if (ACS_PassiveTaunt_Enabled())
 			{
-				stupidArray.PushBack( 'igni_primary_beh_passive_taunt' );
+				stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_passive_taunt' );
 			}
 			else
 			{
-				stupidArray.PushBack( 'igni_primary_beh' );
+				stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh' );
 			}
 		}
 	}
-	
+
 	if ( prevStateName == 'TraverseExploration' || prevStateName == 'PlayerDialogScene' )
 	{
 		ACS_CombatBehSwitch();
@@ -115,17 +115,9 @@ latent function ACS_BehSwitch(prevStateName : name)
 
 function ACS_CombatBehSwitch()
 {
-	var vBehSwitch 										: cBehSwitch;
-
-	if (ACS_New_Replacers_Female_Active())
-	{
-		return;
-	}
-
-	vBehSwitch = new cBehSwitch in theGame;
-	
 	if (!thePlayer.IsCiri() 
 	&& thePlayer.IsAlive()
+	&& !ACS_New_Replacers_Female_Active()
 	)
 	{
 		if (!thePlayer.IsThrowingItemWithAim()
@@ -134,7 +126,7 @@ function ACS_CombatBehSwitch()
 		&& !thePlayer.IsUsingHorse()
 		&& !thePlayer.IsUsingVehicle())
 		{
-			vBehSwitch.BehSwitch_Engage();
+			GetACSWatcher().CombatBehSwitch();
 
 			GetWitcherPlayer().RemoveTimer( 'DelayedSheathSword' );
 
@@ -152,18 +144,18 @@ function ACS_CombatBehSwitch()
 					//GetACSWatcher().AddTimer( 'ACS_DelayedSheathSword', 2.f, false );
 				//}
 
-				if (thePlayer.HasTag ('summoned_shades'))
+				if (thePlayer.HasTag ('acs_summoned_shades'))
 				{
-					thePlayer.RemoveTag('summoned_shades');
+					thePlayer.RemoveTag('acs_summoned_shades');
 				}
 				
-				if (thePlayer.HasTag ('ethereal_shout'))
+				if (thePlayer.HasTag ('acs_ethereal_shout'))
 				{
-					thePlayer.RemoveTag('ethereal_shout');
+					thePlayer.RemoveTag('acs_ethereal_shout');
 				}
 				
 				/*
-				if (thePlayer.HasTag ('vampire_claws_equipped'))
+				if (thePlayer.HasTag ('acs_vampire_claws_equipped'))
 				{
 					ClawDestroy();
 
@@ -198,7 +190,7 @@ function ACS_CombatBehSwitch()
 
 				GetACSWatcher().BerserkMarkDestroy();
 
-				HybridTagRemoval();
+				ACS_HybridTagRemoval();
 
 				ACS_Axii_Shield_Destroy_IMMEDIATE();
 
@@ -210,13 +202,13 @@ function ACS_CombatBehSwitch()
 
 				Bruxa_Camo_Decoy_Deactivate();
 
-				GetACSTentacle_1().Destroy();
+				ACSGetCActor('ACS_Tentacle_1').Destroy();
 
-				GetACSTentacle_2().Destroy();
+				ACSGetCActor('ACS_Tentacle_2').Destroy();
 
-				GetACSTentacle_3().Destroy();
+				ACSGetCActor('ACS_Tentacle_3').Destroy();
 
-				GetACSTentacleAnchor().Destroy();
+				ACSGetCEntity('acs_tentacle_anchor').Destroy();
 
 				GetACSWatcher().SetRageProcess(false);
 
@@ -224,11 +216,11 @@ function ACS_CombatBehSwitch()
 				
 				//GetACSWatcher().AddTimer('ACS_DetachBehaviorTimer', 2, false);
 
-				IgniBowDestroy();
-				AxiiBowDestroy();
-				AardBowDestroy();
-				YrdenBowDestroy();
-				QuenBowDestroy();
+				ACS_IgniBowDestroy();
+				ACS_AxiiBowDestroy();
+				ACS_AardBowDestroy();
+				ACS_YrdenBowDestroy();
+				ACS_QuenBowDestroy();
 
 				ACSSignComboIconDestroyAll();
 
@@ -236,7 +228,7 @@ function ACS_CombatBehSwitch()
 
 				GetACSWatcher().ACS_DestroyAllShields();
 
-				//ACS_NekkerGuardianShareLifeForce_Destroy();
+				//ACSGetCEntityDestroyAll('ACS_Nekker_Life_Force');
 
 				thePlayer.ClearAnimationSpeedMultipliers();
 
@@ -425,46 +417,6 @@ function ACS_Elderblood_Assassin_Spawn_Controller()
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function ACS_ExplorationBehSwitch()
-{
-	var vBehSwitch : cBehSwitch;
-	vBehSwitch = new cBehSwitch in theGame;
-	
-	if (!thePlayer.IsCiri() 
-	&& thePlayer.IsAlive())
-	{
-		vBehSwitch.BehSwitch_Engage_3();
-	}
-}
-
-function ACS_BehSwitchINIT()
-{
-	var vBehSwitch : cBehSwitch;
-
-	if (ACS_New_Replacers_Female_Active() && !thePlayer.IsCiri())
-	{
-		return;
-	}
-
-	vBehSwitch = new cBehSwitch in theGame;
-	
-	if (ACS_Enabled())
-	{
-		if (!thePlayer.IsCiri()
-		&& !theGame.IsDialogOrCutscenePlaying() 
-		&& !thePlayer.IsInNonGameplayCutscene() 
-		&& !thePlayer.IsInGameplayScene()
-		&& !thePlayer.IsSwimming()
-		&& !thePlayer.IsUsingHorse()
-		&& !thePlayer.IsUsingVehicle()
-		&& thePlayer.IsAlive()
-		)
-		{
-			vBehSwitch.BehSwitch_Engage_2();
-		}
-	}
-}
-
 statemachine class cBehSwitch
 {
     function BehSwitch_Engage()
@@ -511,104 +463,112 @@ state BehSwitch_Engage_3 in cBehSwitch
 		{
 			if (ACS_PassiveTaunt_Enabled())
 			{
-				if (thePlayer.HasTag('quen_sword_equipped'))
+				if (thePlayer.HasTag('acs_quen_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_primary_beh_E3ARP_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('axii_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_primary_beh_E3ARP_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('aard_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_primary_beh_E3ARP_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('yrden_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_primary_beh_E3ARP_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('vampire_claws_equipped'))
+				else if (thePlayer.HasTag('acs_vampire_claws_equipped'))
 				{
-					stupidArray.PushBack( 'claw_beh_E3ARP_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_E3ARP_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('igni_sword_equipped'))
+				else if (thePlayer.HasTag('acs_sorc_fists_equipped'))
 				{
-					stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 				}
-				else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_igni_sword_equipped'))
 				{
-					stupidArray.PushBack( 'igni_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' );
+				}
+				else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
+				{
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 				else
 				{
-					stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
 			else
 			{
-				if (thePlayer.HasTag('quen_sword_equipped'))
+				if (thePlayer.HasTag('acs_quen_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_primary_beh_E3ARP_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP_swordwalk' );
 				}
-				else if (thePlayer.HasTag('axii_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_primary_beh_E3ARP_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP_swordwalk' );
 				}
-				else if (thePlayer.HasTag('aard_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_primary_beh_E3ARP' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP' );
 				}
-				else if (thePlayer.HasTag('yrden_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_primary_beh_E3ARP_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP_swordwalk' );
 				}
-				else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_secondary_beh_E3ARP_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP_swordwalk' );
 				}
-				else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_secondary_beh_E3ARP_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_swordwalk' );
 				}
-				else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_secondary_beh_E3ARP_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP_swordwalk' );
 				}
-				else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_secondary_beh_E3ARP_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP_swordwalk' );
 				}
-				else if (thePlayer.HasTag('vampire_claws_equipped'))
+				else if (thePlayer.HasTag('acs_vampire_claws_equipped'))
 				{
-					stupidArray.PushBack( 'claw_beh_E3ARP' );
+					stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_E3ARP' );
 				}
-				else if (thePlayer.HasTag('igni_sword_equipped'))
+				else if (thePlayer.HasTag('acs_sorc_fists_equipped'))
 				{
-					stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 				}
-				else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_igni_sword_equipped'))
 				{
-					stupidArray.PushBack( 'igni_secondary_beh_E3ARP_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk' );
+				}
+				else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
+				{
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_E3ARP_swordwalk' );
 				}
 				else
 				{
-					stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk' );
 				}
 			}
 		}
@@ -616,109 +576,128 @@ state BehSwitch_Engage_3 in cBehSwitch
 		{
 			if (ACS_PassiveTaunt_Enabled())
 			{
-				if (thePlayer.HasTag('quen_sword_equipped'))
+				if (thePlayer.HasTag('acs_quen_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_primary_beh_E3ARP_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('axii_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_primary_beh_E3ARP_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('aard_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_primary_beh_E3ARP_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('yrden_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_primary_beh_E3ARP_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_secondary_beh_E3ARP_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_secondary_beh_E3ARP_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_secondary_beh_E3ARP_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('vampire_claws_equipped'))
+				else if (thePlayer.HasTag('acs_vampire_claws_equipped'))
 				{
-					stupidArray.PushBack( 'claw_beh_E3ARP_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_E3ARP_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('igni_sword_equipped'))
+				else if (thePlayer.HasTag('acs_sorc_fists_equipped'))
 				{
-					stupidArray.PushBack( 'igni_primary_beh_E3ARP_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 				}
-				else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_igni_sword_equipped'))
 				{
-					stupidArray.PushBack( 'igni_secondary_beh_E3ARP_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_passive_taunt' );
+				}
+				else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
+				{
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_E3ARP_passive_taunt' );
 				}
 				else
 				{
-					stupidArray.PushBack( 'igni_primary_beh_E3ARP_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_passive_taunt' );
 				}
 			}
 			else
 			{
-				if (thePlayer.HasTag('quen_sword_equipped'))
+				if (thePlayer.HasTag('acs_quen_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_primary_beh_E3ARP' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP' );
 				}
-				else if (thePlayer.HasTag('axii_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_primary_beh_E3ARP' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP' );
 				}
-				else if (thePlayer.HasTag('aard_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_primary_beh_E3ARP' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP' );
 				}
-				else if (thePlayer.HasTag('yrden_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_primary_beh_E3ARP' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP' );
 				}
-				else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_secondary_beh_E3ARP' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP' );
 				}
-				else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_secondary_beh_E3ARP' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP' );
 				}
-				else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_secondary_beh_E3ARP' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP' );
 				}
-				else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_secondary_beh_E3ARP' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP' );
 				}
-				else if (thePlayer.HasTag('vampire_claws_equipped'))
+				else if (thePlayer.HasTag('acs_vampire_claws_equipped'))
 				{
-					stupidArray.PushBack( 'claw_beh_E3ARP' );
+					stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_E3ARP' );
 				}
-				else if (thePlayer.HasTag('igni_sword_equipped'))
+				else if (thePlayer.HasTag('acs_sorc_fists_equipped'))
 				{
-					stupidArray.PushBack( 'igni_primary_beh_E3ARP' );
+					stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 				}
-				else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_igni_sword_equipped'))
 				{
-					stupidArray.PushBack( 'igni_secondary_beh_E3ARP' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP' );
+				}
+				else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
+				{
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_E3ARP' );
 				}
 				else
 				{
-					stupidArray.PushBack( 'igni_primary_beh_E3ARP' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP' );
 				}
 			}
 		}
 
-		thePlayer.ActivateBehaviors(stupidArray);
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
+		}
 	}
 
 	entry function BehSwitch_SCAAR_3()
@@ -729,104 +708,112 @@ state BehSwitch_Engage_3 in cBehSwitch
 		{
 			if (ACS_PassiveTaunt_Enabled())
 			{
-				if (thePlayer.HasTag('quen_sword_equipped'))
+				if (thePlayer.HasTag('acs_quen_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_primary_beh_SCAAR_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('axii_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_primary_beh_SCAAR_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('aard_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_primary_beh_SCAAR_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('yrden_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_primary_beh_SCAAR_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('vampire_claws_equipped'))
+				else if (thePlayer.HasTag('acs_vampire_claws_equipped'))
 				{
-					stupidArray.PushBack( 'claw_beh_SCAAR_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_SCAAR_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('igni_sword_equipped'))
+				else if (thePlayer.HasTag('acs_sorc_fists_equipped'))
 				{
-					stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 				}
-				else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_igni_sword_equipped'))
 				{
-					stupidArray.PushBack( 'igni_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' );
+				}
+				else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
+				{
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 				else
 				{
-					stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
 			else
 			{
-				if (thePlayer.HasTag('quen_sword_equipped'))
+				if (thePlayer.HasTag('acs_quen_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_primary_beh_SCAAR_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR_swordwalk' );
 				}
-				else if (thePlayer.HasTag('axii_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_primary_beh_SCAAR_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR_swordwalk' );
 				}
-				else if (thePlayer.HasTag('aard_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_primary_beh_SCAAR' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR' );
 				}
-				else if (thePlayer.HasTag('yrden_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_primary_beh_SCAAR_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR_swordwalk' );
 				}
-				else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_secondary_beh_SCAAR_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR_swordwalk' );
 				}
-				else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_secondary_beh_SCAAR_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_swordwalk' );
 				}
-				else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_secondary_beh_SCAAR_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR_swordwalk' );
 				}
-				else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_secondary_beh_SCAAR_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR_swordwalk' );
 				}
-				else if (thePlayer.HasTag('vampire_claws_equipped'))
+				else if (thePlayer.HasTag('acs_vampire_claws_equipped'))
 				{
-					stupidArray.PushBack( 'claw_beh_SCAAR' );
+					stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_SCAAR' );
 				}
-				else if (thePlayer.HasTag('igni_sword_equipped'))
+				else if (thePlayer.HasTag('acs_sorc_fists_equipped'))
 				{
-					stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 				}
-				else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_igni_sword_equipped'))
 				{
-					stupidArray.PushBack( 'igni_secondary_beh_SCAAR_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk' );
+				}
+				else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
+				{
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_SCAAR_swordwalk' );
 				}
 				else
 				{
-					stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk' );
 				}
 			}
 		}
@@ -834,109 +821,128 @@ state BehSwitch_Engage_3 in cBehSwitch
 		{
 			if (ACS_PassiveTaunt_Enabled())
 			{
-				if (thePlayer.HasTag('quen_sword_equipped'))
+				if (thePlayer.HasTag('acs_quen_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_primary_beh_SCAAR_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('axii_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_primary_beh_SCAAR_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('aard_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_primary_beh_SCAAR_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('yrden_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_primary_beh_SCAAR_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_secondary_beh_SCAAR_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_secondary_beh_SCAAR_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_secondary_beh_SCAAR_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('vampire_claws_equipped'))
+				else if (thePlayer.HasTag('acs_vampire_claws_equipped'))
 				{
-					stupidArray.PushBack( 'claw_beh_SCAAR_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_SCAAR_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('igni_sword_equipped'))
+				else if (thePlayer.HasTag('acs_sorc_fists_equipped'))
 				{
-					stupidArray.PushBack( 'igni_primary_beh_SCAAR_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 				}
-				else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_igni_sword_equipped'))
 				{
-					stupidArray.PushBack( 'igni_secondary_beh_SCAAR_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_passive_taunt' );
+				}
+				else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
+				{
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_SCAAR_passive_taunt' );
 				}
 				else
 				{
-					stupidArray.PushBack( 'igni_primary_beh_SCAAR_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_passive_taunt' );
 				}
 			}
 			else
 			{
-				if (thePlayer.HasTag('quen_sword_equipped'))
+				if (thePlayer.HasTag('acs_quen_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_primary_beh_SCAAR' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR' );
 				}
-				else if (thePlayer.HasTag('axii_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_primary_beh_SCAAR' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR' );
 				}
-				else if (thePlayer.HasTag('aard_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_primary_beh_SCAAR' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR' );
 				}
-				else if (thePlayer.HasTag('yrden_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_primary_beh_SCAAR' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR' );
 				}
-				else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_secondary_beh_SCAAR' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR' );
 				}
-				else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_secondary_beh_SCAAR' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR' );
 				}
-				else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_secondary_beh_SCAAR' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR' );
 				}
-				else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_secondary_beh_SCAAR' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR' );
 				}
-				else if (thePlayer.HasTag('vampire_claws_equipped'))
+				else if (thePlayer.HasTag('acs_vampire_claws_equipped'))
 				{
-					stupidArray.PushBack( 'claw_beh_SCAAR' );
+					stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_SCAAR' );
 				}
-				else if (thePlayer.HasTag('igni_sword_equipped'))
+				else if (thePlayer.HasTag('acs_sorc_fists_equipped'))
 				{
-					stupidArray.PushBack( 'igni_primary_beh_SCAAR' );
+					stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 				}
-				else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_igni_sword_equipped'))
 				{
-					stupidArray.PushBack( 'igni_secondary_beh_SCAAR' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR' );
+				}
+				else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
+				{
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_SCAAR' );
 				}
 				else
 				{
-					stupidArray.PushBack( 'igni_primary_beh_SCAAR' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR' );
 				}
 			}
 		}
 
-		thePlayer.ActivateBehaviors(stupidArray);
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
+		}
 	}
 
 	entry function BehSwitch_3()
@@ -947,104 +953,112 @@ state BehSwitch_Engage_3 in cBehSwitch
 		{
 			if (ACS_PassiveTaunt_Enabled())
 			{
-				if (thePlayer.HasTag('quen_sword_equipped'))
+				if (thePlayer.HasTag('acs_quen_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_primary_beh_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_swordwalk_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('axii_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_primary_beh_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_swordwalk_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('aard_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_primary_beh_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('yrden_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_primary_beh_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_swordwalk_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_secondary_beh_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_swordwalk_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_secondary_beh_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_swordwalk_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_secondary_beh_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_swordwalk_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_secondary_beh_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_swordwalk_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('vampire_claws_equipped'))
+				else if (thePlayer.HasTag('acs_vampire_claws_equipped'))
 				{
-					stupidArray.PushBack( 'claw_beh_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('igni_sword_equipped'))
+				else if (thePlayer.HasTag('acs_sorc_fists_equipped'))
 				{
-					stupidArray.PushBack( 'igni_primary_beh_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 				}
-				else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_igni_sword_equipped'))
 				{
-					stupidArray.PushBack( 'igni_secondary_beh_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_swordwalk_passive_taunt' );
+				}
+				else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
+				{
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_swordwalk_passive_taunt' );
 				}
 				else
 				{
-					stupidArray.PushBack( 'igni_primary_beh_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_swordwalk_passive_taunt' );
 				}
 			}
 			else
 			{
-				if (thePlayer.HasTag('quen_sword_equipped'))
+				if (thePlayer.HasTag('acs_quen_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_primary_beh_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_swordwalk' );
 				}
-				else if (thePlayer.HasTag('axii_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_primary_beh_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_swordwalk' );
 				}
-				else if (thePlayer.HasTag('aard_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_primary_beh' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh' );
 				}
-				else if (thePlayer.HasTag('yrden_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_primary_beh_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_swordwalk' );
 				}
-				else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_secondary_beh_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_swordwalk' );
 				}
-				else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_secondary_beh_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_swordwalk' );
 				}
-				else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_secondary_beh_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_swordwalk' );
 				}
-				else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_secondary_beh_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_swordwalk' );
 				}
-				else if (thePlayer.HasTag('vampire_claws_equipped'))
+				else if (thePlayer.HasTag('acs_vampire_claws_equipped'))
 				{
-					stupidArray.PushBack( 'claw_beh' );
+					stupidArray.Clear(); stupidArray.PushBack( 'claw_beh' );
 				}
-				else if (thePlayer.HasTag('igni_sword_equipped'))
+				else if (thePlayer.HasTag('acs_sorc_fists_equipped'))
 				{
-					stupidArray.PushBack( 'igni_primary_beh_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 				}
-				else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_igni_sword_equipped'))
 				{
-					stupidArray.PushBack( 'igni_secondary_beh_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_swordwalk' );
+				}
+				else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
+				{
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_swordwalk' );
 				}
 				else
 				{
-					stupidArray.PushBack( 'igni_primary_beh_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_swordwalk' );
 				}
 			}
 		}
@@ -1052,109 +1066,128 @@ state BehSwitch_Engage_3 in cBehSwitch
 		{
 			if (ACS_PassiveTaunt_Enabled())
 			{
-				if (thePlayer.HasTag('quen_sword_equipped'))
+				if (thePlayer.HasTag('acs_quen_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_primary_beh_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('axii_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_primary_beh_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('aard_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_primary_beh_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('yrden_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_primary_beh_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_secondary_beh_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_secondary_beh_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_secondary_beh_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('vampire_claws_equipped'))
+				else if (thePlayer.HasTag('acs_vampire_claws_equipped'))
 				{
-					stupidArray.PushBack( 'claw_beh_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('igni_sword_equipped'))
+				else if (thePlayer.HasTag('acs_sorc_fists_equipped'))
 				{
-					stupidArray.PushBack( 'igni_primary_beh_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 				}
-				else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_igni_sword_equipped'))
 				{
-					stupidArray.PushBack( 'igni_secondary_beh_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_passive_taunt' );
+				}
+				else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
+				{
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_passive_taunt' );
 				}
 				else
 				{
-					stupidArray.PushBack( 'igni_primary_beh_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_passive_taunt' );
 				}
 			}
 			else
 			{
-				if (thePlayer.HasTag('quen_sword_equipped'))
+				if (thePlayer.HasTag('acs_quen_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_primary_beh' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh' );
 				}
-				else if (thePlayer.HasTag('axii_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_primary_beh' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh' );
 				}
-				else if (thePlayer.HasTag('aard_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_primary_beh' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh' );
 				}
-				else if (thePlayer.HasTag('yrden_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_primary_beh' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh' );
 				}
-				else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_secondary_beh' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh' );
 				}
-				else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_secondary_beh' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh' );
 				}
-				else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_secondary_beh' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh' );
 				}
-				else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_secondary_beh' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh' );
 				}
-				else if (thePlayer.HasTag('vampire_claws_equipped'))
+				else if (thePlayer.HasTag('acs_vampire_claws_equipped'))
 				{
-					stupidArray.PushBack( 'claw_beh' );
+					stupidArray.Clear(); stupidArray.PushBack( 'claw_beh' );
 				}
-				else if (thePlayer.HasTag('igni_sword_equipped'))
+				else if (thePlayer.HasTag('acs_sorc_fists_equipped'))
 				{
-					stupidArray.PushBack( 'igni_primary_beh' );
+					stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 				}
-				else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_igni_sword_equipped'))
 				{
-					stupidArray.PushBack( 'igni_secondary_beh' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh' );
+				}
+				else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
+				{
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh' );
 				}
 				else
 				{
-					stupidArray.PushBack( 'igni_primary_beh' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh' );
 				}
 			}
 		}
 
-		thePlayer.ActivateBehaviors(stupidArray);
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
+		}
 	}
 }
 
@@ -1203,7 +1236,7 @@ state BehSwitch_Engage_2 in cBehSwitch
 		
 		thePlayer.SetBehaviorVariable( 'WeaponType', 0);
 		
-		if ( thePlayer.HasTag('vampire_claws_equipped') )
+		if ( thePlayer.HasTag('acs_vampire_claws_equipped') || thePlayer.HasTag('acs_sorc_fists_equipped') )
 		{
 			thePlayer.SetBehaviorVariable( 'playerWeapon', (int) PW_Steel );
 			thePlayer.SetBehaviorVariable( 'playerWeaponForOverlay', (int) PW_Steel );
@@ -1247,11 +1280,24 @@ state BehSwitch_Engage_2 in cBehSwitch
 	{
 		ACS_WeaponDestroyInit();
 
-		HybridTagRemoval();
+		ACS_HybridTagRemoval();
 
 		if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh' )
 		{
-			thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh' );
+			stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh' );
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 
 		ACS_Load_Sound();
@@ -1368,108 +1414,118 @@ state BehSwitch_Engage_2 in cBehSwitch
 	{
 		stupidArray.Clear();
 
+		
+
 		if (ACS_SwordWalk_Enabled())
 		{
 			if (ACS_PassiveTaunt_Enabled())
 			{
-				if (thePlayer.HasTag('quen_sword_equipped'))
+				if (thePlayer.HasTag('acs_quen_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_primary_beh_E3ARP_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('axii_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_primary_beh_E3ARP_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('aard_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_primary_beh_E3ARP_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('yrden_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_primary_beh_E3ARP_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('vampire_claws_equipped'))
+				else if (thePlayer.HasTag('acs_vampire_claws_equipped'))
 				{
-					stupidArray.PushBack( 'claw_beh_E3ARP_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_E3ARP_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('igni_sword_equipped'))
+				else if (thePlayer.HasTag('acs_sorc_fists_equipped'))
 				{
-					stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 				}
-				else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_igni_sword_equipped'))
 				{
-					stupidArray.PushBack( 'igni_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' );
+				}
+				else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
+				{
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 				else
 				{
-					stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
 			else
 			{
-				if (thePlayer.HasTag('quen_sword_equipped'))
+				if (thePlayer.HasTag('acs_quen_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_primary_beh_E3ARP_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP_swordwalk' );
 				}
-				else if (thePlayer.HasTag('axii_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_primary_beh_E3ARP_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP_swordwalk' );
 				}
-				else if (thePlayer.HasTag('aard_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_primary_beh_E3ARP' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP' );
 				}
-				else if (thePlayer.HasTag('yrden_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_primary_beh_E3ARP_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP_swordwalk' );
 				}
-				else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_secondary_beh_E3ARP_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP_swordwalk' );
 				}
-				else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_secondary_beh_E3ARP_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_swordwalk' );
 				}
-				else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_secondary_beh_E3ARP_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP_swordwalk' );
 				}
-				else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_secondary_beh_E3ARP_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP_swordwalk' );
 				}
-				else if (thePlayer.HasTag('vampire_claws_equipped'))
+				else if (thePlayer.HasTag('acs_vampire_claws_equipped'))
 				{
-					stupidArray.PushBack( 'claw_beh_E3ARP' );
+					stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_E3ARP' );
 				}
-				else if (thePlayer.HasTag('igni_sword_equipped'))
+				else if (thePlayer.HasTag('acs_sorc_fists_equipped'))
 				{
-					stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 				}
-				else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_igni_sword_equipped'))
 				{
-					stupidArray.PushBack( 'igni_secondary_beh_E3ARP_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk' );
+				}
+				else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
+				{
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_E3ARP_swordwalk' );
 				}
 				else
 				{
-					stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk' );
 				}
 			}
 		}
@@ -1477,217 +1533,246 @@ state BehSwitch_Engage_2 in cBehSwitch
 		{
 			if (ACS_PassiveTaunt_Enabled())
 			{
-				if (thePlayer.HasTag('quen_sword_equipped'))
+				if (thePlayer.HasTag('acs_quen_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_primary_beh_E3ARP_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('axii_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_primary_beh_E3ARP_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('aard_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_primary_beh_E3ARP_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('yrden_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_primary_beh_E3ARP_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_secondary_beh_E3ARP_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_secondary_beh_E3ARP_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_secondary_beh_E3ARP_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('vampire_claws_equipped'))
+				else if (thePlayer.HasTag('acs_vampire_claws_equipped'))
 				{
-					stupidArray.PushBack( 'claw_beh_E3ARP_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_E3ARP_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('igni_sword_equipped'))
+				else if (thePlayer.HasTag('acs_sorc_fists_equipped'))
 				{
-					stupidArray.PushBack( 'igni_primary_beh_E3ARP_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 				}
-				else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_igni_sword_equipped'))
 				{
-					stupidArray.PushBack( 'igni_secondary_beh_E3ARP_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_passive_taunt' );
+				}
+				else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
+				{
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_E3ARP_passive_taunt' );
 				}
 				else
 				{
-					stupidArray.PushBack( 'igni_primary_beh_E3ARP_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_passive_taunt' );
 				}
 			}
 			else
 			{
-				if (thePlayer.HasTag('quen_sword_equipped'))
+				if (thePlayer.HasTag('acs_quen_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_primary_beh_E3ARP' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP' );
 				}
-				else if (thePlayer.HasTag('axii_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_primary_beh_E3ARP' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP' );
 				}
-				else if (thePlayer.HasTag('aard_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_primary_beh_E3ARP' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP' );
 				}
-				else if (thePlayer.HasTag('yrden_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_primary_beh_E3ARP' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP' );
 				}
-				else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_secondary_beh_E3ARP' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP' );
 				}
-				else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_secondary_beh_E3ARP' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP' );
 				}
-				else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_secondary_beh_E3ARP' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP' );
 				}
-				else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_secondary_beh_E3ARP' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP' );
 				}
-				else if (thePlayer.HasTag('vampire_claws_equipped'))
+				else if (thePlayer.HasTag('acs_vampire_claws_equipped'))
 				{
-					stupidArray.PushBack( 'claw_beh_E3ARP' );
+					stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_E3ARP' );
 				}
-				else if (thePlayer.HasTag('igni_sword_equipped'))
+				else if (thePlayer.HasTag('acs_sorc_fists_equipped'))
 				{
-					stupidArray.PushBack( 'igni_primary_beh_E3ARP' );
+					stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 				}
-				else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_igni_sword_equipped'))
 				{
-					stupidArray.PushBack( 'igni_secondary_beh_E3ARP' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP' );
+				}
+				else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
+				{
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_E3ARP' );
 				}
 				else
 				{
-					stupidArray.PushBack( 'igni_primary_beh_E3ARP' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP' );
 				}
 			}
 		}
 
-		thePlayer.ActivateBehaviors(stupidArray);
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
+		}
 	}
 
 	latent function ActivateBehaviors_SCAAR_Default()
 	{
 		stupidArray.Clear();
 
+		
+
 		if (ACS_SwordWalk_Enabled())
 		{
 			if (ACS_PassiveTaunt_Enabled())
 			{
-				if (thePlayer.HasTag('quen_sword_equipped'))
+				if (thePlayer.HasTag('acs_quen_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_primary_beh_SCAAR_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('axii_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_primary_beh_SCAAR_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('aard_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_primary_beh_SCAAR_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('yrden_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_primary_beh_SCAAR_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('vampire_claws_equipped'))
+				else if (thePlayer.HasTag('acs_vampire_claws_equipped'))
 				{
-					stupidArray.PushBack( 'claw_beh_SCAAR_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_SCAAR_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('igni_sword_equipped'))
+				else if (thePlayer.HasTag('acs_sorc_fists_equipped'))
 				{
-					stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 				}
-				else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_igni_sword_equipped'))
 				{
-					stupidArray.PushBack( 'igni_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' );
+				}
+				else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
+				{
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 				else
 				{
-					stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
 			else
 			{
-				if (thePlayer.HasTag('quen_sword_equipped'))
+				if (thePlayer.HasTag('acs_quen_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_primary_beh_SCAAR_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR_swordwalk' );
 				}
-				else if (thePlayer.HasTag('axii_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_primary_beh_SCAAR_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR_swordwalk' );
 				}
-				else if (thePlayer.HasTag('aard_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_primary_beh_SCAAR' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR' );
 				}
-				else if (thePlayer.HasTag('yrden_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_primary_beh_SCAAR_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR_swordwalk' );
 				}
-				else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_secondary_beh_SCAAR_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR_swordwalk' );
 				}
-				else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_secondary_beh_SCAAR_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_swordwalk' );
 				}
-				else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_secondary_beh_SCAAR_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR_swordwalk' );
 				}
-				else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_secondary_beh_SCAAR_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR_swordwalk' );
 				}
-				else if (thePlayer.HasTag('vampire_claws_equipped'))
+				else if (thePlayer.HasTag('acs_vampire_claws_equipped'))
 				{
-					stupidArray.PushBack( 'claw_beh_SCAAR' );
+					stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_SCAAR' );
 				}
-				else if (thePlayer.HasTag('igni_sword_equipped'))
+				else if (thePlayer.HasTag('acs_sorc_fists_equipped'))
 				{
-					stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 				}
-				else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_igni_sword_equipped'))
 				{
-					stupidArray.PushBack( 'igni_secondary_beh_SCAAR_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk' );
+				}
+				else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
+				{
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_SCAAR_swordwalk' );
 				}
 				else
 				{
-					stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk' );
 				}
 			}
 		}
@@ -1695,328 +1780,372 @@ state BehSwitch_Engage_2 in cBehSwitch
 		{
 			if (ACS_PassiveTaunt_Enabled())
 			{
-				if (thePlayer.HasTag('quen_sword_equipped'))
+				if (thePlayer.HasTag('acs_quen_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_primary_beh_SCAAR_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('axii_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_primary_beh_SCAAR_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('aard_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_primary_beh_SCAAR_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('yrden_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_primary_beh_SCAAR_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_secondary_beh_SCAAR_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_secondary_beh_SCAAR_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_secondary_beh_SCAAR_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('vampire_claws_equipped'))
+				else if (thePlayer.HasTag('acs_vampire_claws_equipped'))
 				{
-					stupidArray.PushBack( 'claw_beh_SCAAR_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_SCAAR_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('igni_sword_equipped'))
+				else if (thePlayer.HasTag('acs_sorc_fists_equipped'))
 				{
-					stupidArray.PushBack( 'igni_primary_beh_SCAAR_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 				}
-				else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_igni_sword_equipped'))
 				{
-					stupidArray.PushBack( 'igni_secondary_beh_SCAAR_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_passive_taunt' );
+				}
+				else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
+				{
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_SCAAR_passive_taunt' );
 				}
 				else
 				{
-					stupidArray.PushBack( 'igni_primary_beh_SCAAR_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_passive_taunt' );
 				}
 			}
 			else
 			{
-				if (thePlayer.HasTag('quen_sword_equipped'))
+				if (thePlayer.HasTag('acs_quen_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_primary_beh_SCAAR' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR' );
 				}
-				else if (thePlayer.HasTag('axii_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_primary_beh_SCAAR' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR' );
 				}
-				else if (thePlayer.HasTag('aard_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_primary_beh_SCAAR' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR' );
 				}
-				else if (thePlayer.HasTag('yrden_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_primary_beh_SCAAR' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR' );
 				}
-				else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_secondary_beh_SCAAR' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR' );
 				}
-				else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_secondary_beh_SCAAR' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR' );
 				}
-				else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_secondary_beh_SCAAR' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR' );
 				}
-				else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_secondary_beh_SCAAR' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR' );
 				}
-				else if (thePlayer.HasTag('vampire_claws_equipped'))
+				else if (thePlayer.HasTag('acs_vampire_claws_equipped'))
 				{
-					stupidArray.PushBack( 'claw_beh_SCAAR' );
+					stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_SCAAR' );
 				}
-				else if (thePlayer.HasTag('igni_sword_equipped'))
+				else if (thePlayer.HasTag('acs_sorc_fists_equipped'))
 				{
-					stupidArray.PushBack( 'igni_primary_beh_SCAAR' );
+					stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 				}
-				else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_igni_sword_equipped'))
 				{
-					stupidArray.PushBack( 'igni_secondary_beh_SCAAR' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR' );
+				}
+				else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
+				{
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_SCAAR' );
 				}
 				else
 				{
-					stupidArray.PushBack( 'igni_primary_beh_SCAAR' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR' );
 				}
 			}
 		}
 
-		thePlayer.ActivateBehaviors(stupidArray);
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
+		}
 	}
 
 	latent function ActivateBehaviors_Default()
 	{
+		stupidArray.Clear();
+
+		
+
 		if (ACS_SwordWalk_Enabled())
 		{
-			stupidArray.Clear();
-
 			if (ACS_PassiveTaunt_Enabled())
 			{
-				if (thePlayer.HasTag('quen_sword_equipped'))
+				if (thePlayer.HasTag('acs_quen_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_primary_beh_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_swordwalk_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('axii_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_primary_beh_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_swordwalk_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('aard_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_primary_beh_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('yrden_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_primary_beh_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_swordwalk_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_secondary_beh_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_swordwalk_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_secondary_beh_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_swordwalk_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_secondary_beh_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_swordwalk_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_secondary_beh_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_swordwalk_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('vampire_claws_equipped'))
+				else if (thePlayer.HasTag('acs_vampire_claws_equipped'))
 				{
-					stupidArray.PushBack( 'claw_beh_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('igni_sword_equipped'))
+				else if (thePlayer.HasTag('acs_sorc_fists_equipped'))
 				{
-					stupidArray.PushBack( 'igni_primary_beh_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 				}
-				else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_igni_sword_equipped'))
 				{
-					stupidArray.PushBack( 'igni_secondary_beh_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_swordwalk_passive_taunt' );
+				}
+				else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
+				{
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_swordwalk_passive_taunt' );
 				}
 				else
 				{
-					stupidArray.PushBack( 'igni_primary_beh_swordwalk_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_swordwalk_passive_taunt' );
 				}
 			}
 			else
 			{
-				if (thePlayer.HasTag('quen_sword_equipped'))
+				if (thePlayer.HasTag('acs_quen_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_primary_beh_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_swordwalk' );
 				}
-				else if (thePlayer.HasTag('axii_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_primary_beh_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_swordwalk' );
 				}
-				else if (thePlayer.HasTag('aard_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_primary_beh' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh' );
 				}
-				else if (thePlayer.HasTag('yrden_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_primary_beh_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_swordwalk' );
 				}
-				else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_secondary_beh_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_swordwalk' );
 				}
-				else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_secondary_beh_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_swordwalk' );
 				}
-				else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_secondary_beh_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_swordwalk' );
 				}
-				else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_secondary_beh_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_swordwalk' );
 				}
-				else if (thePlayer.HasTag('vampire_claws_equipped'))
+				else if (thePlayer.HasTag('acs_vampire_claws_equipped'))
 				{
-					stupidArray.PushBack( 'claw_beh' );
+					stupidArray.Clear(); stupidArray.PushBack( 'claw_beh' );
 				}
-				else if (thePlayer.HasTag('igni_sword_equipped'))
+				else if (thePlayer.HasTag('acs_sorc_fists_equipped'))
 				{
-					stupidArray.PushBack( 'igni_primary_beh_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 				}
-				else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_igni_sword_equipped'))
 				{
-					stupidArray.PushBack( 'igni_secondary_beh_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_swordwalk' );
+				}
+				else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
+				{
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_swordwalk' );
 				}
 				else
 				{
-					stupidArray.PushBack( 'igni_primary_beh_swordwalk' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_swordwalk' );
 				}
 			}
-
-			thePlayer.ActivateBehaviors(stupidArray);
 		}
 		else
 		{
-			stupidArray.Clear();
-
 			if (ACS_PassiveTaunt_Enabled())
 			{
-				if (thePlayer.HasTag('quen_sword_equipped'))
+				if (thePlayer.HasTag('acs_quen_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_primary_beh_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('axii_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_primary_beh_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('aard_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_primary_beh_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('yrden_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_primary_beh_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_secondary_beh_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_secondary_beh_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_secondary_beh_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('vampire_claws_equipped'))
+				else if (thePlayer.HasTag('acs_vampire_claws_equipped'))
 				{
-					stupidArray.PushBack( 'claw_beh_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_passive_taunt' );
 				}
-				else if (thePlayer.HasTag('igni_sword_equipped'))
+				else if (thePlayer.HasTag('acs_sorc_fists_equipped'))
 				{
-					stupidArray.PushBack( 'igni_primary_beh_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 				}
-				else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_igni_sword_equipped'))
 				{
-					stupidArray.PushBack( 'igni_secondary_beh_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_passive_taunt' );
+				}
+				else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
+				{
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_passive_taunt' );
 				}
 				else
 				{
-					stupidArray.PushBack( 'igni_primary_beh_passive_taunt' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_passive_taunt' );
 				}
 			}
 			else
 			{
-				if (thePlayer.HasTag('quen_sword_equipped'))
+				if (thePlayer.HasTag('acs_quen_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_primary_beh' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh' );
 				}
-				else if (thePlayer.HasTag('axii_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_primary_beh' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh' );
 				}
-				else if (thePlayer.HasTag('aard_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_primary_beh' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh' );
 				}
-				else if (thePlayer.HasTag('yrden_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_primary_beh' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh' );
 				}
-				else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'quen_secondary_beh' );
+					stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh' );
 				}
-				else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'axii_secondary_beh' );
+					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh' );
 				}
-				else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'aard_secondary_beh' );
+					stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh' );
 				}
-				else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 				{
-					stupidArray.PushBack( 'yrden_secondary_beh' );
+					stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh' );
 				}
-				else if (thePlayer.HasTag('vampire_claws_equipped'))
+				else if (thePlayer.HasTag('acs_vampire_claws_equipped'))
 				{
-					stupidArray.PushBack( 'claw_beh' );
+					stupidArray.Clear(); stupidArray.PushBack( 'claw_beh' );
 				}
-				else if (thePlayer.HasTag('igni_sword_equipped'))
+				else if (thePlayer.HasTag('acs_sorc_fists_equipped'))
 				{
-					stupidArray.PushBack( 'igni_primary_beh' );
+					stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 				}
-				else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+				else if (thePlayer.HasTag('acs_igni_sword_equipped'))
 				{
-					stupidArray.PushBack( 'igni_secondary_beh' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh' );
+				}
+				else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
+				{
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh' );
 				}
 				else
 				{
-					stupidArray.PushBack( 'igni_primary_beh' );
+					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
 
 			thePlayer.ActivateBehaviors(stupidArray);
 		}
@@ -2070,7 +2199,7 @@ state BehSwitch_Engage in cBehSwitch
 		
 		thePlayer.SetBehaviorVariable( 'WeaponType', 0);
 		
-		if ( thePlayer.HasTag('vampire_claws_equipped') )
+		if ( thePlayer.HasTag('acs_vampire_claws_equipped') || thePlayer.HasTag('acs_sorc_fists_equipped') )
 		{
 			thePlayer.SetBehaviorVariable( 'playerWeapon', (int) PW_Steel );
 			thePlayer.SetBehaviorVariable( 'playerWeaponForOverlay', (int) PW_Steel );
@@ -2188,7 +2317,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 	}
-
+	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	latent function BehSwitchPrime()
@@ -2260,21 +2389,40 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_GetFistMode() == 0
-			|| ACS_GetFistMode() == 2 )
+			if (ACS_GetFistMode() == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh' );
 				}
 			}
 			else if (ACS_GetFistMode() == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'claw_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh' );
 				}
 			}
+			else if (ACS_GetFistMode() == 2 )
+			{
+				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+				{
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
+				}
+			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -2284,158 +2432,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -2443,158 +2604,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -2602,158 +2776,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -2761,158 +2948,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -2920,158 +3120,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -3081,121 +3294,121 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('igni_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('igni_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh' );
 			}	
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 3 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('axii_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 3 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('axii_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 3 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 3 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 7 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('aard_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 7 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('aard_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 7 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 7 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 5 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('yrden_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 5 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('yrden_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 5 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 5 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 1 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('quen_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 1 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('quen_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 1 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 1 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('igni_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('igni_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 4 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('axii_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 4 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('axii_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 4 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 4 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 8 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('aard_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 8 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('aard_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 8 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 8 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 6 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('yrden_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 6 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('yrden_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 6 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 6 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 2 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('quen_secondary_sword_equipped')  )
-			|| ( ACS_GetFocusModeSteelWeapon() == 2 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('quen_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 2 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped')  )
+			|| ( ACS_GetFocusModeSteelWeapon() == 2 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh' );
 			}
 		}
 		else if 
@@ -3203,21 +3416,40 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_GetFistMode() == 0
-			|| ACS_GetFistMode() == 2 )
+			if (ACS_GetFistMode() == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh' );
 				}
 			}
 			else if (ACS_GetFistMode() == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'claw_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh' );
 				}
 			}
+			else if (ACS_GetFistMode() == 2 )
+			{
+				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+				{
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
+				}
+			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -3225,111 +3457,111 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if 
 		(
-			thePlayer.HasTag('igni_sword_equipped')
+			thePlayer.HasTag('acs_igni_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh' ); ACS_Theft_Prevention_9 ();
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh' ); 
 			}	
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('axii_sword_equipped')
+			thePlayer.HasTag('acs_axii_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('aard_sword_equipped')
+			thePlayer.HasTag('acs_aard_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('yrden_sword_equipped')
+			thePlayer.HasTag('acs_yrden_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('quen_sword_equipped')
+			thePlayer.HasTag('acs_quen_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('igni_secondary_sword_equipped')
+			thePlayer.HasTag('acs_igni_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('axii_secondary_sword_equipped')
+			thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('aard_secondary_sword_equipped')
+			thePlayer.HasTag('acs_aard_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh' ); ACS_Theft_Prevention_9 ();
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh' ); 
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('yrden_secondary_sword_equipped')
+			thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('quen_secondary_sword_equipped')
+			thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh' )
 			{
-				ACS_Theft_Prevention_9 (); thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh' );
+				  stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh' );
 			}
 		}
 		else if 
@@ -3337,21 +3569,40 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_GetFistMode() == 0
-			|| ACS_GetFistMode() == 2 )
+			if (ACS_GetFistMode() == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh' );
 				}
 			}
 			else if (ACS_GetFistMode() == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'claw_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh' );
 				}
 			}
+			else if (ACS_GetFistMode() == 2 )
+			{
+				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+				{
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
+				}
+			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -3365,107 +3616,107 @@ state BehSwitch_Engage in cBehSwitch
 				{
 					if 
 					(
-						ACS_GetItem_Eredin_Silver() && thePlayer.HasTag('axii_sword_equipped') 
+						ACS_GetItem_Eredin_Silver() && thePlayer.HasTag('acs_axii_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Claws_Silver() && thePlayer.HasTag('aard_sword_equipped') 
+						ACS_GetItem_Claws_Silver() && thePlayer.HasTag('acs_aard_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Imlerith_Silver() && thePlayer.HasTag('yrden_sword_equipped')
+						ACS_GetItem_Imlerith_Silver() && thePlayer.HasTag('acs_yrden_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Olgierd_Silver() && thePlayer.HasTag('quen_sword_equipped')
+						ACS_GetItem_Olgierd_Silver() && thePlayer.HasTag('acs_quen_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Greg_Silver() && thePlayer.HasTag('axii_secondary_sword_equipped') 
+						ACS_GetItem_Greg_Silver() && thePlayer.HasTag('acs_axii_secondary_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh' );
 						}
 					}
 
 					else if 
 					(
-						ACS_GetItem_Katana_Silver() && thePlayer.HasTag('axii_secondary_sword_equipped')
+						ACS_GetItem_Katana_Silver() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Axe_Silver() && thePlayer.HasTag('aard_secondary_sword_equipped') 
+						ACS_GetItem_Axe_Silver() && thePlayer.HasTag('acs_aard_secondary_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Hammer_Silver() && thePlayer.HasTag('yrden_secondary_sword_equipped')
+						ACS_GetItem_Hammer_Silver() && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Spear_Silver() &&  thePlayer.HasTag('quen_secondary_sword_equipped')
+						ACS_GetItem_Spear_Silver() &&  thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh' );
 						}
 					}
 					else
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh' );
 						}
 					}
 				}
@@ -3473,107 +3724,107 @@ state BehSwitch_Engage in cBehSwitch
 				{
 					if 
 					(
-						ACS_GetItem_Eredin_Steel() && thePlayer.HasTag('axii_sword_equipped')
+						ACS_GetItem_Eredin_Steel() && thePlayer.HasTag('acs_axii_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Claws_Steel() && thePlayer.HasTag('aard_sword_equipped')
+						ACS_GetItem_Claws_Steel() && thePlayer.HasTag('acs_aard_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh' );
 						}
 					}
 						
 					else if 
 					(
-						(ACS_GetItem_MageStaff_Steel() || ACS_GetItem_Imlerith_Steel()) && thePlayer.HasTag('yrden_sword_equipped')
+						(ACS_GetItem_MageStaff_Steel() || ACS_GetItem_Imlerith_Steel()) && thePlayer.HasTag('acs_yrden_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Olgierd_Steel() && thePlayer.HasTag('quen_sword_equipped')
+						ACS_GetItem_Olgierd_Steel() && thePlayer.HasTag('acs_quen_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh' );
 						}
 					}
 
 					else if 
 					(
-						ACS_GetItem_Katana_Steel() && thePlayer.HasTag('axii_secondary_sword_equipped')
+						ACS_GetItem_Katana_Steel() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Greg_Steel() && thePlayer.HasTag('axii_secondary_sword_equipped')
+						ACS_GetItem_Greg_Steel() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Axe_Steel() && thePlayer.HasTag('aard_secondary_sword_equipped')
+						ACS_GetItem_Axe_Steel() && thePlayer.HasTag('acs_aard_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Hammer_Steel() && thePlayer.HasTag('yrden_secondary_sword_equipped')
+						ACS_GetItem_Hammer_Steel() && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Spear_Steel() && thePlayer.HasTag('quen_secondary_sword_equipped')
+						ACS_GetItem_Spear_Steel() && thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh' );
 						}
 					}
 					else
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh' );
 						}
 					}
 				}
@@ -3582,19 +3833,29 @@ state BehSwitch_Engage in cBehSwitch
 			{
 				if 
 				(
-					thePlayer.HasTag('vampire_claws_equipped')
+					thePlayer.HasTag('acs_vampire_claws_equipped')
 				)
 				{
 					if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh' )
 					{
-						thePlayer.ActivateAndSyncBehavior( 'claw_beh' );
+						 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh' );
+					}
+				}
+				else if 
+				(
+					thePlayer.HasTag('acs_sorc_fists_equipped')
+				)
+				{
+					if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+					{
+						 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 					}
 				}
 				else
 				{
 					if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh' )
 					{
-						thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh' );
+						 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh' );
 					}
 				}
 			}
@@ -3604,8 +3865,21 @@ state BehSwitch_Engage in cBehSwitch
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh' );
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -3680,21 +3954,40 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_GetFistMode() == 0
-			|| ACS_GetFistMode() == 2 )
+			if (ACS_GetFistMode() == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh' );
 				}
 			}
 			else if (ACS_GetFistMode() == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'claw_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_passive_taunt' );
 				}
 			}
+			else if (ACS_GetFistMode() == 2 )
+			{
+				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+				{
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
+				}
+			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -3704,158 +3997,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -3863,158 +4169,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -4022,158 +4341,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -4181,158 +4513,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -4340,158 +4685,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -4501,121 +4859,121 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('igni_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('igni_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_passive_taunt' );
 			}	
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 3 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('axii_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 3 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('axii_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 3 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 3 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 7 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('aard_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 7 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('aard_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 7 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 7 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 5 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('yrden_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 5 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('yrden_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 5 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 5 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 1 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('quen_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 1 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('quen_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 1 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 1 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('igni_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('igni_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 4 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('axii_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 4 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('axii_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 4 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 4 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 8 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('aard_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 8 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('aard_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 8 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 8 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 6 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('yrden_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 6 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('yrden_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 6 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 6 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 2 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('quen_secondary_sword_equipped')  )
-			|| ( ACS_GetFocusModeSteelWeapon() == 2 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('quen_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 2 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped')  )
+			|| ( ACS_GetFocusModeSteelWeapon() == 2 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_passive_taunt' );
 			}
 		}
 		else if 
@@ -4623,21 +4981,40 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_GetFistMode() == 0
-			|| ACS_GetFistMode() == 2 )
+			if (ACS_GetFistMode() == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_passive_taunt' );
 				}
 			}
 			else if (ACS_GetFistMode() == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'claw_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_passive_taunt' );
 				}
 			}
+			else if (ACS_GetFistMode() == 2 )
+			{
+				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+				{
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
+				}
+			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -4645,111 +5022,111 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if 
 		(
-			thePlayer.HasTag('igni_sword_equipped')
+			thePlayer.HasTag('acs_igni_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_passive_taunt' );
 			}	
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('axii_sword_equipped')
+			thePlayer.HasTag('acs_axii_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('aard_sword_equipped')
+			thePlayer.HasTag('acs_aard_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('yrden_sword_equipped')
+			thePlayer.HasTag('acs_yrden_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('quen_sword_equipped')
+			thePlayer.HasTag('acs_quen_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('igni_secondary_sword_equipped')
+			thePlayer.HasTag('acs_igni_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('axii_secondary_sword_equipped')
+			thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('aard_secondary_sword_equipped')
+			thePlayer.HasTag('acs_aard_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_passive_taunt' ); ACS_Theft_Prevention_9 ();
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_passive_taunt' ); 
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('yrden_secondary_sword_equipped')
+			thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('quen_secondary_sword_equipped')
+			thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_passive_taunt' )
 			{
-				ACS_Theft_Prevention_9 (); thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_passive_taunt' );
+				  stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_passive_taunt' );
 			}
 		}
 		else if 
@@ -4757,21 +5134,40 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_GetFistMode() == 0
-			|| ACS_GetFistMode() == 2 )
+			if (ACS_GetFistMode() == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_passive_taunt' );
 				}
 			}
 			else if (ACS_GetFistMode() == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'claw_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_passive_taunt' );
 				}
 			}
+			else if (ACS_GetFistMode() == 2 )
+			{
+				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+				{
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
+				}
+			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -4785,107 +5181,107 @@ state BehSwitch_Engage in cBehSwitch
 				{
 					if 
 					(
-						ACS_GetItem_Eredin_Silver() && thePlayer.HasTag('axii_sword_equipped') 
+						ACS_GetItem_Eredin_Silver() && thePlayer.HasTag('acs_axii_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Claws_Silver() && thePlayer.HasTag('aard_sword_equipped') 
+						ACS_GetItem_Claws_Silver() && thePlayer.HasTag('acs_aard_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Imlerith_Silver() && thePlayer.HasTag('yrden_sword_equipped')
+						ACS_GetItem_Imlerith_Silver() && thePlayer.HasTag('acs_yrden_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Olgierd_Silver() && thePlayer.HasTag('quen_sword_equipped')
+						ACS_GetItem_Olgierd_Silver() && thePlayer.HasTag('acs_quen_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Greg_Silver() && thePlayer.HasTag('axii_secondary_sword_equipped') 
+						ACS_GetItem_Greg_Silver() && thePlayer.HasTag('acs_axii_secondary_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
 						}
 					}
 
 					else if 
 					(
-						ACS_GetItem_Katana_Silver() && thePlayer.HasTag('axii_secondary_sword_equipped')
+						ACS_GetItem_Katana_Silver() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Axe_Silver() && thePlayer.HasTag('aard_secondary_sword_equipped') 
+						ACS_GetItem_Axe_Silver() && thePlayer.HasTag('acs_aard_secondary_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Hammer_Silver() && thePlayer.HasTag('yrden_secondary_sword_equipped')
+						ACS_GetItem_Hammer_Silver() && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Spear_Silver() &&  thePlayer.HasTag('quen_secondary_sword_equipped')
+						ACS_GetItem_Spear_Silver() &&  thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_passive_taunt' );
 						}
 					}
 					else
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_passive_taunt' );
 						}
 					}
 				}
@@ -4893,107 +5289,107 @@ state BehSwitch_Engage in cBehSwitch
 				{
 					if 
 					(
-						ACS_GetItem_Eredin_Steel() && thePlayer.HasTag('axii_sword_equipped')
+						ACS_GetItem_Eredin_Steel() && thePlayer.HasTag('acs_axii_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Claws_Steel() && thePlayer.HasTag('aard_sword_equipped')
+						ACS_GetItem_Claws_Steel() && thePlayer.HasTag('acs_aard_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						(ACS_GetItem_MageStaff_Steel() || ACS_GetItem_Imlerith_Steel()) && thePlayer.HasTag('yrden_sword_equipped')
+						(ACS_GetItem_MageStaff_Steel() || ACS_GetItem_Imlerith_Steel()) && thePlayer.HasTag('acs_yrden_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Olgierd_Steel() && thePlayer.HasTag('quen_sword_equipped')
+						ACS_GetItem_Olgierd_Steel() && thePlayer.HasTag('acs_quen_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_passive_taunt' );
 						}
 					}
 
 					else if 
 					(
-						ACS_GetItem_Katana_Steel() && thePlayer.HasTag('axii_secondary_sword_equipped')
+						ACS_GetItem_Katana_Steel() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Greg_Steel() && thePlayer.HasTag('axii_secondary_sword_equipped')
+						ACS_GetItem_Greg_Steel() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Axe_Steel() && thePlayer.HasTag('aard_secondary_sword_equipped')
+						ACS_GetItem_Axe_Steel() && thePlayer.HasTag('acs_aard_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Hammer_Steel() && thePlayer.HasTag('yrden_secondary_sword_equipped')
+						ACS_GetItem_Hammer_Steel() && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Spear_Steel() && thePlayer.HasTag('quen_secondary_sword_equipped')
+						ACS_GetItem_Spear_Steel() && thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_passive_taunt' );
 						}
 					}
 					else
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_passive_taunt' );
 						}
 					}
 				}
@@ -5002,19 +5398,29 @@ state BehSwitch_Engage in cBehSwitch
 			{
 				if 
 				(
-					thePlayer.HasTag('vampire_claws_equipped')
+					thePlayer.HasTag('acs_vampire_claws_equipped')
 				)
 				{
 					if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_passive_taunt' )
 					{
-						thePlayer.ActivateAndSyncBehavior( 'claw_beh_passive_taunt' );
+						 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_passive_taunt' );
+					}
+				}
+				else if 
+				(
+					thePlayer.HasTag('acs_sorc_fists_equipped')
+				)
+				{
+					if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+					{
+						 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 					}
 				}
 				else
 				{
 					if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_passive_taunt' )
 					{
-						thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_passive_taunt' );
+						 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_passive_taunt' );
 					}
 				}
 			}
@@ -5023,8 +5429,21 @@ state BehSwitch_Engage in cBehSwitch
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_passive_taunt' );
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -5099,21 +5518,40 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_GetFistMode() == 0
-			|| ACS_GetFistMode() == 2 )
+			if (ACS_GetFistMode() == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_swordwalk' );
 				}
 			}
 			else if (ACS_GetFistMode() == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'claw_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh' );
 				}
 			}
+			else if (ACS_GetFistMode() == 2 )
+			{
+				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+				{
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
+				}
+			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -5123,158 +5561,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -5282,158 +5733,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -5441,158 +5905,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -5600,158 +6077,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -5759,158 +6249,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -5920,121 +6423,121 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('igni_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('igni_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_swordwalk' );
 			}	
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 3 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('axii_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 3 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('axii_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 3 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 3 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_swordwalk' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 7 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('aard_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 7 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('aard_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 7 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 7 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 5 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('yrden_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 5 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('yrden_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 5 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 5 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_swordwalk' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 1 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('quen_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 1 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('quen_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 1 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 1 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_swordwalk' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('igni_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('igni_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_swordwalk' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 4 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('axii_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 4 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('axii_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 4 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 4 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_swordwalk' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 8 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('aard_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 8 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('aard_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 8 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 8 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_swordwalk' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 6 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('yrden_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 6 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('yrden_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 6 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 6 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_swordwalk' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 2 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('quen_secondary_sword_equipped')  )
-			|| ( ACS_GetFocusModeSteelWeapon() == 2 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('quen_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 2 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped')  )
+			|| ( ACS_GetFocusModeSteelWeapon() == 2 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_swordwalk' );
 			}
 		}
 		else if 
@@ -6042,21 +6545,40 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_GetFistMode() == 0
-			|| ACS_GetFistMode() == 2 )
+			if (ACS_GetFistMode() == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh' );
 				}
 			}
 			else if (ACS_GetFistMode() == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'claw_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh' );
 				}
 			}
+			else if (ACS_GetFistMode() == 2 )
+			{
+				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+				{
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
+				}
+			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -6064,111 +6586,111 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if 
 		(
-			thePlayer.HasTag('igni_sword_equipped')
+			thePlayer.HasTag('acs_igni_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_swordwalk' );
 			}	
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('axii_sword_equipped')
+			thePlayer.HasTag('acs_axii_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_swordwalk' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('aard_sword_equipped')
+			thePlayer.HasTag('acs_aard_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('yrden_sword_equipped')
+			thePlayer.HasTag('acs_yrden_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_swordwalk' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('quen_sword_equipped')
+			thePlayer.HasTag('acs_quen_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_swordwalk' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('igni_secondary_sword_equipped')
+			thePlayer.HasTag('acs_igni_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_swordwalk' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('axii_secondary_sword_equipped')
+			thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_swordwalk' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('aard_secondary_sword_equipped')
+			thePlayer.HasTag('acs_aard_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_swordwalk' ); ACS_Theft_Prevention_9 ();
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_swordwalk' ); 
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('yrden_secondary_sword_equipped')
+			thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_swordwalk' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('quen_secondary_sword_equipped')
+			thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_swordwalk' )
 			{
-				ACS_Theft_Prevention_9 (); thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_swordwalk' );
+				  stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_swordwalk' );
 			}
 		}
 		else if 
@@ -6176,21 +6698,40 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_GetFistMode() == 0
-			|| ACS_GetFistMode() == 2 )
+			if (ACS_GetFistMode() == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh' );
 				}
 			}
 			else if (ACS_GetFistMode() == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'claw_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh' );
 				}
 			}
+			else if (ACS_GetFistMode() == 2 )
+			{
+				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+				{
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
+				}
+			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -6204,107 +6745,107 @@ state BehSwitch_Engage in cBehSwitch
 				{
 					if 
 					(
-						ACS_GetItem_Eredin_Silver() && thePlayer.HasTag('axii_sword_equipped') 
+						ACS_GetItem_Eredin_Silver() && thePlayer.HasTag('acs_axii_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_swordwalk' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Claws_Silver() && thePlayer.HasTag('aard_sword_equipped') 
+						ACS_GetItem_Claws_Silver() && thePlayer.HasTag('acs_aard_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Imlerith_Silver() && thePlayer.HasTag('yrden_sword_equipped')
+						ACS_GetItem_Imlerith_Silver() && thePlayer.HasTag('acs_yrden_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_swordwalk' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Olgierd_Silver() && thePlayer.HasTag('quen_sword_equipped')
+						ACS_GetItem_Olgierd_Silver() && thePlayer.HasTag('acs_quen_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_swordwalk' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Greg_Silver() && thePlayer.HasTag('axii_secondary_sword_equipped') 
+						ACS_GetItem_Greg_Silver() && thePlayer.HasTag('acs_axii_secondary_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_swordwalk' );
 						}
 					}
 
 					else if 
 					(
-						ACS_GetItem_Katana_Silver() && thePlayer.HasTag('axii_secondary_sword_equipped')
+						ACS_GetItem_Katana_Silver() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_swordwalk' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Axe_Silver() && thePlayer.HasTag('aard_secondary_sword_equipped') 
+						ACS_GetItem_Axe_Silver() && thePlayer.HasTag('acs_aard_secondary_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_swordwalk' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Hammer_Silver() && thePlayer.HasTag('yrden_secondary_sword_equipped')
+						ACS_GetItem_Hammer_Silver() && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_swordwalk' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Spear_Silver() &&  thePlayer.HasTag('quen_secondary_sword_equipped')
+						ACS_GetItem_Spear_Silver() &&  thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_swordwalk' );
 						}
 					}
 					else
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_swordwalk' );
 						}
 					}
 				}
@@ -6312,107 +6853,107 @@ state BehSwitch_Engage in cBehSwitch
 				{
 					if 
 					(
-						ACS_GetItem_Eredin_Steel() && thePlayer.HasTag('axii_sword_equipped')
+						ACS_GetItem_Eredin_Steel() && thePlayer.HasTag('acs_axii_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_swordwalk' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Claws_Steel() && thePlayer.HasTag('aard_sword_equipped')
+						ACS_GetItem_Claws_Steel() && thePlayer.HasTag('acs_aard_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh' );
 						}
 					}
 						
 					else if 
 					(
-						(ACS_GetItem_MageStaff_Steel() || ACS_GetItem_Imlerith_Steel()) && thePlayer.HasTag('yrden_sword_equipped')
+						(ACS_GetItem_MageStaff_Steel() || ACS_GetItem_Imlerith_Steel()) && thePlayer.HasTag('acs_yrden_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_swordwalk' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Olgierd_Steel() && thePlayer.HasTag('quen_sword_equipped')
+						ACS_GetItem_Olgierd_Steel() && thePlayer.HasTag('acs_quen_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_swordwalk' );
 						}
 					}
 
 					else if 
 					(
-						ACS_GetItem_Katana_Steel() && thePlayer.HasTag('axii_secondary_sword_equipped')
+						ACS_GetItem_Katana_Steel() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_swordwalk' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Greg_Steel() && thePlayer.HasTag('axii_secondary_sword_equipped')
+						ACS_GetItem_Greg_Steel() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_swordwalk' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Axe_Steel() && thePlayer.HasTag('aard_secondary_sword_equipped')
+						ACS_GetItem_Axe_Steel() && thePlayer.HasTag('acs_aard_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_swordwalk' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Hammer_Steel() && thePlayer.HasTag('yrden_secondary_sword_equipped')
+						ACS_GetItem_Hammer_Steel() && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_swordwalk' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Spear_Steel() && thePlayer.HasTag('quen_secondary_sword_equipped')
+						ACS_GetItem_Spear_Steel() && thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_swordwalk' );
 						}
 					}
 					else
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_swordwalk' );
 						}
 					}
 				}
@@ -6421,19 +6962,29 @@ state BehSwitch_Engage in cBehSwitch
 			{
 				if 
 				(
-					thePlayer.HasTag('vampire_claws_equipped')
+					thePlayer.HasTag('acs_vampire_claws_equipped')
 				)
 				{
 					if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh' )
 					{
-						thePlayer.ActivateAndSyncBehavior( 'claw_beh' );
+						 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh' );
+					}
+				}
+				else if 
+				(
+					thePlayer.HasTag('acs_sorc_fists_equipped')
+				)
+				{
+					if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+					{
+						 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 					}
 				}
 				else
 				{
 					if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_swordwalk' )
 					{
-						thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_swordwalk' );
+						 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_swordwalk' );
 					}
 				}
 			}
@@ -6442,8 +6993,21 @@ state BehSwitch_Engage in cBehSwitch
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_swordwalk' );
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -6518,21 +7082,40 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_GetFistMode() == 0
-			|| ACS_GetFistMode() == 2 )
+			if (ACS_GetFistMode() == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh' );
 				}
 			}
 			else if (ACS_GetFistMode() == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'claw_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_passive_taunt' );
 				}
 			}
+			else if (ACS_GetFistMode() == 2 )
+			{
+				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+				{
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
+				}
+			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -6542,158 +7125,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -6701,158 +7297,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -6860,158 +7469,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -7019,158 +7641,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -7178,158 +7813,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -7339,121 +7987,121 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('igni_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('igni_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_swordwalk_passive_taunt' );
 			}	
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 3 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('axii_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 3 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('axii_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 3 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 3 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_swordwalk_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 7 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('aard_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 7 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('aard_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 7 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 7 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 5 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('yrden_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 5 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('yrden_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 5 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 5 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_swordwalk_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 1 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('quen_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 1 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('quen_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 1 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 1 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_swordwalk_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('igni_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('igni_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_swordwalk_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 4 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('axii_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 4 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('axii_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 4 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 4 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_swordwalk_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 8 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('aard_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 8 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('aard_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 8 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 8 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_swordwalk_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 6 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('yrden_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 6 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('yrden_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 6 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 6 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_swordwalk_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 2 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('quen_secondary_sword_equipped')  )
-			|| ( ACS_GetFocusModeSteelWeapon() == 2 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('quen_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 2 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped')  )
+			|| ( ACS_GetFocusModeSteelWeapon() == 2 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_swordwalk_passive_taunt' );
 			}
 		}
 		else if 
@@ -7461,21 +8109,40 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_GetFistMode() == 0
-			|| ACS_GetFistMode() == 2 )
+			if (ACS_GetFistMode() == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh' );
 				}
 			}
 			else if (ACS_GetFistMode() == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'claw_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_passive_taunt' );
 				}
 			}
+			else if (ACS_GetFistMode() == 2 )
+			{
+				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+				{
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
+				}
+			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -7483,111 +8150,111 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if 
 		(
-			thePlayer.HasTag('igni_sword_equipped')
+			thePlayer.HasTag('acs_igni_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_swordwalk_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('axii_sword_equipped')
+			thePlayer.HasTag('acs_axii_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_swordwalk_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('aard_sword_equipped')
+			thePlayer.HasTag('acs_aard_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('yrden_sword_equipped')
+			thePlayer.HasTag('acs_yrden_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_swordwalk_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('quen_sword_equipped')
+			thePlayer.HasTag('acs_quen_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_swordwalk_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('igni_secondary_sword_equipped')
+			thePlayer.HasTag('acs_igni_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_swordwalk_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('axii_secondary_sword_equipped')
+			thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_swordwalk_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('aard_secondary_sword_equipped')
+			thePlayer.HasTag('acs_aard_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_swordwalk_passive_taunt' ); ACS_Theft_Prevention_9 ();
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_swordwalk_passive_taunt' ); 
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('yrden_secondary_sword_equipped')
+			thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_swordwalk_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('quen_secondary_sword_equipped')
+			thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_swordwalk_passive_taunt' )
 			{
-				ACS_Theft_Prevention_9 (); thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_swordwalk_passive_taunt' );
+				  stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_swordwalk_passive_taunt' );
 			}
 		}
 		else if 
@@ -7595,21 +8262,40 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_GetFistMode() == 0
-			|| ACS_GetFistMode() == 2 )
+			if (ACS_GetFistMode() == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh' );
 				}
 			}
 			else if (ACS_GetFistMode() == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'claw_beh_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_passive_taunt' );
 				}
 			}
+			else if (ACS_GetFistMode() == 2 )
+			{
+				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+				{
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
+				}
+			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -7623,107 +8309,107 @@ state BehSwitch_Engage in cBehSwitch
 				{
 					if 
 					(
-						ACS_GetItem_Eredin_Silver() && thePlayer.HasTag('axii_sword_equipped') 
+						ACS_GetItem_Eredin_Silver() && thePlayer.HasTag('acs_axii_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_swordwalk_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Claws_Silver() && thePlayer.HasTag('aard_sword_equipped') 
+						ACS_GetItem_Claws_Silver() && thePlayer.HasTag('acs_aard_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Imlerith_Silver() && thePlayer.HasTag('yrden_sword_equipped')
+						ACS_GetItem_Imlerith_Silver() && thePlayer.HasTag('acs_yrden_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_swordwalk_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Olgierd_Silver() && thePlayer.HasTag('quen_sword_equipped')
+						ACS_GetItem_Olgierd_Silver() && thePlayer.HasTag('acs_quen_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_swordwalk_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Greg_Silver() && thePlayer.HasTag('axii_secondary_sword_equipped') 
+						ACS_GetItem_Greg_Silver() && thePlayer.HasTag('acs_axii_secondary_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_swordwalk_passive_taunt' );
 						}
 					}
 
 					else if 
 					(
-						ACS_GetItem_Katana_Silver() && thePlayer.HasTag('axii_secondary_sword_equipped')
+						ACS_GetItem_Katana_Silver() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_swordwalk_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Axe_Silver() && thePlayer.HasTag('aard_secondary_sword_equipped') 
+						ACS_GetItem_Axe_Silver() && thePlayer.HasTag('acs_aard_secondary_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_swordwalk_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Hammer_Silver() && thePlayer.HasTag('yrden_secondary_sword_equipped')
+						ACS_GetItem_Hammer_Silver() && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_swordwalk_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Spear_Silver() &&  thePlayer.HasTag('quen_secondary_sword_equipped')
+						ACS_GetItem_Spear_Silver() &&  thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_swordwalk_passive_taunt' );
 						}
 					}
 					else
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_swordwalk_passive_taunt' );
 						}
 					}
 				}
@@ -7731,107 +8417,107 @@ state BehSwitch_Engage in cBehSwitch
 				{
 					if 
 					(
-						ACS_GetItem_Eredin_Steel() && thePlayer.HasTag('axii_sword_equipped')
+						ACS_GetItem_Eredin_Steel() && thePlayer.HasTag('acs_axii_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_swordwalk_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Claws_Steel() && thePlayer.HasTag('aard_sword_equipped')
+						ACS_GetItem_Claws_Steel() && thePlayer.HasTag('acs_aard_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						(ACS_GetItem_MageStaff_Steel() || ACS_GetItem_Imlerith_Steel()) && thePlayer.HasTag('yrden_sword_equipped')
+						(ACS_GetItem_MageStaff_Steel() || ACS_GetItem_Imlerith_Steel()) && thePlayer.HasTag('acs_yrden_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_swordwalk_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Olgierd_Steel() && thePlayer.HasTag('quen_sword_equipped')
+						ACS_GetItem_Olgierd_Steel() && thePlayer.HasTag('acs_quen_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_swordwalk_passive_taunt' );
 						}
 					}
 
 					else if 
 					(
-						ACS_GetItem_Katana_Steel() && thePlayer.HasTag('axii_secondary_sword_equipped')
+						ACS_GetItem_Katana_Steel() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_swordwalk_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Greg_Steel() && thePlayer.HasTag('axii_secondary_sword_equipped')
+						ACS_GetItem_Greg_Steel() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_swordwalk_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Axe_Steel() && thePlayer.HasTag('aard_secondary_sword_equipped')
+						ACS_GetItem_Axe_Steel() && thePlayer.HasTag('acs_aard_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_swordwalk_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Hammer_Steel() && thePlayer.HasTag('yrden_secondary_sword_equipped')
+						ACS_GetItem_Hammer_Steel() && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_swordwalk_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Spear_Steel() && thePlayer.HasTag('quen_secondary_sword_equipped')
+						ACS_GetItem_Spear_Steel() && thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_swordwalk_passive_taunt' );
 						}
 					}
 					else
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_swordwalk_passive_taunt' );
 						}
 					}
 				}
@@ -7840,19 +8526,29 @@ state BehSwitch_Engage in cBehSwitch
 			{
 				if 
 				(
-					thePlayer.HasTag('vampire_claws_equipped')
+					thePlayer.HasTag('acs_vampire_claws_equipped')
 				)
 				{
 					if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_passive_taunt' )
 					{
-						thePlayer.ActivateAndSyncBehavior( 'claw_beh_passive_taunt' );
+						 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_passive_taunt' );
+					}
+				}
+				else if 
+				(
+					thePlayer.HasTag('acs_sorc_fists_equipped')
+				)
+				{
+					if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+					{
+						 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 					}
 				}
 				else
 				{
 					if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_swordwalk_passive_taunt' )
 					{
-						thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_swordwalk_passive_taunt' );
+						 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_swordwalk_passive_taunt' );
 					}
 				}
 			}
@@ -7861,8 +8557,21 @@ state BehSwitch_Engage in cBehSwitch
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_swordwalk_passive_taunt' );
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -7872,51 +8581,55 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		stupidArray.Clear();
 
-		if (thePlayer.HasTag('quen_sword_equipped'))
+		if (thePlayer.HasTag('acs_quen_sword_equipped'))
 		{
-			stupidArray.PushBack( 'quen_primary_beh' );
+			stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh' );
 		}
-		else if (thePlayer.HasTag('axii_sword_equipped'))
+		else if (thePlayer.HasTag('acs_axii_sword_equipped'))
 		{
-			stupidArray.PushBack( 'axii_primary_beh' );
+			stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh' );
 		}
-		else if (thePlayer.HasTag('aard_sword_equipped'))
+		else if (thePlayer.HasTag('acs_aard_sword_equipped'))
 		{
-			stupidArray.PushBack( 'aard_primary_beh' );
+			stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh' );
 		}
-		else if (thePlayer.HasTag('yrden_sword_equipped'))
+		else if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 		{
-			stupidArray.PushBack( 'yrden_primary_beh' );
+			stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh' );
 		}
-		else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'quen_secondary_beh' );
+			stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh' );
 		}
-		else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'axii_secondary_beh' );
+			stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh' );
 		}
-		else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'aard_secondary_beh' );
+			stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh' );
 		}
-		else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'yrden_secondary_beh' );
+			stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh' );
 		}
-		else if (thePlayer.HasTag('vampire_claws_equipped'))
+		else if (thePlayer.HasTag('acs_vampire_claws_equipped'))
 		{
-			stupidArray.PushBack( 'claw_beh' );
+			stupidArray.Clear(); stupidArray.PushBack( 'claw_beh' );
+		}
+		else if (thePlayer.HasTag('acs_sorc_fists_equipped'))
+		{
+			stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 		}
 		else if (
-		thePlayer.HasTag('igni_bow_equipped')
+		thePlayer.HasTag('acs_igni_bow_equipped')
 		|| thePlayer.HasTag('axii_bow_equipped')
 		|| thePlayer.HasTag('aard_bow_equipped')
 		|| thePlayer.HasTag('yrden_bow_equipped')
 		|| thePlayer.HasTag('quen_bow_equipped')
 		)
 		{
-			stupidArray.PushBack( 'acs_bow_beh' );
+			stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 		}
 		else if (
 		thePlayer.HasTag('igni_crossbow_equipped')
@@ -7926,73 +8639,88 @@ state BehSwitch_Engage in cBehSwitch
 		|| thePlayer.HasTag('quen_crossbow_equipped')
 		)
 		{
-			stupidArray.PushBack( 'acs_crossbow_beh' );
+			stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 		}
-		else if (thePlayer.HasTag('igni_sword_equipped'))
+		else if (thePlayer.HasTag('acs_igni_sword_equipped'))
 		{
-			stupidArray.PushBack( 'igni_primary_beh' );
+			stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh' );
 		}
-		else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'igni_secondary_beh' );
+			stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh' );
 		}
 		else
 		{
-			stupidArray.PushBack( 'igni_primary_beh' );
+			stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh' );
 		}
 
-		thePlayer.ActivateBehaviors(stupidArray);
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
+		}
 	}
 
 	latent function ActivateBehaviors_Passive_Taunt()
 	{
 		stupidArray.Clear();
 
-		if (thePlayer.HasTag('quen_sword_equipped'))
+		if (thePlayer.HasTag('acs_quen_sword_equipped'))
 		{
-			stupidArray.PushBack( 'quen_primary_beh_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('axii_sword_equipped'))
+		else if (thePlayer.HasTag('acs_axii_sword_equipped'))
 		{
-			stupidArray.PushBack( 'axii_primary_beh_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('aard_sword_equipped'))
+		else if (thePlayer.HasTag('acs_aard_sword_equipped'))
 		{
-			stupidArray.PushBack( 'aard_primary_beh_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('yrden_sword_equipped'))
+		else if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 		{
-			stupidArray.PushBack( 'yrden_primary_beh_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'quen_secondary_beh_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'aard_secondary_beh_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'yrden_secondary_beh_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('vampire_claws_equipped'))
+		else if (thePlayer.HasTag('acs_vampire_claws_equipped'))
 		{
-			stupidArray.PushBack( 'claw_beh_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_passive_taunt' );
+		}
+		else if (thePlayer.HasTag('acs_sorc_fists_equipped'))
+		{
+			stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 		}
 		else if (
-		thePlayer.HasTag('igni_bow_equipped')
+		thePlayer.HasTag('acs_igni_bow_equipped')
 		|| thePlayer.HasTag('axii_bow_equipped')
 		|| thePlayer.HasTag('aard_bow_equipped')
 		|| thePlayer.HasTag('yrden_bow_equipped')
 		|| thePlayer.HasTag('quen_bow_equipped')
 		)
 		{
-			stupidArray.PushBack( 'acs_bow_beh' );
+			stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 		}
 		else if (
 		thePlayer.HasTag('igni_crossbow_equipped')
@@ -8002,73 +8730,88 @@ state BehSwitch_Engage in cBehSwitch
 		|| thePlayer.HasTag('quen_crossbow_equipped')
 		)
 		{
-			stupidArray.PushBack( 'acs_crossbow_beh' );
+			stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 		}
-		else if (thePlayer.HasTag('igni_sword_equipped'))
+		else if (thePlayer.HasTag('acs_igni_sword_equipped'))
 		{
-			stupidArray.PushBack( 'igni_primary_beh_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'igni_secondary_beh_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_passive_taunt' );
 		}
 		else
 		{
-			stupidArray.PushBack( 'igni_primary_beh_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_passive_taunt' );
 		}
 
-		thePlayer.ActivateBehaviors(stupidArray);
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
+		}
 	}
 
 	latent function ActivateBehaviors_SwordWalk()
 	{
 		stupidArray.Clear();
 		
-		if (thePlayer.HasTag('quen_sword_equipped'))
+		if (thePlayer.HasTag('acs_quen_sword_equipped'))
 		{
-			stupidArray.PushBack( 'quen_primary_beh_swordwalk' );
+			stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_swordwalk' );
 		}
-		else if (thePlayer.HasTag('axii_sword_equipped'))
+		else if (thePlayer.HasTag('acs_axii_sword_equipped'))
 		{
-			stupidArray.PushBack( 'axii_primary_beh_swordwalk' );
+			stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_swordwalk' );
 		}
-		else if (thePlayer.HasTag('aard_sword_equipped'))
+		else if (thePlayer.HasTag('acs_aard_sword_equipped'))
 		{
-			stupidArray.PushBack( 'aard_primary_beh' );
+			stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh' );
 		}
-		else if (thePlayer.HasTag('yrden_sword_equipped'))
+		else if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 		{
-			stupidArray.PushBack( 'yrden_primary_beh_swordwalk' );
+			stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_swordwalk' );
 		}
-		else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'quen_secondary_beh_swordwalk' );
+			stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_swordwalk' );
 		}
-		else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'axii_secondary_beh_swordwalk' );
+			stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_swordwalk' );
 		}
-		else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'aard_secondary_beh_swordwalk' );
+			stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_swordwalk' );
 		}
-		else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'yrden_secondary_beh_swordwalk' );
+			stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_swordwalk' );
 		}
-		else if (thePlayer.HasTag('vampire_claws_equipped'))
+		else if (thePlayer.HasTag('acs_vampire_claws_equipped'))
 		{
-			stupidArray.PushBack( 'claw_beh' );
+			stupidArray.Clear(); stupidArray.PushBack( 'claw_beh' );
+		}
+		else if (thePlayer.HasTag('acs_sorc_fists_equipped'))
+		{
+			stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 		}
 		else if (
-		thePlayer.HasTag('igni_bow_equipped')
+		thePlayer.HasTag('acs_igni_bow_equipped')
 		|| thePlayer.HasTag('axii_bow_equipped')
 		|| thePlayer.HasTag('aard_bow_equipped')
 		|| thePlayer.HasTag('yrden_bow_equipped')
 		|| thePlayer.HasTag('quen_bow_equipped')
 		)
 		{
-			stupidArray.PushBack( 'acs_bow_beh' );
+			stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 		}
 		else if (
 		thePlayer.HasTag('igni_crossbow_equipped')
@@ -8078,73 +8821,88 @@ state BehSwitch_Engage in cBehSwitch
 		|| thePlayer.HasTag('quen_crossbow_equipped')
 		)
 		{
-			stupidArray.PushBack( 'acs_crossbow_beh' );
+			stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 		}
-		else if (thePlayer.HasTag('igni_sword_equipped'))
+		else if (thePlayer.HasTag('acs_igni_sword_equipped'))
 		{
-			stupidArray.PushBack( 'igni_primary_beh_swordwalk' );
+			stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_swordwalk' );
 		}
-		else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'igni_secondary_beh_swordwalk' );
+			stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_swordwalk' );
 		}
 		else
 		{
-			stupidArray.PushBack( 'igni_primary_beh_swordwalk' );
+			stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_swordwalk' );
 		}
 
-		thePlayer.ActivateBehaviors(stupidArray);
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
+		}
 	}
 
 	latent function ActivateBehaviors_SwordWalk_Passive_Taunt()
 	{
 		stupidArray.Clear();
 		
-		if (thePlayer.HasTag('quen_sword_equipped'))
+		if (thePlayer.HasTag('acs_quen_sword_equipped'))
 		{
-			stupidArray.PushBack( 'quen_primary_beh_swordwalk_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_swordwalk_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('axii_sword_equipped'))
+		else if (thePlayer.HasTag('acs_axii_sword_equipped'))
 		{
-			stupidArray.PushBack( 'axii_primary_beh_swordwalk_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_swordwalk_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('aard_sword_equipped'))
+		else if (thePlayer.HasTag('acs_aard_sword_equipped'))
 		{
-			stupidArray.PushBack( 'aard_primary_beh_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('yrden_sword_equipped'))
+		else if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 		{
-			stupidArray.PushBack( 'yrden_primary_beh_swordwalk_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_swordwalk_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'quen_secondary_beh_swordwalk_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_swordwalk_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'axii_secondary_beh_swordwalk_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_swordwalk_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'aard_secondary_beh_swordwalk_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_swordwalk_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'yrden_secondary_beh_swordwalk_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_swordwalk_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('vampire_claws_equipped'))
+		else if (thePlayer.HasTag('acs_vampire_claws_equipped'))
 		{
-			stupidArray.PushBack( 'claw_beh_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_passive_taunt' );
+		}
+		else if (thePlayer.HasTag('acs_sorc_fists_equipped'))
+		{
+			stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 		}
 		else if (
-		thePlayer.HasTag('igni_bow_equipped')
+		thePlayer.HasTag('acs_igni_bow_equipped')
 		|| thePlayer.HasTag('axii_bow_equipped')
 		|| thePlayer.HasTag('aard_bow_equipped')
 		|| thePlayer.HasTag('yrden_bow_equipped')
 		|| thePlayer.HasTag('quen_bow_equipped')
 		)
 		{
-			stupidArray.PushBack( 'acs_bow_beh' );
+			stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh' );
 		}
 		else if (
 		thePlayer.HasTag('igni_crossbow_equipped')
@@ -8154,22 +8912,33 @@ state BehSwitch_Engage in cBehSwitch
 		|| thePlayer.HasTag('quen_crossbow_equipped')
 		)
 		{
-			stupidArray.PushBack( 'acs_crossbow_beh' );
+			stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh' );
 		}
-		else if (thePlayer.HasTag('igni_sword_equipped'))
+		else if (thePlayer.HasTag('acs_igni_sword_equipped'))
 		{
-			stupidArray.PushBack( 'igni_primary_beh_swordwalk_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_swordwalk_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'igni_secondary_beh_swordwalk_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_swordwalk_passive_taunt' );
 		}
 		else
 		{
-			stupidArray.PushBack( 'igni_primary_beh_swordwalk_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_swordwalk_passive_taunt' );
 		}
 
-		thePlayer.ActivateBehaviors(stupidArray);
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
+		}
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -8178,51 +8947,55 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		stupidArray.Clear();
 
-		if (thePlayer.HasTag('quen_sword_equipped'))
+		if (thePlayer.HasTag('acs_quen_sword_equipped'))
 		{
-			stupidArray.PushBack( 'quen_primary_beh_SCAAR' );
+			stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR' );
 		}
-		else if (thePlayer.HasTag('axii_sword_equipped'))
+		else if (thePlayer.HasTag('acs_axii_sword_equipped'))
 		{
-			stupidArray.PushBack( 'axii_primary_beh_SCAAR' );
+			stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR' );
 		}
-		else if (thePlayer.HasTag('aard_sword_equipped'))
+		else if (thePlayer.HasTag('acs_aard_sword_equipped'))
 		{
-			stupidArray.PushBack( 'aard_primary_beh_SCAAR' );
+			stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR' );
 		}
-		else if (thePlayer.HasTag('yrden_sword_equipped'))
+		else if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 		{
-			stupidArray.PushBack( 'yrden_primary_beh_SCAAR' );
+			stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR' );
 		}
-		else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'quen_secondary_beh_SCAAR' );
+			stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR' );
 		}
-		else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'axii_secondary_beh_SCAAR' );
+			stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR' );
 		}
-		else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'aard_secondary_beh_SCAAR' );
+			stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR' );
 		}
-		else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'yrden_secondary_beh_SCAAR' );
+			stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR' );
 		}
-		else if (thePlayer.HasTag('vampire_claws_equipped'))
+		else if (thePlayer.HasTag('acs_vampire_claws_equipped'))
 		{
-			stupidArray.PushBack( 'claw_beh_SCAAR' );
+			stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_SCAAR' );
+		}
+		else if (thePlayer.HasTag('acs_sorc_fists_equipped'))
+		{
+			stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 		}
 		else if (
-		thePlayer.HasTag('igni_bow_equipped')
+		thePlayer.HasTag('acs_igni_bow_equipped')
 		|| thePlayer.HasTag('axii_bow_equipped')
 		|| thePlayer.HasTag('aard_bow_equipped')
 		|| thePlayer.HasTag('yrden_bow_equipped')
 		|| thePlayer.HasTag('quen_bow_equipped')
 		)
 		{
-			stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
+			stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 		}
 		else if (
 		thePlayer.HasTag('igni_crossbow_equipped')
@@ -8232,75 +9005,90 @@ state BehSwitch_Engage in cBehSwitch
 		|| thePlayer.HasTag('quen_crossbow_equipped')
 		)
 		{
-			stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
+			stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 		}
 		else if (
-		thePlayer.HasTag('igni_sword_equipped'))
+		thePlayer.HasTag('acs_igni_sword_equipped'))
 		{
-			stupidArray.PushBack( 'igni_primary_beh_SCAAR' );
+			stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR' );
 		}
 		else if (
-		thePlayer.HasTag('igni_secondary_sword_equipped'))
+		thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'igni_secondary_beh_SCAAR' );
+			stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_SCAAR' );
 		}
 		else
 		{
-			stupidArray.PushBack( 'igni_primary_beh_SCAAR' );
+			stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR' );
 		}
 
-		thePlayer.ActivateBehaviors(stupidArray);
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
+		}
 	}
 
 	latent function ActivateBehaviors_SCAAR_Passive_Taunt()
 	{
 		stupidArray.Clear();
 
-		if (thePlayer.HasTag('quen_sword_equipped'))
+		if (thePlayer.HasTag('acs_quen_sword_equipped'))
 		{
-			stupidArray.PushBack( 'quen_primary_beh_SCAAR_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('axii_sword_equipped'))
+		else if (thePlayer.HasTag('acs_axii_sword_equipped'))
 		{
-			stupidArray.PushBack( 'axii_primary_beh_SCAAR_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('aard_sword_equipped'))
+		else if (thePlayer.HasTag('acs_aard_sword_equipped'))
 		{
-			stupidArray.PushBack( 'aard_primary_beh_SCAAR_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('yrden_sword_equipped'))
+		else if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 		{
-			stupidArray.PushBack( 'yrden_primary_beh_SCAAR_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'quen_secondary_beh_SCAAR_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'aard_secondary_beh_SCAAR_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'yrden_secondary_beh_SCAAR_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('vampire_claws_equipped'))
+		else if (thePlayer.HasTag('acs_vampire_claws_equipped'))
 		{
-			stupidArray.PushBack( 'claw_beh_SCAAR_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_SCAAR_passive_taunt' );
+		}
+		else if (thePlayer.HasTag('acs_sorc_fists_equipped'))
+		{
+			stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 		}
 		else if (
-		thePlayer.HasTag('igni_bow_equipped')
+		thePlayer.HasTag('acs_igni_bow_equipped')
 		|| thePlayer.HasTag('axii_bow_equipped')
 		|| thePlayer.HasTag('aard_bow_equipped')
 		|| thePlayer.HasTag('yrden_bow_equipped')
 		|| thePlayer.HasTag('quen_bow_equipped')
 		)
 		{
-			stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
+			stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 		}
 		else if (
 		thePlayer.HasTag('igni_crossbow_equipped')
@@ -8310,75 +9098,90 @@ state BehSwitch_Engage in cBehSwitch
 		|| thePlayer.HasTag('quen_crossbow_equipped')
 		)
 		{
-			stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
+			stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 		}
 		else if (
-		thePlayer.HasTag('igni_sword_equipped'))
+		thePlayer.HasTag('acs_igni_sword_equipped'))
 		{
-			stupidArray.PushBack( 'igni_primary_beh_SCAAR_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_passive_taunt' );
 		}
 		else if (
-		thePlayer.HasTag('igni_secondary_sword_equipped'))
+		thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'igni_secondary_beh_SCAAR_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_SCAAR_passive_taunt' );
 		}
 		else
 		{
-			stupidArray.PushBack( 'igni_primary_beh_SCAAR_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_passive_taunt' );
 		}
 
-		thePlayer.ActivateBehaviors(stupidArray);
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
+		}
 	}
 
 	latent function ActivateBehaviors_SCAAR_SwordWalk()
 	{
 		stupidArray.Clear();
 		
-		if (thePlayer.HasTag('quen_sword_equipped'))
+		if (thePlayer.HasTag('acs_quen_sword_equipped'))
 		{
-			stupidArray.PushBack( 'quen_primary_beh_SCAAR_swordwalk' );
+			stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR_swordwalk' );
 		}
-		else if (thePlayer.HasTag('axii_sword_equipped'))
+		else if (thePlayer.HasTag('acs_axii_sword_equipped'))
 		{
-			stupidArray.PushBack( 'axii_primary_beh_SCAAR_swordwalk' );
+			stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR_swordwalk' );
 		}
-		else if (thePlayer.HasTag('aard_sword_equipped'))
+		else if (thePlayer.HasTag('acs_aard_sword_equipped'))
 		{
-			stupidArray.PushBack( 'aard_primary_beh_SCAAR' );
+			stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR' );
 		}
-		else if (thePlayer.HasTag('yrden_sword_equipped'))
+		else if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 		{
-			stupidArray.PushBack( 'yrden_primary_beh_SCAAR_swordwalk' );
+			stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR_swordwalk' );
 		}
-		else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'quen_secondary_beh_SCAAR_swordwalk' );
+			stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR_swordwalk' );
 		}
-		else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'axii_secondary_beh_SCAAR_swordwalk' );
+			stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_swordwalk' );
 		}
-		else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'aard_secondary_beh_SCAAR_swordwalk' );
+			stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR_swordwalk' );
 		}
-		else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'yrden_secondary_beh_SCAAR_swordwalk' );
+			stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR_swordwalk' );
 		}
-		else if (thePlayer.HasTag('vampire_claws_equipped'))
+		else if (thePlayer.HasTag('acs_vampire_claws_equipped'))
 		{
-			stupidArray.PushBack( 'claw_beh_SCAAR' );
+			stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_SCAAR' );
+		}
+		else if (thePlayer.HasTag('acs_sorc_fists_equipped'))
+		{
+			stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 		}
 		else if (
-		thePlayer.HasTag('igni_bow_equipped')
+		thePlayer.HasTag('acs_igni_bow_equipped')
 		|| thePlayer.HasTag('axii_bow_equipped')
 		|| thePlayer.HasTag('aard_bow_equipped')
 		|| thePlayer.HasTag('yrden_bow_equipped')
 		|| thePlayer.HasTag('quen_bow_equipped')
 		)
 		{
-			stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
+			stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 		}
 		else if (
 		thePlayer.HasTag('igni_crossbow_equipped')
@@ -8388,73 +9191,88 @@ state BehSwitch_Engage in cBehSwitch
 		|| thePlayer.HasTag('quen_crossbow_equipped')
 		)
 		{
-			stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
+			stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 		}
-		else if (thePlayer.HasTag('igni_sword_equipped'))
+		else if (thePlayer.HasTag('acs_igni_sword_equipped'))
 		{
-			stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk' );
+			stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk' );
 		}
-		else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'igni_secondary_beh_SCAAR_swordwalk' );
+			stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_SCAAR_swordwalk' );
 		}
 		else
 		{
-			stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk' );
+			stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk' );
 		}
 
-		thePlayer.ActivateBehaviors(stupidArray);
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
+		}
 	}
 
 	latent function ActivateBehaviors_SCAAR_SwordWalk_Passive_Taunt()
 	{
 		stupidArray.Clear();
 		
-		if (thePlayer.HasTag('quen_sword_equipped'))
+		if (thePlayer.HasTag('acs_quen_sword_equipped'))
 		{
-			stupidArray.PushBack( 'quen_primary_beh_SCAAR_swordwalk_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR_swordwalk_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('axii_sword_equipped'))
+		else if (thePlayer.HasTag('acs_axii_sword_equipped'))
 		{
-			stupidArray.PushBack( 'axii_primary_beh_SCAAR_swordwalk_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR_swordwalk_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('aard_sword_equipped'))
+		else if (thePlayer.HasTag('acs_aard_sword_equipped'))
 		{
-			stupidArray.PushBack( 'aard_primary_beh_SCAAR_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('yrden_sword_equipped'))
+		else if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 		{
-			stupidArray.PushBack( 'yrden_primary_beh_SCAAR_swordwalk_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR_swordwalk_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'quen_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'axii_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'aard_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'yrden_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('vampire_claws_equipped'))
+		else if (thePlayer.HasTag('acs_vampire_claws_equipped'))
 		{
-			stupidArray.PushBack( 'claw_beh_SCAAR_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_SCAAR_passive_taunt' );
+		}
+		else if (thePlayer.HasTag('acs_sorc_fists_equipped'))
+		{
+			stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 		}
 		else if (
-		thePlayer.HasTag('igni_bow_equipped')
+		thePlayer.HasTag('acs_igni_bow_equipped')
 		|| thePlayer.HasTag('axii_bow_equipped')
 		|| thePlayer.HasTag('aard_bow_equipped')
 		|| thePlayer.HasTag('yrden_bow_equipped')
 		|| thePlayer.HasTag('quen_bow_equipped')
 		)
 		{
-			stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
+			stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 		}
 		else if (
 		thePlayer.HasTag('igni_crossbow_equipped')
@@ -8464,22 +9282,33 @@ state BehSwitch_Engage in cBehSwitch
 		|| thePlayer.HasTag('quen_crossbow_equipped')
 		)
 		{
-			stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
+			stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 		}
-		else if (thePlayer.HasTag('igni_sword_equipped'))
+		else if (thePlayer.HasTag('acs_igni_sword_equipped'))
 		{
-			stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'igni_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 		}
 		else
 		{
-			stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' );
 		}
 
-		thePlayer.ActivateBehaviors(stupidArray);
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
+		}
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -8553,21 +9382,40 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_GetFistMode() == 0
-			|| ACS_GetFistMode() == 2 )
+			if (ACS_GetFistMode() == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR' );
 				}
 			}
 			else if (ACS_GetFistMode() == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'claw_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_SCAAR' );
 				}
 			}
+			else if (ACS_GetFistMode() == 2 )
+			{
+				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+				{
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
+				}
+			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -8577,158 +9425,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_SCAAR' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -8736,158 +9597,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_SCAAR' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -8895,158 +9769,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_SCAAR' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -9054,158 +9941,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_SCAAR' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -9213,158 +10113,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_SCAAR' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -9374,121 +10287,121 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('igni_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('igni_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR' );
 			}	
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 3 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('axii_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 3 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('axii_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 3 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 3 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_SCAAR' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_SCAAR' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 7 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('aard_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 7 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('aard_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 7 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 7 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_SCAAR' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_SCAAR' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 5 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('yrden_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 5 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('yrden_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 5 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 5 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_SCAAR' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_SCAAR' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 1 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('quen_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 1 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('quen_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 1 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 1 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_SCAAR' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_SCAAR' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('igni_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('igni_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_SCAAR' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_SCAAR' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_SCAAR' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 4 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('axii_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 4 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('axii_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 4 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 4 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_SCAAR' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 8 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('aard_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 8 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('aard_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 8 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 8 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_SCAAR' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_SCAAR' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 6 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('yrden_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 6 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('yrden_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 6 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 6 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_SCAAR' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_SCAAR' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 2 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('quen_secondary_sword_equipped')  )
-			|| ( ACS_GetFocusModeSteelWeapon() == 2 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('quen_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 2 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped')  )
+			|| ( ACS_GetFocusModeSteelWeapon() == 2 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_SCAAR' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_SCAAR' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR' );
 			}
 		}
 		else if 
@@ -9496,21 +10409,40 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_GetFistMode() == 0
-			|| ACS_GetFistMode() == 2 )
+			if (ACS_GetFistMode() == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR' );
 				}
 			}
 			else if (ACS_GetFistMode() == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'claw_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_SCAAR' );
 				}
 			}
+			else if (ACS_GetFistMode() == 2 )
+			{
+				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+				{
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
+				}
+			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -9518,111 +10450,111 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if 
 		(
-			thePlayer.HasTag('igni_sword_equipped')
+			thePlayer.HasTag('acs_igni_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR' ); ACS_Theft_Prevention_9 ();
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR' ); 
 			}	
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('axii_sword_equipped')
+			thePlayer.HasTag('acs_axii_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_SCAAR' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_SCAAR' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('aard_sword_equipped')
+			thePlayer.HasTag('acs_aard_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_SCAAR' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_SCAAR' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('yrden_sword_equipped')
+			thePlayer.HasTag('acs_yrden_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_SCAAR' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_SCAAR' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('quen_sword_equipped')
+			thePlayer.HasTag('acs_quen_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_SCAAR' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_SCAAR' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('igni_secondary_sword_equipped')
+			thePlayer.HasTag('acs_igni_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_SCAAR' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_SCAAR' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_SCAAR' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('axii_secondary_sword_equipped')
+			thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_SCAAR' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('aard_secondary_sword_equipped')
+			thePlayer.HasTag('acs_aard_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_SCAAR' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_SCAAR' ); ACS_Theft_Prevention_9 ();
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR' ); 
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('yrden_secondary_sword_equipped')
+			thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_SCAAR' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_SCAAR' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('quen_secondary_sword_equipped')
+			thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_SCAAR' )
 			{
-				ACS_Theft_Prevention_9 (); thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_SCAAR' );
+				  stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR' );
 			}
 		}
 		else if 
@@ -9630,21 +10562,40 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_GetFistMode() == 0
-			|| ACS_GetFistMode() == 2 )
+			if (ACS_GetFistMode() == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR' );
 				}
 			}
 			else if (ACS_GetFistMode() == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'claw_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_SCAAR' );
 				}
 			}
+			else if (ACS_GetFistMode() == 2 )
+			{
+				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+				{
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
+				}
+			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -9658,107 +10609,107 @@ state BehSwitch_Engage in cBehSwitch
 				{
 					if 
 					(
-						ACS_GetItem_Eredin_Silver() && thePlayer.HasTag('axii_sword_equipped') 
+						ACS_GetItem_Eredin_Silver() && thePlayer.HasTag('acs_axii_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_SCAAR' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_SCAAR' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Claws_Silver() && thePlayer.HasTag('aard_sword_equipped') 
+						ACS_GetItem_Claws_Silver() && thePlayer.HasTag('acs_aard_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_SCAAR' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_SCAAR' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Imlerith_Silver() && thePlayer.HasTag('yrden_sword_equipped')
+						ACS_GetItem_Imlerith_Silver() && thePlayer.HasTag('acs_yrden_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_SCAAR' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_SCAAR' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Olgierd_Silver() && thePlayer.HasTag('quen_sword_equipped')
+						ACS_GetItem_Olgierd_Silver() && thePlayer.HasTag('acs_quen_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_SCAAR' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_SCAAR' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Greg_Silver() && thePlayer.HasTag('axii_secondary_sword_equipped') 
+						ACS_GetItem_Greg_Silver() && thePlayer.HasTag('acs_axii_secondary_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_SCAAR' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR' );
 						}
 					}
 
 					else if 
 					(
-						ACS_GetItem_Katana_Silver() && thePlayer.HasTag('axii_secondary_sword_equipped')
+						ACS_GetItem_Katana_Silver() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_SCAAR' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Axe_Silver() && thePlayer.HasTag('aard_secondary_sword_equipped') 
+						ACS_GetItem_Axe_Silver() && thePlayer.HasTag('acs_aard_secondary_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_SCAAR' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_SCAAR' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Hammer_Silver() && thePlayer.HasTag('yrden_secondary_sword_equipped')
+						ACS_GetItem_Hammer_Silver() && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_SCAAR' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_SCAAR' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Spear_Silver() &&  thePlayer.HasTag('quen_secondary_sword_equipped')
+						ACS_GetItem_Spear_Silver() &&  thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_SCAAR' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_SCAAR' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR' );
 						}
 					}
 					else
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR' );
 						}
 					}
 				}
@@ -9766,107 +10717,107 @@ state BehSwitch_Engage in cBehSwitch
 				{
 					if 
 					(
-						ACS_GetItem_Eredin_Steel() && thePlayer.HasTag('axii_sword_equipped')
+						ACS_GetItem_Eredin_Steel() && thePlayer.HasTag('acs_axii_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_SCAAR' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_SCAAR' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Claws_Steel() && thePlayer.HasTag('aard_sword_equipped')
+						ACS_GetItem_Claws_Steel() && thePlayer.HasTag('acs_aard_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_SCAAR' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_SCAAR' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR' );
 						}
 					}
 						
 					else if 
 					(
-						(ACS_GetItem_MageStaff_Steel() || ACS_GetItem_Imlerith_Steel()) && thePlayer.HasTag('yrden_sword_equipped')
+						(ACS_GetItem_MageStaff_Steel() || ACS_GetItem_Imlerith_Steel()) && thePlayer.HasTag('acs_yrden_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_SCAAR' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_SCAAR' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Olgierd_Steel() && thePlayer.HasTag('quen_sword_equipped')
+						ACS_GetItem_Olgierd_Steel() && thePlayer.HasTag('acs_quen_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_SCAAR' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_SCAAR' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR' );
 						}
 					}
 
 					else if 
 					(
-						ACS_GetItem_Katana_Steel() && thePlayer.HasTag('axii_secondary_sword_equipped')
+						ACS_GetItem_Katana_Steel() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_SCAAR' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Greg_Steel() && thePlayer.HasTag('axii_secondary_sword_equipped')
+						ACS_GetItem_Greg_Steel() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_SCAAR' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Axe_Steel() && thePlayer.HasTag('aard_secondary_sword_equipped')
+						ACS_GetItem_Axe_Steel() && thePlayer.HasTag('acs_aard_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_SCAAR' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_SCAAR' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Hammer_Steel() && thePlayer.HasTag('yrden_secondary_sword_equipped')
+						ACS_GetItem_Hammer_Steel() && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_SCAAR' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_SCAAR' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Spear_Steel() && thePlayer.HasTag('quen_secondary_sword_equipped')
+						ACS_GetItem_Spear_Steel() && thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_SCAAR' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_SCAAR' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR' );
 						}
 					}
 					else
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR' );
 						}
 					}
 				}
@@ -9875,19 +10826,29 @@ state BehSwitch_Engage in cBehSwitch
 			{
 				if 
 				(
-					thePlayer.HasTag('vampire_claws_equipped')
+					thePlayer.HasTag('acs_vampire_claws_equipped')
 				)
 				{
 					if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_SCAAR' )
 					{
-						thePlayer.ActivateAndSyncBehavior( 'claw_beh_SCAAR' );
+						 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_SCAAR' );
+					}
+				}
+				else if 
+				(
+					thePlayer.HasTag('acs_sorc_fists_equipped')
+				)
+				{
+					if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+					{
+						 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 					}
 				}
 				else
 				{
 					if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR' )
 					{
-						thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR' );
+						 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR' );
 					}
 				}
 			}
@@ -9896,8 +10857,21 @@ state BehSwitch_Engage in cBehSwitch
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR' );
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -9972,21 +10946,40 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_GetFistMode() == 0
-			|| ACS_GetFistMode() == 2 )
+			if (ACS_GetFistMode() == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk' );
 				}
 			}
 			else if (ACS_GetFistMode() == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'claw_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_SCAAR' );
 				}
 			}
+			else if (ACS_GetFistMode() == 2 )
+			{
+				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+				{
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
+				}
+			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -9996,158 +10989,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_SCAAR_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -10155,158 +11161,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_SCAAR_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -10314,158 +11333,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_SCAAR_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -10473,158 +11505,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_SCAAR_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -10632,158 +11677,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_SCAAR_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -10793,121 +11851,121 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('igni_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('igni_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk' );
 			}	
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 3 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('axii_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 3 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('axii_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 3 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 3 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_SCAAR_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_SCAAR_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR_swordwalk' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 7 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('aard_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 7 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('aard_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 7 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 7 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_SCAAR' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_SCAAR' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 5 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('yrden_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 5 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('yrden_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 5 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 5 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_SCAAR_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_SCAAR_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR_swordwalk' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 1 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('quen_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 1 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('quen_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 1 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 1 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_SCAAR_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_SCAAR_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR_swordwalk' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('igni_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('igni_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_SCAAR_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_SCAAR_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_SCAAR_swordwalk' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 4 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('axii_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 4 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('axii_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 4 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 4 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_SCAAR_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_swordwalk' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 8 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('aard_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 8 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('aard_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 8 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 8 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_SCAAR_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_SCAAR_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR_swordwalk' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 6 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('yrden_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 6 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('yrden_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 6 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 6 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_SCAAR_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_SCAAR_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR_swordwalk' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 2 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('quen_secondary_sword_equipped')  )
-			|| ( ACS_GetFocusModeSteelWeapon() == 2 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('quen_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 2 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped')  )
+			|| ( ACS_GetFocusModeSteelWeapon() == 2 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_SCAAR_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_SCAAR_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR_swordwalk' );
 			}
 		}
 		else if 
@@ -10915,21 +11973,40 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_GetFistMode() == 0
-			|| ACS_GetFistMode() == 2 )
+			if (ACS_GetFistMode() == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk' );
 				}
 			}
 			else if (ACS_GetFistMode() == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'claw_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_SCAAR' );
 				}
 			}
+			else if (ACS_GetFistMode() == 2 )
+			{
+				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+				{
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
+				}
+			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -10937,111 +12014,111 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if 
 		(
-			thePlayer.HasTag('igni_sword_equipped')
+			thePlayer.HasTag('acs_igni_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_swordwalk' ); ACS_Theft_Prevention_9 ();
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk' ); 
 			}	
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('axii_sword_equipped')
+			thePlayer.HasTag('acs_axii_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_SCAAR_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_SCAAR_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR_swordwalk' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('aard_sword_equipped')
+			thePlayer.HasTag('acs_aard_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_SCAAR' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_SCAAR' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('yrden_sword_equipped')
+			thePlayer.HasTag('acs_yrden_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_SCAAR_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_SCAAR_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR_swordwalk' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('quen_sword_equipped')
+			thePlayer.HasTag('acs_quen_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_SCAAR_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_SCAAR_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR_swordwalk' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('igni_secondary_sword_equipped')
+			thePlayer.HasTag('acs_igni_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_SCAAR_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_SCAAR_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_SCAAR_swordwalk' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('axii_secondary_sword_equipped')
+			thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_SCAAR_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_swordwalk' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('aard_secondary_sword_equipped')
+			thePlayer.HasTag('acs_aard_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_SCAAR_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_SCAAR_swordwalk' ); ACS_Theft_Prevention_9 ();
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR_swordwalk' ); 
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('yrden_secondary_sword_equipped')
+			thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_SCAAR_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_SCAAR_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR_swordwalk' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('quen_secondary_sword_equipped')
+			thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_SCAAR_swordwalk' )
 			{
-				ACS_Theft_Prevention_9 (); thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_SCAAR_swordwalk' );
+				  stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR_swordwalk' );
 			}
 		}
 		else if 
@@ -11049,21 +12126,40 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_GetFistMode() == 0
-			|| ACS_GetFistMode() == 2 )
+			if (ACS_GetFistMode() == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk' );
 				}
 			}
 			else if (ACS_GetFistMode() == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'claw_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_SCAAR' );
 				}
 			}
+			else if (ACS_GetFistMode() == 2 )
+			{
+				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+				{
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
+				}
+			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -11077,107 +12173,107 @@ state BehSwitch_Engage in cBehSwitch
 				{
 					if 
 					(
-						ACS_GetItem_Eredin_Silver() && thePlayer.HasTag('axii_sword_equipped') 
+						ACS_GetItem_Eredin_Silver() && thePlayer.HasTag('acs_axii_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_SCAAR_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_SCAAR_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR_swordwalk' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Claws_Silver() && thePlayer.HasTag('aard_sword_equipped') 
+						ACS_GetItem_Claws_Silver() && thePlayer.HasTag('acs_aard_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_SCAAR' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_SCAAR' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Imlerith_Silver() && thePlayer.HasTag('yrden_sword_equipped')
+						ACS_GetItem_Imlerith_Silver() && thePlayer.HasTag('acs_yrden_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_SCAAR_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_SCAAR_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR_swordwalk' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Olgierd_Silver() && thePlayer.HasTag('quen_sword_equipped')
+						ACS_GetItem_Olgierd_Silver() && thePlayer.HasTag('acs_quen_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_SCAAR_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_SCAAR_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR_swordwalk' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Greg_Silver() && thePlayer.HasTag('axii_secondary_sword_equipped') 
+						ACS_GetItem_Greg_Silver() && thePlayer.HasTag('acs_axii_secondary_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_SCAAR_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_swordwalk' );
 						}
 					}
 
 					else if 
 					(
-						ACS_GetItem_Katana_Silver() && thePlayer.HasTag('axii_secondary_sword_equipped')
+						ACS_GetItem_Katana_Silver() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_SCAAR_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_swordwalk' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Axe_Silver() && thePlayer.HasTag('aard_secondary_sword_equipped') 
+						ACS_GetItem_Axe_Silver() && thePlayer.HasTag('acs_aard_secondary_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_SCAAR_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_SCAAR_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR_swordwalk' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Hammer_Silver() && thePlayer.HasTag('yrden_secondary_sword_equipped')
+						ACS_GetItem_Hammer_Silver() && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_SCAAR_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_SCAAR_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR_swordwalk' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Spear_Silver() &&  thePlayer.HasTag('quen_secondary_sword_equipped')
+						ACS_GetItem_Spear_Silver() &&  thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_SCAAR_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_SCAAR_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR_swordwalk' );
 						}
 					}
 					else
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk' );
 						}
 					}
 				}
@@ -11185,107 +12281,107 @@ state BehSwitch_Engage in cBehSwitch
 				{
 					if 
 					(
-						ACS_GetItem_Eredin_Steel() && thePlayer.HasTag('axii_sword_equipped')
+						ACS_GetItem_Eredin_Steel() && thePlayer.HasTag('acs_axii_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_SCAAR_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_SCAAR_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR_swordwalk' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Claws_Steel() && thePlayer.HasTag('aard_sword_equipped')
+						ACS_GetItem_Claws_Steel() && thePlayer.HasTag('acs_aard_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_SCAAR' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_SCAAR' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR' );
 						}
 					}
 						
 					else if 
 					(
-						(ACS_GetItem_MageStaff_Steel() || ACS_GetItem_Imlerith_Steel()) && thePlayer.HasTag('yrden_sword_equipped')
+						(ACS_GetItem_MageStaff_Steel() || ACS_GetItem_Imlerith_Steel()) && thePlayer.HasTag('acs_yrden_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_SCAAR_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_SCAAR_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR_swordwalk' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Olgierd_Steel() && thePlayer.HasTag('quen_sword_equipped')
+						ACS_GetItem_Olgierd_Steel() && thePlayer.HasTag('acs_quen_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_SCAAR_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_SCAAR_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR_swordwalk' );
 						}
 					}
 
 					else if 
 					(
-						ACS_GetItem_Katana_Steel() && thePlayer.HasTag('axii_secondary_sword_equipped')
+						ACS_GetItem_Katana_Steel() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_SCAAR_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_swordwalk' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Greg_Steel() && thePlayer.HasTag('axii_secondary_sword_equipped')
+						ACS_GetItem_Greg_Steel() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_SCAAR_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_swordwalk' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Axe_Steel() && thePlayer.HasTag('aard_secondary_sword_equipped')
+						ACS_GetItem_Axe_Steel() && thePlayer.HasTag('acs_aard_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_SCAAR_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_SCAAR_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR_swordwalk' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Hammer_Steel() && thePlayer.HasTag('yrden_secondary_sword_equipped')
+						ACS_GetItem_Hammer_Steel() && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_SCAAR_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_SCAAR_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR_swordwalk' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Spear_Steel() && thePlayer.HasTag('quen_secondary_sword_equipped')
+						ACS_GetItem_Spear_Steel() && thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_SCAAR_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_SCAAR_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR_swordwalk' );
 						}
 					}
 					else
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk' );
 						}
 					}
 				}
@@ -11294,19 +12390,29 @@ state BehSwitch_Engage in cBehSwitch
 			{
 				if 
 				(
-					thePlayer.HasTag('vampire_claws_equipped')
+					thePlayer.HasTag('acs_vampire_claws_equipped')
 				)
 				{
 					if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_SCAAR' )
 					{
-						thePlayer.ActivateAndSyncBehavior( 'claw_beh_SCAAR' );
+						 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_SCAAR' );
+					}
+				}
+				else if 
+				(
+					thePlayer.HasTag('acs_sorc_fists_equipped')
+				)
+				{
+					if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+					{
+						 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 					}
 				}
 				else
 				{
 					if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_swordwalk' )
 					{
-						thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_swordwalk' );
+						 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk' );
 					}
 				}
 			}
@@ -11315,8 +12421,21 @@ state BehSwitch_Engage in cBehSwitch
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk' );
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -11391,21 +12510,40 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_GetFistMode() == 0
-			|| ACS_GetFistMode() == 2 )
+			if (ACS_GetFistMode() == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_passive_taunt' );
 				}
 			}
 			else if (ACS_GetFistMode() == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'claw_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_SCAAR_passive_taunt' );
 				}
 			}
+			else if (ACS_GetFistMode() == 2 )
+			{
+				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+				{
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
+				}
+			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -11415,158 +12553,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_SCAAR_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -11574,158 +12725,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_SCAAR_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -11733,158 +12897,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_SCAAR_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -11892,158 +13069,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_SCAAR_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -12051,158 +13241,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_SCAAR_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -12212,121 +13415,121 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('igni_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('igni_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_passive_taunt' );
 			}	
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 3 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('axii_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 3 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('axii_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 3 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 3 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_SCAAR_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_SCAAR_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 7 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('aard_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 7 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('aard_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 7 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 7 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_SCAAR_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_SCAAR_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 5 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('yrden_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 5 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('yrden_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 5 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 5 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_SCAAR_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_SCAAR_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 1 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('quen_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 1 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('quen_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 1 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 1 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_SCAAR_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_SCAAR_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('igni_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('igni_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_SCAAR_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_SCAAR_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_SCAAR_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 4 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('axii_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 4 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('axii_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 4 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 4 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_SCAAR_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 8 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('aard_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 8 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('aard_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 8 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 8 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_SCAAR_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_SCAAR_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 6 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('yrden_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 6 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('yrden_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 6 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 6 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_SCAAR_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_SCAAR_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 2 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('quen_secondary_sword_equipped')  )
-			|| ( ACS_GetFocusModeSteelWeapon() == 2 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('quen_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 2 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped')  )
+			|| ( ACS_GetFocusModeSteelWeapon() == 2 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_SCAAR_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_SCAAR_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR_passive_taunt' );
 			}
 		}
 		else if 
@@ -12334,21 +13537,40 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_GetFistMode() == 0
-			|| ACS_GetFistMode() == 2 )
+			if (ACS_GetFistMode() == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_passive_taunt' );
 				}
 			}
 			else if (ACS_GetFistMode() == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'claw_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_SCAAR_passive_taunt' );
 				}
 			}
+			else if (ACS_GetFistMode() == 2 )
+			{
+				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+				{
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
+				}
+			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -12356,111 +13578,111 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if 
 		(
-			thePlayer.HasTag('igni_sword_equipped')
+			thePlayer.HasTag('acs_igni_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_passive_taunt' ); ACS_Theft_Prevention_9 ();
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_passive_taunt' ); 
 			}	
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('axii_sword_equipped')
+			thePlayer.HasTag('acs_axii_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_SCAAR_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_SCAAR_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('aard_sword_equipped')
+			thePlayer.HasTag('acs_aard_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_SCAAR_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_SCAAR_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('yrden_sword_equipped')
+			thePlayer.HasTag('acs_yrden_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_SCAAR_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_SCAAR_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('quen_sword_equipped')
+			thePlayer.HasTag('acs_quen_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_SCAAR_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_SCAAR_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('igni_secondary_sword_equipped')
+			thePlayer.HasTag('acs_igni_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_SCAAR_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_SCAAR_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_SCAAR_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('axii_secondary_sword_equipped')
+			thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_SCAAR_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('aard_secondary_sword_equipped')
+			thePlayer.HasTag('acs_aard_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_SCAAR_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_SCAAR_passive_taunt' ); ACS_Theft_Prevention_9 ();
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR_passive_taunt' ); 
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('yrden_secondary_sword_equipped')
+			thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_SCAAR_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_SCAAR_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('quen_secondary_sword_equipped')
+			thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_SCAAR_passive_taunt' )
 			{
-				ACS_Theft_Prevention_9 (); thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_SCAAR_passive_taunt' );
+				  stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR_passive_taunt' );
 			}
 		}
 		else if 
@@ -12468,21 +13690,40 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_GetFistMode() == 0
-			|| ACS_GetFistMode() == 2 )
+			if (ACS_GetFistMode() == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_passive_taunt' );
 				}
 			}
 			else if (ACS_GetFistMode() == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_SCAAR_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'claw_beh_SCAAR_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_SCAAR_passive_taunt' );
 				}
 			}
+			else if (ACS_GetFistMode() == 2 )
+			{
+				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+				{
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
+				}
+			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -12496,107 +13737,107 @@ state BehSwitch_Engage in cBehSwitch
 				{
 					if 
 					(
-						ACS_GetItem_Eredin_Silver() && thePlayer.HasTag('axii_sword_equipped') 
+						ACS_GetItem_Eredin_Silver() && thePlayer.HasTag('acs_axii_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_SCAAR_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_SCAAR_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Claws_Silver() && thePlayer.HasTag('aard_sword_equipped') 
+						ACS_GetItem_Claws_Silver() && thePlayer.HasTag('acs_aard_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_SCAAR_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_SCAAR_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Imlerith_Silver() && thePlayer.HasTag('yrden_sword_equipped')
+						ACS_GetItem_Imlerith_Silver() && thePlayer.HasTag('acs_yrden_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_SCAAR_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_SCAAR_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Olgierd_Silver() && thePlayer.HasTag('quen_sword_equipped')
+						ACS_GetItem_Olgierd_Silver() && thePlayer.HasTag('acs_quen_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_SCAAR_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_SCAAR_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Greg_Silver() && thePlayer.HasTag('axii_secondary_sword_equipped') 
+						ACS_GetItem_Greg_Silver() && thePlayer.HasTag('acs_axii_secondary_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_SCAAR_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 						}
 					}
 
 					else if 
 					(
-						ACS_GetItem_Katana_Silver() && thePlayer.HasTag('axii_secondary_sword_equipped')
+						ACS_GetItem_Katana_Silver() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_SCAAR_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Axe_Silver() && thePlayer.HasTag('aard_secondary_sword_equipped') 
+						ACS_GetItem_Axe_Silver() && thePlayer.HasTag('acs_aard_secondary_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_SCAAR_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_SCAAR_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Hammer_Silver() && thePlayer.HasTag('yrden_secondary_sword_equipped')
+						ACS_GetItem_Hammer_Silver() && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_SCAAR_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_SCAAR_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Spear_Silver() &&  thePlayer.HasTag('quen_secondary_sword_equipped')
+						ACS_GetItem_Spear_Silver() &&  thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_SCAAR_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_SCAAR_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR_passive_taunt' );
 						}
 					}
 					else
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_passive_taunt' );
 						}
 					}
 				}
@@ -12604,107 +13845,107 @@ state BehSwitch_Engage in cBehSwitch
 				{
 					if 
 					(
-						ACS_GetItem_Eredin_Steel() && thePlayer.HasTag('axii_sword_equipped')
+						ACS_GetItem_Eredin_Steel() && thePlayer.HasTag('acs_axii_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_SCAAR_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_SCAAR_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Claws_Steel() && thePlayer.HasTag('aard_sword_equipped')
+						ACS_GetItem_Claws_Steel() && thePlayer.HasTag('acs_aard_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_SCAAR_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_SCAAR_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						(ACS_GetItem_MageStaff_Steel() || ACS_GetItem_Imlerith_Steel()) && thePlayer.HasTag('yrden_sword_equipped')
+						(ACS_GetItem_MageStaff_Steel() || ACS_GetItem_Imlerith_Steel()) && thePlayer.HasTag('acs_yrden_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_SCAAR_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_SCAAR_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Olgierd_Steel() && thePlayer.HasTag('quen_sword_equipped')
+						ACS_GetItem_Olgierd_Steel() && thePlayer.HasTag('acs_quen_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_SCAAR_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_SCAAR_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR_passive_taunt' );
 						}
 					}
 
 					else if 
 					(
-						ACS_GetItem_Katana_Steel() && thePlayer.HasTag('axii_secondary_sword_equipped')
+						ACS_GetItem_Katana_Steel() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_SCAAR_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Greg_Steel() && thePlayer.HasTag('axii_secondary_sword_equipped')
+						ACS_GetItem_Greg_Steel() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_SCAAR_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Axe_Steel() && thePlayer.HasTag('aard_secondary_sword_equipped')
+						ACS_GetItem_Axe_Steel() && thePlayer.HasTag('acs_aard_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_SCAAR_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_SCAAR_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Hammer_Steel() && thePlayer.HasTag('yrden_secondary_sword_equipped')
+						ACS_GetItem_Hammer_Steel() && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_SCAAR_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_SCAAR_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Spear_Steel() && thePlayer.HasTag('quen_secondary_sword_equipped')
+						ACS_GetItem_Spear_Steel() && thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_SCAAR_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_SCAAR_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR_passive_taunt' );
 						}
 					}
 					else
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_passive_taunt' );
 						}
 					}
 				}
@@ -12713,19 +13954,29 @@ state BehSwitch_Engage in cBehSwitch
 			{
 				if 
 				(
-					thePlayer.HasTag('vampire_claws_equipped')
+					thePlayer.HasTag('acs_vampire_claws_equipped')
 				)
 				{
 					if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_SCAAR_passive_taunt' )
 					{
-						thePlayer.ActivateAndSyncBehavior( 'claw_beh_SCAAR_passive_taunt' );
+						 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_SCAAR_passive_taunt' );
+					}
+				}
+				else if 
+				(
+					thePlayer.HasTag('acs_sorc_fists_equipped')
+				)
+				{
+					if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+					{
+						 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 					}
 				}
 				else
 				{
 					if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_passive_taunt' )
 					{
-						thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_passive_taunt' );
+						 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_passive_taunt' );
 					}
 				}
 			}
@@ -12734,8 +13985,21 @@ state BehSwitch_Engage in cBehSwitch
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_passive_taunt' );
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -12810,21 +14074,40 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_GetFistMode() == 0
-			|| ACS_GetFistMode() == 2 )
+			if (ACS_GetFistMode() == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
 			else if (ACS_GetFistMode() == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'claw_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_SCAAR' );
 				}
 			}
+			else if (ACS_GetFistMode() == 2 )
+			{
+				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+				{
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
+				}
+			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -12834,158 +14117,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -12993,158 +14289,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -13152,158 +14461,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -13311,158 +14633,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -13470,158 +14805,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_SCAAR' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_SCAAR' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -13631,121 +14979,121 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('igni_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('igni_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' );
 			}	
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 3 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('axii_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 3 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('axii_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 3 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 3 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_SCAAR_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_SCAAR_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR_swordwalk_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 7 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('aard_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 7 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('aard_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 7 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 7 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_SCAAR' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_SCAAR' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 5 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('yrden_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 5 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('yrden_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 5 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 5 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_SCAAR_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_SCAAR_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR_swordwalk_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 1 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('quen_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 1 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('quen_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 1 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 1 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_SCAAR_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_SCAAR_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR_swordwalk_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('igni_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('igni_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_SCAAR_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 4 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('axii_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 4 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('axii_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 4 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 4 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 8 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('aard_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 8 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('aard_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 8 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 8 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_SCAAR_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 6 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('yrden_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 6 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('yrden_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 6 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 6 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_SCAAR_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 2 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('quen_secondary_sword_equipped')  )
-			|| ( ACS_GetFocusModeSteelWeapon() == 2 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('quen_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 2 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped')  )
+			|| ( ACS_GetFocusModeSteelWeapon() == 2 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_SCAAR_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 			}
 		}
 		else if 
@@ -13753,21 +15101,40 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_GetFistMode() == 0
-			|| ACS_GetFistMode() == 2 )
+			if (ACS_GetFistMode() == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
 			else if (ACS_GetFistMode() == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'claw_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_SCAAR' );
 				}
 			}
+			else if (ACS_GetFistMode() == 2 )
+			{
+				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+				{
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
+				}
+			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -13775,111 +15142,111 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if 
 		(
-			thePlayer.HasTag('igni_sword_equipped')
+			thePlayer.HasTag('acs_igni_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' ); ACS_Theft_Prevention_9 ();
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' ); 
 			}	
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('axii_sword_equipped')
+			thePlayer.HasTag('acs_axii_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_SCAAR_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_SCAAR_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR_swordwalk_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('aard_sword_equipped')
+			thePlayer.HasTag('acs_aard_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_SCAAR' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_SCAAR' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('yrden_sword_equipped')
+			thePlayer.HasTag('acs_yrden_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_SCAAR_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_SCAAR_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR_swordwalk_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('quen_sword_equipped')
+			thePlayer.HasTag('acs_quen_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_SCAAR_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_SCAAR_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR_swordwalk_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('igni_secondary_sword_equipped')
+			thePlayer.HasTag('acs_igni_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_SCAAR_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('axii_secondary_sword_equipped')
+			thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('aard_secondary_sword_equipped')
+			thePlayer.HasTag('acs_aard_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_SCAAR_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_SCAAR_swordwalk_passive_taunt' ); ACS_Theft_Prevention_9 ();
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR_swordwalk_passive_taunt' ); 
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('yrden_secondary_sword_equipped')
+			thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_SCAAR_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('quen_secondary_sword_equipped')
+			thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_SCAAR_swordwalk_passive_taunt' )
 			{
-				ACS_Theft_Prevention_9 (); thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+				  stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 			}
 		}
 		else if 
@@ -13887,20 +15254,39 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_GetFistMode() == 0
-			|| ACS_GetFistMode() == 2 )
+			if (ACS_GetFistMode() == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' );
 				}
 			}
 			else if (ACS_GetFistMode() == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_SCAAR' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'claw_beh_SCAAR' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_SCAAR' );
 				}
+			}
+			else if (ACS_GetFistMode() == 2 )
+			{
+				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+				{
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
+				}
+			}
+
+			if (stupidArray.Size() > 0)
+			{
+				//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+				//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+				//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+				//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+				//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+				//thePlayer.RaiseForceEvent( 'Climb' );
+
+				thePlayer.ActivateBehaviors(stupidArray);
 			}
 		}
 	}
@@ -13915,107 +15301,107 @@ state BehSwitch_Engage in cBehSwitch
 				{
 					if 
 					(
-						ACS_GetItem_Eredin_Silver() && thePlayer.HasTag('axii_sword_equipped') 
+						ACS_GetItem_Eredin_Silver() && thePlayer.HasTag('acs_axii_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_SCAAR_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_SCAAR_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR_swordwalk_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Claws_Silver() && thePlayer.HasTag('aard_sword_equipped') 
+						ACS_GetItem_Claws_Silver() && thePlayer.HasTag('acs_aard_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_SCAAR' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_SCAAR' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Imlerith_Silver() && thePlayer.HasTag('yrden_sword_equipped')
+						ACS_GetItem_Imlerith_Silver() && thePlayer.HasTag('acs_yrden_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_SCAAR_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_SCAAR_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR_swordwalk_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Olgierd_Silver() && thePlayer.HasTag('quen_sword_equipped')
+						ACS_GetItem_Olgierd_Silver() && thePlayer.HasTag('acs_quen_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_SCAAR_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_SCAAR_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR_swordwalk_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Greg_Silver() && thePlayer.HasTag('axii_secondary_sword_equipped') 
+						ACS_GetItem_Greg_Silver() && thePlayer.HasTag('acs_axii_secondary_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 						}
 					}
 
 					else if 
 					(
-						ACS_GetItem_Katana_Silver() && thePlayer.HasTag('axii_secondary_sword_equipped')
+						ACS_GetItem_Katana_Silver() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Axe_Silver() && thePlayer.HasTag('aard_secondary_sword_equipped') 
+						ACS_GetItem_Axe_Silver() && thePlayer.HasTag('acs_aard_secondary_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_SCAAR_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Hammer_Silver() && thePlayer.HasTag('yrden_secondary_sword_equipped')
+						ACS_GetItem_Hammer_Silver() && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_SCAAR_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Spear_Silver() &&  thePlayer.HasTag('quen_secondary_sword_equipped')
+						ACS_GetItem_Spear_Silver() &&  thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_SCAAR_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 						}
 					}
 					else
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' );
 						}
 					}
 				}
@@ -14023,107 +15409,107 @@ state BehSwitch_Engage in cBehSwitch
 				{
 					if 
 					(
-						ACS_GetItem_Eredin_Steel() && thePlayer.HasTag('axii_sword_equipped')
+						ACS_GetItem_Eredin_Steel() && thePlayer.HasTag('acs_axii_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_SCAAR_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_SCAAR_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR_swordwalk_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Claws_Steel() && thePlayer.HasTag('aard_sword_equipped')
+						ACS_GetItem_Claws_Steel() && thePlayer.HasTag('acs_aard_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_SCAAR' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_SCAAR' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR' );
 						}
 					}
 						
 					else if 
 					(
-						(ACS_GetItem_MageStaff_Steel() || ACS_GetItem_Imlerith_Steel()) && thePlayer.HasTag('yrden_sword_equipped')
+						(ACS_GetItem_MageStaff_Steel() || ACS_GetItem_Imlerith_Steel()) && thePlayer.HasTag('acs_yrden_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_SCAAR_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_SCAAR_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR_swordwalk_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Olgierd_Steel() && thePlayer.HasTag('quen_sword_equipped')
+						ACS_GetItem_Olgierd_Steel() && thePlayer.HasTag('acs_quen_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_SCAAR_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_SCAAR_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR_swordwalk_passive_taunt' );
 						}
 					}
 
 					else if 
 					(
-						ACS_GetItem_Katana_Steel() && thePlayer.HasTag('axii_secondary_sword_equipped')
+						ACS_GetItem_Katana_Steel() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Greg_Steel() && thePlayer.HasTag('axii_secondary_sword_equipped')
+						ACS_GetItem_Greg_Steel() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Axe_Steel() && thePlayer.HasTag('aard_secondary_sword_equipped')
+						ACS_GetItem_Axe_Steel() && thePlayer.HasTag('acs_aard_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_SCAAR_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Hammer_Steel() && thePlayer.HasTag('yrden_secondary_sword_equipped')
+						ACS_GetItem_Hammer_Steel() && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_SCAAR_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Spear_Steel() && thePlayer.HasTag('quen_secondary_sword_equipped')
+						ACS_GetItem_Spear_Steel() && thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_SCAAR_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_SCAAR_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR_swordwalk_passive_taunt' );
 						}
 					}
 					else
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' );
 						}
 					}
 				}
@@ -14132,19 +15518,29 @@ state BehSwitch_Engage in cBehSwitch
 			{
 				if 
 				(
-					thePlayer.HasTag('vampire_claws_equipped')
+					thePlayer.HasTag('acs_vampire_claws_equipped')
 				)
 				{
 					if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_SCAAR' )
 					{
-						thePlayer.ActivateAndSyncBehavior( 'claw_beh_SCAAR' );
+						 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_SCAAR' );
+					}
+				}
+				else if 
+				(
+					thePlayer.HasTag('acs_sorc_fists_equipped')
+				)
+				{
+					if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+					{
+						 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 					}
 				}
 				else
 				{
 					if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' )
 					{
-						thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' );
+						 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' );
 					}
 				}
 			}
@@ -14154,8 +15550,21 @@ state BehSwitch_Engage in cBehSwitch
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' );
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -14165,51 +15574,55 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		stupidArray.Clear();
 
-		if (thePlayer.HasTag('quen_sword_equipped'))
+		if (thePlayer.HasTag('acs_quen_sword_equipped'))
 		{
-			stupidArray.PushBack( 'quen_primary_beh_E3ARP' );
+			stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP' );
 		}
-		else if (thePlayer.HasTag('axii_sword_equipped'))
+		else if (thePlayer.HasTag('acs_axii_sword_equipped'))
 		{
-			stupidArray.PushBack( 'axii_primary_beh_E3ARP' );
+			stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP' );
 		}
-		else if (thePlayer.HasTag('aard_sword_equipped'))
+		else if (thePlayer.HasTag('acs_aard_sword_equipped'))
 		{
-			stupidArray.PushBack( 'aard_primary_beh_E3ARP' );
+			stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP' );
 		}
-		else if (thePlayer.HasTag('yrden_sword_equipped'))
+		else if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 		{
-			stupidArray.PushBack( 'yrden_primary_beh_E3ARP' );
+			stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP' );
 		}
-		else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'quen_secondary_beh_E3ARP' );
+			stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP' );
 		}
-		else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'axii_secondary_beh_E3ARP' );
+			stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP' );
 		}
-		else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'aard_secondary_beh_E3ARP' );
+			stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP' );
 		}
-		else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'yrden_secondary_beh_E3ARP' );
+			stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP' );
 		}
-		else if (thePlayer.HasTag('vampire_claws_equipped'))
+		else if (thePlayer.HasTag('acs_vampire_claws_equipped'))
 		{
-			stupidArray.PushBack( 'claw_beh_E3ARP' );
+			stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_E3ARP' );
+		}
+		else if (thePlayer.HasTag('acs_sorc_fists_equipped'))
+		{
+			stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 		}
 		else if (
-		thePlayer.HasTag('igni_bow_equipped')
+		thePlayer.HasTag('acs_igni_bow_equipped')
 		|| thePlayer.HasTag('axii_bow_equipped')
 		|| thePlayer.HasTag('aard_bow_equipped')
 		|| thePlayer.HasTag('yrden_bow_equipped')
 		|| thePlayer.HasTag('quen_bow_equipped')
 		)
 		{
-			stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
+			stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 		}
 		else if (
 		thePlayer.HasTag('igni_crossbow_equipped')
@@ -14219,75 +15632,90 @@ state BehSwitch_Engage in cBehSwitch
 		|| thePlayer.HasTag('quen_crossbow_equipped')
 		)
 		{
-			stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
+			stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 		}
 		else if (
-		thePlayer.HasTag('igni_sword_equipped'))
+		thePlayer.HasTag('acs_igni_sword_equipped'))
 		{
-			stupidArray.PushBack( 'igni_primary_beh_E3ARP' );
+			stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP' );
 		}
 		else if (
-		thePlayer.HasTag('igni_secondary_sword_equipped'))
+		thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'igni_secondary_beh_E3ARP' );
+			stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_E3ARP' );
 		}
 		else
 		{
-			stupidArray.PushBack( 'igni_primary_beh_E3ARP' );
+			stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP' );
 		}
 
-		thePlayer.ActivateBehaviors(stupidArray);
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
+		}
 	}
 
 	latent function ActivateBehaviors_E3ARP_Passive_Taunt()
 	{
 		stupidArray.Clear();
 
-		if (thePlayer.HasTag('quen_sword_equipped'))
+		if (thePlayer.HasTag('acs_quen_sword_equipped'))
 		{
-			stupidArray.PushBack( 'quen_primary_beh_E3ARP_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('axii_sword_equipped'))
+		else if (thePlayer.HasTag('acs_axii_sword_equipped'))
 		{
-			stupidArray.PushBack( 'axii_primary_beh_E3ARP_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('aard_sword_equipped'))
+		else if (thePlayer.HasTag('acs_aard_sword_equipped'))
 		{
-			stupidArray.PushBack( 'aard_primary_beh_E3ARP_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('yrden_sword_equipped'))
+		else if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 		{
-			stupidArray.PushBack( 'yrden_primary_beh_E3ARP_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'quen_secondary_beh_E3ARP_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'aard_secondary_beh_E3ARP_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'yrden_secondary_beh_E3ARP_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('vampire_claws_equipped'))
+		else if (thePlayer.HasTag('acs_vampire_claws_equipped'))
 		{
-			stupidArray.PushBack( 'claw_beh_E3ARP_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_E3ARP_passive_taunt' );
+		}
+		else if (thePlayer.HasTag('acs_sorc_fists_equipped'))
+		{
+			stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 		}
 		else if (
-		thePlayer.HasTag('igni_bow_equipped')
+		thePlayer.HasTag('acs_igni_bow_equipped')
 		|| thePlayer.HasTag('axii_bow_equipped')
 		|| thePlayer.HasTag('aard_bow_equipped')
 		|| thePlayer.HasTag('yrden_bow_equipped')
 		|| thePlayer.HasTag('quen_bow_equipped')
 		)
 		{
-			stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
+			stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 		}
 		else if (
 		thePlayer.HasTag('igni_crossbow_equipped')
@@ -14297,75 +15725,90 @@ state BehSwitch_Engage in cBehSwitch
 		|| thePlayer.HasTag('quen_crossbow_equipped')
 		)
 		{
-			stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
+			stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 		}
 		else if (
-		thePlayer.HasTag('igni_sword_equipped'))
+		thePlayer.HasTag('acs_igni_sword_equipped'))
 		{
-			stupidArray.PushBack( 'igni_primary_beh_E3ARP_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_passive_taunt' );
 		}
 		else if (
-		thePlayer.HasTag('igni_secondary_sword_equipped'))
+		thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'igni_secondary_beh_E3ARP_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_E3ARP_passive_taunt' );
 		}
 		else
 		{
-			stupidArray.PushBack( 'igni_primary_beh_E3ARP_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_passive_taunt' );
 		}
 
-		thePlayer.ActivateBehaviors(stupidArray);
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
+		}
 	}
 
 	latent function ActivateBehaviors_E3ARP_SwordWalk()
 	{
 		stupidArray.Clear();
 
-		if (thePlayer.HasTag('quen_sword_equipped'))
+		if (thePlayer.HasTag('acs_quen_sword_equipped'))
 		{
-			stupidArray.PushBack( 'quen_primary_beh_E3ARP_swordwalk' );
+			stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP_swordwalk' );
 		}
-		else if (thePlayer.HasTag('axii_sword_equipped'))
+		else if (thePlayer.HasTag('acs_axii_sword_equipped'))
 		{
-			stupidArray.PushBack( 'axii_primary_beh_E3ARP_swordwalk' );
+			stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP_swordwalk' );
 		}
-		else if (thePlayer.HasTag('aard_sword_equipped'))
+		else if (thePlayer.HasTag('acs_aard_sword_equipped'))
 		{
-			stupidArray.PushBack( 'aard_primary_beh_E3ARP' );
+			stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP' );
 		}
-		else if (thePlayer.HasTag('yrden_sword_equipped'))
+		else if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 		{
-			stupidArray.PushBack( 'yrden_primary_beh_E3ARP_swordwalk' );
+			stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP_swordwalk' );
 		}
-		else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'quen_secondary_beh_E3ARP_swordwalk' );
+			stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP_swordwalk' );
 		}
-		else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'axii_secondary_beh_E3ARP_swordwalk' );
+			stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_swordwalk' );
 		}
-		else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'aard_secondary_beh_E3ARP_swordwalk' );
+			stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP_swordwalk' );
 		}
-		else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'yrden_secondary_beh_E3ARP_swordwalk' );
+			stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP_swordwalk' );
 		}
-		else if (thePlayer.HasTag('vampire_claws_equipped'))
+		else if (thePlayer.HasTag('acs_vampire_claws_equipped'))
 		{
-			stupidArray.PushBack( 'claw_beh_E3ARP' );
+			stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_E3ARP' );
+		}
+		else if (thePlayer.HasTag('acs_sorc_fists_equipped'))
+		{
+			stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 		}
 		else if (
-		thePlayer.HasTag('igni_bow_equipped')
+		thePlayer.HasTag('acs_igni_bow_equipped')
 		|| thePlayer.HasTag('axii_bow_equipped')
 		|| thePlayer.HasTag('aard_bow_equipped')
 		|| thePlayer.HasTag('yrden_bow_equipped')
 		|| thePlayer.HasTag('quen_bow_equipped')
 		)
 		{
-			stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
+			stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 		}
 		else if (
 		thePlayer.HasTag('igni_crossbow_equipped')
@@ -14375,75 +15818,90 @@ state BehSwitch_Engage in cBehSwitch
 		|| thePlayer.HasTag('quen_crossbow_equipped')
 		)
 		{
-			stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
+			stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 		}
 		else if (
-		thePlayer.HasTag('igni_sword_equipped'))
+		thePlayer.HasTag('acs_igni_sword_equipped'))
 		{
-			stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk' );
+			stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk' );
 		}
 		else if (
-		thePlayer.HasTag('igni_secondary_sword_equipped'))
+		thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'igni_secondary_beh_E3ARP_swordwalk' );
+			stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_E3ARP_swordwalk' );
 		}
 		else
 		{
-			stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk' );
+			stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk' );
 		}
 
-		thePlayer.ActivateBehaviors(stupidArray);
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
+		}
 	}
 
 	latent function ActivateBehaviors_E3ARP_SwordWalk_Passive_Taunt()
 	{
 		stupidArray.Clear();
 
-		if (thePlayer.HasTag('quen_sword_equipped'))
+		if (thePlayer.HasTag('acs_quen_sword_equipped'))
 		{
-			stupidArray.PushBack( 'quen_primary_beh_E3ARP_swordwalk_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP_swordwalk_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('axii_sword_equipped'))
+		else if (thePlayer.HasTag('acs_axii_sword_equipped'))
 		{
-			stupidArray.PushBack( 'axii_primary_beh_E3ARP_swordwalk_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP_swordwalk_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('aard_sword_equipped'))
+		else if (thePlayer.HasTag('acs_aard_sword_equipped'))
 		{
-			stupidArray.PushBack( 'aard_primary_beh_E3ARP_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('yrden_sword_equipped'))
+		else if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 		{
-			stupidArray.PushBack( 'yrden_primary_beh_E3ARP_swordwalk_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP_swordwalk_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'quen_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'axii_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'aard_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+		else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'yrden_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 		}
-		else if (thePlayer.HasTag('vampire_claws_equipped'))
+		else if (thePlayer.HasTag('acs_vampire_claws_equipped'))
 		{
-			stupidArray.PushBack( 'claw_beh_E3ARP_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_E3ARP_passive_taunt' );
+		}
+		else if (thePlayer.HasTag('acs_sorc_fists_equipped'))
+		{
+			stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 		}
 		else if (
-		thePlayer.HasTag('igni_bow_equipped')
+		thePlayer.HasTag('acs_igni_bow_equipped')
 		|| thePlayer.HasTag('axii_bow_equipped')
 		|| thePlayer.HasTag('aard_bow_equipped')
 		|| thePlayer.HasTag('yrden_bow_equipped')
 		|| thePlayer.HasTag('quen_bow_equipped')
 		)
 		{
-			stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
+			stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 		}
 		else if (
 		thePlayer.HasTag('igni_crossbow_equipped')
@@ -14453,24 +15911,35 @@ state BehSwitch_Engage in cBehSwitch
 		|| thePlayer.HasTag('quen_crossbow_equipped')
 		)
 		{
-			stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
+			stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 		}
 		else if (
-		thePlayer.HasTag('igni_sword_equipped'))
+		thePlayer.HasTag('acs_igni_sword_equipped'))
 		{
-			stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' );
 		}
 		else if (
-		thePlayer.HasTag('igni_secondary_sword_equipped'))
+		thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 		{
-			stupidArray.PushBack( 'igni_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 		}
 		else
 		{
-			stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' );
+			stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' );
 		}
 
-		thePlayer.ActivateBehaviors(stupidArray);
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
+		}
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -14544,20 +16013,39 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_GetFistMode() == 0
-			|| ACS_GetFistMode() == 2 )
+			if (ACS_GetFistMode() == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP' );
 				}
 			}
 			else if (ACS_GetFistMode() == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'claw_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_E3ARP' );
 				}
+			}
+			else if (ACS_GetFistMode() == 2 )
+			{
+				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+				{
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
+				}
+			}
+
+			if (stupidArray.Size() > 0)
+			{
+				//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+				//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+				//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+				//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+				//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+				//thePlayer.RaiseForceEvent( 'Climb' );
+
+				thePlayer.ActivateBehaviors(stupidArray);
 			}
 		}
 	}
@@ -14568,158 +16056,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_E3ARP' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -14727,158 +16228,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_E3ARP' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -14886,158 +16400,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_E3ARP' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -15045,158 +16572,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_E3ARP' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -15204,158 +16744,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_E3ARP' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -15365,121 +16918,121 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('igni_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('igni_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP' );
 			}	
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 3 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('axii_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 3 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('axii_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 3 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 3 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_E3ARP' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_E3ARP' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 7 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('aard_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 7 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('aard_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 7 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 7 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_E3ARP' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_E3ARP' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 5 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('yrden_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 5 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('yrden_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 5 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 5 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_E3ARP' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_E3ARP' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 1 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('quen_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 1 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('quen_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 1 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 1 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_E3ARP' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_E3ARP' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('igni_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('igni_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_E3ARP' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_E3ARP' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_E3ARP' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 4 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('axii_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 4 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('axii_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 4 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 4 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_E3ARP' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 8 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('aard_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 8 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('aard_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 8 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 8 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_E3ARP' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_E3ARP' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 6 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('yrden_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 6 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('yrden_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 6 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 6 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_E3ARP' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_E3ARP' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 2 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('quen_secondary_sword_equipped')  )
-			|| ( ACS_GetFocusModeSteelWeapon() == 2 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('quen_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 2 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped')  )
+			|| ( ACS_GetFocusModeSteelWeapon() == 2 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_E3ARP' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_E3ARP' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP' );
 			}
 		}
 		else if 
@@ -15487,21 +17040,40 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_GetFistMode() == 0
-			|| ACS_GetFistMode() == 2 )
+			if (ACS_GetFistMode() == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP' );
 				}
 			}
 			else if (ACS_GetFistMode() == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'claw_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_E3ARP' );
 				}
 			}
+			else if (ACS_GetFistMode() == 2 )
+			{
+				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+				{
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
+				}
+			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -15509,111 +17081,111 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if 
 		(
-			thePlayer.HasTag('igni_sword_equipped')
+			thePlayer.HasTag('acs_igni_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP' ); ACS_Theft_Prevention_9 ();
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP' ); 
 			}	
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('axii_sword_equipped')
+			thePlayer.HasTag('acs_axii_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_E3ARP' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_E3ARP' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('aard_sword_equipped')
+			thePlayer.HasTag('acs_aard_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_E3ARP' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_E3ARP' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('yrden_sword_equipped')
+			thePlayer.HasTag('acs_yrden_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_E3ARP' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_E3ARP' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('quen_sword_equipped')
+			thePlayer.HasTag('acs_quen_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_E3ARP' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_E3ARP' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('igni_secondary_sword_equipped')
+			thePlayer.HasTag('acs_igni_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_E3ARP' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_E3ARP' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_E3ARP' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('axii_secondary_sword_equipped')
+			thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_E3ARP' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('aard_secondary_sword_equipped')
+			thePlayer.HasTag('acs_aard_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_E3ARP' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_E3ARP' ); ACS_Theft_Prevention_9 ();
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP' ); 
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('yrden_secondary_sword_equipped')
+			thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_E3ARP' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_E3ARP' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('quen_secondary_sword_equipped')
+			thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_E3ARP' )
 			{
-				ACS_Theft_Prevention_9 (); thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_E3ARP' );
+				  stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP' );
 			}
 		}
 		else if 
@@ -15621,21 +17193,40 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_GetFistMode() == 0
-			|| ACS_GetFistMode() == 2 )
+			if (ACS_GetFistMode() == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP' );
 				}
 			}
 			else if (ACS_GetFistMode() == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'claw_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_E3ARP' );
 				}
 			}
+			else if (ACS_GetFistMode() == 2 )
+			{
+				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+				{
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
+				}
+			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -15649,107 +17240,107 @@ state BehSwitch_Engage in cBehSwitch
 				{
 					if 
 					(
-						ACS_GetItem_Eredin_Silver() && thePlayer.HasTag('axii_sword_equipped') 
+						ACS_GetItem_Eredin_Silver() && thePlayer.HasTag('acs_axii_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_E3ARP' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_E3ARP' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Claws_Silver() && thePlayer.HasTag('aard_sword_equipped') 
+						ACS_GetItem_Claws_Silver() && thePlayer.HasTag('acs_aard_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_E3ARP' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_E3ARP' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Imlerith_Silver() && thePlayer.HasTag('yrden_sword_equipped')
+						ACS_GetItem_Imlerith_Silver() && thePlayer.HasTag('acs_yrden_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_E3ARP' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_E3ARP' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Olgierd_Silver() && thePlayer.HasTag('quen_sword_equipped')
+						ACS_GetItem_Olgierd_Silver() && thePlayer.HasTag('acs_quen_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_E3ARP' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_E3ARP' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Greg_Silver() && thePlayer.HasTag('axii_secondary_sword_equipped') 
+						ACS_GetItem_Greg_Silver() && thePlayer.HasTag('acs_axii_secondary_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_E3ARP' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP' );
 						}
 					}
 
 					else if 
 					(
-						ACS_GetItem_Katana_Silver() && thePlayer.HasTag('axii_secondary_sword_equipped')
+						ACS_GetItem_Katana_Silver() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_E3ARP' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Axe_Silver() && thePlayer.HasTag('aard_secondary_sword_equipped') 
+						ACS_GetItem_Axe_Silver() && thePlayer.HasTag('acs_aard_secondary_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_E3ARP' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_E3ARP' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Hammer_Silver() && thePlayer.HasTag('yrden_secondary_sword_equipped')
+						ACS_GetItem_Hammer_Silver() && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_E3ARP' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_E3ARP' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Spear_Silver() &&  thePlayer.HasTag('quen_secondary_sword_equipped')
+						ACS_GetItem_Spear_Silver() &&  thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_E3ARP' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_E3ARP' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP' );
 						}
 					}
 					else
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP' );
 						}
 					}
 				}
@@ -15757,107 +17348,107 @@ state BehSwitch_Engage in cBehSwitch
 				{
 					if 
 					(
-						ACS_GetItem_Eredin_Steel() && thePlayer.HasTag('axii_sword_equipped')
+						ACS_GetItem_Eredin_Steel() && thePlayer.HasTag('acs_axii_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_E3ARP' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_E3ARP' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Claws_Steel() && thePlayer.HasTag('aard_sword_equipped')
+						ACS_GetItem_Claws_Steel() && thePlayer.HasTag('acs_aard_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_E3ARP' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_E3ARP' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP' );
 						}
 					}
 						
 					else if 
 					(
-						(ACS_GetItem_MageStaff_Steel() || ACS_GetItem_Imlerith_Steel()) && thePlayer.HasTag('yrden_sword_equipped')
+						(ACS_GetItem_MageStaff_Steel() || ACS_GetItem_Imlerith_Steel()) && thePlayer.HasTag('acs_yrden_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_E3ARP' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_E3ARP' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Olgierd_Steel() && thePlayer.HasTag('quen_sword_equipped')
+						ACS_GetItem_Olgierd_Steel() && thePlayer.HasTag('acs_quen_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_E3ARP' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_E3ARP' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP' );
 						}
 					}
 
 					else if 
 					(
-						ACS_GetItem_Katana_Steel() && thePlayer.HasTag('axii_secondary_sword_equipped')
+						ACS_GetItem_Katana_Steel() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_E3ARP' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Greg_Steel() && thePlayer.HasTag('axii_secondary_sword_equipped')
+						ACS_GetItem_Greg_Steel() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_E3ARP' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Axe_Steel() && thePlayer.HasTag('aard_secondary_sword_equipped')
+						ACS_GetItem_Axe_Steel() && thePlayer.HasTag('acs_aard_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_E3ARP' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_E3ARP' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Hammer_Steel() && thePlayer.HasTag('yrden_secondary_sword_equipped')
+						ACS_GetItem_Hammer_Steel() && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_E3ARP' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_E3ARP' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Spear_Steel() && thePlayer.HasTag('quen_secondary_sword_equipped')
+						ACS_GetItem_Spear_Steel() && thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_E3ARP' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_E3ARP' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP' );
 						}
 					}
 					else
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP' );
 						}
 					}
 				}
@@ -15866,19 +17457,29 @@ state BehSwitch_Engage in cBehSwitch
 			{
 				if 
 				(
-					thePlayer.HasTag('vampire_claws_equipped')
+					thePlayer.HasTag('acs_vampire_claws_equipped')
 				)
 				{
 					if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_E3ARP' )
 					{
-						thePlayer.ActivateAndSyncBehavior( 'claw_beh_E3ARP' );
+						 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_E3ARP' );
+					}
+				}
+				else if 
+				(
+					thePlayer.HasTag('acs_sorc_fists_equipped')
+				)
+				{
+					if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+					{
+						 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 					}
 				}
 				else
 				{
 					if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP' )
 					{
-						thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP' );
+						 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP' );
 					}
 				}
 			}
@@ -15887,8 +17488,21 @@ state BehSwitch_Engage in cBehSwitch
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP' );
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -15963,21 +17577,40 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_GetFistMode() == 0
-			|| ACS_GetFistMode() == 2 )
+			if (ACS_GetFistMode() == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk' );
 				}
 			}
 			else if (ACS_GetFistMode() == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'claw_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_E3ARP' );
 				}
 			}
+			else if (ACS_GetFistMode() == 2 )
+			{
+				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+				{
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
+				}
+			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -15987,158 +17620,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_E3ARP_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -16146,158 +17792,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_E3ARP_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -16305,158 +17964,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_E3ARP_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -16464,158 +18136,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_E3ARP_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -16623,158 +18308,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_E3ARP_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP_swordwalk' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP_swordwalk' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -16784,121 +18482,121 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('igni_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('igni_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk' );
 			}	
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 3 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('axii_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 3 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('axii_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 3 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 3 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_E3ARP_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_E3ARP_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP_swordwalk' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 7 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('aard_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 7 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('aard_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 7 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 7 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_E3ARP' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_E3ARP' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 5 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('yrden_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 5 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('yrden_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 5 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 5 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_E3ARP_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_E3ARP_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP_swordwalk' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 1 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('quen_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 1 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('quen_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 1 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 1 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_E3ARP_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_E3ARP_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP_swordwalk' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('igni_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('igni_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_E3ARP_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_E3ARP_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_E3ARP_swordwalk' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 4 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('axii_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 4 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('axii_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 4 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 4 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_E3ARP_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_swordwalk' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 8 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('aard_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 8 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('aard_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 8 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 8 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_E3ARP_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_E3ARP_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP_swordwalk' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 6 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('yrden_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 6 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('yrden_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 6 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 6 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_E3ARP_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_E3ARP_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP_swordwalk' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 2 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('quen_secondary_sword_equipped')  )
-			|| ( ACS_GetFocusModeSteelWeapon() == 2 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('quen_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 2 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped')  )
+			|| ( ACS_GetFocusModeSteelWeapon() == 2 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_E3ARP_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_E3ARP_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP_swordwalk' );
 			}
 		}
 		else if 
@@ -16906,21 +18604,40 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_GetFistMode() == 0
-			|| ACS_GetFistMode() == 2 )
+			if (ACS_GetFistMode() == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk' );
 				}
 			}
 			else if (ACS_GetFistMode() == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'claw_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_E3ARP' );
 				}
 			}
+			else if (ACS_GetFistMode() == 2 )
+			{
+				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+				{
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
+				}
+			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -16928,111 +18645,111 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if 
 		(
-			thePlayer.HasTag('igni_sword_equipped')
+			thePlayer.HasTag('acs_igni_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_swordwalk' ); ACS_Theft_Prevention_9 ();
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk' ); 
 			}	
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('axii_sword_equipped')
+			thePlayer.HasTag('acs_axii_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_E3ARP_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_E3ARP_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP_swordwalk' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('aard_sword_equipped')
+			thePlayer.HasTag('acs_aard_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_E3ARP' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_E3ARP' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('yrden_sword_equipped')
+			thePlayer.HasTag('acs_yrden_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_E3ARP_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_E3ARP_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP_swordwalk' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('quen_sword_equipped')
+			thePlayer.HasTag('acs_quen_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_E3ARP_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_E3ARP_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP_swordwalk' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('igni_secondary_sword_equipped')
+			thePlayer.HasTag('acs_igni_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_E3ARP_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_E3ARP_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_E3ARP_swordwalk' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('axii_secondary_sword_equipped')
+			thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_E3ARP_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_swordwalk' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('aard_secondary_sword_equipped')
+			thePlayer.HasTag('acs_aard_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_E3ARP_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_E3ARP_swordwalk' ); ACS_Theft_Prevention_9 ();
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP_swordwalk' ); 
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('yrden_secondary_sword_equipped')
+			thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_E3ARP_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_E3ARP_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP_swordwalk' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('quen_secondary_sword_equipped')
+			thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_E3ARP_swordwalk' )
 			{
-				ACS_Theft_Prevention_9 (); thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_E3ARP_swordwalk' );
+				  stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP_swordwalk' );
 			}
 		}
 		else if 
@@ -17040,21 +18757,40 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_GetFistMode() == 0
-			|| ACS_GetFistMode() == 2 )
+			if (ACS_GetFistMode() == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_swordwalk' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_swordwalk' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk' );
 				}
 			}
 			else if (ACS_GetFistMode() == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'claw_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_E3ARP' );
 				}
 			}
+			else if (ACS_GetFistMode() == 2 )
+			{
+				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+				{
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
+				}
+			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -17068,107 +18804,107 @@ state BehSwitch_Engage in cBehSwitch
 				{
 					if 
 					(
-						ACS_GetItem_Eredin_Silver() && thePlayer.HasTag('axii_sword_equipped') 
+						ACS_GetItem_Eredin_Silver() && thePlayer.HasTag('acs_axii_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_E3ARP_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_E3ARP_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP_swordwalk' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Claws_Silver() && thePlayer.HasTag('aard_sword_equipped') 
+						ACS_GetItem_Claws_Silver() && thePlayer.HasTag('acs_aard_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_E3ARP' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_E3ARP' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Imlerith_Silver() && thePlayer.HasTag('yrden_sword_equipped')
+						ACS_GetItem_Imlerith_Silver() && thePlayer.HasTag('acs_yrden_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_E3ARP_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_E3ARP_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP_swordwalk' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Olgierd_Silver() && thePlayer.HasTag('quen_sword_equipped')
+						ACS_GetItem_Olgierd_Silver() && thePlayer.HasTag('acs_quen_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_E3ARP_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_E3ARP_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP_swordwalk' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Greg_Silver() && thePlayer.HasTag('axii_secondary_sword_equipped') 
+						ACS_GetItem_Greg_Silver() && thePlayer.HasTag('acs_axii_secondary_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_E3ARP_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_swordwalk' );
 						}
 					}
 
 					else if 
 					(
-						ACS_GetItem_Katana_Silver() && thePlayer.HasTag('axii_secondary_sword_equipped')
+						ACS_GetItem_Katana_Silver() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_E3ARP_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_swordwalk' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Axe_Silver() && thePlayer.HasTag('aard_secondary_sword_equipped') 
+						ACS_GetItem_Axe_Silver() && thePlayer.HasTag('acs_aard_secondary_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_E3ARP_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_E3ARP_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP_swordwalk' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Hammer_Silver() && thePlayer.HasTag('yrden_secondary_sword_equipped')
+						ACS_GetItem_Hammer_Silver() && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_E3ARP_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_E3ARP_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP_swordwalk' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Spear_Silver() &&  thePlayer.HasTag('quen_secondary_sword_equipped')
+						ACS_GetItem_Spear_Silver() &&  thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_E3ARP_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_E3ARP_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP_swordwalk' );
 						}
 					}
 					else
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk' );
 						}
 					}
 				}
@@ -17176,107 +18912,107 @@ state BehSwitch_Engage in cBehSwitch
 				{
 					if 
 					(
-						ACS_GetItem_Eredin_Steel() && thePlayer.HasTag('axii_sword_equipped')
+						ACS_GetItem_Eredin_Steel() && thePlayer.HasTag('acs_axii_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_E3ARP_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_E3ARP_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP_swordwalk' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Claws_Steel() && thePlayer.HasTag('aard_sword_equipped')
+						ACS_GetItem_Claws_Steel() && thePlayer.HasTag('acs_aard_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_E3ARP' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_E3ARP' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP' );
 						}
 					}
 						
 					else if 
 					(
-						(ACS_GetItem_MageStaff_Steel() || ACS_GetItem_Imlerith_Steel()) && thePlayer.HasTag('yrden_sword_equipped')
+						(ACS_GetItem_MageStaff_Steel() || ACS_GetItem_Imlerith_Steel()) && thePlayer.HasTag('acs_yrden_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_E3ARP_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_E3ARP_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP_swordwalk' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Olgierd_Steel() && thePlayer.HasTag('quen_sword_equipped')
+						ACS_GetItem_Olgierd_Steel() && thePlayer.HasTag('acs_quen_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_E3ARP_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_E3ARP_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP_swordwalk' );
 						}
 					}
 
 					else if 
 					(
-						ACS_GetItem_Katana_Steel() && thePlayer.HasTag('axii_secondary_sword_equipped')
+						ACS_GetItem_Katana_Steel() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_E3ARP_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_swordwalk' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Greg_Steel() && thePlayer.HasTag('axii_secondary_sword_equipped')
+						ACS_GetItem_Greg_Steel() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_E3ARP_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_swordwalk' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Axe_Steel() && thePlayer.HasTag('aard_secondary_sword_equipped')
+						ACS_GetItem_Axe_Steel() && thePlayer.HasTag('acs_aard_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_E3ARP_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_E3ARP_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP_swordwalk' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Hammer_Steel() && thePlayer.HasTag('yrden_secondary_sword_equipped')
+						ACS_GetItem_Hammer_Steel() && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_E3ARP_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_E3ARP_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP_swordwalk' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Spear_Steel() && thePlayer.HasTag('quen_secondary_sword_equipped')
+						ACS_GetItem_Spear_Steel() && thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_E3ARP_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_E3ARP_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP_swordwalk' );
 						}
 					}
 					else
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_swordwalk' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_swordwalk' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk' );
 						}
 					}
 				}
@@ -17285,19 +19021,29 @@ state BehSwitch_Engage in cBehSwitch
 			{
 				if 
 				(
-					thePlayer.HasTag('vampire_claws_equipped')
+					thePlayer.HasTag('acs_vampire_claws_equipped')
 				)
 				{
 					if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_E3ARP' )
 					{
-						thePlayer.ActivateAndSyncBehavior( 'claw_beh_E3ARP' );
+						 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_E3ARP' );
+					}
+				}
+				else if 
+				(
+					thePlayer.HasTag('acs_sorc_fists_equipped')
+				)
+				{
+					if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+					{
+						 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 					}
 				}
 				else
 				{
 					if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_swordwalk' )
 					{
-						thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_swordwalk' );
+						 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk' );
 					}
 				}
 			}
@@ -17306,8 +19052,21 @@ state BehSwitch_Engage in cBehSwitch
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_swordwalk' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_swordwalk' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk' );
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -17382,21 +19141,40 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_GetFistMode() == 0
-			|| ACS_GetFistMode() == 2 )
+			if (ACS_GetFistMode() == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_passive_taunt' );
 				}
 			}
 			else if (ACS_GetFistMode() == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'claw_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_E3ARP_passive_taunt' );
 				}
 			}
+			else if (ACS_GetFistMode() == 2 )
+			{
+				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+				{
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
+				}
+			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -17406,158 +19184,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_E3ARP_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -17565,158 +19356,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_E3ARP_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -17724,158 +19528,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_E3ARP_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -17883,158 +19700,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_E3ARP_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -18042,158 +19872,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_E3ARP_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -18203,121 +20046,121 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('igni_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('igni_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_passive_taunt' );
 			}	
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 3 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('axii_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 3 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('axii_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 3 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 3 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_E3ARP_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_E3ARP_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 7 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('aard_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 7 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('aard_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 7 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 7 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_E3ARP_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_E3ARP_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 5 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('yrden_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 5 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('yrden_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 5 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 5 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_E3ARP_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_E3ARP_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 1 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('quen_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 1 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('quen_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 1 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 1 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_E3ARP_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_E3ARP_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('igni_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('igni_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_E3ARP_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_E3ARP_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_E3ARP_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 4 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('axii_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 4 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('axii_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 4 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 4 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_E3ARP_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 8 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('aard_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 8 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('aard_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 8 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 8 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_E3ARP_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_E3ARP_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 6 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('yrden_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 6 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('yrden_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 6 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 6 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_E3ARP_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_E3ARP_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 2 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('quen_secondary_sword_equipped')  )
-			|| ( ACS_GetFocusModeSteelWeapon() == 2 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('quen_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 2 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped')  )
+			|| ( ACS_GetFocusModeSteelWeapon() == 2 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_E3ARP_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_E3ARP_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP_passive_taunt' );
 			}
 		}
 		else if 
@@ -18325,21 +20168,40 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_GetFistMode() == 0
-			|| ACS_GetFistMode() == 2 )
+			if (ACS_GetFistMode() == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_passive_taunt' );
 				}
 			}
 			else if (ACS_GetFistMode() == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'claw_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_E3ARP_passive_taunt' );
 				}
 			}
+			else if (ACS_GetFistMode() == 2 )
+			{
+				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+				{
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
+				}
+			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -18347,111 +20209,111 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if 
 		(
-			thePlayer.HasTag('igni_sword_equipped')
+			thePlayer.HasTag('acs_igni_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_passive_taunt' ); ACS_Theft_Prevention_9 ();
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_passive_taunt' ); 
 			}	
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('axii_sword_equipped')
+			thePlayer.HasTag('acs_axii_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_E3ARP_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_E3ARP_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('aard_sword_equipped')
+			thePlayer.HasTag('acs_aard_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_E3ARP_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_E3ARP_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('yrden_sword_equipped')
+			thePlayer.HasTag('acs_yrden_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_E3ARP_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_E3ARP_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('quen_sword_equipped')
+			thePlayer.HasTag('acs_quen_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_E3ARP_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_E3ARP_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('igni_secondary_sword_equipped')
+			thePlayer.HasTag('acs_igni_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_E3ARP_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_E3ARP_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_E3ARP_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('axii_secondary_sword_equipped')
+			thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_E3ARP_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('aard_secondary_sword_equipped')
+			thePlayer.HasTag('acs_aard_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_E3ARP_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_E3ARP_passive_taunt' ); ACS_Theft_Prevention_9 ();
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP_passive_taunt' ); 
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('yrden_secondary_sword_equipped')
+			thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_E3ARP_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_E3ARP_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('quen_secondary_sword_equipped')
+			thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_E3ARP_passive_taunt' )
 			{
-				ACS_Theft_Prevention_9 (); thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_E3ARP_passive_taunt' );
+				  stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP_passive_taunt' );
 			}
 		}
 		else if 
@@ -18459,21 +20321,40 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_GetFistMode() == 0
-			|| ACS_GetFistMode() == 2 )
+			if (ACS_GetFistMode() == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_passive_taunt' );
 				}
 			}
 			else if (ACS_GetFistMode() == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_E3ARP_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'claw_beh_E3ARP_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_E3ARP_passive_taunt' );
 				}
 			}
+			else if (ACS_GetFistMode() == 2 )
+			{
+				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+				{
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
+				}
+			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -18487,107 +20368,107 @@ state BehSwitch_Engage in cBehSwitch
 				{
 					if 
 					(
-						ACS_GetItem_Eredin_Silver() && thePlayer.HasTag('axii_sword_equipped') 
+						ACS_GetItem_Eredin_Silver() && thePlayer.HasTag('acs_axii_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_E3ARP_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_E3ARP_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Claws_Silver() && thePlayer.HasTag('aard_sword_equipped') 
+						ACS_GetItem_Claws_Silver() && thePlayer.HasTag('acs_aard_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_E3ARP_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_E3ARP_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Imlerith_Silver() && thePlayer.HasTag('yrden_sword_equipped')
+						ACS_GetItem_Imlerith_Silver() && thePlayer.HasTag('acs_yrden_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_E3ARP_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_E3ARP_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Olgierd_Silver() && thePlayer.HasTag('quen_sword_equipped')
+						ACS_GetItem_Olgierd_Silver() && thePlayer.HasTag('acs_quen_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_E3ARP_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_E3ARP_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Greg_Silver() && thePlayer.HasTag('axii_secondary_sword_equipped') 
+						ACS_GetItem_Greg_Silver() && thePlayer.HasTag('acs_axii_secondary_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_E3ARP_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 						}
 					}
 
 					else if 
 					(
-						ACS_GetItem_Katana_Silver() && thePlayer.HasTag('axii_secondary_sword_equipped')
+						ACS_GetItem_Katana_Silver() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_E3ARP_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Axe_Silver() && thePlayer.HasTag('aard_secondary_sword_equipped') 
+						ACS_GetItem_Axe_Silver() && thePlayer.HasTag('acs_aard_secondary_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_E3ARP_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_E3ARP_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Hammer_Silver() && thePlayer.HasTag('yrden_secondary_sword_equipped')
+						ACS_GetItem_Hammer_Silver() && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_E3ARP_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_E3ARP_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Spear_Silver() &&  thePlayer.HasTag('quen_secondary_sword_equipped')
+						ACS_GetItem_Spear_Silver() &&  thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_E3ARP_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_E3ARP_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP_passive_taunt' );
 						}
 					}
 					else
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_passive_taunt' );
 						}
 					}
 				}
@@ -18595,107 +20476,107 @@ state BehSwitch_Engage in cBehSwitch
 				{
 					if 
 					(
-						ACS_GetItem_Eredin_Steel() && thePlayer.HasTag('axii_sword_equipped')
+						ACS_GetItem_Eredin_Steel() && thePlayer.HasTag('acs_axii_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_E3ARP_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_E3ARP_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Claws_Steel() && thePlayer.HasTag('aard_sword_equipped')
+						ACS_GetItem_Claws_Steel() && thePlayer.HasTag('acs_aard_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_E3ARP_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_E3ARP_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						(ACS_GetItem_MageStaff_Steel() || ACS_GetItem_Imlerith_Steel()) && thePlayer.HasTag('yrden_sword_equipped')
+						(ACS_GetItem_MageStaff_Steel() || ACS_GetItem_Imlerith_Steel()) && thePlayer.HasTag('acs_yrden_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_E3ARP_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_E3ARP_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Olgierd_Steel() && thePlayer.HasTag('quen_sword_equipped')
+						ACS_GetItem_Olgierd_Steel() && thePlayer.HasTag('acs_quen_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_E3ARP_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_E3ARP_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP_passive_taunt' );
 						}
 					}
 
 					else if 
 					(
-						ACS_GetItem_Katana_Steel() && thePlayer.HasTag('axii_secondary_sword_equipped')
+						ACS_GetItem_Katana_Steel() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_E3ARP_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Greg_Steel() && thePlayer.HasTag('axii_secondary_sword_equipped')
+						ACS_GetItem_Greg_Steel() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_E3ARP_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Axe_Steel() && thePlayer.HasTag('aard_secondary_sword_equipped')
+						ACS_GetItem_Axe_Steel() && thePlayer.HasTag('acs_aard_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_E3ARP_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_E3ARP_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Hammer_Steel() && thePlayer.HasTag('yrden_secondary_sword_equipped')
+						ACS_GetItem_Hammer_Steel() && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_E3ARP_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_E3ARP_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Spear_Steel() && thePlayer.HasTag('quen_secondary_sword_equipped')
+						ACS_GetItem_Spear_Steel() && thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_E3ARP_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_E3ARP_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP_passive_taunt' );
 						}
 					}
 					else
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_passive_taunt' );
 						}
 					}
 				}
@@ -18704,19 +20585,29 @@ state BehSwitch_Engage in cBehSwitch
 			{
 				if 
 				(
-					thePlayer.HasTag('vampire_claws_equipped')
+					thePlayer.HasTag('acs_vampire_claws_equipped')
 				)
 				{
 					if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_E3ARP_passive_taunt' )
 					{
-						thePlayer.ActivateAndSyncBehavior( 'claw_beh_E3ARP_passive_taunt' );
+						 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_E3ARP_passive_taunt' );
+					}
+				}
+				else if 
+				(
+					thePlayer.HasTag('acs_sorc_fists_equipped')
+				)
+				{
+					if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+					{
+						 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 					}
 				}
 				else
 				{
 					if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_passive_taunt' )
 					{
-						thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_passive_taunt' );
+						 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_passive_taunt' );
 					}
 				}
 			} 
@@ -18725,8 +20616,21 @@ state BehSwitch_Engage in cBehSwitch
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_passive_taunt' );
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -18801,21 +20705,40 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_GetFistMode() == 0
-			|| ACS_GetFistMode() == 2 )
+			if (ACS_GetFistMode() == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
 			else if (ACS_GetFistMode() == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'claw_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_E3ARP' );
 				}
 			}
+			else if (ACS_GetFistMode() == 2 )
+			{
+				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+				{
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
+				}
+			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -18825,158 +20748,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -18984,158 +20920,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -19143,158 +21092,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -19302,158 +21264,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -19461,158 +21436,171 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 0)
 		{
-			if (thePlayer.HasTag('igni_sword_equipped'))
+			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('igni_bow_equipped'))
+			else if (thePlayer.HasTag('acs_igni_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('igni_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 1)
 		{
-			if (thePlayer.HasTag('quen_sword_equipped'))
+			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('quen_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_quen_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('quen_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 2)
 		{
-			if (thePlayer.HasTag('axii_sword_equipped'))
+			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('axii_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_axii_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('axii_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 3)
 		{
-			if (thePlayer.HasTag('aard_sword_equipped'))
+			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP' );
 				}
 			}
-			else if (thePlayer.HasTag('aard_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_aard_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('aard_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
 		}
 		else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 4)
 		{
-			if (thePlayer.HasTag('yrden_sword_equipped'))
+			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
-			else if (thePlayer.HasTag('yrden_secondary_sword_equipped'))
+			else if (thePlayer.HasTag('acs_yrden_secondary_sword_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_bow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_bow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_bow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_bow_beh_E3ARP' );
 				}
 			}
 			else if (thePlayer.HasTag('yrden_crossbow_equipped'))
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_crossbow_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'acs_crossbow_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_crossbow_beh_E3ARP' );
 				}
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -19622,121 +21610,121 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('igni_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('igni_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' );
 			}	
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 3 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('axii_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 3 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('axii_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 3 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 3 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_E3ARP_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_E3ARP_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP_swordwalk_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 7 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('aard_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 7 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('aard_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 7 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 7 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_E3ARP' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_E3ARP' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 5 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('yrden_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 5 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('yrden_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 5 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 5 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_E3ARP_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_E3ARP_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP_swordwalk_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 1 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('quen_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 1 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('quen_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 1 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 1 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_E3ARP_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_E3ARP_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP_swordwalk_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('igni_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('igni_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_E3ARP_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 4 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('axii_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 4 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('axii_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 4 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 4 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 8 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('aard_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 8 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('aard_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 8 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 8 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_E3ARP_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 6 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('yrden_secondary_sword_equipped') )
-			|| ( ACS_GetFocusModeSteelWeapon() == 6 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('yrden_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 6 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
+			|| ( ACS_GetFocusModeSteelWeapon() == 6 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_E3ARP_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			( ACS_GetFocusModeSilverWeapon() == 2 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('quen_secondary_sword_equipped')  )
-			|| ( ACS_GetFocusModeSteelWeapon() == 2 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('quen_secondary_sword_equipped') )
+			( ACS_GetFocusModeSilverWeapon() == 2 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped')  )
+			|| ( ACS_GetFocusModeSteelWeapon() == 2 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_E3ARP_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 			}
 		}
 		else if 
@@ -19744,21 +21732,40 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_GetFistMode() == 0
-			|| ACS_GetFistMode() == 2 )
+			if (ACS_GetFistMode() == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
 			else if (ACS_GetFistMode() == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'claw_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_E3ARP' );
 				}
 			}
+			else if (ACS_GetFistMode() == 2 )
+			{
+				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+				{
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
+				}
+			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -19766,111 +21773,111 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if 
 		(
-			thePlayer.HasTag('igni_sword_equipped')
+			thePlayer.HasTag('acs_igni_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' ); ACS_Theft_Prevention_9 ();
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' ); 
 			}	
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('axii_sword_equipped')
+			thePlayer.HasTag('acs_axii_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_E3ARP_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_E3ARP_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP_swordwalk_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('aard_sword_equipped')
+			thePlayer.HasTag('acs_aard_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_E3ARP' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_E3ARP' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('yrden_sword_equipped')
+			thePlayer.HasTag('acs_yrden_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_E3ARP_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_E3ARP_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP_swordwalk_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('quen_sword_equipped')
+			thePlayer.HasTag('acs_quen_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_E3ARP_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_E3ARP_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP_swordwalk_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('igni_secondary_sword_equipped')
+			thePlayer.HasTag('acs_igni_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_E3ARP_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('axii_secondary_sword_equipped')
+			thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('aard_secondary_sword_equipped')
+			thePlayer.HasTag('acs_aard_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_E3ARP_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_E3ARP_swordwalk_passive_taunt' ); ACS_Theft_Prevention_9 ();
+				 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP_swordwalk_passive_taunt' ); 
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('yrden_secondary_sword_equipped')
+			thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_E3ARP_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 			}
 		}
 			
 		else if 
 		(
-			thePlayer.HasTag('quen_secondary_sword_equipped')
+			thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_E3ARP_swordwalk_passive_taunt' )
 			{
-				ACS_Theft_Prevention_9 (); thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+				  stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 			}
 		}
 		else if 
@@ -19878,21 +21885,40 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_GetFistMode() == 0
-			|| ACS_GetFistMode() == 2 )
+			if (ACS_GetFistMode() == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' );
 				}
 			}
 			else if (ACS_GetFistMode() == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_E3ARP' )
 				{
-					thePlayer.ActivateAndSyncBehavior( 'claw_beh_E3ARP' );
+					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_E3ARP' );
 				}
 			}
+			else if (ACS_GetFistMode() == 2 )
+			{
+				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+				{
+					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
+				}
+			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 
@@ -19906,107 +21932,107 @@ state BehSwitch_Engage in cBehSwitch
 				{
 					if 
 					(
-						ACS_GetItem_Eredin_Silver() && thePlayer.HasTag('axii_sword_equipped') 
+						ACS_GetItem_Eredin_Silver() && thePlayer.HasTag('acs_axii_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_E3ARP_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_E3ARP_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP_swordwalk_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Claws_Silver() && thePlayer.HasTag('aard_sword_equipped') 
+						ACS_GetItem_Claws_Silver() && thePlayer.HasTag('acs_aard_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_E3ARP' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_E3ARP' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Imlerith_Silver() && thePlayer.HasTag('yrden_sword_equipped')
+						ACS_GetItem_Imlerith_Silver() && thePlayer.HasTag('acs_yrden_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_E3ARP_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_E3ARP_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP_swordwalk_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Olgierd_Silver() && thePlayer.HasTag('quen_sword_equipped')
+						ACS_GetItem_Olgierd_Silver() && thePlayer.HasTag('acs_quen_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_E3ARP_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_E3ARP_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP_swordwalk_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Greg_Silver() && thePlayer.HasTag('axii_secondary_sword_equipped') 
+						ACS_GetItem_Greg_Silver() && thePlayer.HasTag('acs_axii_secondary_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 						}
 					}
 
 					else if 
 					(
-						ACS_GetItem_Katana_Silver() && thePlayer.HasTag('axii_secondary_sword_equipped')
+						ACS_GetItem_Katana_Silver() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Axe_Silver() && thePlayer.HasTag('aard_secondary_sword_equipped') 
+						ACS_GetItem_Axe_Silver() && thePlayer.HasTag('acs_aard_secondary_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_E3ARP_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Hammer_Silver() && thePlayer.HasTag('yrden_secondary_sword_equipped')
+						ACS_GetItem_Hammer_Silver() && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_E3ARP_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Spear_Silver() &&  thePlayer.HasTag('quen_secondary_sword_equipped')
+						ACS_GetItem_Spear_Silver() &&  thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_E3ARP_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 						}
 					}
 					else
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' );
 						}
 					}
 				}
@@ -20014,107 +22040,107 @@ state BehSwitch_Engage in cBehSwitch
 				{
 					if 
 					(
-						ACS_GetItem_Eredin_Steel() && thePlayer.HasTag('axii_sword_equipped')
+						ACS_GetItem_Eredin_Steel() && thePlayer.HasTag('acs_axii_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_E3ARP_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_primary_beh_E3ARP_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP_swordwalk_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Claws_Steel() && thePlayer.HasTag('aard_sword_equipped')
+						ACS_GetItem_Claws_Steel() && thePlayer.HasTag('acs_aard_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_E3ARP' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_primary_beh_E3ARP' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP' );
 						}
 					}
 						
 					else if 
 					(
-						(ACS_GetItem_MageStaff_Steel() || ACS_GetItem_Imlerith_Steel()) && thePlayer.HasTag('yrden_sword_equipped')
+						(ACS_GetItem_MageStaff_Steel() || ACS_GetItem_Imlerith_Steel()) && thePlayer.HasTag('acs_yrden_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_E3ARP_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_primary_beh_E3ARP_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP_swordwalk_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Olgierd_Steel() && thePlayer.HasTag('quen_sword_equipped')
+						ACS_GetItem_Olgierd_Steel() && thePlayer.HasTag('acs_quen_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_E3ARP_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_primary_beh_E3ARP_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP_swordwalk_passive_taunt' );
 						}
 					}
 
 					else if 
 					(
-						ACS_GetItem_Katana_Steel() && thePlayer.HasTag('axii_secondary_sword_equipped')
+						ACS_GetItem_Katana_Steel() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Greg_Steel() && thePlayer.HasTag('axii_secondary_sword_equipped')
+						ACS_GetItem_Greg_Steel() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'axii_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Axe_Steel() && thePlayer.HasTag('aard_secondary_sword_equipped')
+						ACS_GetItem_Axe_Steel() && thePlayer.HasTag('acs_aard_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_E3ARP_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'aard_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'aard_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Hammer_Steel() && thePlayer.HasTag('yrden_secondary_sword_equipped')
+						ACS_GetItem_Hammer_Steel() && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_E3ARP_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'yrden_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'yrden_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 						}
 					}
 						
 					else if 
 					(
-						ACS_GetItem_Spear_Steel() && thePlayer.HasTag('quen_secondary_sword_equipped')
+						ACS_GetItem_Spear_Steel() && thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_E3ARP_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'quen_secondary_beh_E3ARP_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP_swordwalk_passive_taunt' );
 						}
 					}
 					else
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' )
 						{
-							thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' );
+							 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' );
 						}
 					}
 				}
@@ -20123,19 +22149,29 @@ state BehSwitch_Engage in cBehSwitch
 			{
 				if 
 				(
-					thePlayer.HasTag('vampire_claws_equipped')
+					thePlayer.HasTag('acs_vampire_claws_equipped')
 				)
 				{
 					if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_E3ARP' )
 					{
-						thePlayer.ActivateAndSyncBehavior( 'claw_beh_E3ARP' );
+						 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_E3ARP' );
+					}
+				}
+				else if 
+				(
+					thePlayer.HasTag('acs_sorc_fists_equipped')
+				)
+				{
+					if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+					{
+						 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
 					}
 				}
 				else
 				{
 					if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' )
 					{
-						thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' );
+						 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' );
 					}
 				}
 			} 
@@ -20144,8 +22180,21 @@ state BehSwitch_Engage in cBehSwitch
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' )
 			{
-				thePlayer.ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' );
+				 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' );
 			}
+		}
+
+		if (stupidArray.Size() > 0)
+		{
+			//thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0);
+			//thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+			//thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+			//thePlayer.RaiseForceEvent( 'Climb' );
+
+			thePlayer.ActivateBehaviors(stupidArray);
 		}
 	}
 }

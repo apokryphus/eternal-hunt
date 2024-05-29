@@ -1,4 +1,4 @@
-function ACS_Oneliner(text: string, position: Vector, optional tag: string, optional offset: Vector, optional lifetime: float): ACS_Oneliner 
+function ACS_Oneliner(text: string, position: Vector, optional tag: string, optional offset: Vector, optional lifetime: float, optional render_distance: float): ACS_Oneliner 
 {
   var oneliner: ACS_Oneliner;
 
@@ -8,12 +8,13 @@ function ACS_Oneliner(text: string, position: Vector, optional tag: string, opti
   oneliner.offset = offset;
   oneliner.position = position;
   oneliner.lifetime = lifetime;
+  oneliner.render_distance = render_distance;
   oneliner.register();
 
   return oneliner;
 }
 
-function ACS_OnelinerScreen(text: string, position: Vector, optional tag: string, optional offset: Vector, optional lifetime: float): ACS_OnelinerScreen 
+function ACS_OnelinerScreen(text: string, position: Vector, optional tag: string, optional offset: Vector, optional lifetime: float, optional render_distance: float): ACS_OnelinerScreen 
 {
   var oneliner: ACS_OnelinerScreen;
 
@@ -23,12 +24,13 @@ function ACS_OnelinerScreen(text: string, position: Vector, optional tag: string
   oneliner.offset = offset;
   oneliner.position = position;
   oneliner.lifetime = lifetime;
+  oneliner.render_distance = render_distance;
   oneliner.register();
 
   return oneliner;
 }
 
-function ACS_OnelinerEntity(text: string, entity: CEntity, optional tag: string, optional offset: Vector, optional lifetime: float): ACS_OnelinerEntity 
+function ACS_OnelinerEntity(text: string, entity: CEntity, optional tag: string, optional offset: Vector, optional lifetime: float, optional render_distance: float): ACS_OnelinerEntity 
 {
   var oneliner: ACS_OnelinerEntity;
 
@@ -38,6 +40,7 @@ function ACS_OnelinerEntity(text: string, entity: CEntity, optional tag: string,
   oneliner.tag = tag;
   oneliner.offset = offset;
   oneliner.lifetime = lifetime;
+  oneliner.render_distance = render_distance;
   oneliner.register();
 
   return oneliner;
@@ -73,7 +76,7 @@ statemachine class ACS_Oneliner
   var position: Vector;
   var offset: Vector;
   var entity: CEntity;
-  var render_distance: int;
+  var render_distance: float;
   var lifetime : float;
 
   default lifetime = 0;
@@ -111,7 +114,7 @@ statemachine class ACS_Oneliner
 
   //////////////////////////////////////////////////////////////////////////////
 
-  public function setRenderDistance(value: int): ACS_Oneliner 
+  public function setRenderDistance(value: float): ACS_Oneliner 
   {
     this.render_distance = value;
 

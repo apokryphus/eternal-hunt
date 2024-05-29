@@ -383,7 +383,7 @@ function ACS_OnTakeDamage(action: W3DamageAction)
 				{
 					GetACSWatcher().ACS_TransformationDisable();
 
-					ACS_Guards_Tutorial();
+					ACS_Tutorial_Display_Check('ACS_Guards_Tutorial_Shown');
 
 					action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
 
@@ -447,7 +447,7 @@ function ACS_OnTakeDamage(action: W3DamageAction)
 					}
 					else
 					{
-						if (thePlayer.HasTag('vampire_claws_equipped'))
+						if (thePlayer.HasTag('acs_vampire_claws_equipped'))
 						{
 							GetACSWatcher().PlayerPlayAnimation('bruxa_death_front_ACS');
 							//((CAnimatedComponent)thePlayer.GetComponentByClassName('CAnimatedComponent')).FreezePoseFadeIn(3.125);
@@ -1442,7 +1442,7 @@ function ACS_Enemy_On_Take_Damage_General(action: W3DamageAction)
 				||
 				(npc.UsesEssence() && npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= 0.01))
 				{
-					if (thePlayer.IsWeaponHeld('fist') && !thePlayer.HasTag('vampire_claws_equipped') )
+					if (thePlayer.IsWeaponHeld('fist') && !thePlayer.HasTag('acs_vampire_claws_equipped') )
 					{
 						
 					}
@@ -1469,7 +1469,7 @@ function ACS_Enemy_On_Take_Damage_General(action: W3DamageAction)
 					{
 						GetACSWatcher().NPC_BloodCovered_Effect(action);
 
-						if (thePlayer.IsWeaponHeld('fist') && !thePlayer.HasTag('vampire_claws_equipped') )
+						if (thePlayer.IsWeaponHeld('fist') && !thePlayer.HasTag('acs_vampire_claws_equipped') )
 						{
 
 						}
@@ -1627,11 +1627,11 @@ function ACS_Enemy_On_Take_Damage_General(action: W3DamageAction)
 			{
 				if (npc.UsesVitality())
 				{
-					action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.99;
+					action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.5;
 				}
 				else if (npc.UsesEssence())
 				{
-					action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.99;
+					action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.5;
 				}
 			}
 
@@ -1721,7 +1721,7 @@ function ACS_Sign_Combo_System(action: W3DamageAction)
 
 		//ACSSignComboSystemRemoveTags();
 
-		ACS_Sign_Combo_System_Tutorial();
+		ACS_Tutorial_Display_Check('ACS_Sign_Combo_System_Tutorial_Shown');
 
 		ent = theGame.CreateEntity( (CEntityTemplate)LoadResource( 
 
@@ -2068,7 +2068,7 @@ function ACS_KillCount_Manager( npc : CActor )
 			npc.HasAbility('mon_toad_base')
 			|| npc.HasAbility('q604_caretaker')
 			|| npc.HasAbility('mon_czart')
-			|| npc.HasAbility('sfx_bies')
+			|| npc.GetSfxTag() == 'sfx_bies'
 			|| npc.GetSfxTag() == 'sfx_lessog'
 			|| npc.HasAbility('mon_sprigan')
 			|| npc.HasAbility('mon_sharley_base')
@@ -2134,6 +2134,29 @@ function ACS_Forest_God_On_Take_Damage(action: W3DamageAction)
 	{
 		if ( playerAttacker )
 		{
+			if (npc.UsesVitality())
+			{
+				if( thePlayer.IsDoingSpecialAttack(false))
+				{
+					action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.5;
+				}
+				else
+				{
+					action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.25;
+				}
+			}
+			else if (npc.UsesEssence())
+			{
+				if( thePlayer.IsDoingSpecialAttack(false))
+				{
+					action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.5;
+				}
+				else
+				{
+					action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.25;
+				}
+			}
+
 			if ( (npc.GetStat(BCS_Essence) <= npc.GetStatMax(BCS_Essence) * 0.5)
 			&& !npc.HasTag('ACS_Spawn_Adds_1'))
 			{
@@ -2205,22 +2228,22 @@ function ACS_Rage_Enemy_On_Take_Damage(action: W3DamageAction)
 				{
 					if( thePlayer.IsDoingSpecialAttack(false))
 					{
-						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.5;
+						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.75;
 					}
 					else
 					{
-						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.25;
+						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.5;
 					}
 				}
 				else if (npc.UsesEssence())
 				{
 					if( thePlayer.IsDoingSpecialAttack(false))
 					{
-						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.5;
+						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.75;
 					}
 					else
 					{
-						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.25;
+						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.5;
 					}
 				}
 
@@ -3021,12 +3044,12 @@ function ACS_NightStalker_On_Take_Damage(action: W3DamageAction)
 
 				movementAdjustorNPC.RotateTowards( ticket, GetWitcherPlayer() );
 
-				GetACSNightStalker().SetTatgetableByPlayer(true);
+				ACSGetCActor('ACS_Night_Stalker').SetTatgetableByPlayer(true);
 				
-				if (GetACSNightStalker().IsEffectActive('predator_mode', false))
+				if (ACSGetCActor('ACS_Night_Stalker').IsEffectActive('predator_mode', false))
 				{
 					npc.SetCanPlayHitAnim(true); 
-					GetACSNightStalker().DestroyEffect('predator_mode');
+					ACSGetCActor('ACS_Night_Stalker').DestroyEffect('predator_mode');
 
 					if (npc.UsesVitality())
 					{
@@ -3079,12 +3102,12 @@ function ACS_NightStalker_On_Take_Damage(action: W3DamageAction)
 					}
 				}
 
-				GetACSNightStalker().DestroyEffect('glow');
-				GetACSNightStalker().PlayEffectSingle('glow');
+				ACSGetCActor('ACS_Night_Stalker').DestroyEffect('glow');
+				ACSGetCActor('ACS_Night_Stalker').PlayEffectSingle('glow');
 
-				if (!GetACSNightStalker().IsEffectActive('demonic_possession', false))
+				if (!ACSGetCActor('ACS_Night_Stalker').IsEffectActive('demonic_possession', false))
 				{
-					GetACSNightStalker().PlayEffectSingle('demonic_possession');
+					ACSGetCActor('ACS_Night_Stalker').PlayEffectSingle('demonic_possession');
 				}
 			}
 		}
@@ -3129,13 +3152,13 @@ function ACS_XenoTyrant_On_Take_Damage(action: W3DamageAction)
 			{
 				npc.SetCanPlayHitAnim(false); 
 
-				if (GetACSXenoTyrant().HasAbility('mon_kikimore_small'))
+				if (ACSGetCActor('ACS_Xeno_Tyrant').HasAbility('mon_kikimore_small'))
 				{
-					GetACSXenoTyrant().RemoveAbility('mon_kikimore_small');
+					ACSGetCActor('ACS_Xeno_Tyrant').RemoveAbility('mon_kikimore_small');
 				}
 				else
 				{
-					GetACSXenoTyrant().AddAbility('mon_kikimore_small');
+					ACSGetCActor('ACS_Xeno_Tyrant').AddAbility('mon_kikimore_small');
 				}
 
 				if (ACS_ActionDealsFireDamage(action)
@@ -3607,7 +3630,7 @@ function ACS_Fire_Bear_On_Take_Damage(action: W3DamageAction)
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
-				if (ACSFireBear().IsEffectActive('flames', false))
+				if (ACSGetCActor('ACS_Fire_Bear').IsEffectActive('flames', false))
 				{
 					if (npc.UsesVitality())
 					{
@@ -3777,11 +3800,11 @@ function ACS_Knightmare_On_Take_Damage(action: W3DamageAction)
 						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.99;
 					}
 
-					GetACSKnightmareQuenHit().StopEffect('discharge');
-					GetACSKnightmareQuenHit().PlayEffectSingle('discharge');
+					ACSGetCEntity('ACS_knightmare_quen_hit').StopEffect('discharge');
+					ACSGetCEntity('ACS_knightmare_quen_hit').PlayEffectSingle('discharge');
 
-					GetACSKnightmareQuen().PlayEffectSingle('default_fx');
-					GetACSKnightmareQuen().StopEffect('default_fx');
+					ACSGetCEntity('ACS_knightmare_quen').PlayEffectSingle('default_fx');
+					ACSGetCEntity('ACS_knightmare_quen').StopEffect('default_fx');
 				}
 				else
 				{
@@ -3809,14 +3832,14 @@ function ACS_Knightmare_On_Take_Damage(action: W3DamageAction)
 					}
 				}
 				
-				GetACSKnightmareQuenHit().StopEffect('quen_rebound_sphere_bear_abl2');
-				//GetACSKnightmareQuenHit().PlayEffectSingle('quen_rebound_sphere_bear_abl2');
+				ACSGetCEntity('ACS_knightmare_quen_hit').StopEffect('quen_rebound_sphere_bear_abl2');
+				//ACSGetCEntity('ACS_knightmare_quen_hit').PlayEffectSingle('quen_rebound_sphere_bear_abl2');
 
-				GetACSKnightmareQuenHit().StopEffect('quen_rebound_sphere_bear_abl2_copy');
-				//GetACSKnightmareQuenHit().PlayEffectSingle('quen_rebound_sphere_bear_abl2_copy');
+				ACSGetCEntity('ACS_knightmare_quen_hit').StopEffect('quen_rebound_sphere_bear_abl2_copy');
+				//ACSGetCEntity('ACS_knightmare_quen_hit').PlayEffectSingle('quen_rebound_sphere_bear_abl2_copy');
 
-				GetACSKnightmareQuenHit().StopEffect('quen_impulse_explode');
-				//GetACSKnightmareQuen().PlayEffectSingle('quen_impulse_explode');
+				ACSGetCEntity('ACS_knightmare_quen_hit').StopEffect('quen_impulse_explode');
+				//ACSGetCEntity('ACS_knightmare_quen').PlayEffectSingle('quen_impulse_explode');
 			}
 		}
 		else
@@ -4027,11 +4050,11 @@ function ACS_Rat_Mage_On_Take_Damage(action: W3DamageAction)
 						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.99;
 					}
 
-					GetACSRatMageQuenHit().StopEffect('discharge');
-					GetACSRatMageQuenHit().PlayEffectSingle('discharge');
+					ACSGetCEntity('ACS_rat_mage_quen_hit').StopEffect('discharge');
+					ACSGetCEntity('ACS_rat_mage_quen_hit').PlayEffectSingle('discharge');
 
-					GetACSRatMageQuen().PlayEffectSingle('default_fx');
-					GetACSRatMageQuen().StopEffect('default_fx');
+					ACSGetCEntity('ACS_rat_mage_quen').PlayEffectSingle('default_fx');
+					ACSGetCEntity('ACS_rat_mage_quen').StopEffect('default_fx');
 				}
 				else
 				{
@@ -4045,11 +4068,11 @@ function ACS_Rat_Mage_On_Take_Damage(action: W3DamageAction)
 					}
 				}
 				
-				GetACSRatMageQuenHit().StopEffect('quen_rebound_sphere_bear_abl2');
+				ACSGetCEntity('ACS_rat_mage_quen_hit').StopEffect('quen_rebound_sphere_bear_abl2');
 
-				GetACSRatMageQuenHit().StopEffect('quen_rebound_sphere_bear_abl2_copy');
+				ACSGetCEntity('ACS_rat_mage_quen_hit').StopEffect('quen_rebound_sphere_bear_abl2_copy');
 
-				GetACSRatMageQuenHit().StopEffect('quen_impulse_explode');
+				ACSGetCEntity('ACS_rat_mage_quen_hit').StopEffect('quen_impulse_explode');
 			}
 		}
 		else
@@ -4113,9 +4136,9 @@ function ACS_Canaris_On_Take_Damage(action: W3DamageAction)
 					//caranthir_hit_anim_names.PushBack('hit_back_fall_01');
 					//caranthir_hit_anim_names.PushBack('hit_back_fall_02');
 
-					if( GetACSCanaris().IsAlive()) {GetACSCanaris().ClearAnimationSpeedMultipliers();}	
+					if( ACSGetCActor('ACS_Canaris').IsAlive()) {ACSGetCActor('ACS_Canaris').ClearAnimationSpeedMultipliers();}	
 
-					GetACSCanaris().SetAnimationSpeedMultiplier( 1.5  );
+					ACSGetCActor('ACS_Canaris').SetAnimationSpeedMultiplier( 1.5  );
 																		
 					GetACSWatcher().RemoveTimer('ACS_Caranthir_ResetAnimation'); 
 					GetACSWatcher().AddTimer('ACS_Caranthir_ResetAnimation', 0.5  , false);
@@ -4127,21 +4150,21 @@ function ACS_Canaris_On_Take_Damage(action: W3DamageAction)
 					caranthir_hit_anim_names.PushBack('hit_back_fall_01');
 					caranthir_hit_anim_names.PushBack('hit_back_fall_02');
 
-					if( GetACSCanaris().IsAlive()) {GetACSCanaris().ClearAnimationSpeedMultipliers();}	
+					if( ACSGetCActor('ACS_Canaris').IsAlive()) {ACSGetCActor('ACS_Canaris').ClearAnimationSpeedMultipliers();}	
 
-					GetACSCanaris().SetAnimationSpeedMultiplier( 1.5  );
+					ACSGetCActor('ACS_Canaris').SetAnimationSpeedMultiplier( 1.5  );
 																		
 					GetACSWatcher().RemoveTimer('ACS_Caranthir_ResetAnimation'); 
 					GetACSWatcher().AddTimer('ACS_Caranthir_ResetAnimation', 0.5  , false);
 
 					animatedComponentA.PlaySlotAnimationAsync ( caranthir_hit_anim_names[RandRange(caranthir_hit_anim_names.Size())], 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.5f, 0.5f));
 
-					GetACSCanaris().DestroyEffect('teleport_short');
-					GetACSCanaris().PlayEffectSingle('teleport_short');
-					GetACSCanaris().StopEffect('teleport_short');
+					ACSGetCActor('ACS_Canaris').DestroyEffect('teleport_short');
+					ACSGetCActor('ACS_Canaris').PlayEffectSingle('teleport_short');
+					ACSGetCActor('ACS_Canaris').StopEffect('teleport_short');
 
-					GetACSCanaris().DestroyEffect('ice_armor');
-					GetACSCanaris().PlayEffectSingle('ice_armor');
+					ACSGetCActor('ACS_Canaris').DestroyEffect('ice_armor');
+					ACSGetCActor('ACS_Canaris').PlayEffectSingle('ice_armor');
 
 					GetACSWatcher().ACS_Caranthir_Teleport_FX();
 
@@ -4153,7 +4176,7 @@ function ACS_Canaris_On_Take_Damage(action: W3DamageAction)
 						spawnPos = newSpawnPos;
 					}
 
-					GetACSCanaris().Teleport(ACSFixZAxis(spawnPos));
+					ACSGetCActor('ACS_Canaris').Teleport(ACSFixZAxis(spawnPos));
 				}
 				
 				if (npc.UsesVitality())
@@ -4560,8 +4583,8 @@ function ACS_Wolf_On_Take_Damage(action: W3DamageAction)
 		&& ((CNewNPC)npc).GetNPCType() != ENGT_Quest
 		&& !((CNewNPC)npc).IsInInterior()
 		&& !npc.HasTag('ACS_Shadow_Wolf')
-		&& GetACSFluffy() 
-		&& GetACSFluffy().IsAlive()
+		&& ACSGetCActor('ACS_Fluffy') 
+		&& ACSGetCActor('ACS_Fluffy').IsAlive()
 		)
 		{
 			if (
@@ -4810,7 +4833,7 @@ function ACS_Fluffy_On_Take_Damage(action: W3DamageAction)
 
 						npc.SoundEvent("monster_wild_dog_howl");
 
-						if (GetACSFluffy() && GetACSFluffy().IsAlive())
+						if (ACSGetCActor('ACS_Fluffy') && ACSGetCActor('ACS_Fluffy').IsAlive())
 						{
 							ACS_FluffyShadowWolfSpawn(npc, npc.GetWorldPosition());
 						}
@@ -4902,14 +4925,14 @@ function ACS_Botchling_On_Take_Damage(action: W3DamageAction)
 						{
 							if (npc && npc.IsAlive())
 							{
-								GetACSBotchling().PlayEffect('fx_quest_q103');
-								GetACSBotchling().StopEffect('fx_quest_q103');
+								ACSGetCActor('ACS_Botchling').PlayEffect('fx_quest_q103');
+								ACSGetCActor('ACS_Botchling').StopEffect('fx_quest_q103');
 
-								GetACSBotchling().PlayEffect('appear_fx');
-								GetACSBotchling().PlayEffect('morph_fx');
+								ACSGetCActor('ACS_Botchling').PlayEffect('appear_fx');
+								ACSGetCActor('ACS_Botchling').PlayEffect('morph_fx');
 
-								GetACSBotchling().StopEffect('appear_fx');
-								GetACSBotchling().StopEffect('morph_fx');
+								ACSGetCActor('ACS_Botchling').StopEffect('appear_fx');
+								ACSGetCActor('ACS_Botchling').StopEffect('morph_fx');
 
 								ACS_BotchlingWraithSpawn(npc, npc.GetWorldPosition());
 							}
@@ -5292,7 +5315,7 @@ function ACS_Bruxa_On_Take_Damage(action: W3DamageAction)
 			{
 				if (!npc.HasTag('ACS_Unseen_Blade_Summon_Trigger'))
 				{
-					if(!ACS_Blade_Of_The_Unseen() && !ACSVampireMonster())
+					if(!ACSGetCActor('ACS_Blade_Of_The_Unseen') && !ACSGetCActor('ACS_Vampire_Monster'))
 					{
 						GetACSStorage().acs_Number_Of_Bruxae_Slain_Increment();
 						
@@ -5327,7 +5350,7 @@ function ACS_Bruxa_On_Take_Damage(action: W3DamageAction)
 
 						npc.AddTag('ACS_Unseen_Blade_Summon_Trigger');
 					}
-					else if(ACS_Blade_Of_The_Unseen() && ACS_Blade_Of_The_Unseen().IsAlive())
+					else if(ACSGetCActor('ACS_Blade_Of_The_Unseen') && ACSGetCActor('ACS_Blade_Of_The_Unseen').IsAlive())
 					{
 						playerRot = thePlayer.GetWorldRotation();
 
@@ -5341,7 +5364,7 @@ function ACS_Bruxa_On_Take_Damage(action: W3DamageAction)
 							spawnPos = newSpawnPos;
 						}
 
-						ACS_Blade_Of_The_Unseen().TeleportWithRotation(ACSFixZAxis(spawnPos), playerRot);
+						ACSGetCActor('ACS_Blade_Of_The_Unseen').TeleportWithRotation(ACSFixZAxis(spawnPos), playerRot);
 
 						npc.AddTag('ACS_Unseen_Blade_Summon_Trigger');
 					}
@@ -5583,7 +5606,7 @@ function ACS_Melusine_Original_On_Take_Damage(action: W3DamageAction)
 							RequestWeatherChangeTo('WT_Rain_Storm', 5.0, false);
 						}
 
-						ACS_Lightning_Strike_No_Condition();
+						GetACSWatcher().Lightning_Strike_No_Condition();
 
 						GetACSWatcher().RemoveTimer('MelusineSpawnDelay');
 						GetACSWatcher().AddTimer('MelusineSpawnDelay', RandRangeF(10,5), false);
@@ -5622,7 +5645,7 @@ function ACS_Melusine_On_Take_Damage(action: W3DamageAction)
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
-				if (GetACSMelusineCloud().HasAbility('DjinnRage'))
+				if (ACSGetCActor('ACS_Melusine_Cloud').HasAbility('DjinnRage'))
 				{
 					if (npc.UsesVitality())
 					{
@@ -5673,13 +5696,13 @@ function ACS_Melusine_On_Take_Damage(action: W3DamageAction)
 					}
 				}
 
-				if (GetACSMelusineBossbar().UsesVitality())
+				if (ACSGetCActor('ACS_Melusine_Bossbar').UsesVitality())
 				{
-					GetACSMelusineBossbar().DrainVitality(action.processedDmg.vitalityDamage);
+					ACSGetCActor('ACS_Melusine_Bossbar').DrainVitality(action.processedDmg.vitalityDamage);
 				}
-				else if (GetACSMelusineBossbar().UsesEssence())
+				else if (ACSGetCActor('ACS_Melusine_Bossbar').UsesEssence())
 				{
-					GetACSMelusineBossbar().DrainEssence(action.processedDmg.essenceDamage);
+					ACSGetCActor('ACS_Melusine_Bossbar').DrainEssence(action.processedDmg.essenceDamage);
 				}
 			}
 
@@ -5689,13 +5712,13 @@ function ACS_Melusine_On_Take_Damage(action: W3DamageAction)
 			{
 				if ( !npc.HasTag('ACS_Melusine_Death'))
 				{
-					GetACSMelusineCloud().Destroy();
+					ACSGetCActor('ACS_Melusine_Cloud').Destroy();
 
-					GetACSMelusineBossbar().Destroy();
+					ACSGetCActor('ACS_Melusine_Bossbar').Destroy();
 
 					GetWitcherPlayer().AddPoints(EExperiencePoint, 500, false );
 
-					ACS_Lightning_Strike_No_Condition_Mult();
+					GetACSWatcher().Lightning_Strike_No_Condition_Mult();
 
 					if (GetWeatherConditionName() != 'WT_Clear')
 					{
@@ -6166,15 +6189,15 @@ function ACS_Pirate_Zombie_On_Take_Damage(action: W3DamageAction)
 
 					((CNewNPC)npc).SetVisibility(false);
 
-					GetACSPirateZombieSwordTrail().Destroy();
+					ACSGetCEntity('ACS_Pirate_Zombie_Trail').Destroy();
 
-					GetACSPirateZombieChestBone1().Destroy();
+					ACSGetCEntity('ACS_Pirate_Zombie_Chest_Bone_1').Destroy();
 
-					GetACSPirateZombieChestBone2().Destroy();
+					ACSGetCEntity('ACS_Pirate_Zombie_Chest_Bone_2').Destroy();
 
-					GetACSPirateZombieChestBone3().Destroy();
+					ACSGetCEntity('ACS_Pirate_Zombie_Chest_Bone_3').Destroy();
 
-					GetACSPirateZombieChestBone4().Destroy();
+					ACSGetCEntity('ACS_Pirate_Zombie_Chest_Bone_4').Destroy();
 
 					GetWitcherPlayer().AddPoints(EExperiencePoint, 250, false );
 
@@ -6227,7 +6250,7 @@ function ACS_Svalblod_On_Take_Damage(action: W3DamageAction)
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
-				if (GetACSSvalblodBossbar().UsesVitality())
+				if (ACSGetCActor('ACS_Svalblod_Bossbar').UsesVitality())
 				{
 					if( thePlayer.IsDoingSpecialAttack(false))
 					{
@@ -6238,9 +6261,9 @@ function ACS_Svalblod_On_Take_Damage(action: W3DamageAction)
 						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.25;
 					}
 
-					GetACSSvalblodBossbar().DrainVitality(action.processedDmg.vitalityDamage / 2);
+					ACSGetCActor('ACS_Svalblod_Bossbar').DrainVitality(action.processedDmg.vitalityDamage / 2);
 				}
-				else if (GetACSSvalblodBossbar().UsesEssence())
+				else if (ACSGetCActor('ACS_Svalblod_Bossbar').UsesEssence())
 				{
 					if( thePlayer.IsDoingSpecialAttack(false))
 					{
@@ -6251,7 +6274,7 @@ function ACS_Svalblod_On_Take_Damage(action: W3DamageAction)
 						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.25;
 					}
 
-					GetACSSvalblodBossbar().DrainEssence(action.processedDmg.essenceDamage / 2);
+					ACSGetCActor('ACS_Svalblod_Bossbar').DrainEssence(action.processedDmg.essenceDamage / 2);
 				}
 
 				action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
@@ -6259,7 +6282,7 @@ function ACS_Svalblod_On_Take_Damage(action: W3DamageAction)
 			}
 
 			if (
-			GetACSSvalblodBossbar().UsesEssence() && GetACSSvalblodBossbar().GetCurrentHealth() < GetACSSvalblodBossbar().GetMaxHealth() * RandRangeF(0.75, 0.25)
+			ACSGetCActor('ACS_Svalblod_Bossbar').UsesEssence() && ACSGetCActor('ACS_Svalblod_Bossbar').GetCurrentHealth() < ACSGetCActor('ACS_Svalblod_Bossbar').GetMaxHealth() * RandRangeF(0.75, 0.25)
 			)
 			{
 				if ( !npc.HasTag('ACS_Svalblod_Transform'))
@@ -6323,7 +6346,7 @@ function ACS_Svalblod_Bear_On_Take_Damage(action: W3DamageAction)
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
-				if (GetACSSvalblodBossbar().UsesVitality())
+				if (ACSGetCActor('ACS_Svalblod_Bossbar').UsesVitality())
 				{
 					if( thePlayer.IsDoingSpecialAttack(false))
 					{
@@ -6334,9 +6357,9 @@ function ACS_Svalblod_Bear_On_Take_Damage(action: W3DamageAction)
 						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.875;
 					}
 
-					GetACSSvalblodBossbar().DrainVitality(action.processedDmg.vitalityDamage / 2);
+					ACSGetCActor('ACS_Svalblod_Bossbar').DrainVitality(action.processedDmg.vitalityDamage / 2);
 				}
-				else if (GetACSSvalblodBossbar().UsesEssence())
+				else if (ACSGetCActor('ACS_Svalblod_Bossbar').UsesEssence())
 				{
 					if( thePlayer.IsDoingSpecialAttack(false))
 					{
@@ -6347,7 +6370,7 @@ function ACS_Svalblod_Bear_On_Take_Damage(action: W3DamageAction)
 						action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.875;
 					}
 
-					GetACSSvalblodBossbar().DrainEssence(action.processedDmg.essenceDamage / 2);
+					ACSGetCActor('ACS_Svalblod_Bossbar').DrainEssence(action.processedDmg.essenceDamage / 2);
 				}
 
 				action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
@@ -6369,12 +6392,12 @@ function ACS_Svalblod_Bear_On_Take_Damage(action: W3DamageAction)
 			}
 
 			if (
-			GetACSSvalblodBossbar().GetCurrentHealth() <= 0.1
+			ACSGetCActor('ACS_Svalblod_Bossbar').GetCurrentHealth() <= 0.1
 			)
 			{
 				if ( !npc.HasTag('ACS_Svalblod_Bear_Death'))
 				{
-					GetACSSvalblodBossbar().Destroy();
+					ACSGetCActor('ACS_Svalblod_Bossbar').Destroy();
 
 					movementAdjustor.CancelAll();
 
@@ -6745,13 +6768,13 @@ function ACS_Duskwraith_On_Take_Damage(action: W3DamageAction)
 			&& !(((W3Action_Attack)action).IsParried())
 			)
 			{
-				if (ACSDuskwraith().IsEffectActive('shadows_form_banshee', false))
+				if (ACSGetCActor('ACS_Duskwraith').IsEffectActive('shadows_form_banshee', false))
 				{
 					npc.SetCanPlayHitAnim(false); 
 
-					ACSDuskwraith().StopEffect('shadows_form_banshee');
-					ACSDuskwraith().StopEffect('shadows_form_noonwraith_test');
-					ACSDuskwraith().PlayEffectSingle('shadows_form_noonwraith');
+					ACSGetCActor('ACS_Duskwraith').StopEffect('shadows_form_banshee');
+					ACSGetCActor('ACS_Duskwraith').StopEffect('shadows_form_noonwraith_test');
+					ACSGetCActor('ACS_Duskwraith').PlayEffectSingle('shadows_form_noonwraith');
 
 					if (npc.UsesVitality())
 					{
@@ -7455,13 +7478,13 @@ function ACS_Draug_On_Take_Damage(action: W3DamageAction)
 
 					((CActor)npc).GetInventory().AddAnItem( 'acs_crossbow_item', 1 );
 
-					GetACSDraugFakeAnchor().BreakAttachment();
+					ACSGetCEntity('ACS_Draug_Fake_Anchor').BreakAttachment();
 
-					GetACSDraugFakeAnchor().Teleport(ACSDraug().GetWorldPosition() + Vector(0,0,-200));
+					ACSGetCEntity('ACS_Draug_Fake_Anchor').Teleport(ACSGetCActor('ACS_Draug').GetWorldPosition() + Vector(0,0,-200));
 
-					GetACSDraugFakeAnchor().DestroyAfter(0.001);
+					ACSGetCEntity('ACS_Draug_Fake_Anchor').DestroyAfter(0.001);
 
-					l_comp = ((CActor)ACSDraug()).GetComponentsByClassName( 'CMorphedMeshManagerComponent' );
+					l_comp = ((CActor)ACSGetCActor('ACS_Draug')).GetComponentsByClassName( 'CMorphedMeshManagerComponent' );
 					size = l_comp.Size();
 
 					for ( j=0; j<size; j+= 1 )
@@ -7608,9 +7631,9 @@ function ACS_MegaWraith_On_Take_Damage(action: W3DamageAction)
 				{
 					GetWitcherPlayer().AddPoints(EExperiencePoint, 500, false );
 
-					GetACSMegaWraithRWeapon().Destroy();
+					ACSGetCEntity('ACS_MegaWraith_R_Weapon').Destroy();
 
-					GetACSMegaWraithLWeapon().Destroy();
+					ACSGetCEntity('ACS_MegaWraith_L_Weapon').Destroy();
 
 					npc.StopEffect('demonic_possession');
 
@@ -8847,18 +8870,18 @@ function ACS_Dao_Turret_On_Take_Damage(action: W3DamageAction)
 			{
 				if ( !npc.HasTag('ACS_Dao_Turret_Death'))
 				{
-					if (GetACS_Dao().UsesEssence())
+					if (ACSGetCActor('ACS_Dao').UsesEssence())
 					{
-						if (GetACS_Dao().GetStat(BCS_Essence) > GetACS_Dao().GetStatMax(BCS_Essence) * 0.05)
+						if (ACSGetCActor('ACS_Dao').GetStat(BCS_Essence) > ACSGetCActor('ACS_Dao').GetStatMax(BCS_Essence) * 0.05)
 						{
-							GetACS_Dao().DrainEssence(GetACS_Dao().GetStatMax(BCS_Essence) * 0.125 );
+							ACSGetCActor('ACS_Dao').DrainEssence(ACSGetCActor('ACS_Dao').GetStatMax(BCS_Essence) * 0.125 );
 						}
 					}
-					else if (GetACS_Dao().UsesVitality())
+					else if (ACSGetCActor('ACS_Dao').UsesVitality())
 					{
-						if (GetACS_Dao().GetStat(BCS_Vitality) > GetACS_Dao().GetStatMax(BCS_Vitality) * 0.05)
+						if (ACSGetCActor('ACS_Dao').GetStat(BCS_Vitality) > ACSGetCActor('ACS_Dao').GetStatMax(BCS_Vitality) * 0.05)
 						{
-							GetACS_Dao().DrainVitality(GetACS_Dao().GetStatMax(BCS_Vitality) * 0.125 );
+							ACSGetCActor('ACS_Dao').DrainVitality(ACSGetCActor('ACS_Dao').GetStatMax(BCS_Vitality) * 0.125 );
 						}
 					}
 
@@ -9197,6 +9220,21 @@ function ACS_Swarm_Mother_On_Take_Damage(action: W3DamageAction)
 	{
 		if ( playerAttacker )
 		{
+			if (
+			(npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.1)
+			||(npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= 0.1)
+			)
+			{
+				if (!npc.HasTag('ACS_Swarm_Mother_End_Stage'))
+				{
+					ACSGetCEntityDestroyAll('ACS_Swarm_Mother_Hive');
+
+					GetWitcherPlayer().AddPoints(EExperiencePoint, 50, false );
+
+					npc.AddTag('ACS_Swarm_Mother_End_Stage');
+				}
+			}
+
 			if ( !action.IsDoTDamage() 
 			&& !action.WasDodged() 
 			//&& action.IsActionMelee() && !thePlayer.IsUsingHorse() && !thePlayer.IsUsingVehicle()
@@ -9257,21 +9295,6 @@ function ACS_Swarm_Mother_On_Take_Damage(action: W3DamageAction)
 			else if (npc.UsesEssence())
 			{
 				action.processedDmg.essenceDamage -= action.processedDmg.essenceDamage * 0.5;
-			}
-
-			if (
-			(npc.GetCurrentHealth() - action.processedDmg.vitalityDamage <= 0.1)
-			||(npc.GetCurrentHealth() - action.processedDmg.essenceDamage <= 0.1)
-			)
-			{
-				if (!npc.HasTag('ACS_Swarm_Mother_End_Stage'))
-				{
-					ACS_SwarmMotherDestroyHives();
-
-					GetWitcherPlayer().AddPoints(EExperiencePoint, 50, false );
-
-					npc.AddTag('ACS_Swarm_Mother_End_Stage');
-				}
 			}
 		}
 		else
@@ -9666,6 +9689,7 @@ function ACS_Player_Attack(action: W3DamageAction)
 	var heal, playerVitality 																																				: float;
 	var curTargetVitality, maxTargetVitality, curTargetEssence, maxTargetEssence, finisherDist, vampireDmgValSteel, vampireDmgValSilver										: float;
 	var item_steel, item_silver																																				: SItemUniqueId;
+	var animatedComponentA 																											: CAnimatedComponent;
 	
     npc = (CActor)action.victim;
 	
@@ -9730,11 +9754,11 @@ function ACS_Player_Attack(action: W3DamageAction)
 		/*
 		&& (
 		thePlayer.IsWeaponHeld('fist')
-		|| thePlayer.HasTag('aard_sword_equipped')
-		|| thePlayer.HasTag('aard_secondary_sword_equipped')
-		|| thePlayer.HasTag('yrden_sword_equipped')
-		|| thePlayer.HasTag('yrden_secondary_sword_equipped')
-		|| thePlayer.HasTag('quen_secondary_sword_equipped')
+		|| thePlayer.HasTag('acs_aard_sword_equipped')
+		|| thePlayer.HasTag('acs_aard_secondary_sword_equipped')
+		|| thePlayer.HasTag('acs_yrden_sword_equipped')
+		|| thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
+		|| thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 		|| thePlayer.HasTag('ACS_In_Ciri_Special_Attack')
 		|| thePlayer.HasTag('acs_bow_active') 
 		|| thePlayer.HasTag('acs_crossbow_active')
@@ -9842,8 +9866,8 @@ function ACS_Player_Attack(action: W3DamageAction)
 
 				GetWitcherPlayer().GainStat(BCS_Vitality, (GetWitcherPlayer().GetStatMax(BCS_Vitality) - GetWitcherPlayer().GetStat(BCS_Vitality)) * 0.125 );
 				
-				if ((GetWitcherPlayer().HasTag('igni_sword_equipped')
-				|| GetWitcherPlayer().HasTag('igni_secondary_sword_equipped'))
+				if ((GetWitcherPlayer().HasTag('acs_igni_sword_equipped')
+				|| GetWitcherPlayer().HasTag('acs_igni_secondary_sword_equipped'))
 				&& thePlayer.GetStat(BCS_Focus) == thePlayer.GetStatMax(BCS_Focus)
 				&& thePlayer.GetStat(BCS_Stamina) == thePlayer.GetStatMax(BCS_Stamina)
 				)
@@ -9890,12 +9914,33 @@ function ACS_Player_Attack(action: W3DamageAction)
 
 			npc.SignalGameplayEvent('DisableFinisher');
 
+			if (npc.CanPlayHitAnim()
+			&& thePlayer.IsAnyWeaponHeld()
+			&& !thePlayer.IsWeaponHeld('fist')
+			)
+			{
+				animatedComponentA = (CAnimatedComponent)thePlayer.GetComponentByClassName( 'CAnimatedComponent' );
+
+				animatedComponentA.UnfreezePose();
+
+				animatedComponentA.FreezePose();
+
+				if (ACS_MoreThanOneEnemyNearby())
+				{
+					animatedComponentA.UnfreezePoseFadeOut(0.75f);
+				}
+				else
+				{
+					animatedComponentA.UnfreezePoseFadeOut(1.0f);
+				}
+			}
+			
 			if (
-			GetWitcherPlayer().HasTag('aard_sword_equipped')
-			|| GetWitcherPlayer().HasTag('aard_secondary_sword_equipped')
-			|| GetWitcherPlayer().HasTag('yrden_sword_equipped')
-			|| GetWitcherPlayer().HasTag('yrden_secondary_sword_equipped')
-			|| GetWitcherPlayer().HasTag('quen_secondary_sword_equipped')
+			GetWitcherPlayer().HasTag('acs_aard_sword_equipped')
+			|| GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped')
+			|| GetWitcherPlayer().HasTag('acs_yrden_sword_equipped')
+			|| GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped')
+			|| GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped')
 			)
 			{
 				if (npc.UsesEssence())
@@ -10088,9 +10133,9 @@ function ACS_Player_Attack(action: W3DamageAction)
 				return;
 			}
 			else if ( 
-			GetWitcherPlayer().HasTag('axii_sword_equipped')
-			|| GetWitcherPlayer().HasTag('axii_secondary_sword_equipped')
-			|| GetWitcherPlayer().HasTag('quen_sword_equipped'))
+			GetWitcherPlayer().HasTag('acs_axii_sword_equipped')
+			|| GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped')
+			|| GetWitcherPlayer().HasTag('acs_quen_sword_equipped'))
 			{
 				if (npc.UsesEssence())
 				{
@@ -10278,8 +10323,8 @@ function ACS_Player_Attack(action: W3DamageAction)
 			}
 			else if 
 			(
-			GetWitcherPlayer().HasTag('igni_sword_equipped')
-			|| GetWitcherPlayer().HasTag('igni_secondary_sword_equipped')
+			GetWitcherPlayer().HasTag('acs_igni_sword_equipped')
+			|| GetWitcherPlayer().HasTag('acs_igni_secondary_sword_equipped')
 			)
 			{
 				if (ACS_Griffin_School_Check()
@@ -10458,7 +10503,7 @@ function ACS_Player_Attack(action: W3DamageAction)
 
 				return;
 			}
-			else if (GetWitcherPlayer().HasTag('vampire_claws_equipped'))
+			else if (GetWitcherPlayer().HasTag('acs_vampire_claws_equipped'))
 			{
 				npc.StopEffect('focus_sound_red_fx');
 
@@ -10630,21 +10675,21 @@ function ACS_Player_Attack(action: W3DamageAction)
 				{
 					if (RandF() < 0.5 )
 					{
-						ACS_Vampire_Arms_1_Get().PlayEffectSingle('blood');
+						ACSGetCEntity('acs_vampire_extra_arms_1').PlayEffectSingle('blood');
 
-						ACS_Vampire_Arms_1_Get().StopEffect('blood');
+						ACSGetCEntity('acs_vampire_extra_arms_1').StopEffect('blood');
 
-						ACS_Vampire_Arms_2_Get().PlayEffectSingle('blood');
+						ACSGetCEntity('acs_vampire_extra_arms_2').PlayEffectSingle('blood');
 
-						ACS_Vampire_Arms_2_Get().StopEffect('blood');
+						ACSGetCEntity('acs_vampire_extra_arms_2').StopEffect('blood');
 
-						ACS_Vampire_Arms_3_Get().PlayEffectSingle('blood');
+						ACSGetCEntity('acs_vampire_extra_arms_3').PlayEffectSingle('blood');
 
-						ACS_Vampire_Arms_3_Get().StopEffect('blood');
+						ACSGetCEntity('acs_vampire_extra_arms_3').StopEffect('blood');
 
-						ACS_Vampire_Arms_4_Get().PlayEffectSingle('blood');
+						ACSGetCEntity('acs_vampire_extra_arms_4').PlayEffectSingle('blood');
 
-						ACS_Vampire_Arms_4_Get().StopEffect('blood');
+						ACSGetCEntity('acs_vampire_extra_arms_4').StopEffect('blood');
 
 						GetWitcherPlayer().PlayEffectSingle('blood_effect_claws');
 						GetWitcherPlayer().StopEffect('blood_effect_claws');
@@ -10660,7 +10705,7 @@ function ACS_Player_Attack(action: W3DamageAction)
 				GetWitcherPlayer().RemoveTag('ACS_Vampire_Dash_Attack');
 
 				return;
-			}		
+			}	
 		}
 
 		/*
@@ -10715,15 +10760,15 @@ function ACS_Player_Guard(action: W3DamageAction)
 	&& !action.WasDodged()
 	&& !GetWitcherPlayer().IsInFistFightMiniGame() 
 	&& !GetWitcherPlayer().HasTag('ACS_Camo_Active')
-	//&& !GetWitcherPlayer().HasTag('igni_sword_equipped')
-	//&& !GetWitcherPlayer().HasTag('igni_secondary_sword_equipped')
+	//&& !GetWitcherPlayer().HasTag('acs_igni_sword_equipped')
+	//&& !GetWitcherPlayer().HasTag('acs_igni_secondary_sword_equipped')
 	)
 	{
 		if(
 		(GetWitcherPlayer().GetStat(BCS_Stamina) >= GetWitcherPlayer().GetStatMax(BCS_Stamina) * 0.1)
 		)
 		{
-			if ( GetWitcherPlayer().HasTag('vampire_claws_equipped') )
+			if ( GetWitcherPlayer().HasTag('acs_vampire_claws_equipped') )
 			{
 				action.SetHitReactionType(0, false);
 				action.ClearDamage();
@@ -10753,7 +10798,7 @@ function ACS_Player_Guard(action: W3DamageAction)
 
 				if (ACS_ParryingStaminaCostAction_Enabled())
 				{
-					ACS_Parry_Tutorial();
+					ACS_Tutorial_Display_Check('ACS_Parry_Tutorial_Shown');
 
 					if( GetWitcherPlayer().GetInventory().GetItemEquippedOnSlot(EES_Armor, item) )
 					{
@@ -10862,7 +10907,7 @@ function ACS_Player_Guard(action: W3DamageAction)
 					}
 				}
 			}
-			else if ( GetWitcherPlayer().HasTag('axii_sword_equipped') )
+			else if ( GetWitcherPlayer().HasTag('acs_axii_sword_equipped') )
 			{
 				vACS_Shield_Summon = new cACS_Shield_Summon in theGame;
 
@@ -10879,7 +10924,7 @@ function ACS_Player_Guard(action: W3DamageAction)
 
 				if (ACS_ParryingStaminaCostAction_Enabled())
 				{
-					ACS_Parry_Tutorial();
+					ACS_Tutorial_Display_Check('ACS_Parry_Tutorial_Shown');
 
 					if( GetWitcherPlayer().GetInventory().GetItemEquippedOnSlot(EES_Armor, item) )
 					{
@@ -10981,8 +11026,8 @@ function ACS_Player_Guard(action: W3DamageAction)
 					}
 				}
 
-				ACS_Shield().PlayEffectSingle('aard_cone_hit');
-				ACS_Shield().StopEffect('aard_cone_hit');
+				ACSGetCEntity('ACS_Shield').PlayEffectSingle('aard_cone_hit');
+				ACSGetCEntity('ACS_Shield').StopEffect('aard_cone_hit');
 			}
 			else 
 			{
@@ -10995,7 +11040,7 @@ function ACS_Player_Guard(action: W3DamageAction)
 
 				if (ACS_ParryingStaminaCostAction_Enabled())
 				{
-					ACS_Parry_Tutorial();
+					ACS_Tutorial_Display_Check('ACS_Parry_Tutorial_Shown');
 
 					if( GetWitcherPlayer().GetInventory().GetItemEquippedOnSlot(EES_Armor, item) )
 					{
@@ -11123,17 +11168,17 @@ function ACS_Take_Damage(action: W3DamageAction)
 
 	movementAdjustor = GetWitcherPlayer().GetMovingAgentComponent().GetMovementAdjustor();
 
-	movementAdjustorWerewolf = GetACSTransformationWerewolf().GetMovingAgentComponent().GetMovementAdjustor();
+	movementAdjustorWerewolf = ACSGetCActor('ACS_Transformation_Werewolf').GetMovingAgentComponent().GetMovementAdjustor();
 
-	movementAdjustorVampiress = GetACSTransformationVampiress().GetMovingAgentComponent().GetMovementAdjustor();
+	movementAdjustorVampiress = ACSGetCActor('ACS_Transformation_Vampiress').GetMovingAgentComponent().GetMovementAdjustor();
 
-	movementAdjustorTransformationVampireMonster = GetACSTransformationVampireMonster().GetMovingAgentComponent().GetMovementAdjustor();
+	movementAdjustorTransformationVampireMonster = ACSGetCActor('ACS_Transformation_Vampire_Monster').GetMovingAgentComponent().GetMovementAdjustor();
 
-	movementAdjustorRedMiasmal = GetACSTransformationRedMiasmal().GetMovingAgentComponent().GetMovementAdjustor();
+	movementAdjustorRedMiasmal = ACSGetCActor('ACS_Transformation_Red_Miasmal').GetMovingAgentComponent().GetMovementAdjustor();
 
-	movementAdjustorSharley = GetACSTransformationSharley().GetMovingAgentComponent().GetMovementAdjustor();
+	movementAdjustorSharley = ACSGetCActor('ACS_Transformation_Sharley').GetMovingAgentComponent().GetMovementAdjustor();
 
-	movementAdjustorBlackWolf = GetACSTransformationBlackWolf().GetMovingAgentComponent().GetMovementAdjustor();
+	movementAdjustorBlackWolf = ACSGetCActor('ACS_Transformation_Black_Wolf').GetMovingAgentComponent().GetMovementAdjustor();
 
 	if (playerVictim && npcAttacker)
 	{
@@ -11150,23 +11195,23 @@ function ACS_Take_Damage(action: W3DamageAction)
 
     if ( playerVictim
 	&& action.GetBuffSourceName() != "FallingDamage"
-	&& !GetWitcherPlayer().HasTag('blood_sucking')
+	&& !GetWitcherPlayer().HasTag('acs_blood_sucking')
 	&& GetWitcherPlayer().GetImmortalityMode() != AIM_Immortal
 	&& GetWitcherPlayer().GetImmortalityMode() != AIM_Invulnerable
 	&& !GetWitcherPlayer().IsDodgeTimerRunning()
 	&& !GetWitcherPlayer().IsCurrentlyDodging()
 	/*
-	&& (GetWitcherPlayer().HasTag('aard_sword_equipped')
-	|| GetWitcherPlayer().HasTag('aard_secondary_sword_equipped')
-	|| GetWitcherPlayer().HasTag('yrden_sword_equipped')
-	|| GetWitcherPlayer().HasTag('yrden_secondary_sword_equipped')
-	|| GetWitcherPlayer().HasTag('quen_secondary_sword_equipped')
-	|| GetWitcherPlayer().HasTag('axii_sword_equipped')
-	|| GetWitcherPlayer().HasTag('axii_secondary_sword_equipped')
-	|| GetWitcherPlayer().HasTag('quen_sword_equipped')
-	|| GetWitcherPlayer().HasTag('igni_sword_equipped')
-	|| GetWitcherPlayer().HasTag('igni_secondary_sword_equipped')
-	|| GetWitcherPlayer().HasTag('vampire_claws_equipped') )
+	&& (GetWitcherPlayer().HasTag('acs_aard_sword_equipped')
+	|| GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped')
+	|| GetWitcherPlayer().HasTag('acs_yrden_sword_equipped')
+	|| GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped')
+	|| GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped')
+	|| GetWitcherPlayer().HasTag('acs_axii_sword_equipped')
+	|| GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped')
+	|| GetWitcherPlayer().HasTag('acs_quen_sword_equipped')
+	|| GetWitcherPlayer().HasTag('acs_igni_sword_equipped')
+	|| GetWitcherPlayer().HasTag('acs_igni_secondary_sword_equipped')
+	|| GetWitcherPlayer().HasTag('acs_vampire_claws_equipped') )
 	*/
 	)
 	{
@@ -11235,14 +11280,14 @@ function ACS_Take_Damage(action: W3DamageAction)
 					{
 						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
 
-						if (!GetACSTransformationWerewolf().HasTag('ACS_Werewolf_Berserk_Mode'))
+						if (!ACSGetCActor('ACS_Transformation_Werewolf').HasTag('ACS_Werewolf_Berserk_Mode'))
 						{
 							movementAdjustorWerewolf.RotateTowards( ticketWerewolf, npcAttacker);
 						}
 					}
 					else
 					{
-						if (!GetACSTransformationWerewolf().HasTag('ACS_Werewolf_Berserk_Mode'))
+						if (!ACSGetCActor('ACS_Transformation_Werewolf').HasTag('ACS_Werewolf_Berserk_Mode'))
 						{
 							action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.5;
 
@@ -11275,13 +11320,13 @@ function ACS_Take_Damage(action: W3DamageAction)
 					}
 					else
 					{
-						if (GetACSTransformationVampiress().HasTag('ACS_Vampiress_Is_Parrying'))
+						if (ACSGetCActor('ACS_Transformation_Vampiress').HasTag('ACS_Vampiress_Is_Parrying'))
 						{
 							action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
 						}
 						else
 						{
-							if (!GetACSTransformationVampiress().HasTag('ACS_Vampiress_Sorceress_Mode'))
+							if (!ACSGetCActor('ACS_Transformation_Vampiress').HasTag('ACS_Vampiress_Sorceress_Mode'))
 							{
 								action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.5;
 							}
@@ -11309,14 +11354,14 @@ function ACS_Take_Damage(action: W3DamageAction)
 					{
 						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
 					}
-					else if (GetACSTransformationVampireMonster().HasTag('ACS_Transformation_Vampire_Monster_Is_Parrying')
+					else if (ACSGetCActor('ACS_Transformation_Vampire_Monster').HasTag('ACS_Transformation_Vampire_Monster_Is_Parrying')
 					)
 					{
 						action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage;
 					}
 					else
 					{
-						if (GetACSTransformationVampireMonster().HasTag('ACS_Transformation_Vampire_Monster_Blood_Armor')
+						if (ACSGetCActor('ACS_Transformation_Vampire_Monster').HasTag('ACS_Transformation_Vampire_Monster_Blood_Armor')
 						)
 						{
 							action.processedDmg.vitalityDamage -= action.processedDmg.vitalityDamage * 0.975;
@@ -11326,15 +11371,15 @@ function ACS_Take_Damage(action: W3DamageAction)
 						}
 					}
 
-					if (GetACSTransformationVampireMonster().HasTag('ACS_Vampire_Monster_Ground_Mode'))
+					if (ACSGetCActor('ACS_Transformation_Vampire_Monster').HasTag('ACS_Vampire_Monster_Ground_Mode'))
 					{
-						if (GetACSTransformationVampireMonster().HasTag('ACS_Transformation_Vampire_Monster_Is_Parrying'))
+						if (ACSGetCActor('ACS_Transformation_Vampire_Monster').HasTag('ACS_Transformation_Vampire_Monster_Is_Parrying'))
 						{
 							movementAdjustorTransformationVampireMonster.RotateTowards( ticketTransformationVampireMonster, npcAttacker);
 						}
 						else
 						{
-							if (!GetACSTransformationVampireMonster().HasTag('ACS_Transformation_Vampire_Monster_Blood_Armor'))
+							if (!ACSGetCActor('ACS_Transformation_Vampire_Monster').HasTag('ACS_Transformation_Vampire_Monster_Blood_Armor'))
 							{
 								movementAdjustorTransformationVampireMonster.RotateTowards( ticketTransformationVampireMonster, npcAttacker);
 							}
@@ -11344,22 +11389,22 @@ function ACS_Take_Damage(action: W3DamageAction)
 					}
 					else
 					{
-						if (GetACSTransformationVampireMonster().HasTag('ACS_Transformation_Vampire_Monster_Blood_Armor'))
+						if (ACSGetCActor('ACS_Transformation_Vampire_Monster').HasTag('ACS_Transformation_Vampire_Monster_Blood_Armor'))
 						{
-							GetACSTransformationVampireMonster().StopEffect('light_hit');
-							GetACSTransformationVampireMonster().PlayEffectSingle('light_hit');
+							ACSGetCActor('ACS_Transformation_Vampire_Monster').StopEffect('light_hit');
+							ACSGetCActor('ACS_Transformation_Vampire_Monster').PlayEffectSingle('light_hit');
 
-							GetACSTransformationVampireMonster().StopEffect('comming_out');
-							GetACSTransformationVampireMonster().PlayEffectSingle('comming_out');
+							ACSGetCActor('ACS_Transformation_Vampire_Monster').StopEffect('comming_out');
+							ACSGetCActor('ACS_Transformation_Vampire_Monster').PlayEffectSingle('comming_out');
 
-							GetACSTransformationVampireMonster().DestroyEffect('body_blood_drip');
-							GetACSTransformationVampireMonster().PlayEffectSingle('body_blood_drip');
-							GetACSTransformationVampireMonster().StopEffect('body_blood_drip');
+							ACSGetCActor('ACS_Transformation_Vampire_Monster').DestroyEffect('body_blood_drip');
+							ACSGetCActor('ACS_Transformation_Vampire_Monster').PlayEffectSingle('body_blood_drip');
+							ACSGetCActor('ACS_Transformation_Vampire_Monster').StopEffect('body_blood_drip');
 						}
 						else
 						{
-							GetACSTransformationVampireMonster().StopEffect('comming_out');
-							GetACSTransformationVampireMonster().PlayEffectSingle('comming_out');
+							ACSGetCActor('ACS_Transformation_Vampire_Monster').StopEffect('comming_out');
+							ACSGetCActor('ACS_Transformation_Vampire_Monster').PlayEffectSingle('comming_out');
 						}
 					}
 				}
@@ -11371,10 +11416,10 @@ function ACS_Take_Damage(action: W3DamageAction)
 
 				if (ACS_Transformation_Red_Miasmal_Check())
 				{
-					if (GetACSTransformationRedMiasmal().HasTag('ACS_Transformation_Red_Miasmal_Rooted'))
+					if (ACSGetCActor('ACS_Transformation_Red_Miasmal').HasTag('ACS_Transformation_Red_Miasmal_Rooted'))
 					{
-						GetACSTransformationRedMiasmal().StopEffect('teleport_roots_1');
-						GetACSTransformationRedMiasmal().PlayEffectSingle('teleport_roots_1');
+						ACSGetCActor('ACS_Transformation_Red_Miasmal').StopEffect('teleport_roots_1');
+						ACSGetCActor('ACS_Transformation_Red_Miasmal').PlayEffectSingle('teleport_roots_1');
 
 						GetACSWatcher().RedMiasmalLightAttackDamage360Actual();
 
@@ -11400,8 +11445,8 @@ function ACS_Take_Damage(action: W3DamageAction)
 						}
 						else
 						{
-							GetACSTransformationRedMiasmal().StopEffect('teleport_roots_1');
-							GetACSTransformationRedMiasmal().PlayEffectSingle('teleport_roots_1');
+							ACSGetCActor('ACS_Transformation_Red_Miasmal').StopEffect('teleport_roots_1');
+							ACSGetCActor('ACS_Transformation_Red_Miasmal').PlayEffectSingle('teleport_roots_1');
 
 							GetACSWatcher().RedMiasmalLightAttackDamage360Actual();
 
@@ -11412,15 +11457,15 @@ function ACS_Take_Damage(action: W3DamageAction)
 
 				if (ACS_Transformation_Sharley_Check())
 				{
-					((CNewNPC)GetACSTransformationSharley()).SetUnstoppable( true );
+					((CNewNPC)ACSGetCActor('ACS_Transformation_Sharley')).SetUnstoppable( true );
 
-					if (GetACSTransformationSharley().HasTag('ACS_Sharley_Is_Spinning')
-					|| GetACSTransformationSharley().HasTag('ACS_Sharley_Roll_Init')
+					if (ACSGetCActor('ACS_Transformation_Sharley').HasTag('ACS_Sharley_Is_Spinning')
+					|| ACSGetCActor('ACS_Transformation_Sharley').HasTag('ACS_Sharley_Roll_Init')
 					)
 					{
-						GetACSTransformationSharley().StopEffect('sonar');
-						GetACSTransformationSharley().PlayEffectSingle('sonar');
-						GetACSTransformationSharley().StopEffect('sonar');
+						ACSGetCActor('ACS_Transformation_Sharley').StopEffect('sonar');
+						ACSGetCActor('ACS_Transformation_Sharley').PlayEffectSingle('sonar');
+						ACSGetCActor('ACS_Transformation_Sharley').StopEffect('sonar');
 
 						GetACSWatcher().SharleyReflectDamage();
 
@@ -11446,9 +11491,9 @@ function ACS_Take_Damage(action: W3DamageAction)
 						}
 						else
 						{
-							GetACSTransformationSharley().StopEffect('sonar');
-							GetACSTransformationSharley().PlayEffectSingle('sonar');
-							GetACSTransformationSharley().StopEffect('sonar');
+							ACSGetCActor('ACS_Transformation_Sharley').StopEffect('sonar');
+							ACSGetCActor('ACS_Transformation_Sharley').PlayEffectSingle('sonar');
+							ACSGetCActor('ACS_Transformation_Sharley').StopEffect('sonar');
 
 							GetACSWatcher().SharleyReflectDamage();
 
@@ -11686,7 +11731,7 @@ function ACS_Take_Damage(action: W3DamageAction)
 							}
 							else
 							{
-								ACS_ArmorSystem_Tutorial();
+								ACS_Tutorial_Display_Check('ACS_ArmorSystem_Tutorial_Shown');
 
 								GetWitcherPlayer().StopEffect('armor_sparks');
 								GetWitcherPlayer().PlayEffectSingle('armor_sparks');
@@ -11747,7 +11792,7 @@ function ACS_Take_Damage(action: W3DamageAction)
 							}
 							else
 							{
-								ACS_ArmorSystem_Tutorial();
+								ACS_Tutorial_Display_Check('ACS_ArmorSystem_Tutorial_Shown');
 
 								GetWitcherPlayer().StopEffect('armor_sparks');
 								GetWitcherPlayer().PlayEffectSingle('armor_sparks');
@@ -11808,7 +11853,7 @@ function ACS_Take_Damage(action: W3DamageAction)
 							}
 							else
 							{
-								ACS_ArmorSystem_Tutorial();
+								ACS_Tutorial_Display_Check('ACS_ArmorSystem_Tutorial_Shown');
 								
 								GetWitcherPlayer().StopEffect('armor_sparks');
 								GetWitcherPlayer().PlayEffectSingle('armor_sparks');
@@ -11893,7 +11938,7 @@ function ACS_Death_Animations(action: W3DamageAction)
 
 	npcAttacker = (CActor)action.attacker;
 
-    if(GetWitcherPlayer().HasTag('vampire_claws_equipped'))
+    if(GetWitcherPlayer().HasTag('acs_vampire_claws_equipped'))
     {
         if (GetWitcherPlayer().IsEnemyInCone( npcAttacker, GetWitcherPlayer().GetHeadingVector(), 50, 145, npcAttacker ))
         {
@@ -11995,10 +12040,10 @@ function ACS_Hit_Animations(action: W3DamageAction)
 		return;
 	}
 
-	if (GetWitcherPlayer().HasTag('blood_sucking')
+	if (GetWitcherPlayer().HasTag('acs_blood_sucking')
 	|| GetWitcherPlayer().HasTag('ACS_IsPerformingFinisher')
-	|| GetWitcherPlayer().HasTag('yrden_secondary_sword_equipped')
-	|| GetWitcherPlayer().HasTag('yrden_sword_equipped')
+	|| GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped')
+	|| GetWitcherPlayer().HasTag('acs_yrden_sword_equipped')
 	|| GetWitcherPlayer().IsCurrentlyDodging()
 	|| GetWitcherPlayer().GetImmortalityMode() == AIM_Invulnerable
 	|| GetWitcherPlayer().IsPerformingFinisher() 
@@ -12026,7 +12071,7 @@ function ACS_Hit_Animations(action: W3DamageAction)
 
 	hit_anim_names.Clear();
 	
-    if ( ( GetWitcherPlayer().HasTag('vampire_claws_equipped') && !GetWitcherPlayer().HasBuff(EET_BlackBlood) ) || GetWitcherPlayer().HasTag('aard_sword_equipped') )
+    if ( ( GetWitcherPlayer().HasTag('acs_vampire_claws_equipped') && !GetWitcherPlayer().HasBuff(EET_BlackBlood) ) || GetWitcherPlayer().HasTag('acs_aard_sword_equipped') )
     {
         GetACSWatcher().RemoveTimer('ACS_bruxa_tackle'); GetACSWatcher().RemoveTimer('ACS_portable_aard'); GetACSWatcher().RemoveTimer('ACS_shout');
 
@@ -12054,7 +12099,7 @@ function ACS_Hit_Animations(action: W3DamageAction)
 			hit_anim_names.PushBack('reaction_hit_back_ACS');
         }
     }
-    else if(GetWitcherPlayer().HasTag('quen_sword_equipped'))
+    else if(GetWitcherPlayer().HasTag('acs_quen_sword_equipped'))
     {
         if (GetWitcherPlayer().GetStat(BCS_Vitality) <= GetWitcherPlayer().GetStatMax(BCS_Vitality) * 0.5)
         {
@@ -12104,7 +12149,7 @@ function ACS_Hit_Animations(action: W3DamageAction)
             }
         }    
     }
-    else if( GetWitcherPlayer().HasTag('quen_secondary_sword_equipped') || GetWitcherPlayer().HasTag('aard_secondary_sword_equipped') )
+    else if( GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped') || GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped') )
     {
         if (GetWitcherPlayer().IsEnemyInCone( npcAttacker, GetWitcherPlayer().GetHeadingVector(), 50, 145, npcAttacker ))
         {
@@ -12139,7 +12184,7 @@ function ACS_Hit_Animations(action: W3DamageAction)
 			hit_anim_names.PushBack('man_npc_2hhammer_hit_back_lp_01_ACS');
         }
     }
-    else if( GetWitcherPlayer().HasTag('axii_sword_equipped') )
+    else if( GetWitcherPlayer().HasTag('acs_axii_sword_equipped') )
     {
         if (GetWitcherPlayer().IsEnemyInCone( npcAttacker, GetWitcherPlayer().GetHeadingVector(), 50, 145, npcAttacker ))
         {
@@ -12200,7 +12245,7 @@ function ACS_Hit_Animations(action: W3DamageAction)
           	hit_anim_names.PushBack('man_npc_longsword_hit_back_ACS');
         }
     }
-    else if( GetWitcherPlayer().HasTag('axii_secondary_sword_equipped') )
+    else if( GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped') )
     {
         if (GetWitcherPlayer().IsEnemyInCone( npcAttacker, GetWitcherPlayer().GetHeadingVector(), 50, 145, npcAttacker ))
         {
@@ -12215,10 +12260,10 @@ function ACS_Hit_Animations(action: W3DamageAction)
         }
     }
     else if( 
-	GetWitcherPlayer().HasTag('igni_sword_equipped')
-	|| GetWitcherPlayer().HasTag('igni_secondary_sword_equipped')
-	|| GetWitcherPlayer().HasTag('igni_sword_equipped_TAG')
-	|| GetWitcherPlayer().HasTag('igni_secondary_sword_equipped_TAG')
+	GetWitcherPlayer().HasTag('acs_igni_sword_equipped')
+	|| GetWitcherPlayer().HasTag('acs_igni_secondary_sword_equipped')
+	|| GetWitcherPlayer().HasTag('acs_igni_sword_equipped_TAG')
+	|| GetWitcherPlayer().HasTag('acs_igni_secondary_sword_equipped_TAG')
 	) 
     {
 		if (ACS_Bear_School_Check()
@@ -12280,19 +12325,19 @@ function ACS_Transformation_Werewolf_Hit_Animations()
 
 	hit_anim_names.Clear();
 
-	GetACSTransformationWerewolf().DestroyEffect('light_hit');
-	GetACSTransformationWerewolf().DestroyEffect('heavy_hit');
-	GetACSTransformationWerewolf().DestroyEffect('light_hit_back');
-	GetACSTransformationWerewolf().DestroyEffect('heavy_hit_back');
-	GetACSTransformationWerewolf().DestroyEffect('blood_spill');
+	ACSGetCActor('ACS_Transformation_Werewolf').DestroyEffect('light_hit');
+	ACSGetCActor('ACS_Transformation_Werewolf').DestroyEffect('heavy_hit');
+	ACSGetCActor('ACS_Transformation_Werewolf').DestroyEffect('light_hit_back');
+	ACSGetCActor('ACS_Transformation_Werewolf').DestroyEffect('heavy_hit_back');
+	ACSGetCActor('ACS_Transformation_Werewolf').DestroyEffect('blood_spill');
 
-	GetACSTransformationWerewolf().PlayEffectSingle('light_hit');
-	GetACSTransformationWerewolf().PlayEffectSingle('heavy_hit');
-	GetACSTransformationWerewolf().PlayEffectSingle('light_hit_back');
-	GetACSTransformationWerewolf().PlayEffectSingle('heavy_hit_back');
-	GetACSTransformationWerewolf().PlayEffectSingle('blood_spill');
+	ACSGetCActor('ACS_Transformation_Werewolf').PlayEffectSingle('light_hit');
+	ACSGetCActor('ACS_Transformation_Werewolf').PlayEffectSingle('heavy_hit');
+	ACSGetCActor('ACS_Transformation_Werewolf').PlayEffectSingle('light_hit_back');
+	ACSGetCActor('ACS_Transformation_Werewolf').PlayEffectSingle('heavy_hit_back');
+	ACSGetCActor('ACS_Transformation_Werewolf').PlayEffectSingle('blood_spill');
 
-	if (GetACSTransformationWerewolf().HasTag('ACS_Werewolf_Berserk_Mode'))
+	if (ACSGetCActor('ACS_Transformation_Werewolf').HasTag('ACS_Werewolf_Berserk_Mode'))
 	{
 		return;
 	}
@@ -12317,7 +12362,7 @@ function ACS_Transformation_Vampiress_Hit_Animations()
 
 	GetACSWatcher().ACSVampiressRemoveAttackTimers();
 
-	if (GetACSTransformationVampiress().HasTag('ACS_Vampiress_Is_Parrying'))
+	if (ACSGetCActor('ACS_Transformation_Vampiress').HasTag('ACS_Vampiress_Is_Parrying'))
 	{
 		vampiress_hit_anim_names.PushBack('bruxa_parry_center');
 		vampiress_hit_anim_names.PushBack('bruxa_parry_left');
@@ -12333,19 +12378,19 @@ function ACS_Transformation_Vampiress_Hit_Animations()
 	}
 	else
 	{
-		GetACSTransformationVampiress().DestroyEffect('light_hit');
-		GetACSTransformationVampiress().DestroyEffect('heavy_hit');
-		GetACSTransformationVampiress().DestroyEffect('light_hit_back');
-		GetACSTransformationVampiress().DestroyEffect('heavy_hit_back');
-		GetACSTransformationVampiress().DestroyEffect('blood_spill');
+		ACSGetCActor('ACS_Transformation_Vampiress').DestroyEffect('light_hit');
+		ACSGetCActor('ACS_Transformation_Vampiress').DestroyEffect('heavy_hit');
+		ACSGetCActor('ACS_Transformation_Vampiress').DestroyEffect('light_hit_back');
+		ACSGetCActor('ACS_Transformation_Vampiress').DestroyEffect('heavy_hit_back');
+		ACSGetCActor('ACS_Transformation_Vampiress').DestroyEffect('blood_spill');
 
-		GetACSTransformationVampiress().PlayEffectSingle('light_hit');
-		GetACSTransformationVampiress().PlayEffectSingle('heavy_hit');
-		GetACSTransformationVampiress().PlayEffectSingle('light_hit_back');
-		GetACSTransformationVampiress().PlayEffectSingle('heavy_hit_back');
-		GetACSTransformationVampiress().PlayEffectSingle('blood_spill');
+		ACSGetCActor('ACS_Transformation_Vampiress').PlayEffectSingle('light_hit');
+		ACSGetCActor('ACS_Transformation_Vampiress').PlayEffectSingle('heavy_hit');
+		ACSGetCActor('ACS_Transformation_Vampiress').PlayEffectSingle('light_hit_back');
+		ACSGetCActor('ACS_Transformation_Vampiress').PlayEffectSingle('heavy_hit_back');
+		ACSGetCActor('ACS_Transformation_Vampiress').PlayEffectSingle('blood_spill');
 
-		if (!GetACSTransformationVampiress().HasTag('ACS_Vampiress_Sorceress_Mode'))
+		if (!ACSGetCActor('ACS_Transformation_Vampiress').HasTag('ACS_Vampiress_Sorceress_Mode'))
 		{
 			vampiress_hit_anim_names.PushBack('bruxa_hit_heavy_front');
 			vampiress_hit_anim_names.PushBack('bruxa_hit_light_front');
@@ -12382,7 +12427,7 @@ function ACS_Transformation_Vampire_Monster_Hit_Animations()
 
 	vampire_monster_hit_anim_names.Clear();
 
-	if (GetACSTransformationVampireMonster().HasTag('ACS_Transformation_Vampire_Monster_Is_Parrying'))
+	if (ACSGetCActor('ACS_Transformation_Vampire_Monster').HasTag('ACS_Transformation_Vampire_Monster_Is_Parrying'))
 	{
 		GetACSWatcher().ACSVampireMonsterRemoveAttackTimers();
 		
@@ -12396,14 +12441,14 @@ function ACS_Transformation_Vampire_Monster_Hit_Animations()
 	}
 	else
 	{
-		if (GetACSTransformationVampireMonster().HasTag('ACS_Transformation_Vampire_Monster_Blood_Armor'))
+		if (ACSGetCActor('ACS_Transformation_Vampire_Monster').HasTag('ACS_Transformation_Vampire_Monster_Blood_Armor'))
 		{
-			GetACSTransformationVampireMonster().StopEffect('light_hit');
-			GetACSTransformationVampireMonster().PlayEffectSingle('light_hit');
+			ACSGetCActor('ACS_Transformation_Vampire_Monster').StopEffect('light_hit');
+			ACSGetCActor('ACS_Transformation_Vampire_Monster').PlayEffectSingle('light_hit');
 
-			GetACSTransformationVampireMonster().DestroyEffect('body_blood_drip');
-			GetACSTransformationVampireMonster().PlayEffectSingle('body_blood_drip');
-			GetACSTransformationVampireMonster().StopEffect('body_blood_drip');
+			ACSGetCActor('ACS_Transformation_Vampire_Monster').DestroyEffect('body_blood_drip');
+			ACSGetCActor('ACS_Transformation_Vampire_Monster').PlayEffectSingle('body_blood_drip');
+			ACSGetCActor('ACS_Transformation_Vampire_Monster').StopEffect('body_blood_drip');
 		}
 		else
 		{
@@ -12424,17 +12469,17 @@ function ACS_Transformation_Red_Miasmal_Hit_Animations()
 
 	hit_anim_names.Clear();
 
-	GetACSTransformationRedMiasmal().DestroyEffect('light_hit');
-	GetACSTransformationRedMiasmal().DestroyEffect('heavy_hit');
-	GetACSTransformationRedMiasmal().DestroyEffect('light_hit_back');
-	GetACSTransformationRedMiasmal().DestroyEffect('heavy_hit_back');
-	GetACSTransformationRedMiasmal().DestroyEffect('blood_spill');
+	ACSGetCActor('ACS_Transformation_Red_Miasmal').DestroyEffect('light_hit');
+	ACSGetCActor('ACS_Transformation_Red_Miasmal').DestroyEffect('heavy_hit');
+	ACSGetCActor('ACS_Transformation_Red_Miasmal').DestroyEffect('light_hit_back');
+	ACSGetCActor('ACS_Transformation_Red_Miasmal').DestroyEffect('heavy_hit_back');
+	ACSGetCActor('ACS_Transformation_Red_Miasmal').DestroyEffect('blood_spill');
 
-	GetACSTransformationRedMiasmal().PlayEffectSingle('light_hit');
-	GetACSTransformationRedMiasmal().PlayEffectSingle('heavy_hit');
-	GetACSTransformationRedMiasmal().PlayEffectSingle('light_hit_back');
-	GetACSTransformationRedMiasmal().PlayEffectSingle('heavy_hit_back');
-	GetACSTransformationRedMiasmal().PlayEffectSingle('blood_spill');
+	ACSGetCActor('ACS_Transformation_Red_Miasmal').PlayEffectSingle('light_hit');
+	ACSGetCActor('ACS_Transformation_Red_Miasmal').PlayEffectSingle('heavy_hit');
+	ACSGetCActor('ACS_Transformation_Red_Miasmal').PlayEffectSingle('light_hit_back');
+	ACSGetCActor('ACS_Transformation_Red_Miasmal').PlayEffectSingle('heavy_hit_back');
+	ACSGetCActor('ACS_Transformation_Red_Miasmal').PlayEffectSingle('blood_spill');
 
 	hit_anim_names.PushBack('monster_lessun_hit_light_f');
 	hit_anim_names.PushBack('monster_lessun_hit_light_left');
@@ -12455,17 +12500,17 @@ function ACS_Transformation_Sharley_Hit_Animations()
 
 	hit_anim_names.Clear();
 
-	GetACSTransformationSharley().DestroyEffect('light_hit');
-	GetACSTransformationSharley().DestroyEffect('heavy_hit');
-	GetACSTransformationSharley().DestroyEffect('light_hit_back');
-	GetACSTransformationSharley().DestroyEffect('heavy_hit_back');
-	GetACSTransformationSharley().DestroyEffect('blood_spill');
+	ACSGetCActor('ACS_Transformation_Sharley').DestroyEffect('light_hit');
+	ACSGetCActor('ACS_Transformation_Sharley').DestroyEffect('heavy_hit');
+	ACSGetCActor('ACS_Transformation_Sharley').DestroyEffect('light_hit_back');
+	ACSGetCActor('ACS_Transformation_Sharley').DestroyEffect('heavy_hit_back');
+	ACSGetCActor('ACS_Transformation_Sharley').DestroyEffect('blood_spill');
 
-	GetACSTransformationSharley().PlayEffectSingle('light_hit');
-	GetACSTransformationSharley().PlayEffectSingle('heavy_hit');
-	GetACSTransformationSharley().PlayEffectSingle('light_hit_back');
-	GetACSTransformationSharley().PlayEffectSingle('heavy_hit_back');
-	GetACSTransformationSharley().PlayEffectSingle('blood_spill');
+	ACSGetCActor('ACS_Transformation_Sharley').PlayEffectSingle('light_hit');
+	ACSGetCActor('ACS_Transformation_Sharley').PlayEffectSingle('heavy_hit');
+	ACSGetCActor('ACS_Transformation_Sharley').PlayEffectSingle('light_hit_back');
+	ACSGetCActor('ACS_Transformation_Sharley').PlayEffectSingle('heavy_hit_back');
+	ACSGetCActor('ACS_Transformation_Sharley').PlayEffectSingle('blood_spill');
 
 	hit_anim_names.PushBack('hit_light_front');
 	hit_anim_names.PushBack('hit_light_left');
@@ -12482,9 +12527,9 @@ function ACS_Transformation_Black_Wolf_Hit_Animations()
 
 	hit_anim_names.Clear();
 
-	GetACSTransformationBlackWolf().DestroyEffect('light_hit');
+	ACSGetCActor('ACS_Transformation_Black_Wolf').DestroyEffect('light_hit');
 
-	GetACSTransformationBlackWolf().PlayEffectSingle('light_hit');
+	ACSGetCActor('ACS_Transformation_Black_Wolf').PlayEffectSingle('light_hit');
 
 	hit_anim_names.PushBack('wolf_hit_front');
 	hit_anim_names.PushBack('wolf_hit_left');
@@ -12689,7 +12734,7 @@ function ACS_Forest_God_Shadows_Attack(action: W3DamageAction)
 	)
 	{	
 		if (
-			 GetWitcherPlayer().HasTag('igni_sword_equipped_TAG') || !GetWitcherPlayer().HasTag('igni_secondary_sword_equipped_TAG')
+			 GetWitcherPlayer().HasTag('acs_igni_sword_equipped_TAG') || !GetWitcherPlayer().HasTag('acs_igni_secondary_sword_equipped_TAG')
 		)
 		{
 			if (playerVictim)
@@ -13118,16 +13163,16 @@ function ACS_Canaris_Attack(action: W3DamageAction)
 		{
 			if (!action.WasDodged() && !GetWitcherPlayer().IsCurrentlyDodging())
 			{
-				GetACSCanarisMeleeEffect().PlayEffectSingle('explode');
-				GetACSCanarisMeleeEffect().StopEffect('explode');
+				ACSGetCEntity('ACS_Canaris_Melee_Effect').PlayEffectSingle('explode');
+				ACSGetCEntity('ACS_Canaris_Melee_Effect').StopEffect('explode');
 
 				//action.processedDmg.vitalityDamage += action.processedDmg.vitalityDamage * 1.5;
 			}
 		}
 		else
 		{
-			GetACSCanarisMeleeEffect().PlayEffectSingle('explode');
-			GetACSCanarisMeleeEffect().StopEffect('explode');
+			ACSGetCEntity('ACS_Canaris_Melee_Effect').PlayEffectSingle('explode');
+			ACSGetCEntity('ACS_Canaris_Melee_Effect').StopEffect('explode');
 		}
 	}
 }
@@ -13266,9 +13311,9 @@ function ACS_XenoTyrant_Attack(action: W3DamageAction)
 						}
 					}
 
-					if (GetACSXenoTyrant().HasAbility('mon_kikimore_small'))
+					if (ACSGetCActor('ACS_Xeno_Tyrant').HasAbility('mon_kikimore_small'))
 					{
-						GetACSXenoTyrant().RemoveAbility('mon_kikimore_small');
+						ACSGetCActor('ACS_Xeno_Tyrant').RemoveAbility('mon_kikimore_small');
 					}
 				}
 
@@ -13305,55 +13350,6 @@ function ACS_XenoSoldier_Attack(action: W3DamageAction)
 	&& !action.IsDoTDamage()
 	)
 	{	
-		if (npc.HasAbility('mon_kikimore_small'))
-		{
-			if (npc.HasAbility('Burrow'))
-			{
-				npc.RemoveAbility('Burrow');
-			}
-
-			if (npc.HasAbility('mon_kikimora_worker'))
-			{
-				npc.RemoveAbility('mon_kikimora_worker');
-			}
-
-			if (!npc.HasAbility('mon_kikimore_big'))
-			{
-				npc.AddAbility('mon_kikimore_big');
-			}
-
-			if (!npc.HasAbility('mon_kikimora_warrior'))
-			{
-				npc.AddAbility('mon_kikimora_warrior');
-			}
-
-			npc.RemoveAbility('mon_kikimore_small');
-		}
-		else
-		{
-			if (!npc.HasAbility('Burrow'))
-			{
-				npc.AddAbility('Burrow');
-			}
-
-			if (!npc.HasAbility('mon_kikimora_worker'))
-			{
-				npc.AddAbility('mon_kikimora_worker');
-			}
-
-			if (npc.HasAbility('mon_kikimore_big'))
-			{
-				npc.RemoveAbility('mon_kikimore_big');
-			}
-
-			if (npc.HasAbility('mon_kikimora_warrior'))
-			{
-				npc.RemoveAbility('mon_kikimora_warrior');
-			}
-
-			npc.AddAbility('mon_kikimore_small');
-		}
-
 		if (action.IsActionMelee())
 		{
 			if (!action.WasDodged() && !GetWitcherPlayer().IsCurrentlyDodging())
@@ -13371,13 +13367,13 @@ function ACS_XenoSoldier_Attack(action: W3DamageAction)
 					}
 				}
 
-				if (GetACSXenoTyrant().UsesVitality()) 
+				if (ACSGetCActor('ACS_Xeno_Tyrant').UsesVitality()) 
 				{ 
-					GetACSXenoTyrant().GainStat( BCS_Vitality, npcAttacker.GetStatMax(BCS_Vitality) * 0.025 );
+					ACSGetCActor('ACS_Xeno_Tyrant').GainStat( BCS_Vitality, npcAttacker.GetStatMax(BCS_Vitality) * 0.025 );
 				} 
-				else if (GetACSXenoTyrant().UsesEssence()) 
+				else if (ACSGetCActor('ACS_Xeno_Tyrant').UsesEssence()) 
 				{ 
-					GetACSXenoTyrant().GainStat( BCS_Essence, npcAttacker.GetStatMax(BCS_Essence) * 0.025 );
+					ACSGetCActor('ACS_Xeno_Tyrant').GainStat( BCS_Essence, npcAttacker.GetStatMax(BCS_Essence) * 0.025 );
 				} 
 			}
 		}
@@ -13414,13 +13410,13 @@ function ACS_XenoWorker_Attack(action: W3DamageAction)
 					}
 				}
 
-				if (GetACSXenoTyrant().UsesVitality()) 
+				if (ACSGetCActor('ACS_Xeno_Tyrant').UsesVitality()) 
 				{ 
-					GetACSXenoTyrant().GainStat( BCS_Vitality, npcAttacker.GetStatMax(BCS_Vitality) * 0.05 );
+					ACSGetCActor('ACS_Xeno_Tyrant').GainStat( BCS_Vitality, npcAttacker.GetStatMax(BCS_Vitality) * 0.05 );
 				} 
-				else if (GetACSXenoTyrant().UsesEssence()) 
+				else if (ACSGetCActor('ACS_Xeno_Tyrant').UsesEssence()) 
 				{ 
-					GetACSXenoTyrant().GainStat( BCS_Essence, npcAttacker.GetStatMax(BCS_Essence) * 0.05 );
+					ACSGetCActor('ACS_Xeno_Tyrant').GainStat( BCS_Essence, npcAttacker.GetStatMax(BCS_Essence) * 0.05 );
 				} 
 			}
 		}
@@ -13554,13 +13550,13 @@ function ACS_XenoArmoredWorker_Attack(action: W3DamageAction)
 					}
 				}
 
-				if (GetACSXenoTyrant().UsesVitality()) 
+				if (ACSGetCActor('ACS_Xeno_Tyrant').UsesVitality()) 
 				{ 
-					GetACSXenoTyrant().GainStat( BCS_Vitality, npcAttacker.GetStatMax(BCS_Vitality) * 0.05 );
+					ACSGetCActor('ACS_Xeno_Tyrant').GainStat( BCS_Vitality, npcAttacker.GetStatMax(BCS_Vitality) * 0.05 );
 				} 
-				else if (GetACSXenoTyrant().UsesEssence()) 
+				else if (ACSGetCActor('ACS_Xeno_Tyrant').UsesEssence()) 
 				{ 
-					GetACSXenoTyrant().GainStat( BCS_Essence, npcAttacker.GetStatMax(BCS_Essence) * 0.05 );
+					ACSGetCActor('ACS_Xeno_Tyrant').GainStat( BCS_Essence, npcAttacker.GetStatMax(BCS_Essence) * 0.05 );
 				} 
 			}
 		}
@@ -13594,11 +13590,11 @@ function ACS_Unseen_Monster_Attack(action: W3DamageAction)
 
 				if (npcAttacker.UsesVitality()) 
 				{ 
-					ACSVampireMonsterBossBar().GainStat( BCS_Vitality, (ACSVampireMonsterBossBar().GetStatMax(BCS_Vitality) - ACSVampireMonsterBossBar().GetStat(BCS_Vitality)) * 0.025 );
+					ACSGetCActor('ACS_Vampire_Monster_Boss_Bar').GainStat( BCS_Vitality, (ACSGetCActor('ACS_Vampire_Monster_Boss_Bar').GetStatMax(BCS_Vitality) - ACSGetCActor('ACS_Vampire_Monster_Boss_Bar').GetStat(BCS_Vitality)) * 0.025 );
 				} 
 				else if (npcAttacker.UsesEssence()) 
 				{ 
-					ACSVampireMonsterBossBar().GainStat( BCS_Essence, (ACSVampireMonsterBossBar().GetStatMax(BCS_Essence) - ACSVampireMonsterBossBar().GetStat(BCS_Essence))  * 0.025 );
+					ACSGetCActor('ACS_Vampire_Monster_Boss_Bar').GainStat( BCS_Essence, (ACSGetCActor('ACS_Vampire_Monster_Boss_Bar').GetStatMax(BCS_Essence) - ACSGetCActor('ACS_Vampire_Monster_Boss_Bar').GetStat(BCS_Essence))  * 0.025 );
 				} 
 			}
 		}
@@ -14081,61 +14077,61 @@ function ACS_MegaWraith_Attack(action: W3DamageAction)
 			npcAttacker.RemoveAbility('FlashStep');
 		}
 
-		GetACSMegaWraithLWeapon().StopEffect('light_trail_extended_fx');
+		ACSGetCEntity('ACS_MegaWraith_L_Weapon').StopEffect('light_trail_extended_fx');
 
-		GetACSMegaWraithLWeapon().StopEffect('wraith_trail');
+		ACSGetCEntity('ACS_MegaWraith_L_Weapon').StopEffect('wraith_trail');
 
-		GetACSMegaWraithLWeapon().StopEffect('special_trail_fx');
+		ACSGetCEntity('ACS_MegaWraith_L_Weapon').StopEffect('special_trail_fx');
 
-		if (!GetACSMegaWraithLWeapon().IsEffectActive('runeword_igni_green', false))
+		if (!ACSGetCEntity('ACS_MegaWraith_L_Weapon').IsEffectActive('runeword_igni_green', false))
 		{
-			GetACSMegaWraithLWeapon().PlayEffectSingle('runeword_igni_green');
+			ACSGetCEntity('ACS_MegaWraith_L_Weapon').PlayEffectSingle('runeword_igni_green');
 		}
 
-		if (!GetACSMegaWraithLWeapon().IsEffectActive('runeword1_fire_trail_green', false))
+		if (!ACSGetCEntity('ACS_MegaWraith_L_Weapon').IsEffectActive('runeword1_fire_trail_green', false))
 		{
-			GetACSMegaWraithLWeapon().PlayEffectSingle('runeword1_fire_trail_green');
+			ACSGetCEntity('ACS_MegaWraith_L_Weapon').PlayEffectSingle('runeword1_fire_trail_green');
 		}
 
-		if (!GetACSMegaWraithLWeapon().IsEffectActive('runeword_quen', false))
+		if (!ACSGetCEntity('ACS_MegaWraith_L_Weapon').IsEffectActive('runeword_quen', false))
 		{
-			GetACSMegaWraithLWeapon().PlayEffectSingle('runeword_quen');
+			ACSGetCEntity('ACS_MegaWraith_L_Weapon').PlayEffectSingle('runeword_quen');
 		}
 
-		GetACSMegaWraithLWeapon().PlayEffectSingle('light_trail_extended_fx');
+		ACSGetCEntity('ACS_MegaWraith_L_Weapon').PlayEffectSingle('light_trail_extended_fx');
 
-		GetACSMegaWraithLWeapon().PlayEffectSingle('wraith_trail');
+		ACSGetCEntity('ACS_MegaWraith_L_Weapon').PlayEffectSingle('wraith_trail');
 
-		GetACSMegaWraithLWeapon().PlayEffectSingle('special_trail_fx');
+		ACSGetCEntity('ACS_MegaWraith_L_Weapon').PlayEffectSingle('special_trail_fx');
 
 
 
-		GetACSMegaWraithRWeapon().StopEffect('light_trail_extended_fx');
+		ACSGetCEntity('ACS_MegaWraith_R_Weapon').StopEffect('light_trail_extended_fx');
 
-		GetACSMegaWraithRWeapon().StopEffect('wraith_trail');
+		ACSGetCEntity('ACS_MegaWraith_R_Weapon').StopEffect('wraith_trail');
 
-		GetACSMegaWraithRWeapon().StopEffect('special_trail_fx');
+		ACSGetCEntity('ACS_MegaWraith_R_Weapon').StopEffect('special_trail_fx');
 
-		if (!GetACSMegaWraithRWeapon().IsEffectActive('runeword_igni_green', false))
+		if (!ACSGetCEntity('ACS_MegaWraith_R_Weapon').IsEffectActive('runeword_igni_green', false))
 		{
-			GetACSMegaWraithRWeapon().PlayEffectSingle('runeword_igni_green');
+			ACSGetCEntity('ACS_MegaWraith_R_Weapon').PlayEffectSingle('runeword_igni_green');
 		}
 
-		if (!GetACSMegaWraithRWeapon().IsEffectActive('runeword1_fire_trail_green', false))
+		if (!ACSGetCEntity('ACS_MegaWraith_R_Weapon').IsEffectActive('runeword1_fire_trail_green', false))
 		{
-			GetACSMegaWraithRWeapon().PlayEffectSingle('runeword1_fire_trail_green');
+			ACSGetCEntity('ACS_MegaWraith_R_Weapon').PlayEffectSingle('runeword1_fire_trail_green');
 		}
 
-		if (!GetACSMegaWraithRWeapon().IsEffectActive('runeword_quen', false))
+		if (!ACSGetCEntity('ACS_MegaWraith_R_Weapon').IsEffectActive('runeword_quen', false))
 		{
-			GetACSMegaWraithRWeapon().PlayEffectSingle('runeword_quen');
+			ACSGetCEntity('ACS_MegaWraith_R_Weapon').PlayEffectSingle('runeword_quen');
 		}
 
-		GetACSMegaWraithRWeapon().PlayEffectSingle('light_trail_extended_fx');
+		ACSGetCEntity('ACS_MegaWraith_R_Weapon').PlayEffectSingle('light_trail_extended_fx');
 
-		GetACSMegaWraithRWeapon().PlayEffectSingle('wraith_trail');
+		ACSGetCEntity('ACS_MegaWraith_R_Weapon').PlayEffectSingle('wraith_trail');
 
-		GetACSMegaWraithRWeapon().PlayEffectSingle('special_trail_fx');
+		ACSGetCEntity('ACS_MegaWraith_R_Weapon').PlayEffectSingle('special_trail_fx');
 
 		if ( !action.WasDodged() && !(((W3Action_Attack)action).IsParried()) )
 		{
@@ -14709,9 +14705,9 @@ function ACS_Viy_Attack(action: W3DamageAction)
 
 			action.processedDmg.vitalityDamage += GetWitcherPlayer().GetStat(BCS_Vitality) * 0.125f;
 
-			thePlayer.AddEffectDefault( EET_Poison, ACSViyOfMaribor(), 'ACS_Viy_Of_Maribor' );
+			thePlayer.AddEffectDefault( EET_Poison, ACSGetCActor('ACS_Viy_Of_Maribor'), 'ACS_Viy_Of_Maribor' );
 
-			thePlayer.AddEffectDefault( EET_HeavyKnockdown, ACSViyOfMaribor(), 'ACS_Viy_Of_Maribor' );
+			thePlayer.AddEffectDefault( EET_HeavyKnockdown, ACSGetCActor('ACS_Viy_Of_Maribor'), 'ACS_Viy_Of_Maribor' );
 		}
 	}
 }
@@ -15501,8 +15497,8 @@ function ACS_NPC_Normal_Attack(action: W3DamageAction)
 
 			if (ACS_DodgeSlowMo_Enabled())
 			{
-				ACS_PerfectDodgesCounters_Tutorial();
-				GetACSWatcher().ACS_SlowMo();
+				ACS_Tutorial_Display_Check('ACS_PerfectDodgesCounters_Tutorial_Shown');
+				GetACSWatcher().ACS_SlowMoAdjustable(0.6,0.6);
 			}
 		}
 	}
@@ -15706,7 +15702,7 @@ state EnemyBehSwitch in cACS_EnemyBehSwitch
 						&& !npc.HasTag('ACS_One_Hand_Swap_Stage_2')
 						)
 						{
-							ACS_Dynamic_Enemy_Behavior_System_Tutorial();
+							ACS_Tutorial_Display_Check('ACS_Dynamic_Enemy_Behavior_System_Tutorial_Shown');
 
 							if ( npc.GetBehaviorGraphInstanceName() == 'sword_2handed' )
 							{
@@ -16243,7 +16239,7 @@ state EnemyBehSwitch in cACS_EnemyBehSwitch
 
 			npc.AddEffectDefault( EET_Stagger, GetWitcherPlayer(), 'ACS_Beh_Swich_Effect' ); 
 
-			shield_temp = (CEntityTemplate)LoadResourceAsync( 
+			shield_temp = (CEntityTemplate)LoadResource( 
 		
 			"dlc\dlc_acs\data\entities\other\shield_spawner.w2ent"
 			

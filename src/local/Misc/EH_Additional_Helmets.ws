@@ -23,11 +23,16 @@ state ACS_Hood_Enable_Engage in cACS_Hood
 	{
 		super.OnEnterState(prevStateName);
 		Hood_Enable_Latent();
-		Hair_Thing();
 	}
 	
 	entry function Hood_Enable_Latent()
 	{
+		var inv : CInventoryComponent;
+		var witcher : W3PlayerWitcher;
+		var ids : array<SItemUniqueId>;
+		var size : int;
+		var i : int;
+
 		l_actor = thePlayer;
 		l_comp = l_actor.GetComponentByClassName( 'CAppearanceComponent' );	
 
@@ -189,23 +194,27 @@ state ACS_Hood_Enable_Engage in cACS_Hood
 				FactsAdd("ACS_Hood_Normal_Equipped", 1, -1);
 			}
 
-			temp_1 = (CEntityTemplate)LoadResource("dlc\ep1\data\characters\models\main_npc\ewald_borsody\ewald_borsody_hood_01.w2ent", true);		
+			temp_1 = (CEntityTemplate)LoadResource(
+
+			//"dlc\ep1\data\characters\models\main_npc\ewald_borsody\ewald_borsody_hood_01.w2ent"
+
+			"dlc\dlc_acs\data\models\hood_morph\acs_hood_morph.w2ent"
+			
+			, true);		
 		}
 
 		((CAppearanceComponent)l_comp).IncludeAppearanceTemplate(temp_1);
-	}
 
-	entry function Hair_Thing()
-	{
-		var inv : CInventoryComponent;
-		var witcher : W3PlayerWitcher;
-		var ids : array<SItemUniqueId>;
-		var size : int;
-		var i : int;
+		if ( FactsQuerySum("ACS_Hood_Normal_Equipped") > 0 )
+		{
+			ACS_PlayerMorph(1, 0.5);
+		}
 
-		witcher = GetWitcherPlayer();
-		inv = witcher.GetInventory();
-		
+		/*
+		Sleep(0.75);
+
+		ids.Clear();
+
 		ids = inv.GetItemsByCategory( 'hair' );
 		size = ids.Size();
 			
@@ -219,8 +228,9 @@ state ACS_Hood_Enable_Engage in cACS_Hood
 		}		
 
 		ids.Clear();
+		*/
 	}
-	
+
 	event OnLeaveState( nextStateName : name ) 
 	{
 		super.OnLeaveState(nextStateName);
@@ -246,16 +256,46 @@ state ACS_Hood_Disable_Engage in cACS_Hood
 
 	entry function Hood_Disable_Entry()
 	{
+		ids.Clear();
+
 		l_actor = thePlayer;
 		l_comp = l_actor.GetComponentByClassName( 'CAppearanceComponent' );
 
+		inv = thePlayer.GetInventory();
+    
+		ids = inv.GetItemsByCategory( 'hair' );
+		size = ids.Size();
+		
+		if( size > 0 )
+		{					
+			for( i = 0; i < size; i+=1 )
+			{
+				if(inv.IsItemMounted( ids[i] ) )
+				{
+					inv.MountItem(ids[i],,true);
+				}
+			}	
+		}		
+
+		ids.Clear();
+
 		if ( FactsQuerySum("ACS_Hood_Normal_Equipped") > 0 )
 		{
-			temp_1 = (CEntityTemplate)LoadResource("dlc\ep1\data\characters\models\main_npc\ewald_borsody\ewald_borsody_hood_01.w2ent", true);		
-		
-			((CAppearanceComponent)l_comp).ExcludeAppearanceTemplate(temp_1);
-
 			FactsRemove("ACS_Hood_Normal_Equipped");
+
+			temp_1 = (CEntityTemplate)LoadResource(
+
+			//"dlc\ep1\data\characters\models\main_npc\ewald_borsody\ewald_borsody_hood_01.w2ent"
+
+			"dlc\dlc_acs\data\models\hood_morph\acs_hood_morph.w2ent"
+			
+			, true);		
+
+			ACS_PlayerMorph(0, 0.5);
+
+			Sleep(0.5);
+
+			((CAppearanceComponent)l_comp).ExcludeAppearanceTemplate(temp_1);
 		}
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -411,23 +451,6 @@ state ACS_Hood_Disable_Engage in cACS_Hood
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		inv = thePlayer.GetInventory();
-    
-		ids = inv.GetItemsByCategory( 'hair' );
-		size = ids.Size();
-		
-		if( size > 0 )
-		{					
-			for( i = 0; i < size; i+=1 )
-			{
-				if(inv.IsItemMounted( ids[i] ) )
-				{
-					inv.MountItem(ids[i],,true);
-				}
-			}	
-		}			
-		ids.Clear();
-
 	}
 	
 	event OnLeaveState( nextStateName : name ) 
@@ -551,8 +574,8 @@ state AttachEredinSkirt in cACS_Wildhunt_Additional_Pieces
 		var h 																: float;
 		var anchor_temp														: CEntityTemplate;
 
-		GetACSEredinSkirt().Destroy();
-		GetACSEredinSkirtAnchor().Destroy();
+		ACSGetCEntity('ACS_Eredin_Skirt').Destroy();
+		ACSGetCEntity('ACS_Eredin_Skirt_Anchor').Destroy();
 
 		anchor_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\entities\other\fx_ent.w2ent", true );
 
@@ -613,8 +636,8 @@ state AttachEredinCloak in cACS_Wildhunt_Additional_Pieces
 		var anchor_temp														: CEntityTemplate;
 
 
-		GetACSEredinCloak().Destroy();
-		GetACSEredinCloakAnchor().Destroy();
+		ACSGetCEntity('ACS_Eredin_Cloak').Destroy();
+		ACSGetCEntity('ACS_Eredin_Cloak_Anchor').Destroy();
 
 
 
@@ -685,8 +708,8 @@ state AttachVGXEredinCloak in cACS_Wildhunt_Additional_Pieces
 		var anchor_temp														: CEntityTemplate;
 
 
-		GetACSVGXEredinCloak().Destroy();
-		GetACSVGXEredinCloakAnchor().Destroy();
+		ACSGetCEntity('ACS_VGX_Eredin_Cloak').Destroy();
+		ACSGetCEntity('ACS_VGX_Eredin_Cloak_Anchor').Destroy();
 
 
 
@@ -757,8 +780,8 @@ state AttachImlerithSkirt in cACS_Wildhunt_Additional_Pieces
 		var anchor_temp														: CEntityTemplate;
 
 
-		GetACSImlerithSkirt().Destroy();
-		GetACSImlerithSkirtAnchor().Destroy();
+		ACSGetCEntity('ACS_Imlerith_Skirt').Destroy();
+		ACSGetCEntity('ACS_Imlerith_Skirt_Anchor').Destroy();
 
 
 
@@ -2939,46 +2962,6 @@ state Engage in cACS_Additional_Helmets
 	}
 }
 
-function GetACSHelm1() : CEntity
-{
-	var entity 			 : CEntity;
-	
-	entity = (CEntity)theGame.GetEntityByTag( 'acs_helm_1' );
-	return entity;
-}
-
-function GetACSHelm2() : CEntity
-{
-	var entity 			 : CEntity;
-	
-	entity = (CEntity)theGame.GetEntityByTag( 'acs_helm_2' );
-	return entity;
-}
-
-function GetACSHelm3() : CEntity
-{
-	var entity 			 : CEntity;
-	
-	entity = (CEntity)theGame.GetEntityByTag( 'acs_helm_3' );
-	return entity;
-}
-
-function GetACSHelm4() : CEntity
-{
-	var entity 			 : CEntity;
-	
-	entity = (CEntity)theGame.GetEntityByTag( 'acs_helm_4' );
-	return entity;
-}
-
-function GetACSHelmAnchor() : CEntity
-{
-	var entity 			 : CEntity;
-	
-	entity = (CEntity)theGame.GetEntityByTag( 'acs_helm_anchor' );
-	return entity;
-}
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 statemachine class cACS_Additional_Helmet_Appearance_Destroy
@@ -4122,28 +4105,4 @@ state Energy in cACS_Swordsanoo
 	{
 		super.OnLeaveState(nextStateName);
 	}
-}
-
-function torso_anchor_1() : CEntity
-{
-	var anchor 			 : CEntity;
-	
-	anchor = (CEntity)theGame.GetEntityByTag( 'acs_torso_anchor_1' );
-	return anchor;
-}
-
-function torso_anchor_2() : CEntity
-{
-	var anchor 			 : CEntity;
-	
-	anchor = (CEntity)theGame.GetEntityByTag( 'acs_torso_anchor_2' );
-	return anchor;
-}
-
-function torso_anchor_3() : CEntity
-{
-	var anchor 			 : CEntity;
-	
-	anchor = (CEntity)theGame.GetEntityByTag( 'acs_torso_anchor_3' );
-	return anchor;
 }

@@ -15,16 +15,16 @@ function ACS_BruxaBiteInit()
 		&& !GetWitcherPlayer().IsPerformingFinisher()
 		)
 		{
-			if (!GetWitcherPlayer().HasTag('in_wraith'))
+			if (!GetWitcherPlayer().HasTag('acs_in_wraith'))
 			{
-				if (!GetWitcherPlayer().HasTag('blood_sucking') 
+				if (!GetWitcherPlayer().HasTag('acs_blood_sucking') 
 				//&& (ACS_BruxaDash_Enabled() || ACS_BruxaLeapAttack_Enabled())
 				//&& GetWitcherPlayer().GetStat( BCS_Stamina ) == GetWitcherPlayer().GetStatMax( BCS_Stamina ) 
 				)
 				{
 					vBruxaBite.BruxaBite_Engage();
 				}
-				else if ( GetWitcherPlayer().HasTag('blood_sucking') 
+				else if ( GetWitcherPlayer().HasTag('acs_blood_sucking') 
 				//&& ACS_Hijack_Enabled() 
 				)
 				{

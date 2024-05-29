@@ -1,11 +1,3 @@
-function ACS_Giant_Lightning_Strike_Single()
-{
-	var vACS_Giant_Lightning_Strike_Single : cACS_Giant_Lightning_Strike_Single;
-	vACS_Giant_Lightning_Strike_Single = new cACS_Giant_Lightning_Strike_Single in theGame;
-			
-	vACS_Giant_Lightning_Strike_Single.Giant_Lightning_Strike_Single_Engage();
-}
-
 statemachine class cACS_Giant_Lightning_Strike_Single
 {
     function Giant_Lightning_Strike_Single_Engage()
@@ -104,65 +96,6 @@ state Giant_Lightning_Strike_Single_Engage in cACS_Giant_Lightning_Strike_Single
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-function ACS_Lightning_Strike_Check() : bool
-{
-	if (
-	(
-	GetWeatherConditionName() == 'WT_Rain_Storm' 
-	|| GetWeatherConditionName() == 'WT_Battle' 
-	|| GetWeatherConditionName() == 'WT_Battle_Forest' 
-	|| GetWeatherConditionName() == 'WT_Wild_Hunt' 
-	|| GetWeatherConditionName() == 'WT_q501_Blizzard' 
-	|| GetWeatherConditionName() == 'WT_q501_Storm' 
-	|| GetWeatherConditionName() == 'WT_q501_Blizzard2' 
-	|| GetWeatherConditionName() == 'WT_q501_fight_ship_18_00' 
-	|| GetWeatherConditionName() == 'WT_q501_storm_arena' 
-	|| GetWeatherConditionName() == 'Spiral_Eternal_Cold' 
-	|| GetWeatherConditionName() == 'Spiral_Dark_Valley'
-	|| GetWeatherConditionName() == 'WT_Rain_Heavy' 
-	|| GetWeatherConditionName() == 'WT_Rain_Dark' 
-	)
-	&& !thePlayer.IsInInterior()
-	)
-	{
-		return true;
-	}
-
-	return false;
-}
-
-function ACS_Lightning_Strike()
-{
-	var vACS_Lightning_Strike : cACS_Lightning_Strike;
-	vACS_Lightning_Strike = new cACS_Lightning_Strike in theGame;
-	
-	if (ACS_Lightning_Strike_Check()
-	&& ACS_can_lightning())
-	{
-		ACS_refresh_lightning_cooldown();
-
-		ACS_Lightning_Tutorial();
-
-		vACS_Lightning_Strike.ACS_Lightning_Strike_Engage();
-	}
-}
-
-function ACS_Lightning_Strike_No_Condition()
-{
-	var vACS_Lightning_Strike : cACS_Lightning_Strike;
-	vACS_Lightning_Strike = new cACS_Lightning_Strike in theGame;
-	
-	vACS_Lightning_Strike.ACS_Lightning_Strike_Engage();
-}
-
-function ACS_Lightning_Strike_No_Condition_Mult()
-{
-	var vACS_Lightning_Strike : cACS_Lightning_Strike;
-	vACS_Lightning_Strike = new cACS_Lightning_Strike in theGame;
-	
-	vACS_Lightning_Strike.ACS_Lightning_Strike_Mult_Engage();
-}
 
 statemachine class cACS_Lightning_Strike
 {
@@ -601,30 +534,6 @@ state ACS_Lightning_Strike_Mult_Engage in cACS_Lightning_Strike
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function ACS_Marker_Fire()
-{
-	var vACS_Marker : cACS_Marker;
-	vACS_Marker = new cACS_Marker in theGame;
-			
-	vACS_Marker.ACS_Marker_Fire_Engage();
-}
-
-function ACS_Marker_Smoke()
-{
-	var vACS_Marker : cACS_Marker;
-	vACS_Marker = new cACS_Marker in theGame;
-			
-	vACS_Marker.ACS_Marker_Smoke_Engage();
-}
-
-function ACS_Marker_Lightning()
-{
-	var vACS_Marker : cACS_Marker;
-	vACS_Marker = new cACS_Marker in theGame;
-			
-	vACS_Marker.ACS_Marker_Lightning_Engage();
-}
-
 statemachine class cACS_Marker
 {
     function ACS_Marker_Fire_Engage()
@@ -835,7 +744,6 @@ state ACS_Marker_Lightning_Engage in cACS_Marker
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 
 function ACS_Giant_Lightning_Strike_Mult()
 {
@@ -1614,6 +1522,9 @@ state ACS_Ice_Bats_Engage in cACS_Ice_Spikes
 
 		BatsProjectile();
 		IceProjectile();
+
+		GetWitcherPlayer().SoundEvent("monster_dettlaff_monster_combat_swarm");
+		GetWitcherPlayer().SoundEvent("Stop_monster_dettlaff_monster_combat_swarm_delay");
 	}
 	
 	latent function BatsProjectile()
@@ -2944,7 +2855,7 @@ function ACS_Rend_Projectile_Switch( noStamina : bool )
 		}
 		else
 		{
-			ACS_Leviathan_Projectile();
+			GetACSWatcher().ACS_Leviathan_Projectile();
 		}
 		
 	}
@@ -2964,23 +2875,23 @@ function ACS_Rend_Projectile_Switch( noStamina : bool )
 			{
 				if (curAdrenaline >= maxAdrenaline * 2/3)
 				{
-					if( GetWitcherPlayer().GetEquippedSign() == ST_Igni && GetWitcherPlayer().HasTag('igni_secondary_sword_equipped') && GetWitcherPlayer().CanUseSkill(S_Sword_s02))
+					if( GetWitcherPlayer().GetEquippedSign() == ST_Igni && GetWitcherPlayer().HasTag('acs_igni_secondary_sword_equipped') && GetWitcherPlayer().CanUseSkill(S_Sword_s02))
 					{
 						ACS_Ifrit_Fire_Projectile();
 					}
-					else if( GetWitcherPlayer().GetEquippedSign() == ST_Axii && GetWitcherPlayer().HasTag('axii_secondary_sword_equipped') && GetWitcherPlayer().CanUseSkill(S_Sword_s02))
+					else if( GetWitcherPlayer().GetEquippedSign() == ST_Axii && GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped') && GetWitcherPlayer().CanUseSkill(S_Sword_s02))
 					{
 						ACS_Eredin_Frost_Projectile();
 					}
-					else if( GetWitcherPlayer().GetEquippedSign() == ST_Aard && GetWitcherPlayer().HasTag('aard_secondary_sword_equipped') && GetWitcherPlayer().CanUseSkill(S_Sword_s02))
+					else if( GetWitcherPlayer().GetEquippedSign() == ST_Aard && GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped') && GetWitcherPlayer().CanUseSkill(S_Sword_s02))
 					{
 						ACS_Golem_Stone_Projectile();
 					}
-					else if( GetWitcherPlayer().GetEquippedSign() == ST_Quen && GetWitcherPlayer().HasTag('quen_secondary_sword_equipped') && GetWitcherPlayer().CanUseSkill(S_Sword_s02))
+					else if( GetWitcherPlayer().GetEquippedSign() == ST_Quen && GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped') && GetWitcherPlayer().CanUseSkill(S_Sword_s02))
 					{
 						ACS_Root_Projectile();
 					}
-					else if( GetWitcherPlayer().GetEquippedSign() == ST_Yrden && GetWitcherPlayer().HasTag('yrden_secondary_sword_equipped') && GetWitcherPlayer().CanUseSkill(S_Sword_s02))
+					else if( GetWitcherPlayer().GetEquippedSign() == ST_Yrden && GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped') && GetWitcherPlayer().CanUseSkill(S_Sword_s02))
 					{
 						ACS_Giant_Shockwave_Mult();
 					}
@@ -2992,24 +2903,12 @@ function ACS_Rend_Projectile_Switch( noStamina : bool )
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function ACS_Leviathan_Projectile()
-{
-	var vACS_Throw_Leviathan : cACS_Throw_Leviathan;
-	vACS_Throw_Leviathan = new cACS_Throw_Leviathan in theGame;
-			
-	vACS_Throw_Leviathan.ACS_Throw_Leviathan_Engage();
-}
 
 statemachine class cACS_Throw_Leviathan
 {
     function ACS_Throw_Leviathan_Engage()
 	{
 		this.PushState('ACS_Throw_Leviathan_Engage');
-	}
-
-	function ACS_Leviathan_Return_Engage()
-	{
-		this.PushState('ACS_Leviathan_Return_Engage');
 	}
 }
 
@@ -3032,6 +2931,9 @@ state ACS_Throw_Leviathan_Engage in cACS_Throw_Leviathan
 	entry function Throw_Leviathan_Entry()
 	{
 		GetACSWatcher().ACS_Leviathan_Create_Savelock();
+
+		ACS_GetItem_Leviathan().PlayEffect('radial_copy');
+		ACS_GetItem_Leviathan().PlayEffect('fire_sparks_trail');
 
 		thePlayer.GetInventory().GetItemEquippedOnSlot(EES_SteelSword, sword_id);
 
@@ -4159,10 +4061,6 @@ state ACS_Giant_Shockwave_Mult_Engage in cACS_Giant_Shockwave_Mult
 	}
 }
 
-function ACS_Theft_Prevention_8()
-{
-	return;
-}
 
 function ACS_Giant_Shockwave()
 {
@@ -4806,25 +4704,25 @@ state ACS_Detonation_Weapon_Effects_Switch_Engage in cACS_Detonation_Weapon_Effe
 		fxPos = MatrixGetTranslation(weaponSlotMatrix);
 		fxRot = weaponEntity.GetWorldRotation();
 		
-		if ( GetWitcherPlayer().HasTag('aard_sword_equipped') )
+		if ( GetWitcherPlayer().HasTag('acs_aard_sword_equipped') )
 		{
 			vfxEnt = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( "fx\monsters\arachas\arachas_poison_cloud.w2ent", true ), fxPos, GetWitcherPlayer().GetWorldRotation() );
 			vfxEnt.PlayEffectSingle('poison_cloud');
 			vfxEnt.DestroyAfter(2.5);
 		}
-		else if ( GetWitcherPlayer().HasTag('aard_secondary_sword_equipped') )
+		else if ( GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped') )
 		{
 			vfxEnt = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( "dlc\bob\data\fx\gameplay\mutation\mutation_2\mutation_2_explode.w2ent", true ), fxPos, fxRot );
 			vfxEnt.PlayEffectSingle('mutation_2_igni');
 			vfxEnt.DestroyAfter(1.5);
 		}
-		else if ( GetWitcherPlayer().HasTag('axii_secondary_sword_equipped') )
+		else if ( GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped') )
 		{
 			vfxEnt = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( "dlc\bob\data\fx\gameplay\mutation\mutation_2\mutation_2_explode.w2ent", true ), fxPos, fxRot );
 			vfxEnt.PlayEffectSingle('mutation_2_aard_b');
 			vfxEnt.DestroyAfter(1.5);
 		}
-		else if ( GetWitcherPlayer().HasTag('igni_secondary_sword_equipped') )
+		else if ( GetWitcherPlayer().HasTag('acs_igni_secondary_sword_equipped') )
 		{
 			vfxEnt = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( "dlc\ep1\data\fx\glyphword\glyphword_20\glyphword_20_explode.w2ent", true ), fxPos, fxRot );
 			vfxEnt.PlayEffectSingle('explode');
@@ -4839,7 +4737,7 @@ state ACS_Detonation_Weapon_Effects_Switch_Engage in cACS_Detonation_Weapon_Effe
 		{
 			if ( thePlayer.IsWeaponHeld( 'fist' ) )
 			{
-				if ( thePlayer.HasTag('vampire_claws_equipped') )
+				if ( thePlayer.HasTag('acs_vampire_claws_equipped') )
 				{
 					if ( thePlayer.HasBuff(EET_BlackBlood) )
 					{
@@ -4861,8 +4759,8 @@ state ACS_Detonation_Weapon_Effects_Switch_Engage in cACS_Detonation_Weapon_Effe
 			else
 			{
 				if ( 
-				thePlayer.HasTag('igni_sword_equipped_TAG') 
-				|| thePlayer.HasTag('igni_sword_equipped') 
+				thePlayer.HasTag('acs_igni_sword_equipped_TAG') 
+				|| thePlayer.HasTag('acs_igni_sword_equipped') 
 				)
 				{
 					dist = 1.5;
@@ -4885,8 +4783,8 @@ state ACS_Detonation_Weapon_Effects_Switch_Engage in cACS_Detonation_Weapon_Effe
 						}
 					}
 				}
-				else if ( thePlayer.HasTag('igni_secondary_sword_equipped_TAG') 
-				|| thePlayer.HasTag('igni_secondary_sword_equipped') 
+				else if ( thePlayer.HasTag('acs_igni_secondary_sword_equipped_TAG') 
+				|| thePlayer.HasTag('acs_igni_secondary_sword_equipped') 
 				)
 				{
 					dist = 1.5;
@@ -4909,7 +4807,7 @@ state ACS_Detonation_Weapon_Effects_Switch_Engage in cACS_Detonation_Weapon_Effe
 						}
 					}
 				}
-				else if ( thePlayer.HasTag('axii_sword_equipped') )
+				else if ( thePlayer.HasTag('acs_axii_sword_equipped') )
 				{
 					dist = 1.6;
 					ang =	70;	
@@ -4920,7 +4818,7 @@ state ACS_Detonation_Weapon_Effects_Switch_Engage in cACS_Detonation_Weapon_Effe
 						ang +=	30;
 					}
 				}
-				else if ( thePlayer.HasTag('axii_secondary_sword_equipped') )
+				else if ( thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
 				{
 					if ( 
 					ACS_GetWeaponMode() == 0
@@ -4937,17 +4835,17 @@ state ACS_Detonation_Weapon_Effects_Switch_Engage in cACS_Detonation_Weapon_Effe
 						ang =	70;
 					}
 				}
-				else if ( thePlayer.HasTag('aard_sword_equipped') )
+				else if ( thePlayer.HasTag('acs_aard_sword_equipped') )
 				{
 					dist = 2;
 					ang =	75;	
 				}
-				else if ( thePlayer.HasTag('aard_secondary_sword_equipped') )
+				else if ( thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
 				{
 					dist = 2;
 					ang = 70;
 				}
-				else if ( thePlayer.HasTag('yrden_sword_equipped') )
+				else if ( thePlayer.HasTag('acs_yrden_sword_equipped') )
 				{
 					if ( ACS_GetWeaponMode() == 0 )
 					{
@@ -4994,12 +4892,12 @@ state ACS_Detonation_Weapon_Effects_Switch_Engage in cACS_Detonation_Weapon_Effe
 						ang = 70;
 					}
 				}
-				else if ( thePlayer.HasTag('yrden_secondary_sword_equipped') )
+				else if ( thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
 				{
 					dist = 3.5;
 					ang =	180;
 				}
-				else if ( thePlayer.HasTag('quen_sword_equipped') )
+				else if ( thePlayer.HasTag('acs_quen_sword_equipped') )
 				{
 					dist = 1.6;
 					ang =	70;
@@ -5009,7 +4907,7 @@ state ACS_Detonation_Weapon_Effects_Switch_Engage in cACS_Detonation_Weapon_Effe
 						ang +=	320;
 					}
 				}
-				else if ( thePlayer.HasTag('quen_secondary_sword_equipped') )
+				else if ( thePlayer.HasTag('acs_quen_secondary_sword_equipped') )
 				{
 					if (thePlayer.HasTag('ACS_Storm_Spear_Active'))
 					{
@@ -5045,7 +4943,7 @@ state ACS_Detonation_Weapon_Effects_Switch_Engage in cACS_Detonation_Weapon_Effe
 				}
 			}
 
-			if ( thePlayer.GetTarget() == ACS_Big_Boi() )
+			if ( thePlayer.GetTarget() == ACSGetCActor('ACS_Big_Boi') )
 			{
 				dist += 0.75;
 				ang += 15;
@@ -5061,8 +4959,8 @@ state ACS_Detonation_Weapon_Effects_Switch_Engage in cACS_Detonation_Weapon_Effe
 			}
 
 			if( thePlayer.HasAbility('Runeword 2 _Stats', true) 
-			&& !thePlayer.HasTag('igni_sword_equipped') 
-			&& !thePlayer.HasTag('igni_secondary_sword_equipped') 
+			&& !thePlayer.HasTag('acs_igni_sword_equipped') 
+			&& !thePlayer.HasTag('acs_igni_secondary_sword_equipped') 
 			&& !ACS_Armor_Equipped_Check())
 			{
 				dist += 1;
@@ -5167,55 +5065,55 @@ state ACS_Detonation_Weapon_Effects_Switch_Engage in cACS_Detonation_Weapon_Effe
 			{				
 				if( ACS_AttitudeCheck ( (CActor)targets[i] ) && npc.IsAlive() )
 				{
-					if ( GetWitcherPlayer().HasTag('aard_sword_equipped') )
+					if ( GetWitcherPlayer().HasTag('acs_aard_sword_equipped') )
 					{
 						vfxEnt = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( "dlc\bob\data\fx\gameplay\mutation\mutation_1\mutation_1_hit.w2ent", true ), fxPos, fxRot );
 						vfxEnt.PlayEffectSingle('mutation_1_hit_aard');
 						vfxEnt.DestroyAfter(1.5);
 					}
-					else if ( GetWitcherPlayer().HasTag('aard_secondary_sword_equipped') )
+					else if ( GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped') )
 					{
 						vfxEnt = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( "dlc\bob\data\fx\gameplay\mutation\mutation_1\mutation_1_hit.w2ent", true ), fxPos, fxRot );
 						vfxEnt.PlayEffectSingle('mutation_1_hit_aard');
 						vfxEnt.DestroyAfter(1.5);
 					}
-					else if ( GetWitcherPlayer().HasTag('quen_sword_equipped') )
+					else if ( GetWitcherPlayer().HasTag('acs_quen_sword_equipped') )
 					{
 						vfxEnt = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( "dlc\bob\data\fx\gameplay\mutation\mutation_2\mutation_2_explode.w2ent", true ), targetPos, targetRot );
 						vfxEnt.PlayEffectSingle('mutation_2_quen');
 						vfxEnt.DestroyAfter(1.5);
 					}
-					else if ( GetWitcherPlayer().HasTag('quen_secondary_sword_equipped') )
+					else if ( GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped') )
 					{
 						vfxEnt = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( "dlc\bob\data\fx\gameplay\mutation\mutation_2\mutation_2_explode.w2ent", true ), targetPos, targetRot );
 						vfxEnt.PlayEffectSingle('mutation_2_quen');
 						vfxEnt.DestroyAfter(1.5);
 					}
-					else if ( GetWitcherPlayer().HasTag('axii_sword_equipped') )
+					else if ( GetWitcherPlayer().HasTag('acs_axii_sword_equipped') )
 					{
 						vfxEnt = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( "dlc\bob\data\fx\gameplay\mutation\mutation_2\mutation_2_explode.w2ent", true ), targetPos, targetRot );
 						vfxEnt.PlayEffectSingle('mutation_2_aard_b');
 						vfxEnt.DestroyAfter(1.5);
 					}
-					else if ( GetWitcherPlayer().HasTag('axii_secondary_sword_equipped') )
+					else if ( GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped') )
 					{
 						vfxEnt = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( "dlc\bob\data\fx\gameplay\mutation\mutation_2\mutation_2_explode.w2ent", true ), targetPos, targetRot );
 						vfxEnt.PlayEffectSingle('mutation_2_aard_b');
 						vfxEnt.DestroyAfter(1.5);
 					}
-					else if ( GetWitcherPlayer().HasTag('yrden_sword_equipped') )
+					else if ( GetWitcherPlayer().HasTag('acs_yrden_sword_equipped') )
 					{
 						vfxEnt = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( "dlc\bob\data\fx\gameplay\mutation\mutation_2\mutation_2_explode.w2ent", true ), targetPos, targetRot );
 						vfxEnt.PlayEffectSingle('mutation_2_yrden');
 						vfxEnt.DestroyAfter(1.5);
 					}
-					else if ( GetWitcherPlayer().HasTag('yrden_secondary_sword_equipped') )
+					else if ( GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped') )
 					{
 						vfxEnt = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( "dlc\bob\data\fx\gameplay\mutation\mutation_2\mutation_2_explode.w2ent", true ), targetPos, targetRot );
 						vfxEnt.PlayEffectSingle('mutation_2_yrden');
 						vfxEnt.DestroyAfter(1.5);
 					}
-					else if ( GetWitcherPlayer().HasTag('igni_secondary_sword_equipped_TAG') )
+					else if ( GetWitcherPlayer().HasTag('acs_igni_secondary_sword_equipped_TAG') )
 					{
 						vfxEnt = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( "dlc\bob\data\fx\gameplay\mutation\mutation_2\mutation_2_explode.w2ent", true ), targetPos, targetRot );
 						vfxEnt.PlayEffectSingle('mutation_2_igni');
@@ -5279,7 +5177,7 @@ state ACS_Passive_Weapon_Effects_Switch_Engage in cACS_Passive_Weapon_Effects_Sw
 		{
 			if ( thePlayer.IsWeaponHeld( 'fist' ) )
 			{
-				if ( thePlayer.HasTag('vampire_claws_equipped') )
+				if ( thePlayer.HasTag('acs_vampire_claws_equipped') )
 				{
 					if ( thePlayer.HasBuff(EET_BlackBlood) )
 					{
@@ -5301,8 +5199,8 @@ state ACS_Passive_Weapon_Effects_Switch_Engage in cACS_Passive_Weapon_Effects_Sw
 			else
 			{
 				if ( 
-				thePlayer.HasTag('igni_sword_equipped_TAG') 
-				|| thePlayer.HasTag('igni_sword_equipped') 
+				thePlayer.HasTag('acs_igni_sword_equipped_TAG') 
+				|| thePlayer.HasTag('acs_igni_sword_equipped') 
 				)
 				{
 					dist = 1.5;
@@ -5325,8 +5223,8 @@ state ACS_Passive_Weapon_Effects_Switch_Engage in cACS_Passive_Weapon_Effects_Sw
 						}
 					}
 				}
-				else if ( thePlayer.HasTag('igni_secondary_sword_equipped_TAG') 
-				|| thePlayer.HasTag('igni_secondary_sword_equipped') 
+				else if ( thePlayer.HasTag('acs_igni_secondary_sword_equipped_TAG') 
+				|| thePlayer.HasTag('acs_igni_secondary_sword_equipped') 
 				)
 				{
 					dist = 1.5;
@@ -5349,7 +5247,7 @@ state ACS_Passive_Weapon_Effects_Switch_Engage in cACS_Passive_Weapon_Effects_Sw
 						}
 					}
 				}
-				else if ( thePlayer.HasTag('axii_sword_equipped') )
+				else if ( thePlayer.HasTag('acs_axii_sword_equipped') )
 				{
 					dist = 1.6;
 					ang =	70;	
@@ -5360,7 +5258,7 @@ state ACS_Passive_Weapon_Effects_Switch_Engage in cACS_Passive_Weapon_Effects_Sw
 						ang +=	30;
 					}
 				}
-				else if ( thePlayer.HasTag('axii_secondary_sword_equipped') )
+				else if ( thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
 				{
 					if ( 
 					ACS_GetWeaponMode() == 0
@@ -5377,17 +5275,17 @@ state ACS_Passive_Weapon_Effects_Switch_Engage in cACS_Passive_Weapon_Effects_Sw
 						ang =	70;
 					}
 				}
-				else if ( thePlayer.HasTag('aard_sword_equipped') )
+				else if ( thePlayer.HasTag('acs_aard_sword_equipped') )
 				{
 					dist = 2;
 					ang =	75;	
 				}
-				else if ( thePlayer.HasTag('aard_secondary_sword_equipped') )
+				else if ( thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
 				{
 					dist = 2;
 					ang = 70;
 				}
-				else if ( thePlayer.HasTag('yrden_sword_equipped') )
+				else if ( thePlayer.HasTag('acs_yrden_sword_equipped') )
 				{
 					if ( ACS_GetWeaponMode() == 0 )
 					{
@@ -5434,12 +5332,12 @@ state ACS_Passive_Weapon_Effects_Switch_Engage in cACS_Passive_Weapon_Effects_Sw
 						ang = 70;
 					}
 				}
-				else if ( thePlayer.HasTag('yrden_secondary_sword_equipped') )
+				else if ( thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
 				{
 					dist = 3.5;
 					ang =	180;
 				}
-				else if ( thePlayer.HasTag('quen_sword_equipped') )
+				else if ( thePlayer.HasTag('acs_quen_sword_equipped') )
 				{
 					dist = 1.6;
 					ang =	70;
@@ -5449,7 +5347,7 @@ state ACS_Passive_Weapon_Effects_Switch_Engage in cACS_Passive_Weapon_Effects_Sw
 						ang +=	320;
 					}
 				}
-				else if ( thePlayer.HasTag('quen_secondary_sword_equipped') )
+				else if ( thePlayer.HasTag('acs_quen_secondary_sword_equipped') )
 				{
 					if (thePlayer.HasTag('ACS_Storm_Spear_Active'))
 					{
@@ -5485,7 +5383,7 @@ state ACS_Passive_Weapon_Effects_Switch_Engage in cACS_Passive_Weapon_Effects_Sw
 				}
 			}
 
-			if ( thePlayer.GetTarget() == ACS_Big_Boi() )
+			if ( thePlayer.GetTarget() == ACSGetCActor('ACS_Big_Boi') )
 			{
 				dist += 0.75;
 				ang += 15;
@@ -5501,8 +5399,8 @@ state ACS_Passive_Weapon_Effects_Switch_Engage in cACS_Passive_Weapon_Effects_Sw
 			}
 
 			if( thePlayer.HasAbility('Runeword 2 _Stats', true) 
-			&& !thePlayer.HasTag('igni_sword_equipped') 
-			&& !thePlayer.HasTag('igni_secondary_sword_equipped') 
+			&& !thePlayer.HasTag('acs_igni_sword_equipped') 
+			&& !thePlayer.HasTag('acs_igni_secondary_sword_equipped') 
 			&& !ACS_Armor_Equipped_Check())
 			{
 				dist += 1;
@@ -5614,28 +5512,28 @@ state ACS_Passive_Weapon_Effects_Switch_Engage in cACS_Passive_Weapon_Effects_Sw
 							{
 								if (GetWitcherPlayer().GetEquippedSign() == ST_Igni)
 								{
-									if ( GetWitcherPlayer().HasTag('yrden_sword_equipped')
-									|| GetWitcherPlayer().HasTag('axii_sword_equipped')
-									|| GetWitcherPlayer().HasTag('quen_sword_equipped')
-									|| GetWitcherPlayer().HasTag('igni_sword_equipped_TAG')
+									if ( GetWitcherPlayer().HasTag('acs_yrden_sword_equipped')
+									|| GetWitcherPlayer().HasTag('acs_axii_sword_equipped')
+									|| GetWitcherPlayer().HasTag('acs_quen_sword_equipped')
+									|| GetWitcherPlayer().HasTag('acs_igni_sword_equipped_TAG')
 									)
 									{
 										vfxEnt = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( "dlc\bob\data\fx\gameplay\mutation\mutation_1\mutation_1_hit.w2ent", true ), targetPos, targetRot );
 										vfxEnt.PlayEffectSingle('mutation_1_hit_igni');
 										vfxEnt.DestroyAfter(1.5);
 									}
-									else if ( GetWitcherPlayer().HasTag('aard_secondary_sword_equipped')
-									|| GetWitcherPlayer().HasTag('yrden_secondary_sword_equipped')
-									|| GetWitcherPlayer().HasTag('axii_secondary_sword_equipped')
-									|| GetWitcherPlayer().HasTag('quen_secondary_sword_equipped')
-									|| GetWitcherPlayer().HasTag('igni_secondary_sword_equipped_TAG')
+									else if ( GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped')
+									|| GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped')
+									|| GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped')
+									|| GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped')
+									|| GetWitcherPlayer().HasTag('acs_igni_secondary_sword_equipped_TAG')
 									)
 									{
 										vfxEnt = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( "dlc\bob\data\fx\gameplay\mutation\mutation_2\mutation_2_critical_force.w2ent", true ), targetPos, targetRot );
 										vfxEnt.PlayEffectSingle('critical_igni');
 										vfxEnt.DestroyAfter(1.5);
 									}
-									else if (GetWitcherPlayer().HasTag('aard_sword_equipped'))
+									else if (GetWitcherPlayer().HasTag('acs_aard_sword_equipped'))
 									{
 										if( ((CNewNPC)npc).GetBloodType() == BT_Red) 
 										{
@@ -5655,28 +5553,28 @@ state ACS_Passive_Weapon_Effects_Switch_Engage in cACS_Passive_Weapon_Effects_Sw
 								}
 								else if (GetWitcherPlayer().GetEquippedSign() == ST_Quen)
 								{
-									if ( GetWitcherPlayer().HasTag('yrden_sword_equipped')
-									|| GetWitcherPlayer().HasTag('axii_sword_equipped')
-									|| GetWitcherPlayer().HasTag('quen_sword_equipped')
-									|| GetWitcherPlayer().HasTag('igni_sword_equipped_TAG')
+									if ( GetWitcherPlayer().HasTag('acs_yrden_sword_equipped')
+									|| GetWitcherPlayer().HasTag('acs_axii_sword_equipped')
+									|| GetWitcherPlayer().HasTag('acs_quen_sword_equipped')
+									|| GetWitcherPlayer().HasTag('acs_igni_sword_equipped_TAG')
 									)
 									{
 										vfxEnt = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( "dlc\bob\data\fx\gameplay\mutation\mutation_1\mutation_1_hit.w2ent", true ), targetPos, targetRot );
 										vfxEnt.PlayEffectSingle('mutation_1_hit_quen');
 										vfxEnt.DestroyAfter(1.5);
 									}
-									else if ( GetWitcherPlayer().HasTag('aard_secondary_sword_equipped')
-									|| GetWitcherPlayer().HasTag('yrden_secondary_sword_equipped')
-									|| GetWitcherPlayer().HasTag('axii_secondary_sword_equipped')
-									|| GetWitcherPlayer().HasTag('quen_secondary_sword_equipped')
-									|| GetWitcherPlayer().HasTag('igni_secondary_sword_equipped_TAG')
+									else if ( GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped')
+									|| GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped')
+									|| GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped')
+									|| GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped')
+									|| GetWitcherPlayer().HasTag('acs_igni_secondary_sword_equipped_TAG')
 									)
 									{
 										vfxEnt = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( "dlc\bob\data\fx\gameplay\mutation\mutation_1\mutation_1_hit.w2ent", true ), targetPos, targetRot );
 										vfxEnt.PlayEffectSingle('mutation_1_hit_quen');
 										vfxEnt.DestroyAfter(1.5);
 									}
-									else if (GetWitcherPlayer().HasTag('aard_sword_equipped'))
+									else if (GetWitcherPlayer().HasTag('acs_aard_sword_equipped'))
 									{
 										if( ((CNewNPC)npc).GetBloodType() == BT_Red) 
 										{
@@ -5696,28 +5594,28 @@ state ACS_Passive_Weapon_Effects_Switch_Engage in cACS_Passive_Weapon_Effects_Sw
 								}
 								else if (GetWitcherPlayer().GetEquippedSign() == ST_Aard)
 								{
-									if ( GetWitcherPlayer().HasTag('yrden_sword_equipped')
-									|| GetWitcherPlayer().HasTag('axii_sword_equipped')
-									|| GetWitcherPlayer().HasTag('quen_sword_equipped')
-									|| GetWitcherPlayer().HasTag('igni_sword_equipped_TAG')
+									if ( GetWitcherPlayer().HasTag('acs_yrden_sword_equipped')
+									|| GetWitcherPlayer().HasTag('acs_axii_sword_equipped')
+									|| GetWitcherPlayer().HasTag('acs_quen_sword_equipped')
+									|| GetWitcherPlayer().HasTag('acs_igni_sword_equipped_TAG')
 									)
 									{
 										vfxEnt = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( "dlc\bob\data\fx\gameplay\mutation\mutation_1\mutation_1_hit.w2ent", true ), targetPos, targetRot );
 										vfxEnt.PlayEffectSingle('mutation_1_hit_aard');
 										vfxEnt.DestroyAfter(1.5);
 									}
-									else if ( GetWitcherPlayer().HasTag('aard_secondary_sword_equipped')
-									|| GetWitcherPlayer().HasTag('yrden_secondary_sword_equipped')
-									|| GetWitcherPlayer().HasTag('axii_secondary_sword_equipped')
-									|| GetWitcherPlayer().HasTag('quen_secondary_sword_equipped')
-									|| GetWitcherPlayer().HasTag('igni_secondary_sword_equipped_TAG')
+									else if ( GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped')
+									|| GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped')
+									|| GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped')
+									|| GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped')
+									|| GetWitcherPlayer().HasTag('acs_igni_secondary_sword_equipped_TAG')
 									)
 									{
 										vfxEnt = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( "dlc\bob\data\fx\gameplay\mutation\mutation_1\mutation_1_hit.w2ent", true ), targetPos, targetRot );
 										vfxEnt.PlayEffectSingle('mutation_1_hit_aard');
 										vfxEnt.DestroyAfter(1.5);
 									}
-									else if (GetWitcherPlayer().HasTag('aard_sword_equipped'))
+									else if (GetWitcherPlayer().HasTag('acs_aard_sword_equipped'))
 									{
 										if( ((CNewNPC)npc).GetBloodType() == BT_Red) 
 										{
@@ -5737,28 +5635,28 @@ state ACS_Passive_Weapon_Effects_Switch_Engage in cACS_Passive_Weapon_Effects_Sw
 								}
 								else if (GetWitcherPlayer().GetEquippedSign() == ST_Axii)
 								{
-									if ( GetWitcherPlayer().HasTag('yrden_sword_equipped')
-									|| GetWitcherPlayer().HasTag('axii_sword_equipped')
-									|| GetWitcherPlayer().HasTag('quen_sword_equipped')
-									|| GetWitcherPlayer().HasTag('igni_sword_equipped_TAG')
+									if ( GetWitcherPlayer().HasTag('acs_yrden_sword_equipped')
+									|| GetWitcherPlayer().HasTag('acs_axii_sword_equipped')
+									|| GetWitcherPlayer().HasTag('acs_quen_sword_equipped')
+									|| GetWitcherPlayer().HasTag('acs_igni_sword_equipped_TAG')
 									)
 									{
 										vfxEnt = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( "dlc\bob\data\fx\gameplay\mutation\mutation_2\mutation_2_critical_force.w2ent", true ), targetPos, targetRot );
 										vfxEnt.PlayEffectSingle('critical_aard');
 										vfxEnt.DestroyAfter(1.5);
 									}
-									else if ( GetWitcherPlayer().HasTag('aard_secondary_sword_equipped')
-									|| GetWitcherPlayer().HasTag('yrden_secondary_sword_equipped')
-									|| GetWitcherPlayer().HasTag('axii_secondary_sword_equipped')
-									|| GetWitcherPlayer().HasTag('quen_secondary_sword_equipped')
-									|| GetWitcherPlayer().HasTag('igni_secondary_sword_equipped_TAG')
+									else if ( GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped')
+									|| GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped')
+									|| GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped')
+									|| GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped')
+									|| GetWitcherPlayer().HasTag('acs_igni_secondary_sword_equipped_TAG')
 									)
 									{
 										vfxEnt = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( "dlc\bob\data\fx\gameplay\mutation\mutation_2\mutation_2_critical_force.w2ent", true ), targetPos, targetRot );
 										vfxEnt.PlayEffectSingle('critical_aard');
 										vfxEnt.DestroyAfter(1.5);
 									}
-									else if (GetWitcherPlayer().HasTag('aard_sword_equipped'))
+									else if (GetWitcherPlayer().HasTag('acs_aard_sword_equipped'))
 									{
 										if( ((CNewNPC)npc).GetBloodType() == BT_Red) 
 										{
@@ -5778,28 +5676,28 @@ state ACS_Passive_Weapon_Effects_Switch_Engage in cACS_Passive_Weapon_Effects_Sw
 								}
 								else if (GetWitcherPlayer().GetEquippedSign() == ST_Yrden)
 								{
-									if ( GetWitcherPlayer().HasTag('yrden_sword_equipped')
-									|| GetWitcherPlayer().HasTag('axii_sword_equipped')
-									|| GetWitcherPlayer().HasTag('quen_sword_equipped')
-									|| GetWitcherPlayer().HasTag('igni_sword_equipped_TAG')
+									if ( GetWitcherPlayer().HasTag('acs_yrden_sword_equipped')
+									|| GetWitcherPlayer().HasTag('acs_axii_sword_equipped')
+									|| GetWitcherPlayer().HasTag('acs_quen_sword_equipped')
+									|| GetWitcherPlayer().HasTag('acs_igni_sword_equipped_TAG')
 									)
 									{
 										vfxEnt = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( "dlc\bob\data\fx\gameplay\mutation\mutation_2\mutation_2_critical_force.w2ent", true ), targetPos, targetRot );
 										vfxEnt.PlayEffectSingle('critical_yrden');
 										vfxEnt.DestroyAfter(1.5);
 									}
-									else if ( GetWitcherPlayer().HasTag('aard_secondary_sword_equipped')
-									|| GetWitcherPlayer().HasTag('yrden_secondary_sword_equipped')
-									|| GetWitcherPlayer().HasTag('axii_secondary_sword_equipped')
-									|| GetWitcherPlayer().HasTag('quen_secondary_sword_equipped')
-									|| GetWitcherPlayer().HasTag('igni_secondary_sword_equipped_TAG')
+									else if ( GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped')
+									|| GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped')
+									|| GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped')
+									|| GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped')
+									|| GetWitcherPlayer().HasTag('acs_igni_secondary_sword_equipped_TAG')
 									)
 									{
 										vfxEnt = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( "dlc\bob\data\fx\gameplay\mutation\mutation_2\mutation_2_explode.w2ent", true ), targetPos, targetRot );
 										vfxEnt.PlayEffectSingle('mutation_2_yrden');
 										vfxEnt.DestroyAfter(1.5);
 									}
-									else if (GetWitcherPlayer().HasTag('aard_sword_equipped'))
+									else if (GetWitcherPlayer().HasTag('acs_aard_sword_equipped'))
 									{
 										if( ((CNewNPC)npc).GetBloodType() == BT_Red) 
 										{
@@ -5818,7 +5716,7 @@ state ACS_Passive_Weapon_Effects_Switch_Engage in cACS_Passive_Weapon_Effects_Sw
 									}
 								}
 							}
-							else if ( GetWitcherPlayer().IsWeaponHeld( 'fist' ) && GetWitcherPlayer().HasTag('vampire_claws_equipped') )
+							else if ( GetWitcherPlayer().IsWeaponHeld( 'fist' ) && GetWitcherPlayer().HasTag('acs_vampire_claws_equipped') )
 							{
 								if( ((CNewNPC)npc).GetBloodType() == BT_Red) 
 								{
@@ -5882,38 +5780,38 @@ state ACS_Passive_Weapon_Effects_Switch_Engage in cACS_Passive_Weapon_Effects_Sw
 								|| npc.HasBuff(EET_Slowdown)
 								)
 								{
-									if ( GetWitcherPlayer().HasTag('aard_sword_equipped') )
+									if ( GetWitcherPlayer().HasTag('acs_aard_sword_equipped') )
 									{
-										aard_blade_trail();
+										acs_aard_blade_trail();
 									}
-									else if ( GetWitcherPlayer().HasTag('aard_secondary_sword_equipped') )
+									else if ( GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped') )
 									{
-										aard_secondary_sword_trail();
+										acs_aard_secondary_sword_trail();
 									}
-									else if ( GetWitcherPlayer().HasTag('yrden_sword_equipped') )
+									else if ( GetWitcherPlayer().HasTag('acs_yrden_sword_equipped') )
 									{
-										yrden_sword_trail();
+										acs_yrden_sword_trail();
 									}
-									else if ( GetWitcherPlayer().HasTag('yrden_secondary_sword_equipped') )
+									else if ( GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped') )
 									{
-										yrden_secondary_sword_trail();
+										acs_yrden_secondary_sword_trail();
 									}
-									else if ( GetWitcherPlayer().HasTag('axii_sword_equipped') )
+									else if ( GetWitcherPlayer().HasTag('acs_axii_sword_equipped') )
 									{
-										axii_sword_trail();
+										acs_axii_sword_trail();
 									}
-									else if ( GetWitcherPlayer().HasTag('axii_secondary_sword_equipped') )
+									else if ( GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped') )
 									{
-										axii_secondary_sword_trail();
+										acs_axii_secondary_sword_trail();
 									}
-									else if ( GetWitcherPlayer().HasTag('quen_sword_equipped') )
+									else if ( GetWitcherPlayer().HasTag('acs_quen_sword_equipped') )
 									{
-										//quen_sword_glow();
-										quen_sword_trail();
+										//acs_quen_sword_glow();
+										acs_quen_sword_trail();
 									}
-									else if ( GetWitcherPlayer().HasTag('quen_secondary_sword_equipped') )
+									else if ( GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped') )
 									{
-										quen_secondary_sword_trail();
+										acs_quen_secondary_sword_trail();
 									}
 								}
 
@@ -5926,38 +5824,38 @@ state ACS_Passive_Weapon_Effects_Switch_Engage in cACS_Passive_Weapon_Effects_Sw
 										{
 											if( !npc.IsImmuneToBuff( EET_Burning ) && !npc.HasBuff( EET_Burning ) ) 
 											{ 
-												if ( GetWitcherPlayer().HasTag('aard_sword_equipped') )
+												if ( GetWitcherPlayer().HasTag('acs_aard_sword_equipped') )
 												{
-													aard_blade_trail();
+													acs_aard_blade_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('aard_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped') )
 												{
-													aard_secondary_sword_trail();
+													acs_aard_secondary_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('yrden_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_yrden_sword_equipped') )
 												{
-													yrden_sword_trail();
+													acs_yrden_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('yrden_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped') )
 												{
-													yrden_secondary_sword_trail();
+													acs_yrden_secondary_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('axii_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_axii_sword_equipped') )
 												{
-													axii_sword_trail();
+													acs_axii_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('axii_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped') )
 												{
-													axii_secondary_sword_trail();
+													acs_axii_secondary_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('quen_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_quen_sword_equipped') )
 												{
-													//quen_sword_glow();
-													quen_sword_trail();
+													//acs_quen_sword_glow();
+													acs_quen_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('quen_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped') )
 												{
-													quen_secondary_sword_trail();
+													acs_quen_secondary_sword_trail();
 												}
 													
 												vfxEnt = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( "dlc\bob\data\fx\gameplay\mutation\mutation_1\mutation_1_hit.w2ent", true ), targetPos, targetRot );
@@ -5974,38 +5872,38 @@ state ACS_Passive_Weapon_Effects_Switch_Engage in cACS_Passive_Weapon_Effects_Sw
 										{
 											if( !npc.IsImmuneToBuff( EET_Burning ) && !npc.HasBuff( EET_Burning ) ) 
 											{ 
-												if ( GetWitcherPlayer().HasTag('aard_sword_equipped') )
+												if ( GetWitcherPlayer().HasTag('acs_aard_sword_equipped') )
 												{
-													aard_blade_trail();
+													acs_aard_blade_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('aard_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped') )
 												{
-													aard_secondary_sword_trail();
+													acs_aard_secondary_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('yrden_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_yrden_sword_equipped') )
 												{
-													yrden_sword_trail();
+													acs_yrden_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('yrden_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped') )
 												{
-													yrden_secondary_sword_trail();
+													acs_yrden_secondary_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('axii_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_axii_sword_equipped') )
 												{
-													axii_sword_trail();
+													acs_axii_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('axii_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped') )
 												{
-													axii_secondary_sword_trail();
+													acs_axii_secondary_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('quen_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_quen_sword_equipped') )
 												{
-													//quen_sword_glow();
-													quen_sword_trail();
+													//acs_quen_sword_glow();
+													acs_quen_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('quen_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped') )
 												{
-													quen_secondary_sword_trail();
+													acs_quen_secondary_sword_trail();
 												}
 
 												vfxEnt = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( "dlc\bob\data\fx\gameplay\mutation\mutation_1\mutation_1_hit.w2ent", true ), targetPos, targetRot );
@@ -6021,38 +5919,38 @@ state ACS_Passive_Weapon_Effects_Switch_Engage in cACS_Passive_Weapon_Effects_Sw
 										{
 											if( !npc.IsImmuneToBuff( EET_Burning ) && !npc.HasBuff( EET_Burning ) ) 
 											{ 
-												if ( GetWitcherPlayer().HasTag('aard_sword_equipped') )
+												if ( GetWitcherPlayer().HasTag('acs_aard_sword_equipped') )
 												{
-													aard_blade_trail();
+													acs_aard_blade_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('aard_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped') )
 												{
-													aard_secondary_sword_trail();
+													acs_aard_secondary_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('yrden_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_yrden_sword_equipped') )
 												{
-													yrden_sword_trail();
+													acs_yrden_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('yrden_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped') )
 												{
-													yrden_secondary_sword_trail();
+													acs_yrden_secondary_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('axii_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_axii_sword_equipped') )
 												{
-													axii_sword_trail();
+													acs_axii_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('axii_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped') )
 												{
-													axii_secondary_sword_trail();
+													acs_axii_secondary_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('quen_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_quen_sword_equipped') )
 												{
-													//quen_sword_glow();
-													quen_sword_trail();
+													//acs_quen_sword_glow();
+													acs_quen_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('quen_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped') )
 												{
-													quen_secondary_sword_trail();
+													acs_quen_secondary_sword_trail();
 												}
 
 												vfxEnt = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( "dlc\bob\data\fx\gameplay\mutation\mutation_1\mutation_1_hit.w2ent", true ), targetPos, targetRot );
@@ -6072,38 +5970,38 @@ state ACS_Passive_Weapon_Effects_Switch_Engage in cACS_Passive_Weapon_Effects_Sw
 										{
 											if( !npc.IsImmuneToBuff( EET_Confusion ) && !npc.HasBuff( EET_Confusion ) ) 
 											{ 
-												if ( GetWitcherPlayer().HasTag('aard_sword_equipped') )
+												if ( GetWitcherPlayer().HasTag('acs_aard_sword_equipped') )
 												{
-													aard_blade_trail();
+													acs_aard_blade_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('aard_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped') )
 												{
-													aard_secondary_sword_trail();
+													acs_aard_secondary_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('yrden_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_yrden_sword_equipped') )
 												{
-													yrden_sword_trail();
+													acs_yrden_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('yrden_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped') )
 												{
-													yrden_secondary_sword_trail();
+													acs_yrden_secondary_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('axii_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_axii_sword_equipped') )
 												{
-													axii_sword_trail();
+													acs_axii_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('axii_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped') )
 												{
-													axii_secondary_sword_trail();
+													acs_axii_secondary_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('quen_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_quen_sword_equipped') )
 												{
-													//quen_sword_glow();
-													quen_sword_trail();
+													//acs_quen_sword_glow();
+													acs_quen_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('quen_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped') )
 												{
-													quen_secondary_sword_trail();
+													acs_quen_secondary_sword_trail();
 												}
 													
 												vfxEnt = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( "dlc\bob\data\fx\gameplay\mutation\mutation_2\mutation_2_critical_force.w2ent", true ), targetPos, targetRot );
@@ -6120,38 +6018,38 @@ state ACS_Passive_Weapon_Effects_Switch_Engage in cACS_Passive_Weapon_Effects_Sw
 										{
 											if( !npc.IsImmuneToBuff( EET_Confusion ) && !npc.HasBuff( EET_Confusion ) ) 
 											{ 
-												if ( GetWitcherPlayer().HasTag('aard_sword_equipped') )
+												if ( GetWitcherPlayer().HasTag('acs_aard_sword_equipped') )
 												{
-													aard_blade_trail();
+													acs_aard_blade_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('aard_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped') )
 												{
-													aard_secondary_sword_trail();
+													acs_aard_secondary_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('yrden_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_yrden_sword_equipped') )
 												{
-													yrden_sword_trail();
+													acs_yrden_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('yrden_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped') )
 												{
-													yrden_secondary_sword_trail();
+													acs_yrden_secondary_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('axii_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_axii_sword_equipped') )
 												{
-													axii_sword_trail();
+													acs_axii_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('axii_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped') )
 												{
-													axii_secondary_sword_trail();
+													acs_axii_secondary_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('quen_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_quen_sword_equipped') )
 												{
-													//quen_sword_glow();
-													quen_sword_trail();
+													//acs_quen_sword_glow();
+													acs_quen_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('quen_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped') )
 												{
-													quen_secondary_sword_trail();
+													acs_quen_secondary_sword_trail();
 												}
 													
 												vfxEnt = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( "dlc\bob\data\fx\gameplay\mutation\mutation_2\mutation_2_critical_force.w2ent", true ), targetPos, targetRot );
@@ -6167,38 +6065,38 @@ state ACS_Passive_Weapon_Effects_Switch_Engage in cACS_Passive_Weapon_Effects_Sw
 										{
 											if( !npc.IsImmuneToBuff( EET_Confusion ) && !npc.HasBuff( EET_Confusion ) ) 
 											{ 
-												if ( GetWitcherPlayer().HasTag('aard_sword_equipped') )
+												if ( GetWitcherPlayer().HasTag('acs_aard_sword_equipped') )
 												{
-													aard_blade_trail();
+													acs_aard_blade_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('aard_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped') )
 												{
-													aard_secondary_sword_trail();
+													acs_aard_secondary_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('yrden_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_yrden_sword_equipped') )
 												{
-													yrden_sword_trail();
+													acs_yrden_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('yrden_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped') )
 												{
-													yrden_secondary_sword_trail();
+													acs_yrden_secondary_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('axii_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_axii_sword_equipped') )
 												{
-													axii_sword_trail();
+													acs_axii_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('axii_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped') )
 												{
-													axii_secondary_sword_trail();
+													acs_axii_secondary_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('quen_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_quen_sword_equipped') )
 												{
-													//quen_sword_glow();
-													quen_sword_trail();
+													//acs_quen_sword_glow();
+													acs_quen_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('quen_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped') )
 												{
-													quen_secondary_sword_trail();
+													acs_quen_secondary_sword_trail();
 												}
 													
 												vfxEnt = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( "dlc\bob\data\fx\gameplay\mutation\mutation_2\mutation_2_critical_force.w2ent", true ), targetPos, targetRot );
@@ -6218,38 +6116,38 @@ state ACS_Passive_Weapon_Effects_Switch_Engage in cACS_Passive_Weapon_Effects_Sw
 										{
 											if( !npc.IsImmuneToBuff( EET_Stagger ) && !npc.HasBuff( EET_Stagger ) ) 
 											{ 
-												if ( GetWitcherPlayer().HasTag('aard_sword_equipped') )
+												if ( GetWitcherPlayer().HasTag('acs_aard_sword_equipped') )
 												{
-													aard_blade_trail();
+													acs_aard_blade_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('aard_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped') )
 												{
-													aard_secondary_sword_trail();
+													acs_aard_secondary_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('yrden_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_yrden_sword_equipped') )
 												{
-													yrden_sword_trail();
+													acs_yrden_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('yrden_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped') )
 												{
-													yrden_secondary_sword_trail();
+													acs_yrden_secondary_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('axii_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_axii_sword_equipped') )
 												{
-													axii_sword_trail();
+													acs_axii_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('axii_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped') )
 												{
-													axii_secondary_sword_trail();
+													acs_axii_secondary_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('quen_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_quen_sword_equipped') )
 												{
-													//quen_sword_glow();
-													quen_sword_trail();
+													//acs_quen_sword_glow();
+													acs_quen_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('quen_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped') )
 												{
-													quen_secondary_sword_trail();
+													acs_quen_secondary_sword_trail();
 												}
 													
 												vfxEnt = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( "dlc\bob\data\fx\gameplay\mutation\mutation_1\mutation_1_hit.w2ent", true ), targetPos, targetRot );
@@ -6266,38 +6164,38 @@ state ACS_Passive_Weapon_Effects_Switch_Engage in cACS_Passive_Weapon_Effects_Sw
 										{
 											if( !npc.IsImmuneToBuff( EET_Stagger ) && !npc.HasBuff( EET_Stagger ) ) 
 											{ 
-												if ( GetWitcherPlayer().HasTag('aard_sword_equipped') )
+												if ( GetWitcherPlayer().HasTag('acs_aard_sword_equipped') )
 												{
-													aard_blade_trail();
+													acs_aard_blade_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('aard_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped') )
 												{
-													aard_secondary_sword_trail();
+													acs_aard_secondary_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('yrden_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_yrden_sword_equipped') )
 												{
-													yrden_sword_trail();
+													acs_yrden_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('yrden_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped') )
 												{
-													yrden_secondary_sword_trail();
+													acs_yrden_secondary_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('axii_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_axii_sword_equipped') )
 												{
-													axii_sword_trail();
+													acs_axii_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('axii_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped') )
 												{
-													axii_secondary_sword_trail();
+													acs_axii_secondary_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('quen_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_quen_sword_equipped') )
 												{
-													//quen_sword_glow();
-													quen_sword_trail();
+													//acs_quen_sword_glow();
+													acs_quen_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('quen_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped') )
 												{
-													quen_secondary_sword_trail();
+													acs_quen_secondary_sword_trail();
 												}
 													
 												vfxEnt = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( "dlc\bob\data\fx\gameplay\mutation\mutation_1\mutation_1_hit.w2ent", true ), targetPos, targetRot );
@@ -6313,38 +6211,38 @@ state ACS_Passive_Weapon_Effects_Switch_Engage in cACS_Passive_Weapon_Effects_Sw
 										{
 											if( !npc.IsImmuneToBuff( EET_Stagger ) && !npc.HasBuff( EET_Stagger ) ) 
 											{ 
-												if ( GetWitcherPlayer().HasTag('aard_sword_equipped') )
+												if ( GetWitcherPlayer().HasTag('acs_aard_sword_equipped') )
 												{
-													aard_blade_trail();
+													acs_aard_blade_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('aard_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped') )
 												{
-													aard_secondary_sword_trail();
+													acs_aard_secondary_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('yrden_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_yrden_sword_equipped') )
 												{
-													yrden_sword_trail();
+													acs_yrden_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('yrden_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped') )
 												{
-													yrden_secondary_sword_trail();
+													acs_yrden_secondary_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('axii_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_axii_sword_equipped') )
 												{
-													axii_sword_trail();
+													acs_axii_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('axii_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped') )
 												{
-													axii_secondary_sword_trail();
+													acs_axii_secondary_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('quen_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_quen_sword_equipped') )
 												{
-													//quen_sword_glow();
-													quen_sword_trail();
+													//acs_quen_sword_glow();
+													acs_quen_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('quen_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped') )
 												{
-													quen_secondary_sword_trail();
+													acs_quen_secondary_sword_trail();
 												}
 													
 												vfxEnt = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( "dlc\bob\data\fx\gameplay\mutation\mutation_1\mutation_1_hit.w2ent", true ), targetPos, targetRot );
@@ -6364,38 +6262,38 @@ state ACS_Passive_Weapon_Effects_Switch_Engage in cACS_Passive_Weapon_Effects_Sw
 										{
 											if( !npc.IsImmuneToBuff( EET_Paralyzed ) && !npc.HasBuff( EET_Paralyzed ) ) 
 											{ 
-												if ( GetWitcherPlayer().HasTag('aard_sword_equipped') )
+												if ( GetWitcherPlayer().HasTag('acs_aard_sword_equipped') )
 												{
-													aard_blade_trail();
+													acs_aard_blade_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('aard_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped') )
 												{
-													aard_secondary_sword_trail();
+													acs_aard_secondary_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('yrden_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_yrden_sword_equipped') )
 												{
-													yrden_sword_trail();
+													acs_yrden_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('yrden_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped') )
 												{
-													yrden_secondary_sword_trail();
+													acs_yrden_secondary_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('axii_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_axii_sword_equipped') )
 												{
-													axii_sword_trail();
+													acs_axii_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('axii_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped') )
 												{
-													axii_secondary_sword_trail();
+													acs_axii_secondary_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('quen_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_quen_sword_equipped') )
 												{
-													//quen_sword_glow();
-													quen_sword_trail();
+													//acs_quen_sword_glow();
+													acs_quen_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('quen_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped') )
 												{
-													quen_secondary_sword_trail();
+													acs_quen_secondary_sword_trail();
 												}
 													
 												vfxEnt = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( "dlc\bob\data\fx\gameplay\mutation\mutation_1\mutation_1_hit.w2ent", true ), targetPos, targetRot );
@@ -6412,38 +6310,38 @@ state ACS_Passive_Weapon_Effects_Switch_Engage in cACS_Passive_Weapon_Effects_Sw
 										{
 											if( !npc.IsImmuneToBuff( EET_Paralyzed ) && !npc.HasBuff( EET_Paralyzed ) ) 
 											{ 
-												if ( GetWitcherPlayer().HasTag('aard_sword_equipped') )
+												if ( GetWitcherPlayer().HasTag('acs_aard_sword_equipped') )
 												{
-													aard_blade_trail();
+													acs_aard_blade_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('aard_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped') )
 												{
-													aard_secondary_sword_trail();
+													acs_aard_secondary_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('yrden_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_yrden_sword_equipped') )
 												{
-													yrden_sword_trail();
+													acs_yrden_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('yrden_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped') )
 												{
-													yrden_secondary_sword_trail();
+													acs_yrden_secondary_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('axii_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_axii_sword_equipped') )
 												{
-													axii_sword_trail();
+													acs_axii_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('axii_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped') )
 												{
-													axii_secondary_sword_trail();
+													acs_axii_secondary_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('quen_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_quen_sword_equipped') )
 												{
-													//quen_sword_glow();
-													quen_sword_trail();
+													//acs_quen_sword_glow();
+													acs_quen_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('quen_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped') )
 												{
-													quen_secondary_sword_trail();
+													acs_quen_secondary_sword_trail();
 												}
 													
 												vfxEnt = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( "dlc\bob\data\fx\gameplay\mutation\mutation_1\mutation_1_hit.w2ent", true ), targetPos, targetRot );
@@ -6459,38 +6357,38 @@ state ACS_Passive_Weapon_Effects_Switch_Engage in cACS_Passive_Weapon_Effects_Sw
 										{
 											if( !npc.IsImmuneToBuff( EET_Paralyzed ) && !npc.HasBuff( EET_Paralyzed ) ) 
 											{ 
-												if ( GetWitcherPlayer().HasTag('aard_sword_equipped') )
+												if ( GetWitcherPlayer().HasTag('acs_aard_sword_equipped') )
 												{
-													aard_blade_trail();
+													acs_aard_blade_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('aard_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped') )
 												{
-													aard_secondary_sword_trail();
+													acs_aard_secondary_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('yrden_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_yrden_sword_equipped') )
 												{
-													yrden_sword_trail();
+													acs_yrden_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('yrden_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped') )
 												{
-													yrden_secondary_sword_trail();
+													acs_yrden_secondary_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('axii_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_axii_sword_equipped') )
 												{
-													axii_sword_trail();
+													acs_axii_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('axii_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped') )
 												{
-													axii_secondary_sword_trail();
+													acs_axii_secondary_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('quen_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_quen_sword_equipped') )
 												{
-													//quen_sword_glow();
-													quen_sword_trail();
+													//acs_quen_sword_glow();
+													acs_quen_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('quen_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped') )
 												{
-													quen_secondary_sword_trail();
+													acs_quen_secondary_sword_trail();
 												}
 													
 												vfxEnt = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( "dlc\bob\data\fx\gameplay\mutation\mutation_1\mutation_1_hit.w2ent", true ), targetPos, targetRot );
@@ -6510,38 +6408,38 @@ state ACS_Passive_Weapon_Effects_Switch_Engage in cACS_Passive_Weapon_Effects_Sw
 										{
 											if( !npc.IsImmuneToBuff( EET_Slowdown ) && !npc.HasBuff( EET_Slowdown ) ) 
 											{ 
-												if ( GetWitcherPlayer().HasTag('aard_sword_equipped') )
+												if ( GetWitcherPlayer().HasTag('acs_aard_sword_equipped') )
 												{
-													aard_blade_trail();
+													acs_aard_blade_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('aard_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped') )
 												{
-													aard_secondary_sword_trail();
+													acs_aard_secondary_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('yrden_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_yrden_sword_equipped') )
 												{
-													yrden_sword_trail();
+													acs_yrden_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('yrden_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped') )
 												{
-													yrden_secondary_sword_trail();
+													acs_yrden_secondary_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('axii_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_axii_sword_equipped') )
 												{
-													axii_sword_trail();
+													acs_axii_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('axii_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped') )
 												{
-													axii_secondary_sword_trail();
+													acs_axii_secondary_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('quen_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_quen_sword_equipped') )
 												{
-													//quen_sword_glow();
-													quen_sword_trail();
+													//acs_quen_sword_glow();
+													acs_quen_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('quen_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped') )
 												{
-													quen_secondary_sword_trail();
+													acs_quen_secondary_sword_trail();
 												}
 													
 												vfxEnt = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( "dlc\bob\data\fx\gameplay\mutation\mutation_2\mutation_2_critical_force.w2ent", true ), targetPos, targetRot );
@@ -6558,38 +6456,38 @@ state ACS_Passive_Weapon_Effects_Switch_Engage in cACS_Passive_Weapon_Effects_Sw
 										{
 											if( !npc.IsImmuneToBuff( EET_Slowdown ) && !npc.HasBuff( EET_Slowdown ) ) 
 											{ 
-												if ( GetWitcherPlayer().HasTag('aard_sword_equipped') )
+												if ( GetWitcherPlayer().HasTag('acs_aard_sword_equipped') )
 												{
-													aard_blade_trail();
+													acs_aard_blade_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('aard_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped') )
 												{
-													aard_secondary_sword_trail();
+													acs_aard_secondary_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('yrden_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_yrden_sword_equipped') )
 												{
-													yrden_sword_trail();
+													acs_yrden_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('yrden_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped') )
 												{
-													yrden_secondary_sword_trail();
+													acs_yrden_secondary_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('axii_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_axii_sword_equipped') )
 												{
-													axii_sword_trail();
+													acs_axii_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('axii_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped') )
 												{
-													axii_secondary_sword_trail();
+													acs_axii_secondary_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('quen_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_quen_sword_equipped') )
 												{
-													//quen_sword_glow();
-													quen_sword_trail();
+													//acs_quen_sword_glow();
+													acs_quen_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('quen_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped') )
 												{
-													quen_secondary_sword_trail();
+													acs_quen_secondary_sword_trail();
 												}
 													
 												vfxEnt = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( "dlc\bob\data\fx\gameplay\mutation\mutation_2\mutation_2_critical_force.w2ent", true ), targetPos, targetRot );
@@ -6605,38 +6503,38 @@ state ACS_Passive_Weapon_Effects_Switch_Engage in cACS_Passive_Weapon_Effects_Sw
 										{
 											if( !npc.IsImmuneToBuff( EET_Slowdown ) && !npc.HasBuff( EET_Slowdown ) ) 
 											{ 
-												if ( GetWitcherPlayer().HasTag('aard_sword_equipped') )
+												if ( GetWitcherPlayer().HasTag('acs_aard_sword_equipped') )
 												{
-													aard_blade_trail();
+													acs_aard_blade_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('aard_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped') )
 												{
-													aard_secondary_sword_trail();
+													acs_aard_secondary_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('yrden_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_yrden_sword_equipped') )
 												{
-													yrden_sword_trail();
+													acs_yrden_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('yrden_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped') )
 												{
-													yrden_secondary_sword_trail();
+													acs_yrden_secondary_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('axii_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_axii_sword_equipped') )
 												{
-													axii_sword_trail();
+													acs_axii_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('axii_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped') )
 												{
-													axii_secondary_sword_trail();
+													acs_axii_secondary_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('quen_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_quen_sword_equipped') )
 												{
-													//quen_sword_glow();
-													quen_sword_trail();
+													//acs_quen_sword_glow();
+													acs_quen_sword_trail();
 												}
-												else if ( GetWitcherPlayer().HasTag('quen_secondary_sword_equipped') )
+												else if ( GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped') )
 												{
-													quen_secondary_sword_trail();
+													acs_quen_secondary_sword_trail();
 												}
 													
 												vfxEnt = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( "dlc\bob\data\fx\gameplay\mutation\mutation_2\mutation_2_critical_force.w2ent", true ), targetPos, targetRot );
@@ -6650,7 +6548,7 @@ state ACS_Passive_Weapon_Effects_Switch_Engage in cACS_Passive_Weapon_Effects_Sw
 							}
 							else
 							{
-								if ( GetWitcherPlayer().HasTag('vampire_claws_equipped') )
+								if ( GetWitcherPlayer().HasTag('acs_vampire_claws_equipped') )
 								{
 									if( ((CNewNPC)npc).GetBloodType() == BT_Red) 
 									{
@@ -6704,7 +6602,7 @@ state ACS_Passive_Weapon_Effects_Switch_Engage in cACS_Passive_Weapon_Effects_Sw
 					}
 					else
 					{
-						if ( GetWitcherPlayer().HasTag('vampire_claws_equipped') )
+						if ( GetWitcherPlayer().HasTag('acs_vampire_claws_equipped') )
 						{
 							if( ((CNewNPC)npc).GetBloodType() == BT_Red) 
 							{
@@ -6807,7 +6705,7 @@ state ACS_Blood_Spatter_Switch_Engage in cACS_Blood_Spatter_Switch
 		{
 			if ( thePlayer.IsWeaponHeld( 'fist' ) )
 			{
-				if ( thePlayer.HasTag('vampire_claws_equipped') )
+				if ( thePlayer.HasTag('acs_vampire_claws_equipped') )
 				{
 					if ( thePlayer.HasBuff(EET_BlackBlood) )
 					{
@@ -6829,8 +6727,8 @@ state ACS_Blood_Spatter_Switch_Engage in cACS_Blood_Spatter_Switch
 			else
 			{
 				if ( 
-				thePlayer.HasTag('igni_sword_equipped_TAG') 
-				|| thePlayer.HasTag('igni_sword_equipped') 
+				thePlayer.HasTag('acs_igni_sword_equipped_TAG') 
+				|| thePlayer.HasTag('acs_igni_sword_equipped') 
 				)
 				{
 					dist = 1.5;
@@ -6849,8 +6747,8 @@ state ACS_Blood_Spatter_Switch_Engage in cACS_Blood_Spatter_Switch
 						}
 					}
 				}
-				else if ( thePlayer.HasTag('igni_secondary_sword_equipped_TAG') 
-				|| thePlayer.HasTag('igni_secondary_sword_equipped') 
+				else if ( thePlayer.HasTag('acs_igni_secondary_sword_equipped_TAG') 
+				|| thePlayer.HasTag('acs_igni_secondary_sword_equipped') 
 				)
 				{
 					dist = 1.5;
@@ -6869,7 +6767,7 @@ state ACS_Blood_Spatter_Switch_Engage in cACS_Blood_Spatter_Switch
 						}
 					}
 				}
-				else if ( thePlayer.HasTag('axii_sword_equipped') )
+				else if ( thePlayer.HasTag('acs_axii_sword_equipped') )
 				{
 					dist = 1.6;
 					ang =	70;	
@@ -6880,7 +6778,7 @@ state ACS_Blood_Spatter_Switch_Engage in cACS_Blood_Spatter_Switch
 						ang +=	30;
 					}
 				}
-				else if ( thePlayer.HasTag('axii_secondary_sword_equipped') )
+				else if ( thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
 				{
 					if ( 
 					ACS_GetWeaponMode() == 0
@@ -6897,17 +6795,17 @@ state ACS_Blood_Spatter_Switch_Engage in cACS_Blood_Spatter_Switch
 						ang =	70;
 					}
 				}
-				else if ( thePlayer.HasTag('aard_sword_equipped') )
+				else if ( thePlayer.HasTag('acs_aard_sword_equipped') )
 				{
 					dist = 2;
 					ang =	75;	
 				}
-				else if ( thePlayer.HasTag('aard_secondary_sword_equipped') )
+				else if ( thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
 				{
 					dist = 2;
 					ang = 70;
 				}
-				else if ( thePlayer.HasTag('yrden_sword_equipped') )
+				else if ( thePlayer.HasTag('acs_yrden_sword_equipped') )
 				{
 					if ( ACS_GetWeaponMode() == 0 )
 					{
@@ -6954,12 +6852,12 @@ state ACS_Blood_Spatter_Switch_Engage in cACS_Blood_Spatter_Switch
 						ang = 70;
 					}
 				}
-				else if ( thePlayer.HasTag('yrden_secondary_sword_equipped') )
+				else if ( thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
 				{
 					dist = 3.5;
 					ang =	180;
 				}
-				else if ( thePlayer.HasTag('quen_sword_equipped') )
+				else if ( thePlayer.HasTag('acs_quen_sword_equipped') )
 				{
 					dist = 1.6;
 					ang =	70;
@@ -6969,7 +6867,7 @@ state ACS_Blood_Spatter_Switch_Engage in cACS_Blood_Spatter_Switch
 						ang +=	320;
 					}
 				}
-				else if ( thePlayer.HasTag('quen_secondary_sword_equipped') )
+				else if ( thePlayer.HasTag('acs_quen_secondary_sword_equipped') )
 				{
 					if (thePlayer.HasTag('ACS_Storm_Spear_Active'))
 					{
@@ -7005,7 +6903,7 @@ state ACS_Blood_Spatter_Switch_Engage in cACS_Blood_Spatter_Switch
 				}
 			}
 
-			if ( thePlayer.GetTarget() == ACS_Big_Boi() )
+			if ( thePlayer.GetTarget() == ACSGetCActor('ACS_Big_Boi') )
 			{
 				dist += 0.75;
 				ang += 15;
@@ -7021,8 +6919,8 @@ state ACS_Blood_Spatter_Switch_Engage in cACS_Blood_Spatter_Switch
 			}
 
 			if( thePlayer.HasAbility('Runeword 2 _Stats', true) 
-			&& !thePlayer.HasTag('igni_sword_equipped') 
-			&& !thePlayer.HasTag('igni_secondary_sword_equipped') 
+			&& !thePlayer.HasTag('acs_igni_sword_equipped') 
+			&& !thePlayer.HasTag('acs_igni_secondary_sword_equipped') 
 			&& !ACS_Armor_Equipped_Check())
 			{
 				dist += 1;
@@ -7159,8 +7057,8 @@ state ACS_Blood_Spatter_Switch_Engage in cACS_Blood_Spatter_Switch
 
 						vfxEnt4.DestroyAfter(1);
 
-						if ((GetWitcherPlayer().HasTag('igni_sword_equipped')
-						|| GetWitcherPlayer().HasTag('igni_secondary_sword_equipped'))
+						if ((GetWitcherPlayer().HasTag('acs_igni_sword_equipped')
+						|| GetWitcherPlayer().HasTag('acs_igni_secondary_sword_equipped'))
 						&& thePlayer.GetStat(BCS_Focus) == thePlayer.GetStatMax(BCS_Focus)
 						&& thePlayer.GetStat(BCS_Stamina) == thePlayer.GetStatMax(BCS_Stamina)
 						)
@@ -7445,7 +7343,7 @@ state ACS_Caretaker_Drain_Energy_Engage in cACS_Caretaker_Drain_Energy
 
 	entry function ACS_Caretaker_Drain_Energy_Entry()
 	{
-		if ( !GetWitcherPlayer().IsWeaponHeld( 'fist' ) && GetWitcherPlayer().HasTag('yrden_sword_equipped') )
+		if ( !GetWitcherPlayer().IsWeaponHeld( 'fist' ) && GetWitcherPlayer().HasTag('acs_yrden_sword_equipped') )
 		{
 			if ( ACS_GetWeaponMode() == 0 )
 			{
@@ -7503,8 +7401,8 @@ state ACS_Caretaker_Drain_Energy_Engage in cACS_Caretaker_Drain_Energy
 		}
 
 		if( thePlayer.HasAbility('Runeword 2 _Stats', true) 
-		&& !thePlayer.HasTag('igni_sword_equipped') 
-		&& !thePlayer.HasTag('igni_secondary_sword_equipped') 
+		&& !thePlayer.HasTag('acs_igni_sword_equipped') 
+		&& !thePlayer.HasTag('acs_igni_secondary_sword_equipped') 
 		&& !ACS_Armor_Equipped_Check())
 		{
 			dist += 1;
@@ -7560,7 +7458,7 @@ state ACS_Caretaker_Drain_Energy_Engage in cACS_Caretaker_Drain_Energy
 						GetWitcherPlayer().PlayEffectSingle('drain_energy', anchor);
 						GetWitcherPlayer().StopEffect('drain_energy');
 
-						yrden_sword_effect_small();
+						acs_yrden_sword_effect_small();
 
 						anchor.DestroyAfter(3);
 					}
@@ -7716,7 +7614,7 @@ state ACS_Marker_Switch_Engage in cACS_Marker_Switch
 		{
 			if ( thePlayer.IsWeaponHeld( 'fist' ) )
 			{
-				if ( thePlayer.HasTag('vampire_claws_equipped') )
+				if ( thePlayer.HasTag('acs_vampire_claws_equipped') )
 				{
 					if ( thePlayer.HasBuff(EET_BlackBlood) )
 					{
@@ -7738,8 +7636,8 @@ state ACS_Marker_Switch_Engage in cACS_Marker_Switch
 			else
 			{
 				if ( 
-				thePlayer.HasTag('igni_sword_equipped_TAG') 
-				|| thePlayer.HasTag('igni_sword_equipped') 
+				thePlayer.HasTag('acs_igni_sword_equipped_TAG') 
+				|| thePlayer.HasTag('acs_igni_sword_equipped') 
 				)
 				{
 					dist = 1.5;
@@ -7758,8 +7656,8 @@ state ACS_Marker_Switch_Engage in cACS_Marker_Switch
 						}
 					}
 				}
-				else if ( thePlayer.HasTag('igni_secondary_sword_equipped_TAG') 
-				|| thePlayer.HasTag('igni_secondary_sword_equipped') 
+				else if ( thePlayer.HasTag('acs_igni_secondary_sword_equipped_TAG') 
+				|| thePlayer.HasTag('acs_igni_secondary_sword_equipped') 
 				)
 				{
 					dist = 1.5;
@@ -7778,7 +7676,7 @@ state ACS_Marker_Switch_Engage in cACS_Marker_Switch
 						}
 					}
 				}
-				else if ( thePlayer.HasTag('axii_sword_equipped') )
+				else if ( thePlayer.HasTag('acs_axii_sword_equipped') )
 				{
 					dist = 1.6;
 					ang =	70;	
@@ -7789,7 +7687,7 @@ state ACS_Marker_Switch_Engage in cACS_Marker_Switch
 						ang +=	30;
 					}
 				}
-				else if ( thePlayer.HasTag('axii_secondary_sword_equipped') )
+				else if ( thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
 				{
 					if ( 
 					ACS_GetWeaponMode() == 0
@@ -7806,17 +7704,17 @@ state ACS_Marker_Switch_Engage in cACS_Marker_Switch
 						ang =	70;
 					}
 				}
-				else if ( thePlayer.HasTag('aard_sword_equipped') )
+				else if ( thePlayer.HasTag('acs_aard_sword_equipped') )
 				{
 					dist = 2;
 					ang =	75;	
 				}
-				else if ( thePlayer.HasTag('aard_secondary_sword_equipped') )
+				else if ( thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
 				{
 					dist = 2;
 					ang = 70;
 				}
-				else if ( thePlayer.HasTag('yrden_sword_equipped') )
+				else if ( thePlayer.HasTag('acs_yrden_sword_equipped') )
 				{
 					if ( ACS_GetWeaponMode() == 0 )
 					{
@@ -7863,12 +7761,12 @@ state ACS_Marker_Switch_Engage in cACS_Marker_Switch
 						ang = 70;
 					}
 				}
-				else if ( thePlayer.HasTag('yrden_secondary_sword_equipped') )
+				else if ( thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
 				{
 					dist = 3.5;
 					ang =	180;
 				}
-				else if ( thePlayer.HasTag('quen_sword_equipped') )
+				else if ( thePlayer.HasTag('acs_quen_sword_equipped') )
 				{
 					dist = 1.6;
 					ang =	70;
@@ -7878,7 +7776,7 @@ state ACS_Marker_Switch_Engage in cACS_Marker_Switch
 						ang +=	320;
 					}
 				}
-				else if ( thePlayer.HasTag('quen_secondary_sword_equipped') )
+				else if ( thePlayer.HasTag('acs_quen_secondary_sword_equipped') )
 				{
 					if (thePlayer.HasTag('ACS_Storm_Spear_Active'))
 					{
@@ -7914,7 +7812,7 @@ state ACS_Marker_Switch_Engage in cACS_Marker_Switch
 				}
 			}
 
-			if ( thePlayer.GetTarget() == ACS_Big_Boi() )
+			if ( thePlayer.GetTarget() == ACSGetCActor('ACS_Big_Boi') )
 			{
 				dist += 0.75;
 				ang += 15;
@@ -7930,8 +7828,8 @@ state ACS_Marker_Switch_Engage in cACS_Marker_Switch
 			}
 
 			if( thePlayer.HasAbility('Runeword 2 _Stats', true) 
-			&& !thePlayer.HasTag('igni_sword_equipped') 
-			&& !thePlayer.HasTag('igni_secondary_sword_equipped') 
+			&& !thePlayer.HasTag('acs_igni_sword_equipped') 
+			&& !thePlayer.HasTag('acs_igni_secondary_sword_equipped') 
 			&& !ACS_Armor_Equipped_Check())
 			{
 				dist += 1;
@@ -8033,9 +7931,9 @@ state ACS_Marker_Switch_Engage in cACS_Marker_Switch
 				&& npc.IsAlive()
 				)
 				{
-					ACS_ElementalComboSystem_Tutorial();
+					ACS_Tutorial_Display_Check('ACS_ElementalComboSystem_Tutorial_Shown');
 
-					if ( GetWitcherPlayer().HasTag('aard_sword_equipped') )
+					if ( GetWitcherPlayer().HasTag('acs_aard_sword_equipped') )
 					{
 						markerTemplate = (CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\fx\vampire_decal.w2ent", true );
 		
@@ -8067,7 +7965,7 @@ state ACS_Marker_Switch_Engage in cACS_Marker_Switch
 
 						markerNPC_1.AddTag('PrimerMark');
 					}
-					else if ( GetWitcherPlayer().HasTag('aard_secondary_sword_equipped') )
+					else if ( GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped') )
 					{
 						markerTemplate = (CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\fx\vampire_decal.w2ent", true );
 		
@@ -8099,7 +7997,7 @@ state ACS_Marker_Switch_Engage in cACS_Marker_Switch
 
 						markerNPC_1.AddTag('PrimerMark');
 					}
-					else if ( GetWitcherPlayer().HasTag('yrden_sword_equipped') )
+					else if ( GetWitcherPlayer().HasTag('acs_yrden_sword_equipped') )
 					{
 						markerTemplate = (CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\fx\vampire_decal.w2ent", true );
 		
@@ -8131,7 +8029,7 @@ state ACS_Marker_Switch_Engage in cACS_Marker_Switch
 
 						markerNPC_1.AddTag('PrimerMark');
 					}
-					else if ( GetWitcherPlayer().HasTag('yrden_secondary_sword_equipped') )
+					else if ( GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped') )
 					{
 						markerTemplate = (CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\fx\vampire_decal.w2ent", true );
 		
@@ -8163,7 +8061,7 @@ state ACS_Marker_Switch_Engage in cACS_Marker_Switch
 
 						markerNPC_1.AddTag('PrimerMark');
 					}
-					else if ( GetWitcherPlayer().HasTag('axii_sword_equipped') )
+					else if ( GetWitcherPlayer().HasTag('acs_axii_sword_equipped') )
 					{
 						markerTemplate = (CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\fx\vampire_decal.w2ent", true );
 		
@@ -8195,7 +8093,7 @@ state ACS_Marker_Switch_Engage in cACS_Marker_Switch
 
 						markerNPC_1.AddTag('PrimerMark');
 					}
-					else if ( GetWitcherPlayer().HasTag('axii_secondary_sword_equipped') )
+					else if ( GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped') )
 					{
 						markerTemplate = (CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\fx\vampire_decal.w2ent", true );
 		
@@ -8227,7 +8125,7 @@ state ACS_Marker_Switch_Engage in cACS_Marker_Switch
 
 						markerNPC_1.AddTag('PrimerMark');
 					}
-					else if ( GetWitcherPlayer().HasTag('quen_sword_equipped') )
+					else if ( GetWitcherPlayer().HasTag('acs_quen_sword_equipped') )
 					{
 						markerTemplate = (CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\fx\vampire_decal.w2ent", true );
 		
@@ -8259,7 +8157,7 @@ state ACS_Marker_Switch_Engage in cACS_Marker_Switch
 
 						markerNPC_1.AddTag('PrimerMark');
 					}
-					else if ( GetWitcherPlayer().HasTag('quen_secondary_sword_equipped') )
+					else if ( GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped') )
 					{
 						markerTemplate = (CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\fx\vampire_decal.w2ent", true );
 		
@@ -8291,7 +8189,7 @@ state ACS_Marker_Switch_Engage in cACS_Marker_Switch
 
 						markerNPC_1.AddTag('PrimerMark');
 					}
-					else if ( GetWitcherPlayer().HasTag('igni_sword_equipped_TAG') )
+					else if ( GetWitcherPlayer().HasTag('acs_igni_sword_equipped_TAG') )
 					{
 						markerTemplate = (CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\fx\vampire_decal.w2ent", true );
 		
@@ -8354,7 +8252,7 @@ statemachine class cACS_GatesOfBabylon
 
 state Engage in cACS_GatesOfBabylon
 {
-	private var initpos															: Vector;
+	private var portalPos, initpos												: Vector;
 	private var sword 															: W3ACSSwordProjectile;
 	private var actor, pActor       											: CActor;
 	private var targetPosition													: Vector;
@@ -8555,12 +8453,17 @@ state Engage in cACS_GatesOfBabylon
 	
 	latent function Projectile_1()
 	{	
-		initpos = GetWitcherPlayer().GetWorldPosition();				
-		initpos.Z += RandRangeF(10,6);
+		portalPos = GetWitcherPlayer().GetWorldPosition();		
+
+		portalPos.Z += 1;
+
+		initpos = portalPos;	
+
+		initpos.Z += 1;
 
 		portal_temp = (CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\fx\portal.w2ent", true );
 
-		portal_ent = (CEntity)theGame.CreateEntity( portal_temp, initpos );
+		portal_ent = (CEntity)theGame.CreateEntity( portal_temp, portalPos );
 
 		portal_ent.PlayEffectSingle('teleport');
 
@@ -8628,12 +8531,15 @@ state Engage in cACS_GatesOfBabylon
 
 	latent function Projectile_2()
 	{	
-		initpos = GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * RandRangeF(7,5);				
-		initpos.Z += RandRangeF(5,4);
+		portalPos = GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * 3;				
+		portalPos.Z -= 0.5;
+
+		initpos = portalPos;			
+		initpos.Z += 2;
 
 		portal_temp = (CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\fx\portal.w2ent", true );
 
-		portal_ent = (CEntity)theGame.CreateEntity( portal_temp, initpos );
+		portal_ent = (CEntity)theGame.CreateEntity( portal_temp, portalPos );
 
 		portal_ent.PlayEffectSingle('teleport');
 
@@ -8703,12 +8609,15 @@ state Engage in cACS_GatesOfBabylon
 
 	latent function Projectile_3()
 	{	
-		initpos = GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * RandRangeF(-5,-7);				
-		initpos.Z += RandRangeF(5,4);
+		portalPos = GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * -3;		
+		portalPos.Z -= 0.5;
+
+		initpos = portalPos;			
+		initpos.Z += 2;
 
 		portal_temp = (CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\fx\portal.w2ent", true );
 
-		portal_ent = (CEntity)theGame.CreateEntity( portal_temp, initpos );
+		portal_ent = (CEntity)theGame.CreateEntity( portal_temp, portalPos );
 
 		portal_ent.PlayEffectSingle('teleport');
 
@@ -8777,10 +8686,16 @@ state Engage in cACS_GatesOfBabylon
 
 	latent function Projectile_4()
 	{
-		initpos = GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * RandRangeF(10,7);				
-		initpos.Z += RandRangeF(2,1);
+		portalPos = GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * 5;			
+
+		portalPos.Z -= 1.5;
+
+		initpos = portalPos;			
+		initpos.Z += 3;
 
 		portal_temp = (CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\fx\portal.w2ent", true );
+
+		portal_ent = (CEntity)theGame.CreateEntity( portal_temp, portalPos );
 
 		portal_ent = (CEntity)theGame.CreateEntity( portal_temp, initpos );
 
@@ -8852,12 +8767,15 @@ state Engage in cACS_GatesOfBabylon
 
 	latent function Projectile_5()
 	{	
-		initpos = GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * RandRangeF(-7,-10);				
-		initpos.Z += RandRangeF(2,1);
+		portalPos = GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * -5;	
+		portalPos.Z -= 1.5;
+
+		initpos = portalPos;			
+		initpos.Z += 3;
 
 		portal_temp = (CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\fx\portal.w2ent", true );
 
-		portal_ent = (CEntity)theGame.CreateEntity( portal_temp, initpos );
+		portal_ent = (CEntity)theGame.CreateEntity( portal_temp, portalPos );
 
 		portal_ent.PlayEffectSingle('teleport');
 
@@ -10065,7 +9983,7 @@ state ACS_Hijack_Marker_Create_Engage in cACS_Hijack_Marker_Create
 
 				vfxEnt.PlayEffectSingle('ground_smoke');
 
-				vfxEnt.AddTag('Hijack_Marker_2');
+				vfxEnt.AddTag('ACS_Hijack_Marker_2');
 			}
 		}
 	}
@@ -10123,9 +10041,9 @@ state ACS_Arrow_Create_Engage in cACS_Arrow_Create
 	{
 		if (GetWitcherPlayer().HasTag('acs_bow_active'))
 		{
-			//ACS_Bow_Arrow().Destroy();
-			ACS_Bow_Arrow().Teleport( GetWitcherPlayer().GetWorldPosition() + Vector( 0, 0, -200 ) );
-			ACS_Bow_Arrow().DestroyAfter(0.0125);
+			//ACSGetCEntity('ACS_Bow_Arrow').Destroy();
+			ACSGetCEntity('ACS_Bow_Arrow').Teleport( GetWitcherPlayer().GetWorldPosition() + Vector( 0, 0, -200 ) );
+			ACSGetCEntity('ACS_Bow_Arrow').DestroyAfter(0.0125);
 
 			arrow1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResourceAsync( 
 		
@@ -10172,8 +10090,8 @@ state ACS_Arrow_Create_Ready_Engage in cACS_Arrow_Create
 	{
 		if (GetWitcherPlayer().HasTag('acs_bow_active'))
 		{
-			ACS_Bow_Arrow().Teleport( GetWitcherPlayer().GetWorldPosition() + Vector( 0, 0, -200 ) );
-			ACS_Bow_Arrow().DestroyAfter(0.0125);
+			ACSGetCEntity('ACS_Bow_Arrow').Teleport( GetWitcherPlayer().GetWorldPosition() + Vector( 0, 0, -200 ) );
+			ACSGetCEntity('ACS_Bow_Arrow').DestroyAfter(0.0125);
 
 			arrow1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResourceAsync( 
 		
@@ -10242,8 +10160,8 @@ state ACS_Arrow_Create_Ready_Arrow_Rain_Engage in cACS_Arrow_Create
 	{
 		if (GetWitcherPlayer().HasTag('acs_bow_active'))
 		{
-			ACS_Bow_Arrow().Teleport( GetWitcherPlayer().GetWorldPosition() + Vector( 0, 0, -200 ) );
-			ACS_Bow_Arrow().DestroyAfter(0.0125);
+			ACSGetCEntity('ACS_Bow_Arrow').Teleport( GetWitcherPlayer().GetWorldPosition() + Vector( 0, 0, -200 ) );
+			ACSGetCEntity('ACS_Bow_Arrow').DestroyAfter(0.0125);
 
 			arrow1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResourceAsync( 
 		
@@ -10330,25 +10248,25 @@ state ACS_Arrow_Create_Crossbow_Engage in cACS_Arrow_Create
 		attach_vec.Y = 0;
 		attach_vec.Z = 0;
 
-		if (igni_crossbow_1())
+		if (ACSGetCEntity('igni_crossbow_1'))
 		{
-			arrow1.CreateAttachment( igni_crossbow_1(), , attach_vec, attach_rot );
+			arrow1.CreateAttachment( ACSGetCEntity('igni_crossbow_1'), , attach_vec, attach_rot );
 		}
-		else if (axii_crossbow_1())
+		else if (ACSGetCEntity('axii_crossbow_1'))
 		{
-			arrow1.CreateAttachment( axii_crossbow_1(), , attach_vec, attach_rot );
+			arrow1.CreateAttachment( ACSGetCEntity('axii_crossbow_1'), , attach_vec, attach_rot );
 		}
-		else if (aard_crossbow_1())
+		else if (ACSGetCEntity('aard_crossbow_1'))
 		{
-			arrow1.CreateAttachment( aard_crossbow_1(), , attach_vec, attach_rot );
+			arrow1.CreateAttachment( ACSGetCEntity('aard_crossbow_1'), , attach_vec, attach_rot );
 		}
-		else if (quen_crossbow_1())
+		else if (ACSGetCEntity('quen_crossbow_1'))
 		{
-			arrow1.CreateAttachment( quen_crossbow_1(), , attach_vec, attach_rot );
+			arrow1.CreateAttachment( ACSGetCEntity('quen_crossbow_1'), , attach_vec, attach_rot );
 		}
-		else if (yrden_crossbow_1())
+		else if (ACSGetCEntity('yrden_crossbow_1'))
 		{
-			arrow1.CreateAttachment( yrden_crossbow_1(), , attach_vec, attach_rot );
+			arrow1.CreateAttachment( ACSGetCEntity('yrden_crossbow_1'), , attach_vec, attach_rot );
 		}
 		
 		arrow1.AddTag('ACS_Crossbow_Arrow');
@@ -10398,25 +10316,25 @@ state ACS_ShootCrossbow_Arrow_Engage in cACS_Arrow_Create
 		movementAdjustor.RotateTowards( ticket, actortarget );
 
 		//initpos = GetWitcherPlayer().GetBoneWorldPosition('r_hand');
-		if (igni_crossbow_1())
+		if (ACSGetCEntity('igni_crossbow_1'))
 		{
-			initpos = igni_crossbow_1().GetWorldPosition() + igni_crossbow_1().GetWorldUp();		
+			initpos = ACSGetCEntity('igni_crossbow_1').GetWorldPosition() + ACSGetCEntity('igni_crossbow_1').GetWorldUp();		
 		}
-		else if (axii_crossbow_1())
+		else if (ACSGetCEntity('axii_crossbow_1'))
 		{
-			initpos = axii_crossbow_1().GetWorldPosition() + axii_crossbow_1().GetWorldUp();		
+			initpos = ACSGetCEntity('axii_crossbow_1').GetWorldPosition() + ACSGetCEntity('axii_crossbow_1').GetWorldUp();		
 		}
-		else if (aard_crossbow_1())
+		else if (ACSGetCEntity('aard_crossbow_1'))
 		{
-			initpos = aard_crossbow_1().GetWorldPosition() + aard_crossbow_1().GetWorldUp();		
+			initpos = ACSGetCEntity('aard_crossbow_1').GetWorldPosition() + ACSGetCEntity('aard_crossbow_1').GetWorldUp();		
 		}
-		else if (quen_crossbow_1())
+		else if (ACSGetCEntity('quen_crossbow_1'))
 		{
-			initpos = quen_crossbow_1().GetWorldPosition() + quen_crossbow_1().GetWorldUp();		
+			initpos = ACSGetCEntity('quen_crossbow_1').GetWorldPosition() + ACSGetCEntity('quen_crossbow_1').GetWorldUp();		
 		}
-		else if (yrden_crossbow_1())
+		else if (ACSGetCEntity('yrden_crossbow_1'))
 		{
-			initpos = yrden_crossbow_1().GetWorldPosition() + yrden_crossbow_1().GetWorldUp();		
+			initpos = ACSGetCEntity('yrden_crossbow_1').GetWorldPosition() + ACSGetCEntity('yrden_crossbow_1').GetWorldUp();		
 		}
 
 		initpos.Z -= 0.2;
@@ -10466,14 +10384,6 @@ state ACS_ShootCrossbow_Arrow_Engage in cACS_Arrow_Create
 
 		arrow1.DestroyAfter(31);
 	}
-}
-
-function ACS_Bow_Arrow() : CEntity
-{
-	var arrow 			 : CEntity;
-	
-	arrow = (CEntity)theGame.GetEntityByTag( 'ACS_Bow_Arrow' );
-	return arrow;
 }
 
 function ACS_Crossbow_Arrow() : ACSCrossbowProjectile
@@ -10540,8 +10450,8 @@ state ACS_Shoot_Bow_Engage in cACS_Shoot_Bow
 	
 	entry function ShootBowEntry()
 	{	
-		ACS_Bow_Arrow().Teleport( GetWitcherPlayer().GetWorldPosition() + Vector( 0, 0, -200 ) );
-		ACS_Bow_Arrow().DestroyAfter(0.0125);
+		ACSGetCEntity('ACS_Bow_Arrow').Teleport( GetWitcherPlayer().GetWorldPosition() + Vector( 0, 0, -200 ) );
+		ACSGetCEntity('ACS_Bow_Arrow').DestroyAfter(0.0125);
 
 		actortarget = (CActor)( GetWitcherPlayer().GetDisplayTarget() );	
 
@@ -10641,8 +10551,8 @@ state ACS_Shoot_Bow_Arrow_Rain_Engage in cACS_Shoot_Bow
 
 	entry function ShootBowArrowRainEntry()
 	{	
-		ACS_Bow_Arrow().Teleport( GetWitcherPlayer().GetWorldPosition() + Vector( 0, 0, -200 ) );
-		ACS_Bow_Arrow().DestroyAfter(0.0125);
+		ACSGetCEntity('ACS_Bow_Arrow').Teleport( GetWitcherPlayer().GetWorldPosition() + Vector( 0, 0, -200 ) );
+		ACSGetCEntity('ACS_Bow_Arrow').DestroyAfter(0.0125);
 
 		actortarget = (CActor)( GetWitcherPlayer().GetDisplayTarget() );	
 
@@ -11921,7 +11831,7 @@ state ACS_Sparagmos_Engage in cACS_Sparagmos
 
 		//GetACSWatcher().RemoveTimer('ACS_Sparagmos_Electric_Effect');
 
-		//GetACSSparagmosEffect_2().Destroy();
+		//ACSGetCEntity('ACS_Sparagmos_Effect_2').Destroy();
 
 		adjustedRot = GetWitcherPlayer().GetWorldRotation();
 
@@ -12157,54 +12067,6 @@ state ACS_Sparagmos_Damage_Engage in cACS_Sparagmos
 	}
 }
 
-function GetACSSparagmosEffect() : CEntity
-{
-	var ent 				 : CEntity;
-	
-	ent = (CEntity)theGame.GetEntityByTag( 'ACS_Sparagmos_Effect' );
-	return ent;
-}
-
-function GetACSSparagmosEffect_1() : CEntity
-{
-	var ent 				 : CEntity;
-	
-	ent = (CEntity)theGame.GetEntityByTag( 'ACS_Sparagmos_Effect_1' );
-	return ent;
-}
-
-function GetACSSparagmosEffect_2() : CEntity
-{
-	var ent 				 : CEntity;
-	
-	ent = (CEntity)theGame.GetEntityByTag( 'ACS_Sparagmos_Effect_2' );
-	return ent;
-}
-
-function GetACSSparagmosEffect_3() : CEntity
-{
-	var ent 				 : CEntity;
-	
-	ent = (CEntity)theGame.GetEntityByTag( 'ACS_Sparagmos_Effect_3' );
-	return ent;
-}
-
-function GetACSSparagmosEffect_4() : CEntity
-{
-	var ent 				 : CEntity;
-	
-	ent = (CEntity)theGame.GetEntityByTag( 'ACS_Sparagmos_Effect_4' );
-	return ent;
-}
-
-function GetACSSparagmosEffect_5() : CEntity
-{
-	var ent 				 : CEntity;
-	
-	ent = (CEntity)theGame.GetEntityByTag( 'ACS_Sparagmos_Effect_5' );
-	return ent;
-}
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function ACS_Bruxa_Scream()
@@ -12241,7 +12103,7 @@ state ACS_Bruxa_Scream_Engage in cACS_Bruxa_Scream
 
 		pos = GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetHeadingVector() * 1.3;
 
-		if (GetWitcherPlayer().HasTag('vampire_claws_equipped'))
+		if (GetWitcherPlayer().HasTag('acs_vampire_claws_equipped'))
 		{
 			if ( GetWitcherPlayer().HasBuff(EET_BlackBlood) )
 			{
@@ -12288,7 +12150,7 @@ state ACS_Bruxa_Scream_Engage in cACS_Bruxa_Scream
 				GetACSWatcher().AddTimer('ACS_Bruxa_Scream_Release_Delay', 2, false);
 			}
 		}
-		else if (GetWitcherPlayer().HasTag('aard_sword_equipped'))
+		else if (GetWitcherPlayer().HasTag('acs_aard_sword_equipped'))
 		{
 			GetWitcherPlayer().SoundEvent("monster_dettlaff_monster_voice_taunt_claws");
 
@@ -12322,14 +12184,6 @@ state ACS_Bruxa_Scream_Engage in cACS_Bruxa_Scream
 	}
 }
 
-function Get_ACS_Bruxa_Scream() : CEntity
-{
-	var ent 				 : CEntity;
-	
-	ent = (CEntity)theGame.GetEntityByTag( 'ACS_Bruxa_Scream' );
-	return ent;
-}
-
 function ACS_Bruxa_Scream_Release()
 {
 	var dmg																																								: W3DamageAction;
@@ -12354,7 +12208,7 @@ function ACS_Bruxa_Scream_Release()
 			dmg.SetProcessBuffsIfNoDamage(true);
 			dmg.SetCanPlayHitParticle(true);
 			
-			if (GetWitcherPlayer().HasTag('vampire_claws_equipped'))
+			if (GetWitcherPlayer().HasTag('acs_vampire_claws_equipped'))
 			{
 				if ( GetWitcherPlayer().HasBuff(EET_BlackBlood) )
 				{
@@ -12377,9 +12231,9 @@ function ACS_Bruxa_Scream_Release()
 				}
 				else
 				{
-					Get_ACS_Bruxa_Scream().StopEffect('cone');
+					ACSGetCEntity('ACS_Bruxa_Scream').StopEffect('cone');
 
-					Get_ACS_Bruxa_Scream().PlayEffectSingle('fx_push');
+					ACSGetCEntity('ACS_Bruxa_Scream').PlayEffectSingle('fx_push');
 
 					if (actortarget.UsesVitality()) 
 					{ 
@@ -12397,7 +12251,7 @@ function ACS_Bruxa_Scream_Release()
 					dmg.AddEffectInfo( EET_HeavyKnockdown, 1 );
 				}
 			}
-			else if (GetWitcherPlayer().HasTag('aard_sword_equipped'))
+			else if (GetWitcherPlayer().HasTag('acs_aard_sword_equipped'))
 			{
 				if (actortarget.UsesVitality()) 
 				{ 
@@ -12460,9 +12314,9 @@ state ACS_Transformation_Bruxa_Scream_Engage in cACS_Transformation_Bruxa_Scream
 	
 	entry function Bruxa_Scream()
 	{
-		rot = GetACSTransformationVampiress().GetWorldRotation();
+		rot = ACSGetCActor('ACS_Transformation_Vampiress').GetWorldRotation();
 
-		pos = GetACSTransformationVampiress().GetWorldPosition() + GetACSTransformationVampiress().GetHeadingVector() * 1.3;
+		pos = ACSGetCActor('ACS_Transformation_Vampiress').GetWorldPosition() + ACSGetCActor('ACS_Transformation_Vampiress').GetHeadingVector() * 1.3;
 	
 		//GetWitcherPlayer().SoundEvent("monster_bruxa_voice_scream");
 
@@ -12472,7 +12326,7 @@ state ACS_Transformation_Bruxa_Scream_Engage in cACS_Transformation_Bruxa_Scream
 
 		ent.AddTag('ACS_Transformation_Bruxa_Scream');
 
-		ent.CreateAttachment( GetACSTransformationVampiress(), , Vector( 0, 0.5, 0.375 ), EulerAngles(0,0,0) );
+		ent.CreateAttachment( ACSGetCActor('ACS_Transformation_Vampiress'), , Vector( 0, 0.5, 0.375 ), EulerAngles(0,0,0) );
 
 		ent.PlayEffectSingle('cone');
 
@@ -12487,14 +12341,6 @@ state ACS_Transformation_Bruxa_Scream_Engage in cACS_Transformation_Bruxa_Scream
 	}
 }
 
-function Get_ACS_Transformation_Bruxa_Scream() : CEntity
-{
-	var ent 				 : CEntity;
-	
-	ent = (CEntity)theGame.GetEntityByTag( 'ACS_Transformation_Bruxa_Scream' );
-	return ent;
-}
-
 function ACS_Transformation_Bruxa_Scream_Release()
 {
 	var dmg																																								: W3DamageAction;
@@ -12505,7 +12351,7 @@ function ACS_Transformation_Bruxa_Scream_Release()
 
 	actors.Clear();
 
-	actors = GetWitcherPlayer().GetNPCsAndPlayersInCone(10, VecHeading(GetACSTransformationVampiress().GetHeadingVector()), 60, 50, , FLAG_ExcludePlayer + FLAG_Attitude_Hostile + FLAG_OnlyAliveActors );
+	actors = GetWitcherPlayer().GetNPCsAndPlayersInCone(10, VecHeading(ACSGetCActor('ACS_Transformation_Vampiress').GetHeadingVector()), 60, 50, , FLAG_ExcludePlayer + FLAG_Attitude_Hostile + FLAG_OnlyAliveActors );
 
 	if( actors.Size() > 0 )
 	{
@@ -12519,9 +12365,9 @@ function ACS_Transformation_Bruxa_Scream_Release()
 			dmg.SetProcessBuffsIfNoDamage(true);
 			dmg.SetCanPlayHitParticle(true);
 			
-			Get_ACS_Transformation_Bruxa_Scream().StopEffect('cone');
+			ACSGetCEntity('ACS_Transformation_Bruxa_Scream').StopEffect('cone');
 
-			Get_ACS_Transformation_Bruxa_Scream().PlayEffectSingle('fx_push');
+			ACSGetCEntity('ACS_Transformation_Bruxa_Scream').PlayEffectSingle('fx_push');
 
 			if (actortarget.UsesVitality()) 
 			{ 
@@ -12762,14 +12608,6 @@ state ACS_Water_Aard_Release_Engage in cACS_Water_Aard
 			}
 		}
 	}
-}
-
-function Get_ACS_Water_Aard() : CEntity
-{
-	var ent 				 : CEntity;
-	
-	ent = (CEntity)theGame.GetEntityByTag( 'ACS_Water_Aard' );
-	return ent;
 }
 
 function ACS_Water_Aard_Release()
@@ -13421,7 +13259,7 @@ state ACS_Dagger_Summon_Engage in cACS_Dagger_Summon
 		super.OnEnterState(prevStateName);
 		
 		GetACSWatcher().RemoveTimer('ACS_Dagger_Destroy_Timer');
-		//ACS_Dagger().Destroy();
+		//ACSGetCEntity('acs_dagger_1').Destroy();
 
 		if(!GetWitcherPlayer().HasTag('ACS_Dagger_Summoned'))
 		{
@@ -13469,21 +13307,13 @@ state ACS_Dagger_Summon_Engage in cACS_Dagger_Summon
 	}
 }
 
-function ACS_Dagger() : CEntity
-{
-	var sword 			 : CEntity;
-	
-	sword = (CEntity)theGame.GetEntityByTag( 'acs_dagger_1' );
-	return sword;
-}
-
 function ACS_Dagger_Destroy()
 {
-	ACS_Dagger().PlayEffectSingle('fast_attack_buff_hit');
+	ACSGetCEntity('acs_dagger_1').PlayEffectSingle('fast_attack_buff_hit');
 
-	ACS_Dagger().BreakAttachment(); 
-	ACS_Dagger().Teleport( GetWitcherPlayer().GetWorldPosition() + Vector( 0, 0, -200 ) );
-	ACS_Dagger().DestroyAfter(0.00125);
+	ACSGetCEntity('acs_dagger_1').BreakAttachment(); 
+	ACSGetCEntity('acs_dagger_1').Teleport( GetWitcherPlayer().GetWorldPosition() + Vector( 0, 0, -200 ) );
+	ACSGetCEntity('acs_dagger_1').DestroyAfter(0.00125);
 
 	GetWitcherPlayer().RemoveTag('ACS_Dagger_Summoned');
 }
@@ -13784,54 +13614,22 @@ state ACS_Yrden_Sidearm_Summon_Engage in cACS_Yrden_Sidearm_Summon
 	}
 }
 
-function ACS_Yrden_Sidearm_Anchor() : CEntity
-{
-	var sword 			 : CEntity;
-	
-	sword = (CEntity)theGame.GetEntityByTag( 'acs_yrden_sidearm_anchor' );
-	return sword;
-}
-
-function ACS_Yrden_Sidearm_1() : CEntity
-{
-	var sword 			 : CEntity;
-	
-	sword = (CEntity)theGame.GetEntityByTag( 'acs_yrden_sidearm_1' );
-	return sword;
-}
-
-function ACS_Yrden_Sidearm_2() : CEntity
-{
-	var sword 			 : CEntity;
-	
-	sword = (CEntity)theGame.GetEntityByTag( 'acs_yrden_sidearm_2' );
-	return sword;
-}
-
-function ACS_Yrden_Sidearm_3() : CEntity
-{
-	var sword 			 : CEntity;
-	
-	sword = (CEntity)theGame.GetEntityByTag( 'acs_yrden_sidearm_3' );
-	return sword;
-}
-
 function ACS_Yrden_Sidearm_Destroy()
 {
-	ACS_Yrden_Sidearm_Anchor().StopEffect('appear');
-	ACS_Yrden_Sidearm_Anchor().PlayEffectSingle('disappear_fast');
+	ACSGetCEntity('acs_yrden_sidearm_anchor').StopEffect('appear');
+	ACSGetCEntity('acs_yrden_sidearm_anchor').PlayEffectSingle('disappear_fast');
 
-	ACS_Yrden_Sidearm_1().PlayEffectSingle('fire_sparks_trail');
-	ACS_Yrden_Sidearm_1().PlayEffectSingle('runeword1_fire_trail');
-	ACS_Yrden_Sidearm_1().PlayEffectSingle('fast_attack_buff_hit');
+	ACSGetCEntity('acs_yrden_sidearm_1').PlayEffectSingle('fire_sparks_trail');
+	ACSGetCEntity('acs_yrden_sidearm_1').PlayEffectSingle('runeword1_fire_trail');
+	ACSGetCEntity('acs_yrden_sidearm_1').PlayEffectSingle('fast_attack_buff_hit');
 
-	ACS_Yrden_Sidearm_2().PlayEffectSingle('fire_sparks_trail');
-	ACS_Yrden_Sidearm_2().PlayEffectSingle('runeword1_fire_trail');
-	ACS_Yrden_Sidearm_2().PlayEffectSingle('fast_attack_buff_hit');
+	ACSGetCEntity('acs_yrden_sidearm_2').PlayEffectSingle('fire_sparks_trail');
+	ACSGetCEntity('acs_yrden_sidearm_2').PlayEffectSingle('runeword1_fire_trail');
+	ACSGetCEntity('acs_yrden_sidearm_2').PlayEffectSingle('fast_attack_buff_hit');
 
-	ACS_Yrden_Sidearm_3().PlayEffectSingle('fire_sparks_trail');
-	ACS_Yrden_Sidearm_3().PlayEffectSingle('runeword1_fire_trail');
-	ACS_Yrden_Sidearm_3().PlayEffectSingle('fast_attack_buff_hit');
+	ACSGetCEntity('acs_yrden_sidearm_3').PlayEffectSingle('fire_sparks_trail');
+	ACSGetCEntity('acs_yrden_sidearm_3').PlayEffectSingle('runeword1_fire_trail');
+	ACSGetCEntity('acs_yrden_sidearm_3').PlayEffectSingle('fast_attack_buff_hit');
 
 	GetACSWatcher().RemoveTimer('ACS_Yrden_Sidearm_Destroy_Actual_Timer');
 
@@ -13840,38 +13638,38 @@ function ACS_Yrden_Sidearm_Destroy()
 
 function ACS_Yrden_Sidearm_DestroyActual()
 {
-	ACS_Yrden_Sidearm_Anchor().BreakAttachment(); 
-	ACS_Yrden_Sidearm_Anchor().Teleport( GetWitcherPlayer().GetWorldPosition() + Vector( 0, 0, -200 ) );
-	ACS_Yrden_Sidearm_Anchor().DestroyAfter(0.00125);
+	ACSGetCEntity('acs_yrden_sidearm_anchor').BreakAttachment(); 
+	ACSGetCEntity('acs_yrden_sidearm_anchor').Teleport( GetWitcherPlayer().GetWorldPosition() + Vector( 0, 0, -200 ) );
+	ACSGetCEntity('acs_yrden_sidearm_anchor').DestroyAfter(0.00125);
 
-	ACS_Yrden_Sidearm_1().BreakAttachment(); 
-	ACS_Yrden_Sidearm_1().Teleport( GetWitcherPlayer().GetWorldPosition() + Vector( 0, 0, -200 ) );
-	ACS_Yrden_Sidearm_1().DestroyAfter(0.00125);
+	ACSGetCEntity('acs_yrden_sidearm_1').BreakAttachment(); 
+	ACSGetCEntity('acs_yrden_sidearm_1').Teleport( GetWitcherPlayer().GetWorldPosition() + Vector( 0, 0, -200 ) );
+	ACSGetCEntity('acs_yrden_sidearm_1').DestroyAfter(0.00125);
 
-	ACS_Yrden_Sidearm_2().BreakAttachment(); 
-	ACS_Yrden_Sidearm_2().Teleport( GetWitcherPlayer().GetWorldPosition() + Vector( 0, 0, -200 ) );
-	ACS_Yrden_Sidearm_2().DestroyAfter(0.00125);
+	ACSGetCEntity('acs_yrden_sidearm_2').BreakAttachment(); 
+	ACSGetCEntity('acs_yrden_sidearm_2').Teleport( GetWitcherPlayer().GetWorldPosition() + Vector( 0, 0, -200 ) );
+	ACSGetCEntity('acs_yrden_sidearm_2').DestroyAfter(0.00125);
 
-	ACS_Yrden_Sidearm_3().BreakAttachment(); 
-	ACS_Yrden_Sidearm_3().Teleport( GetWitcherPlayer().GetWorldPosition() + Vector( 0, 0, -200 ) );
-	ACS_Yrden_Sidearm_3().DestroyAfter(0.00125);
+	ACSGetCEntity('acs_yrden_sidearm_3').BreakAttachment(); 
+	ACSGetCEntity('acs_yrden_sidearm_3').Teleport( GetWitcherPlayer().GetWorldPosition() + Vector( 0, 0, -200 ) );
+	ACSGetCEntity('acs_yrden_sidearm_3').DestroyAfter(0.00125);
 
 	GetWitcherPlayer().RemoveTag('ACS_Yrden_Sidearm_Summoned');
 }
 
 function ACS_Yrden_Sidearm_DestroyIMMEDIATE()
 {
-	ACS_Yrden_Sidearm_Anchor().BreakAttachment(); 
-	ACS_Yrden_Sidearm_Anchor().Destroy();
+	ACSGetCEntity('acs_yrden_sidearm_anchor').BreakAttachment(); 
+	ACSGetCEntity('acs_yrden_sidearm_anchor').Destroy();
 
-	ACS_Yrden_Sidearm_1().BreakAttachment(); 
-	ACS_Yrden_Sidearm_1().Destroy();
+	ACSGetCEntity('acs_yrden_sidearm_1').BreakAttachment(); 
+	ACSGetCEntity('acs_yrden_sidearm_1').Destroy();
 
-	ACS_Yrden_Sidearm_2().BreakAttachment(); 
-	ACS_Yrden_Sidearm_2().Destroy();
+	ACSGetCEntity('acs_yrden_sidearm_2').BreakAttachment(); 
+	ACSGetCEntity('acs_yrden_sidearm_2').Destroy();
 
-	ACS_Yrden_Sidearm_3().BreakAttachment(); 
-	ACS_Yrden_Sidearm_3().Destroy();
+	ACSGetCEntity('acs_yrden_sidearm_3').BreakAttachment(); 
+	ACSGetCEntity('acs_yrden_sidearm_3').Destroy();
 
 	GetWitcherPlayer().RemoveTag('ACS_Yrden_Sidearm_Summoned');
 }
@@ -13902,50 +13700,50 @@ function ACS_Yrden_Sidearm_UpdateEnhancements()
 
 	if ( runeCount > 0 && ( ( runeCount - 1 ) < enhancements.Size() ) )
 	{
-		ACS_Yrden_Sidearm_1().StopEffect( ACS_GetRuneLevel( runeCount ) );
-		ACS_Yrden_Sidearm_1().StopEffect( ACS_GetRuneFxName( enhancements[ runeCount - 1 ] ) );
+		ACSGetCEntity('acs_yrden_sidearm_1').StopEffect( ACS_GetRuneLevel( runeCount ) );
+		ACSGetCEntity('acs_yrden_sidearm_1').StopEffect( ACS_GetRuneFxName( enhancements[ runeCount - 1 ] ) );
 
-		ACS_Yrden_Sidearm_2().StopEffect( ACS_GetRuneLevel( runeCount ) );
-		ACS_Yrden_Sidearm_2().StopEffect( ACS_GetRuneFxName( enhancements[ runeCount - 1 ] ) );
+		ACSGetCEntity('acs_yrden_sidearm_2').StopEffect( ACS_GetRuneLevel( runeCount ) );
+		ACSGetCEntity('acs_yrden_sidearm_2').StopEffect( ACS_GetRuneFxName( enhancements[ runeCount - 1 ] ) );
 
-		ACS_Yrden_Sidearm_3().StopEffect( ACS_GetRuneLevel( runeCount ) );
-		ACS_Yrden_Sidearm_3().StopEffect( ACS_GetRuneFxName( enhancements[ runeCount - 1 ] ) );
+		ACSGetCEntity('acs_yrden_sidearm_3').StopEffect( ACS_GetRuneLevel( runeCount ) );
+		ACSGetCEntity('acs_yrden_sidearm_3').StopEffect( ACS_GetRuneFxName( enhancements[ runeCount - 1 ] ) );
 
-		ACS_Yrden_Sidearm_1().PlayEffectSingle( ACS_GetRuneLevel( runeCount ) );
-		ACS_Yrden_Sidearm_1().PlayEffectSingle( ACS_GetRuneFxName( enhancements[ runeCount - 1 ] ) );
+		ACSGetCEntity('acs_yrden_sidearm_1').PlayEffectSingle( ACS_GetRuneLevel( runeCount ) );
+		ACSGetCEntity('acs_yrden_sidearm_1').PlayEffectSingle( ACS_GetRuneFxName( enhancements[ runeCount - 1 ] ) );
 
-		ACS_Yrden_Sidearm_2().PlayEffectSingle( ACS_GetRuneLevel( runeCount ) );
-		ACS_Yrden_Sidearm_2().PlayEffectSingle( ACS_GetRuneFxName( enhancements[ runeCount - 1 ] ) );
+		ACSGetCEntity('acs_yrden_sidearm_2').PlayEffectSingle( ACS_GetRuneLevel( runeCount ) );
+		ACSGetCEntity('acs_yrden_sidearm_2').PlayEffectSingle( ACS_GetRuneFxName( enhancements[ runeCount - 1 ] ) );
 
-		ACS_Yrden_Sidearm_3().PlayEffectSingle( ACS_GetRuneLevel( runeCount ) );
-		ACS_Yrden_Sidearm_3().PlayEffectSingle( ACS_GetRuneFxName( enhancements[ runeCount - 1 ] ) );
+		ACSGetCEntity('acs_yrden_sidearm_3').PlayEffectSingle( ACS_GetRuneLevel( runeCount ) );
+		ACSGetCEntity('acs_yrden_sidearm_3').PlayEffectSingle( ACS_GetRuneFxName( enhancements[ runeCount - 1 ] ) );
 	}
 	else if ( 3 == runeCount && 1 == enhancements.Size() )
 	{
-		ACS_Yrden_Sidearm_1().StopEffect( ACS_GetRuneLevel( runeCount ) );
-		ACS_Yrden_Sidearm_1().StopEffect( ACS_GetEnchantmentFxName( enhancements[ 0 ] ) );
+		ACSGetCEntity('acs_yrden_sidearm_1').StopEffect( ACS_GetRuneLevel( runeCount ) );
+		ACSGetCEntity('acs_yrden_sidearm_1').StopEffect( ACS_GetEnchantmentFxName( enhancements[ 0 ] ) );
 
-		ACS_Yrden_Sidearm_2().StopEffect( ACS_GetRuneLevel( runeCount ) );
-		ACS_Yrden_Sidearm_2().StopEffect( ACS_GetEnchantmentFxName( enhancements[ 0 ] ) );
+		ACSGetCEntity('acs_yrden_sidearm_2').StopEffect( ACS_GetRuneLevel( runeCount ) );
+		ACSGetCEntity('acs_yrden_sidearm_2').StopEffect( ACS_GetEnchantmentFxName( enhancements[ 0 ] ) );
 
-		ACS_Yrden_Sidearm_3().StopEffect( ACS_GetRuneLevel( runeCount ) );
-		ACS_Yrden_Sidearm_3().StopEffect( ACS_GetEnchantmentFxName( enhancements[ 0 ] ) );
+		ACSGetCEntity('acs_yrden_sidearm_3').StopEffect( ACS_GetRuneLevel( runeCount ) );
+		ACSGetCEntity('acs_yrden_sidearm_3').StopEffect( ACS_GetEnchantmentFxName( enhancements[ 0 ] ) );
 
-		ACS_Yrden_Sidearm_1().PlayEffectSingle( ACS_GetRuneLevel( runeCount ) );
-		ACS_Yrden_Sidearm_1().PlayEffectSingle( ACS_GetEnchantmentFxName( enhancements[ 0 ] ) );
+		ACSGetCEntity('acs_yrden_sidearm_1').PlayEffectSingle( ACS_GetRuneLevel( runeCount ) );
+		ACSGetCEntity('acs_yrden_sidearm_1').PlayEffectSingle( ACS_GetEnchantmentFxName( enhancements[ 0 ] ) );
 
-		ACS_Yrden_Sidearm_2().PlayEffectSingle( ACS_GetRuneLevel( runeCount ) );
-		ACS_Yrden_Sidearm_2().PlayEffectSingle( ACS_GetEnchantmentFxName( enhancements[ 0 ] ) );
+		ACSGetCEntity('acs_yrden_sidearm_2').PlayEffectSingle( ACS_GetRuneLevel( runeCount ) );
+		ACSGetCEntity('acs_yrden_sidearm_2').PlayEffectSingle( ACS_GetEnchantmentFxName( enhancements[ 0 ] ) );
 
-		ACS_Yrden_Sidearm_3().PlayEffectSingle( ACS_GetRuneLevel( runeCount ) );
-		ACS_Yrden_Sidearm_3().PlayEffectSingle( ACS_GetEnchantmentFxName( enhancements[ 0 ] ) );
+		ACSGetCEntity('acs_yrden_sidearm_3').PlayEffectSingle( ACS_GetRuneLevel( runeCount ) );
+		ACSGetCEntity('acs_yrden_sidearm_3').PlayEffectSingle( ACS_GetEnchantmentFxName( enhancements[ 0 ] ) );
 	}
 
-	ACS_Yrden_Sidearm_1().PlayEffectSingle('rune_blast_loop');
+	ACSGetCEntity('acs_yrden_sidearm_1').PlayEffectSingle('rune_blast_loop');
 
-	ACS_Yrden_Sidearm_2().PlayEffectSingle('rune_blast_loop');
+	ACSGetCEntity('acs_yrden_sidearm_2').PlayEffectSingle('rune_blast_loop');
 
-	ACS_Yrden_Sidearm_3().PlayEffectSingle('rune_blast_loop');
+	ACSGetCEntity('acs_yrden_sidearm_3').PlayEffectSingle('rune_blast_loop');
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -14517,7 +14315,7 @@ state ACS_Rage_Marker_Player_Pre_Engage in cACS_Rage_Marker
 							continue;
 						}
 
-						if (!ACS_Rage_Marker_Player_1_Get())
+						if (!ACSGetCEntity('ACS_Rage_Marker_Player_1'))
 						{
 							GetACSWatcher().Remove_On_Hit_Tags();
 
@@ -14556,7 +14354,7 @@ state ACS_Rage_Marker_Player_Pre_Engage in cACS_Rage_Marker
 								FactsAdd("ACS_Rage_Sound_Played", 1, -1);
 							}
 
-							ACS_Rage_Tutorial();
+							ACS_Tutorial_Display_Check('ACS_Rage_Tutorial_Shown');
 
 							GetACSWatcher().SetRageProcess(true);
 						}
@@ -14786,118 +14584,6 @@ function ACS_Rage_Markers_Player_Destroy()
 	}
 }
 
-function ACS_Rage_Marker_1_Get() : CEntity
-{
-	var marker 			 : CEntity;
-	
-	marker = (CEntity)theGame.GetEntityByTag( 'ACS_Rage_Marker_1' );
-	return marker;
-}
-
-function ACS_Rage_Marker_2_Get() : CEntity
-{
-	var marker 			 : CEntity;
-	
-	marker = (CEntity)theGame.GetEntityByTag( 'ACS_Rage_Marker_2' );
-	return marker;
-}
-
-function ACS_Rage_Marker_3_Get() : CEntity
-{
-	var marker 			 : CEntity;
-	
-	marker = (CEntity)theGame.GetEntityByTag( 'ACS_Rage_Marker_3' );
-	return marker;
-}
-
-function ACS_Rage_Marker_4_Get() : CEntity
-{
-	var marker 			 : CEntity;
-	
-	marker = (CEntity)theGame.GetEntityByTag( 'ACS_Rage_Marker_4' );
-	return marker;
-}
-
-function ACS_Rage_Marker_5_Get() : CEntity
-{
-	var marker 			 : CEntity;
-	
-	marker = (CEntity)theGame.GetEntityByTag( 'ACS_Rage_Marker_5' );
-	return marker;
-}
-
-function ACS_Rage_Marker_6_Get() : CEntity
-{
-	var marker 			 : CEntity;
-	
-	marker = (CEntity)theGame.GetEntityByTag( 'ACS_Rage_Marker_6' );
-	return marker;
-}
-
-function ACS_Rage_Marker_7_Get() : CEntity
-{
-	var marker 			 : CEntity;
-	
-	marker = (CEntity)theGame.GetEntityByTag( 'ACS_Rage_Marker_7' );
-	return marker;
-}
-
-function ACS_Rage_Marker_Player_1_Get() : CEntity
-{
-	var marker 			 : CEntity;
-	
-	marker = (CEntity)theGame.GetEntityByTag( 'ACS_Rage_Marker_Player_1' );
-	return marker;
-}
-
-function ACS_Rage_Marker_Player_2_Get() : CEntity
-{
-	var marker 			 : CEntity;
-	
-	marker = (CEntity)theGame.GetEntityByTag( 'ACS_Rage_Marker_Player_2' );
-	return marker;
-}
-
-function ACS_Rage_Marker_Player_3_Get() : CEntity
-{
-	var marker 			 : CEntity;
-	
-	marker = (CEntity)theGame.GetEntityByTag( 'ACS_Rage_Marker_Player_3' );
-	return marker;
-}
-
-function ACS_Rage_Marker_Player_4_Get() : CEntity
-{
-	var marker 			 : CEntity;
-	
-	marker = (CEntity)theGame.GetEntityByTag( 'ACS_Rage_Marker_Player_4' );
-	return marker;
-}
-
-function ACS_Rage_Marker_Player_5_Get() : CEntity
-{
-	var marker 			 : CEntity;
-	
-	marker = (CEntity)theGame.GetEntityByTag( 'ACS_Rage_Marker_Player_5' );
-	return marker;
-}
-
-function ACS_Rage_Marker_Player_6_Get() : CEntity
-{
-	var marker 			 : CEntity;
-	
-	marker = (CEntity)theGame.GetEntityByTag( 'ACS_Rage_Marker_Player_6' );
-	return marker;
-}
-
-function ACS_Rage_Marker_Player_7_Get() : CEntity
-{
-	var marker 			 : CEntity;
-	
-	marker = (CEntity)theGame.GetEntityByTag( 'ACS_Rage_Marker_Player_7' );
-	return marker;
-}
-
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 statemachine class ACSShieldSpawner extends CGameplayEntity
@@ -14907,24 +14593,28 @@ statemachine class ACSShieldSpawner extends CGameplayEntity
 	var shield															: CEntity;
 	var ents			  												: array<CGameplayEntity>;
 	var i																: int;
-	var progres, targetDistance 										: float;
+	var progres 														: float;
 	var pos 															: Vector;
 	var target															: CGameplayEntity;
 
 	event OnSpawned( spawnData : SEntitySpawnData )
 	{
+		//super.OnSpawned(spawnData);
+
 		pos = this.GetWorldPosition();
 
 		target = this;
 
-		AddTimer('NPCCheckTimer', 0.001, true);
+		//AddTimer('NPCCheckTimer', 0.001, true);
+
+		AddTimer('NPCCheckTimerDelay', 0.001, false);
 	}
-	
-	timer function NPCCheckTimer ( dt : float, id : int)
+
+	timer function NPCCheckTimerDelay ( dt : float, id : int)
 	{ 
 		ents.Clear();
 
-		FindGameplayEntitiesCloseToPoint(ents, pos, 0.1, 10, ,FLAG_OnlyAliveActors + FLAG_ExcludePlayer + FLAG_ExcludeTarget, target,);
+		FindGameplayEntitiesCloseToPoint(ents, this.GetWorldPosition(), 1, 5, ,FLAG_OnlyAliveActors + FLAG_ExcludePlayer);
 		
 		for( i = 0; i < ents.Size(); i += 1 )
 		{
@@ -14932,142 +14622,43 @@ statemachine class ACSShieldSpawner extends CGameplayEntity
 			{
 				actor = (CActor) ents[i];
 
-				targetDistance = VecDistanceSquared2D( GetWitcherPlayer().GetWorldPosition(), actor.GetWorldPosition() ) ;
-
-				if (
-				( !actor.IsAlive() || ( !ACS_AttitudeCheck ( actor ) && targetDistance >= 30 * 30 ) )
-				&& actor.HasTag('ACS_Shield_Attached')
-				&& !actor.HasTag('ACS_Lost_Shield') )
+				if (actor.IsAlive() )
 				{
-					actor.AddTag('ACS_Lost_Shield');
-
-					actor.RemoveTag('ACS_Swapped_To_Shield');
-
-					this.BreakAttachment();
-
-					//shield.BreakAttachment();
-
-					this.AddTimer( 'DropShield', 0.0001, true );
-
-					this.RemoveTimer( 'NPCCheckTimer' );
-
-					this.DestroyAfter(30);
-
-					return;
-				}
-
-				if (actor.IsAlive()
-				&& actor.HasTag('ACS_Swapped_To_Shield')
-				&& !actor.HasTag('ACS_Shield_Attached'))
-				{
-					if (StrContains( actor.GetReadableName(), "novigrad" ) )
+					if (
+					actor.HasTag('ACS_Swapped_To_Shield')
+					&& !actor.HasTag('ACS_Shield_Attached'))
 					{
-						if( RandF() < 0.5 )
+						if (StrContains( actor.GetReadableName(), "novigrad" ) )
 						{
-							shield_temp = (CEntityTemplate)LoadResource( 
+							if( RandF() < 0.5 )
+							{
+								shield_temp = (CEntityTemplate)LoadResource( 
 
-							"items\weapons\shields\novigrad_shield_01.w2ent"
-							
-							, true );
+								"items\weapons\shields\novigrad_shield_01.w2ent"
+								
+								, true );
+							}
+							else
+							{
+								shield_temp = (CEntityTemplate)LoadResource( 
+
+								"items\weapons\shields\novigrad_shield_02.w2ent"
+								
+								, true );
+							}	
 						}
-						else
+						else if (StrContains( actor.GetReadableName(), "redania" ) 
+						|| StrContains( actor.GetReadableName(), "witch_hunter" ) 
+						|| StrContains( actor.GetReadableName(), "inq_" ) 
+						)
 						{
 							shield_temp = (CEntityTemplate)LoadResource( 
 
-							"items\weapons\shields\novigrad_shield_02.w2ent"
+							"items\weapons\shields\redanian_shield_01.w2ent"
 							
-							, true );
-						}	
-					}
-					else if (StrContains( actor.GetReadableName(), "redania" ) 
-					|| StrContains( actor.GetReadableName(), "witch_hunter" ) 
-					|| StrContains( actor.GetReadableName(), "inq_" ) 
-					)
-					{
-						shield_temp = (CEntityTemplate)LoadResource( 
-
-						"items\weapons\shields\redanian_shield_01.w2ent"
-						
-						, true );	
-					}
-					else if (StrContains( actor.GetReadableName(), "nilfgaard" ) )
-					{
-						if( RandF() < 0.5 )
-						{
-							shield_temp = (CEntityTemplate)LoadResource( 
-
-							"items\weapons\shields\nilfgaard_shield_01.w2ent"
-							
-							, true );
+							, true );	
 						}
-						else
-						{
-							shield_temp = (CEntityTemplate)LoadResource( 
-
-							"items\weapons\shields\nilfgaard_shield_02.w2ent"
-							
-							, true );
-						}	
-					}
-					else if (StrContains( actor.GetReadableName(), "brokvar" ) )
-					{
-						shield_temp = (CEntityTemplate)LoadResource( 
-
-						"items\weapons\shields\skellige_brokvar_shield_01.w2ent"
-						
-						, true );	
-					}
-					else if (StrContains( actor.GetReadableName(), "craite" ) )
-					{
-						shield_temp = (CEntityTemplate)LoadResource( 
-
-						"items\weapons\shields\skellige_craite_shield_01.w2ent"
-						
-						, true );	
-					}
-					else if (StrContains( actor.GetReadableName(), "dimun" ) )
-					{
-						shield_temp = (CEntityTemplate)LoadResource( 
-
-						"items\weapons\shields\skellige_dimun_shield_01.w2ent"
-						
-						, true );	
-					}
-					else if (StrContains( actor.GetReadableName(), "drummond" ) )
-					{
-						shield_temp = (CEntityTemplate)LoadResource( 
-
-						"items\weapons\shields\skellige_drummond_shield_01.w2ent"
-						
-						, true );	
-					}
-					else if (StrContains( actor.GetReadableName(), "heymaey" ) )
-					{
-						shield_temp = (CEntityTemplate)LoadResource( 
-
-						"items\weapons\shields\skellige_heymaey_shield_01.w2ent"
-						
-						, true );	
-					}
-					else if (StrContains( actor.GetReadableName(), "tuiseach" ) )
-					{
-						shield_temp = (CEntityTemplate)LoadResource( 
-
-						"items\weapons\shields\skellige_tuiseach_shield_01.w2ent"
-						
-						, true );	
-					}
-					else if (StrContains( actor.GetReadableName(), "temeria" ) )
-					{
-						shield_temp = (CEntityTemplate)LoadResource( 
-
-						"items\weapons\shields\temeria_shield_01.w2ent"
-						
-						, true );	
-					}
-					else if (StrContains( actor.GetReadableName(), "knight" ) )
-					{
-						if (StrContains( actor.GetReadableName(), "nilfgaard" ) )
+						else if (StrContains( actor.GetReadableName(), "nilfgaard" ) )
 						{
 							if( RandF() < 0.5 )
 							{
@@ -15086,15 +14677,71 @@ statemachine class ACSShieldSpawner extends CGameplayEntity
 								, true );
 							}	
 						}
-						else
+						else if (StrContains( actor.GetReadableName(), "brokvar" ) )
 						{
-							if( RandF() < 0.5 )
+							shield_temp = (CEntityTemplate)LoadResource( 
+
+							"items\weapons\shields\skellige_brokvar_shield_01.w2ent"
+							
+							, true );	
+						}
+						else if (StrContains( actor.GetReadableName(), "craite" ) )
+						{
+							shield_temp = (CEntityTemplate)LoadResource( 
+
+							"items\weapons\shields\skellige_craite_shield_01.w2ent"
+							
+							, true );	
+						}
+						else if (StrContains( actor.GetReadableName(), "dimun" ) )
+						{
+							shield_temp = (CEntityTemplate)LoadResource( 
+
+							"items\weapons\shields\skellige_dimun_shield_01.w2ent"
+							
+							, true );	
+						}
+						else if (StrContains( actor.GetReadableName(), "drummond" ) )
+						{
+							shield_temp = (CEntityTemplate)LoadResource( 
+
+							"items\weapons\shields\skellige_drummond_shield_01.w2ent"
+							
+							, true );	
+						}
+						else if (StrContains( actor.GetReadableName(), "heymaey" ) )
+						{
+							shield_temp = (CEntityTemplate)LoadResource( 
+
+							"items\weapons\shields\skellige_heymaey_shield_01.w2ent"
+							
+							, true );	
+						}
+						else if (StrContains( actor.GetReadableName(), "tuiseach" ) )
+						{
+							shield_temp = (CEntityTemplate)LoadResource( 
+
+							"items\weapons\shields\skellige_tuiseach_shield_01.w2ent"
+							
+							, true );	
+						}
+						else if (StrContains( actor.GetReadableName(), "temeria" ) )
+						{
+							shield_temp = (CEntityTemplate)LoadResource( 
+
+							"items\weapons\shields\temeria_shield_01.w2ent"
+							
+							, true );	
+						}
+						else if (StrContains( actor.GetReadableName(), "knight" ) )
+						{
+							if (StrContains( actor.GetReadableName(), "nilfgaard" ) )
 							{
 								if( RandF() < 0.5 )
 								{
 									shield_temp = (CEntityTemplate)LoadResource( 
 
-									"dlc\bob\data\items\weapons\shields\toussaint_shield_01_5_toussaint.w2ent"
+									"items\weapons\shields\nilfgaard_shield_01.w2ent"
 									
 									, true );
 								}
@@ -15102,20 +14749,31 @@ statemachine class ACSShieldSpawner extends CGameplayEntity
 								{
 									shield_temp = (CEntityTemplate)LoadResource( 
 
-									"dlc\bob\data\items\weapons\shields\toussaint_shield_02_6_toussaint.w2ent"
+									"items\weapons\shields\nilfgaard_shield_02.w2ent"
 									
 									, true );
-								}
+								}	
 							}
 							else
 							{
 								if( RandF() < 0.5 )
 								{
-									shield_temp = (CEntityTemplate)LoadResource( 
+									if( RandF() < 0.5 )
+									{
+										shield_temp = (CEntityTemplate)LoadResource( 
 
-									"dlc\bob\data\items\weapons\shields\toussaint_shield_03_7_dun_tynne.w2ent"
-									
-									, true );
+										"dlc\bob\data\items\weapons\shields\toussaint_shield_01_5_toussaint.w2ent"
+										
+										, true );
+									}
+									else
+									{
+										shield_temp = (CEntityTemplate)LoadResource( 
+
+										"dlc\bob\data\items\weapons\shields\toussaint_shield_02_6_toussaint.w2ent"
+										
+										, true );
+									}
 								}
 								else
 								{
@@ -15123,7 +14781,7 @@ statemachine class ACSShieldSpawner extends CGameplayEntity
 									{
 										shield_temp = (CEntityTemplate)LoadResource( 
 
-										"dlc\bob\data\items\weapons\shields\toussaint_shield_01_6_flat_color.w2ent"
+										"dlc\bob\data\items\weapons\shields\toussaint_shield_03_7_dun_tynne.w2ent"
 										
 										, true );
 									}
@@ -15133,135 +14791,103 @@ statemachine class ACSShieldSpawner extends CGameplayEntity
 										{
 											shield_temp = (CEntityTemplate)LoadResource( 
 
-											"dlc\bob\data\items\weapons\shields\toussaint_shield_02_7_flat_color.w2ent"
+											"dlc\bob\data\items\weapons\shields\toussaint_shield_01_6_flat_color.w2ent"
 											
 											, true );
 										}
 										else
 										{
-											shield_temp = (CEntityTemplate)LoadResource( 
+											if( RandF() < 0.5 )
+											{
+												shield_temp = (CEntityTemplate)LoadResource( 
 
-											"dlc\bob\data\items\weapons\shields\toussaint_shield_03_6_flat_color.w2ent"
-											
-											, true );
+												"dlc\bob\data\items\weapons\shields\toussaint_shield_02_7_flat_color.w2ent"
+												
+												, true );
+											}
+											else
+											{
+												shield_temp = (CEntityTemplate)LoadResource( 
+
+												"dlc\bob\data\items\weapons\shields\toussaint_shield_03_6_flat_color.w2ent"
+												
+												, true );
+											}
 										}
 									}
 								}
 							}
 						}
-					}
-					else if (StrContains( actor.GetReadableName(), "wildhunt" ) )
-					{
-						shield_temp = (CEntityTemplate)LoadResource( 
+						else if (StrContains( actor.GetReadableName(), "wildhunt" ) )
+						{
+							shield_temp = (CEntityTemplate)LoadResource( 
 
-						"items\weapons\unique\imlerith_shield\imlerith_shield_intact.w2ent"
-						
-						, true );
-					}
-					else 
-					{
-						if( RandF() < 0.5 )
+							"items\weapons\unique\imlerith_shield\imlerith_shield_intact.w2ent"
+							
+							, true );
+						}
+						else 
 						{
 							if( RandF() < 0.5 )
 							{
-								shield_temp = (CEntityTemplate)LoadResource( 
+								if( RandF() < 0.5 )
+								{
+									shield_temp = (CEntityTemplate)LoadResource( 
 
-								"items\weapons\shields\bandit_shield_01.w2ent"
-								
-								, true );
+									"items\weapons\shields\bandit_shield_01.w2ent"
+									
+									, true );
+								}
+								else
+								{
+									shield_temp = (CEntityTemplate)LoadResource( 
+
+									"items\weapons\shields\bandit_shield_02.w2ent"
+									
+									, true );
+								}	
 							}
 							else
 							{
-								shield_temp = (CEntityTemplate)LoadResource( 
-
-								"items\weapons\shields\bandit_shield_02.w2ent"
-								
-								, true );
-							}	
-						}
-						else
-						{
-							if( RandF() < 0.5 )
-							{
-								shield_temp = (CEntityTemplate)LoadResource( 
+								if( RandF() < 0.5 )
+								{
+									shield_temp = (CEntityTemplate)LoadResource( 
+							
+									"items\weapons\shields\bandit_shield_03.w2ent"
+									
+									, true );
+								}
+								else
+								{
+									shield_temp = (CEntityTemplate)LoadResource( 
 						
-								"items\weapons\shields\bandit_shield_03.w2ent"
-								
-								, true );
-							}
-							else
-							{
-								shield_temp = (CEntityTemplate)LoadResource( 
-					
-								"items\weapons\shields\bandit_shield_04.w2ent"
-								
-								, true );
+									"items\weapons\shields\bandit_shield_04.w2ent"
+									
+									, true );
+								}
 							}
 						}
+						
+						shield = (CEntity)theGame.CreateEntity( shield_temp, GetWitcherPlayer().GetWorldPosition() + Vector( 0, 0, -20 ) );
+
+						//shield.CreateAttachment( actor, 'l_weapon', Vector(0,0,-0.5), EulerAngles(0,0,0) );
+
+						shield.CreateAttachment( this, , Vector(0,0.0125,0), EulerAngles(0,0,0) );
+
+						shield.PlayEffectSingle('aard_cone_hit');
+						shield.PlayEffectSingle('igni_cone_hit');
+						shield.PlayEffectSingle('heavy_block');
+						shield.PlayEffectSingle('light_block');
+
+						shield.DestroyAfter(300);
+
+						shield.AddTag('ACS_ShieldSpawnerShield');
+
+						actor.AddTag('ACS_Shield_Attached');
+
+						this.AddTag('ACS_Shield_Activated');
 					}
-					
-					shield = (CEntity)theGame.CreateEntity( shield_temp, GetWitcherPlayer().GetWorldPosition() + Vector( 0, 0, -20 ) );
-
-					//shield.CreateAttachment( actor, 'l_weapon', Vector(0,0,-0.5), EulerAngles(0,0,0) );
-
-					shield.CreateAttachment( this, , Vector(0,0.0125,0), EulerAngles(0,0,0) );
-
-					shield.PlayEffectSingle('aard_cone_hit');
-					shield.PlayEffectSingle('igni_cone_hit');
-					shield.PlayEffectSingle('heavy_block');
-					shield.PlayEffectSingle('light_block');
-
-					shield.DestroyAfter(300);
-
-					shield.AddTag('ACS_ShieldSpawnerShield');
-
-					actor.AddTag('ACS_Shield_Attached');
 				}
-			}
-			else
-			{
-				this.BreakAttachment();
-
-				//shield.BreakAttachment();
-
-				this.AddTimer( 'DropShield', 0.0001, true );
-
-				this.RemoveTimer( 'NPCCheckTimer' );
-
-				this.DestroyAfter(30);
-			}
-		}
-	}
-
-	timer function DropShield ( dt : float, id : int)
-	{
-		var destpos : Vector;
-
-		this.BreakAttachment();
-
-		this.RemoveTimer( 'NPCCheckTimer' );
-
-		if (thePlayer.IsInInterior()
-		|| GetWitcherPlayer().IsInDarkPlace()
-		)
-		{
-			destpos = this.GetWorldPosition();
-
-			destpos.Z -= 1;
-		}
-		else
-		{
-			destpos = ACSPlayerFixZAxis(this.GetWorldPosition());
-		}
-
-		if(this.GetWorldPosition() != destpos )
-		{
-			this.Teleport( LerpV(this.GetWorldPosition(), destpos, progres) );
-			progres += 0.00075/theGame.GetTimeScale();
-		
-			if(progres >= 1)
-			{
-				RemoveTimer( 'DropShield' );
 			}
 		}
 	}
@@ -15353,6 +14979,8 @@ class ACSHumanDeathCrawlController extends CEntity
 	
 	event OnSpawned( spawnData : SEntitySpawnData )
 	{
+		super.OnSpawned(spawnData);
+
 		AddTimer('AliveCheckTimer', 0.1, true);
 	}
 	
@@ -15563,12 +15191,12 @@ class ACSHumanDeathCrawlController extends CEntity
 							actor.RemoveTag('ACS_witcher_npc');
 						}
 
-						if (GetWitcherPlayer().HasTag('vampire_claws_equipped')
-						|| GetWitcherPlayer().HasTag('aard_sword_equipped')
-						|| GetWitcherPlayer().HasTag('aard_secondary_sword_equipped')
-						|| GetWitcherPlayer().HasTag('yrden_sword_equipped')
-						|| GetWitcherPlayer().HasTag('yrden_secondary_sword_equipped')
-						|| GetWitcherPlayer().HasTag('quen_secondary_sword_equipped'))
+						if (GetWitcherPlayer().HasTag('acs_vampire_claws_equipped')
+						|| GetWitcherPlayer().HasTag('acs_aard_sword_equipped')
+						|| GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped')
+						|| GetWitcherPlayer().HasTag('acs_yrden_sword_equipped')
+						|| GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped')
+						|| GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped'))
 						{
 							if (actor.HasTag('ACS_Final_Fear_Stack'))
 							{
@@ -16025,14 +15653,6 @@ statemachine class cACS_Ciri_Special_Attack extends CEntity
 	}
 }
 
-function ACSCiriSpecialSphere() : CEntity
-{
-	var entity 			 : CEntity;
-	
-	entity = (CEntity)theGame.GetEntityByTag( 'ACS_Ciri_Special_Attack_Sphere' );
-	return entity;
-}
-
 state ACS_Ciri_Special_Attack_Engage in cACS_Ciri_Special_Attack
 {
 	private var actorVictims															: array<CActor>;
@@ -16061,7 +15681,7 @@ state ACS_Ciri_Special_Attack_Engage in cACS_Ciri_Special_Attack
 	
 	entry function Ciri_Special_Attack_Entry()
 	{
-		ACS_Ciri_Special_Attack_Sphere_Destroy();
+		ACSGetCEntityDestroyAll('ACS_Ciri_Special_Attack_Sphere');
 
 		specialAttackEffectTemplate = (CEntityTemplate)LoadResourceAsync('special_attack_ciri');
 
@@ -17036,21 +16656,6 @@ state ACS_Ciri_Spectre_Dodge_Right_Engage in cACS_Ciri_Special_Attack
 	}
 }
 
-function ACS_Ciri_Special_Attack_Sphere_Destroy()
-{	
-	var ents 											: array<CEntity>;
-	var i												: int;
-	
-	ents.Clear();
-
-	theGame.GetEntitiesByTag( 'ACS_Ciri_Special_Attack_Sphere', ents );	
-	
-	for( i = 0; i < ents.Size(); i += 1 )
-	{
-		ents[i].Destroy();
-	}
-}
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 statemachine class cACS_Spawn_Transformation_Werewolf
@@ -17078,7 +16683,7 @@ state Spawn_Transformation_Werewolf_Engage in cACS_Spawn_Transformation_Werewolf
 	event OnEnterState(prevStateName : name)
 	{
 		super.OnEnterState(prevStateName);
-		GetACSTransformationWerewolf().Destroy();
+		ACSGetCActor('ACS_Transformation_Werewolf').Destroy();
 		Spawn_Transformation_Werewolf_Entry();
 	}
 	
@@ -17190,14 +16795,6 @@ state Spawn_Transformation_Werewolf_Engage in cACS_Spawn_Transformation_Werewolf
 	}
 }
 
-function GetACSTransformationWerewolf() : CActor
-{
-	var entity 			 : CActor;
-	
-	entity = (CActor)theGame.GetEntityByTag( 'ACS_Transformation_Werewolf' );
-	return entity;
-}
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 statemachine class cACS_Spawn_Transformation_Red_Miasmal
@@ -17230,7 +16827,7 @@ state Spawn_Transformation_Red_Miasmal_Engage in cACS_Spawn_Transformation_Red_M
 	event OnEnterState(prevStateName : name)
 	{
 		super.OnEnterState(prevStateName);
-		GetACSTransformationRedMiasmal().Destroy();
+		ACSGetCActor('ACS_Transformation_Red_Miasmal').Destroy();
 		Spawn_Transformation_Red_Miasmal_Entry();
 	}
 
@@ -17264,11 +16861,11 @@ state Spawn_Transformation_Red_Miasmal_Engage in cACS_Spawn_Transformation_Red_M
 
 		ent.AddTag('ACS_Transformation_Red_Miasmal');
 
-		GetACSTransformationRedMiasmal().PlayEffectSingle('evil_appear');
-		GetACSTransformationRedMiasmal().StopEffect('evil_appear');
+		ACSGetCActor('ACS_Transformation_Red_Miasmal').PlayEffectSingle('evil_appear');
+		ACSGetCActor('ACS_Transformation_Red_Miasmal').StopEffect('evil_appear');
 
-		GetACSTransformationRedMiasmal().PlayEffectSingle('appear');
-		GetACSTransformationRedMiasmal().StopEffect('appear');
+		ACSGetCActor('ACS_Transformation_Red_Miasmal').PlayEffectSingle('appear');
+		ACSGetCActor('ACS_Transformation_Red_Miasmal').StopEffect('appear');
 
 		GetACSWatcher().CamerasDestroy();
 
@@ -17300,27 +16897,27 @@ state ACS_RedMiasmalBehSwitch_Engage in cACS_Spawn_Transformation_Red_Miasmal
 
 	entry function Beh_Switch_Entry()
 	{
-		p_actor = GetACSTransformationRedMiasmal();
+		p_actor = ACSGetCActor('ACS_Transformation_Red_Miasmal');
 
 		p_comp = p_actor.GetComponentByClassName( 'CAppearanceComponent' );
 
-		if (!GetACSTransformationRedMiasmal().HasTag('ACS_Red_Miasmal_Giant_Mode'))
+		if (!ACSGetCActor('ACS_Transformation_Red_Miasmal').HasTag('ACS_Red_Miasmal_Giant_Mode'))
 		{
-			if ( GetACSTransformationRedMiasmal().GetBehaviorGraphInstanceName() != 'Combat_Giant' )
+			if ( ACSGetCActor('ACS_Transformation_Red_Miasmal').GetBehaviorGraphInstanceName() != 'Combat_Giant' )
 			{
-				GetACSTransformationRedMiasmal().ActivateAndSyncBehavior( 'Combat_Giant' );
+				ACSGetCActor('ACS_Transformation_Red_Miasmal').ActivateAndSyncBehavior( 'Combat_Giant' );
 			}
 
-			GetACSTransformationRedMiasmal().AddTag('ACS_Red_Miasmal_Giant_Mode');
+			ACSGetCActor('ACS_Transformation_Red_Miasmal').AddTag('ACS_Red_Miasmal_Giant_Mode');
 		}
 		else
 		{
-			if ( GetACSTransformationRedMiasmal().GetBehaviorGraphInstanceName() != 'Exploration' )
+			if ( ACSGetCActor('ACS_Transformation_Red_Miasmal').GetBehaviorGraphInstanceName() != 'Exploration' )
 			{
-				GetACSTransformationRedMiasmal().ActivateAndSyncBehavior( 'Exploration' );
+				ACSGetCActor('ACS_Transformation_Red_Miasmal').ActivateAndSyncBehavior( 'Exploration' );
 			}
 
-			GetACSTransformationRedMiasmal().RemoveTag('ACS_Red_Miasmal_Giant_Mode');
+			ACSGetCActor('ACS_Transformation_Red_Miasmal').RemoveTag('ACS_Red_Miasmal_Giant_Mode');
 		}
 	}
 	
@@ -17328,14 +16925,6 @@ state ACS_RedMiasmalBehSwitch_Engage in cACS_Spawn_Transformation_Red_Miasmal
 	{
 		super.OnLeaveState(nextStateName);
 	}
-}
-
-function GetACSTransformationRedMiasmal() : CActor
-{
-	var entity 			 : CActor;
-	
-	entity = (CActor)theGame.GetEntityByTag( 'ACS_Transformation_Red_Miasmal' );
-	return entity;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -17370,7 +16959,7 @@ state Spawn_Transformation_Sharley_Engage in cACS_Spawn_Transformation_Sharley
 	event OnEnterState(prevStateName : name)
 	{
 		super.OnEnterState(prevStateName);
-		GetACSTransformationSharley().Destroy();
+		ACSGetCActor('ACS_Transformation_Sharley').Destroy();
 		Spawn_Transformation_Sharley_Entry();
 	}
 
@@ -17404,16 +16993,16 @@ state Spawn_Transformation_Sharley_Engage in cACS_Spawn_Transformation_Sharley
 
 		ent.AddTag('ACS_Transformation_Sharley');
 
-		GetACSTransformationSharley().PlayEffectSingle('spawn_drop');
-		GetACSTransformationSharley().StopEffect('spawn_drop');
+		ACSGetCActor('ACS_Transformation_Sharley').PlayEffectSingle('spawn_drop');
+		ACSGetCActor('ACS_Transformation_Sharley').StopEffect('spawn_drop');
 
-		GetACSTransformationSharley().PlayEffectSingle('smoke_throw_screen');
-		GetACSTransformationSharley().StopEffect('smoke_throw_screen');
+		ACSGetCActor('ACS_Transformation_Sharley').PlayEffectSingle('smoke_throw_screen');
+		ACSGetCActor('ACS_Transformation_Sharley').StopEffect('smoke_throw_screen');
 
-		GetACSTransformationSharley().PlayEffectSingle('tremor_start_2');
-		GetACSTransformationSharley().StopEffect('tremor_start_2');
+		ACSGetCActor('ACS_Transformation_Sharley').PlayEffectSingle('tremor_start_2');
+		ACSGetCActor('ACS_Transformation_Sharley').StopEffect('tremor_start_2');
 
-		GetACSTransformationSharley().PlayEffectSingle('glow');
+		ACSGetCActor('ACS_Transformation_Sharley').PlayEffectSingle('glow');
 
 		GetACSWatcher().CamerasDestroy();
 
@@ -17453,19 +17042,19 @@ state Sharley_Shockwave_Engage in cACS_Spawn_Transformation_Sharley
 
 	entry function Sharley_Shockwave_Entry()
 	{
-		position = GetACSTransformationSharley().GetWorldPosition() + (GetACSTransformationSharley().GetWorldForward() * 1.1) + GetACSTransformationSharley().GetHeadingVector() * 1.1;
+		position = ACSGetCActor('ACS_Transformation_Sharley').GetWorldPosition() + (ACSGetCActor('ACS_Transformation_Sharley').GetWorldForward() * 1.1) + ACSGetCActor('ACS_Transformation_Sharley').GetHeadingVector() * 1.1;
 		
-		targetPosition_1 = position + GetACSTransformationSharley().GetHeadingVector() * 30;
+		targetPosition_1 = position + ACSGetCActor('ACS_Transformation_Sharley').GetHeadingVector() * 30;
 
 		actors.Clear();
 
-		actors = GetACSTransformationSharley().GetNPCsAndPlayersInCone(5, VecHeading(GetACSTransformationSharley().GetHeadingVector()), 360, 20, , FLAG_ExcludePlayer + FLAG_OnlyAliveActors );
+		actors = ACSGetCActor('ACS_Transformation_Sharley').GetNPCsAndPlayersInCone(5, VecHeading(ACSGetCActor('ACS_Transformation_Sharley').GetHeadingVector()), 360, 20, , FLAG_ExcludePlayer + FLAG_OnlyAliveActors );
 	
 		for( i = 0; i < actors.Size(); i += 1 )
 		{
 			actortarget = (CActor)actors[i];
 
-			if (actortarget == GetACSTransformationSharley()
+			if (actortarget == ACSGetCActor('ACS_Transformation_Sharley')
 			|| actortarget.HasTag('acs_snow_entity')
 			|| actortarget.HasTag('smokeman') 
 			|| actortarget.HasTag('ACS_Tentacle_1') 
@@ -17535,14 +17124,6 @@ state Sharley_Shockwave_Engage in cACS_Spawn_Transformation_Sharley
 	}
 }
 
-function GetACSTransformationSharley() : CActor
-{
-	var entity 			 : CActor;
-	
-	entity = (CActor)theGame.GetEntityByTag( 'ACS_Transformation_Sharley' );
-	return entity;
-}
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 statemachine class cACS_Spawn_Transformation_Black_Wolf
@@ -17575,7 +17156,7 @@ state Spawn_Transformation_Black_Wolf_Engage in cACS_Spawn_Transformation_Black_
 	event OnEnterState(prevStateName : name)
 	{
 		super.OnEnterState(prevStateName);
-		GetACSTransformationBlackWolf().Destroy();
+		ACSGetCActor('ACS_Transformation_Black_Wolf').Destroy();
 		Spawn_Transformation_Black_Wolf_Entry();
 	}
 	
@@ -17615,19 +17196,19 @@ state Spawn_Transformation_Black_Wolf_Engage in cACS_Spawn_Transformation_Black_
 
 		//GetACSWatcher().ACSTransformBlackWolfPlayAnim('wolf_howling_loop', 0.25f, 0.25f);
 
-		//GetACSTransformationBlackWolf().PlayEffectSingle('critical_burning_red_alt');
+		//ACSGetCActor('ACS_Transformation_Black_Wolf').PlayEffectSingle('critical_burning_red_alt');
 
-		//GetACSTransformationBlackWolf().PlayEffectSingle('critical_burning_red_alt_2');
+		//ACSGetCActor('ACS_Transformation_Black_Wolf').PlayEffectSingle('critical_burning_red_alt_2');
 
-		GetACSTransformationBlackWolf().PlayEffectSingle('shadow_form');
+		ACSGetCActor('ACS_Transformation_Black_Wolf').PlayEffectSingle('shadow_form');
 
-		GetACSTransformationBlackWolf().PlayEffectSingle('demonic_posession');
+		ACSGetCActor('ACS_Transformation_Black_Wolf').PlayEffectSingle('demonic_posession');
 
-		GetACSTransformationBlackWolf().PlayEffectSingle('fire_breath');
-		GetACSTransformationBlackWolf().StopEffect('fire_breath');
+		ACSGetCActor('ACS_Transformation_Black_Wolf').PlayEffectSingle('fire_breath');
+		ACSGetCActor('ACS_Transformation_Black_Wolf').StopEffect('fire_breath');
 
-		GetACSTransformationBlackWolf().PlayEffectSingle('shadows_form');
-		GetACSTransformationBlackWolf().StopEffect('shadows_form');
+		ACSGetCActor('ACS_Transformation_Black_Wolf').PlayEffectSingle('shadows_form');
+		ACSGetCActor('ACS_Transformation_Black_Wolf').StopEffect('shadows_form');
 
 		GetACSWatcher().CamerasDestroy();
 
@@ -17667,19 +17248,19 @@ state Sharley_Shockwave_Engage in cACS_Spawn_Transformation_Black_Wolf
 
 	entry function Sharley_Shockwave_Entry()
 	{
-		position = GetACSTransformationSharley().GetWorldPosition() + (GetACSTransformationSharley().GetWorldForward() * 1.1) + GetACSTransformationSharley().GetHeadingVector() * 1.1;
+		position = ACSGetCActor('ACS_Transformation_Sharley').GetWorldPosition() + (ACSGetCActor('ACS_Transformation_Sharley').GetWorldForward() * 1.1) + ACSGetCActor('ACS_Transformation_Sharley').GetHeadingVector() * 1.1;
 		
-		targetPosition_1 = position + GetACSTransformationSharley().GetHeadingVector() * 30;
+		targetPosition_1 = position + ACSGetCActor('ACS_Transformation_Sharley').GetHeadingVector() * 30;
 
 		actors.Clear();
 
-		actors = GetACSTransformationSharley().GetNPCsAndPlayersInCone(5, VecHeading(GetACSTransformationSharley().GetHeadingVector()), 360, 20, , FLAG_ExcludePlayer + FLAG_OnlyAliveActors );
+		actors = ACSGetCActor('ACS_Transformation_Sharley').GetNPCsAndPlayersInCone(5, VecHeading(ACSGetCActor('ACS_Transformation_Sharley').GetHeadingVector()), 360, 20, , FLAG_ExcludePlayer + FLAG_OnlyAliveActors );
 	
 		for( i = 0; i < actors.Size(); i += 1 )
 		{
 			actortarget = (CActor)actors[i];
 
-			if (actortarget == GetACSTransformationSharley()
+			if (actortarget == ACSGetCActor('ACS_Transformation_Sharley')
 			|| actortarget.HasTag('acs_snow_entity')
 			|| actortarget.HasTag('smokeman') 
 			|| actortarget.HasTag('ACS_Tentacle_1') 
@@ -17749,14 +17330,6 @@ state Sharley_Shockwave_Engage in cACS_Spawn_Transformation_Black_Wolf
 	}
 }
 
-function GetACSTransformationBlackWolf() : CActor
-{
-	var entity 			 : CActor;
-	
-	entity = (CActor)theGame.GetEntityByTag( 'ACS_Transformation_Black_Wolf' );
-	return entity;
-}
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 statemachine class cACS_Transformation_Toad
@@ -17809,7 +17382,7 @@ state Spawn_Transformation_Toad_Engage in cACS_Transformation_Toad
 	event OnEnterState(prevStateName : name)
 	{
 		super.OnEnterState(prevStateName);
-		GetACSTransformationToad().Destroy();
+		ACSGetCActor('ACS_Transformation_Toad').Destroy();
 		Spawn_Transformation_Toad_Entry();
 	}
 
@@ -17890,11 +17463,11 @@ state Transformation_Toad_Single_Projectile_Engage in cACS_Transformation_Toad
 		var actors									: array<CActor>;
 		var i 										: int;
 
-		initpos = GetACSTransformationToad().GetWorldPosition() + GetACSTransformationToad().GetWorldForward() * 2;
+		initpos = ACSGetCActor('ACS_Transformation_Toad').GetWorldPosition() + ACSGetCActor('ACS_Transformation_Toad').GetWorldForward() * 2;
 
 		initpos.Z += 1.5;
 
-		rotation = GetACSTransformationToad().GetWorldRotation();
+		rotation = ACSGetCActor('ACS_Transformation_Toad').GetWorldRotation();
 
 		if (thePlayer.GetDisplayTarget())
 		{
@@ -17902,7 +17475,7 @@ state Transformation_Toad_Single_Projectile_Engage in cACS_Transformation_Toad
 		}
 		else
 		{
-			targetPosition = GetACSTransformationToad().GetWorldPosition() + GetACSTransformationToad().GetWorldForward() * 50;
+			targetPosition = ACSGetCActor('ACS_Transformation_Toad').GetWorldPosition() + ACSGetCActor('ACS_Transformation_Toad').GetWorldForward() * 50;
 		}
 
 		proj = (CACSTransformationToadPoisonProjectile)theGame.CreateEntity( 
@@ -17932,15 +17505,15 @@ state Transformation_Toad_Mortar_Projectile1_Engage in cACS_Transformation_Toad
 		var actors									: array<CActor>;
 		var i 										: int;
 
-		//initpos = GetACSTransformationToad().GetBoneWorldPosition();
+		//initpos = ACSGetCActor('ACS_Transformation_Toad').GetBoneWorldPosition();
 
-		GetACSTransformationToad().GetBoneWorldPositionAndRotationByIndex( GetACSTransformationToad().GetBoneIndex( 'r_torso_helper_04' ), bone_vec, bone_rot );
+		ACSGetCActor('ACS_Transformation_Toad').GetBoneWorldPositionAndRotationByIndex( ACSGetCActor('ACS_Transformation_Toad').GetBoneIndex( 'r_torso_helper_04' ), bone_vec, bone_rot );
 
 		initpos = bone_vec;
 
 		initpos.Z += 0.5;
 
-		rotation = GetACSTransformationToad().GetWorldRotation();
+		rotation = ACSGetCActor('ACS_Transformation_Toad').GetWorldRotation();
 
 		if (thePlayer.GetDisplayTarget())
 		{
@@ -17948,7 +17521,7 @@ state Transformation_Toad_Mortar_Projectile1_Engage in cACS_Transformation_Toad
 		}
 		else
 		{
-			targetPosition = GetACSTransformationToad().GetWorldPosition() + GetACSTransformationToad().GetWorldForward() * 50;
+			targetPosition = ACSGetCActor('ACS_Transformation_Toad').GetWorldPosition() + ACSGetCActor('ACS_Transformation_Toad').GetWorldForward() * 50;
 		}
 
 		proj = (CACSTransformationToadSpawnMultipleEntitiesPoisonProjectile)theGame.CreateEntity( 
@@ -17974,7 +17547,7 @@ state Transformation_Toad_Mortar_Projectile1_Engage in cACS_Transformation_Toad
 		}
 		else
 		{
-			targetPos = GetACSTransformationToad().GetWorldPosition() + GetACSTransformationToad().GetWorldForward() * 50;
+			targetPos = ACSGetCActor('ACS_Transformation_Toad').GetWorldPosition() + ACSGetCActor('ACS_Transformation_Toad').GetWorldForward() * 50;
 		}
 
 		randVec = VecRingRand( 2, 6 );
@@ -18003,15 +17576,15 @@ state Transformation_Toad_Mortar_Projectile2_Engage in cACS_Transformation_Toad
 		var actors									: array<CActor>;
 		var i 										: int;
 
-		//initpos = GetACSTransformationToad().GetBoneWorldPosition();
+		//initpos = ACSGetCActor('ACS_Transformation_Toad').GetBoneWorldPosition();
 
-		GetACSTransformationToad().GetBoneWorldPositionAndRotationByIndex( GetACSTransformationToad().GetBoneIndex( 'l_torso_helper_04' ), bone_vec, bone_rot );
+		ACSGetCActor('ACS_Transformation_Toad').GetBoneWorldPositionAndRotationByIndex( ACSGetCActor('ACS_Transformation_Toad').GetBoneIndex( 'l_torso_helper_04' ), bone_vec, bone_rot );
 
 		initpos = bone_vec;
 
 		initpos.Z += 0.5;
 
-		rotation = GetACSTransformationToad().GetWorldRotation();
+		rotation = ACSGetCActor('ACS_Transformation_Toad').GetWorldRotation();
 
 		if (thePlayer.GetDisplayTarget())
 		{
@@ -18019,7 +17592,7 @@ state Transformation_Toad_Mortar_Projectile2_Engage in cACS_Transformation_Toad
 		}
 		else
 		{
-			targetPosition = GetACSTransformationToad().GetWorldPosition() + GetACSTransformationToad().GetWorldForward() * 50;
+			targetPosition = ACSGetCActor('ACS_Transformation_Toad').GetWorldPosition() + ACSGetCActor('ACS_Transformation_Toad').GetWorldForward() * 50;
 		}
 
 		proj = (CACSTransformationToadSpawnMultipleEntitiesPoisonProjectile)theGame.CreateEntity( 
@@ -18045,7 +17618,7 @@ state Transformation_Toad_Mortar_Projectile2_Engage in cACS_Transformation_Toad
 		}
 		else
 		{
-			targetPos = GetACSTransformationToad().GetWorldPosition() + GetACSTransformationToad().GetWorldForward() * 50;
+			targetPos = ACSGetCActor('ACS_Transformation_Toad').GetWorldPosition() + ACSGetCActor('ACS_Transformation_Toad').GetWorldForward() * 50;
 		}
 
 		randVec = VecRingRand( 2, 6 );
@@ -18074,15 +17647,15 @@ state Transformation_Toad_Mortar_Projectile3_Engage in cACS_Transformation_Toad
 		var actors									: array<CActor>;
 		var i 										: int;
 
-		//initpos = GetACSTransformationToad().GetBoneWorldPosition();
+		//initpos = ACSGetCActor('ACS_Transformation_Toad').GetBoneWorldPosition();
 
-		GetACSTransformationToad().GetBoneWorldPositionAndRotationByIndex( GetACSTransformationToad().GetBoneIndex( 'r_torso_helper_05' ), bone_vec, bone_rot );
+		ACSGetCActor('ACS_Transformation_Toad').GetBoneWorldPositionAndRotationByIndex( ACSGetCActor('ACS_Transformation_Toad').GetBoneIndex( 'r_torso_helper_05' ), bone_vec, bone_rot );
 
 		initpos = bone_vec;
 
 		initpos.Z += 0.5;
 
-		rotation = GetACSTransformationToad().GetWorldRotation();
+		rotation = ACSGetCActor('ACS_Transformation_Toad').GetWorldRotation();
 
 		if (thePlayer.GetDisplayTarget())
 		{
@@ -18090,7 +17663,7 @@ state Transformation_Toad_Mortar_Projectile3_Engage in cACS_Transformation_Toad
 		}
 		else
 		{
-			targetPosition = GetACSTransformationToad().GetWorldPosition() + GetACSTransformationToad().GetWorldForward() * 50;
+			targetPosition = ACSGetCActor('ACS_Transformation_Toad').GetWorldPosition() + ACSGetCActor('ACS_Transformation_Toad').GetWorldForward() * 50;
 		}
 
 		proj = (CACSTransformationToadSpawnMultipleEntitiesPoisonProjectile)theGame.CreateEntity( 
@@ -18116,7 +17689,7 @@ state Transformation_Toad_Mortar_Projectile3_Engage in cACS_Transformation_Toad
 		}
 		else
 		{
-			targetPos = GetACSTransformationToad().GetWorldPosition() + GetACSTransformationToad().GetWorldForward() * 50;
+			targetPos = ACSGetCActor('ACS_Transformation_Toad').GetWorldPosition() + ACSGetCActor('ACS_Transformation_Toad').GetWorldForward() * 50;
 		}
 
 		randVec = VecRingRand( 2, 6 );
@@ -18145,15 +17718,15 @@ state Transformation_Toad_Mortar_Projectile4_Engage in cACS_Transformation_Toad
 		var actors									: array<CActor>;
 		var i 										: int;
 
-		//initpos = GetACSTransformationToad().GetBoneWorldPosition();
+		//initpos = ACSGetCActor('ACS_Transformation_Toad').GetBoneWorldPosition();
 
-		GetACSTransformationToad().GetBoneWorldPositionAndRotationByIndex( GetACSTransformationToad().GetBoneIndex( 'l_torso_helper_05' ), bone_vec, bone_rot );
+		ACSGetCActor('ACS_Transformation_Toad').GetBoneWorldPositionAndRotationByIndex( ACSGetCActor('ACS_Transformation_Toad').GetBoneIndex( 'l_torso_helper_05' ), bone_vec, bone_rot );
 
 		initpos = bone_vec;
 
 		initpos.Z += 0.5;
 
-		rotation = GetACSTransformationToad().GetWorldRotation();
+		rotation = ACSGetCActor('ACS_Transformation_Toad').GetWorldRotation();
 
 		if (thePlayer.GetDisplayTarget())
 		{
@@ -18161,7 +17734,7 @@ state Transformation_Toad_Mortar_Projectile4_Engage in cACS_Transformation_Toad
 		}
 		else
 		{
-			targetPosition = GetACSTransformationToad().GetWorldPosition() + GetACSTransformationToad().GetWorldForward() * 50;
+			targetPosition = ACSGetCActor('ACS_Transformation_Toad').GetWorldPosition() + ACSGetCActor('ACS_Transformation_Toad').GetWorldForward() * 50;
 		}
 
 		proj = (CACSTransformationToadSpawnMultipleEntitiesPoisonProjectile)theGame.CreateEntity( 
@@ -18187,7 +17760,7 @@ state Transformation_Toad_Mortar_Projectile4_Engage in cACS_Transformation_Toad
 		}
 		else
 		{
-			targetPos = GetACSTransformationToad().GetWorldPosition() + GetACSTransformationToad().GetWorldForward() * 50;
+			targetPos = ACSGetCActor('ACS_Transformation_Toad').GetWorldPosition() + ACSGetCActor('ACS_Transformation_Toad').GetWorldForward() * 50;
 		}
 
 		randVec = VecRingRand( 2, 6 );
@@ -18196,14 +17769,6 @@ state Transformation_Toad_Mortar_Projectile4_Engage in cACS_Transformation_Toad
 
 		return outPos;
 	}
-}
-
-function GetACSTransformationToad() : CActor
-{
-	var entity 			 : CActor;
-	
-	entity = (CActor)theGame.GetEntityByTag( 'ACS_Transformation_Toad' );
-	return entity;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -18261,7 +17826,7 @@ state Spawn_Transformation_Vampire_Monster_Engage in cACS_Transformation_Vampire
 	event OnEnterState(prevStateName : name)
 	{
 		super.OnEnterState(prevStateName);
-		GetACSTransformationVampireMonster().Destroy();
+		ACSGetCActor('ACS_Transformation_Vampire_Monster').Destroy();
 		Spawn_Transformation_Vampire_Monster_Entry();
 	}
 
@@ -18364,7 +17929,7 @@ state ACS_VampireMonsterBehSwitch_Engage in cACS_Transformation_Vampire_Monster
 
 	entry function Beh_Switch_Entry()
 	{
-		p_actor = GetACSTransformationVampireMonster();
+		p_actor = ACSGetCActor('ACS_Transformation_Vampire_Monster');
 
 		p_comp = p_actor.GetComponentByClassName( 'CAppearanceComponent' );
 
@@ -18380,30 +17945,30 @@ state ACS_VampireMonsterBehSwitch_Engage in cACS_Transformation_Vampire_Monster
 		GetACSWatcher().RemoveTimer('TransformationVampireMonsterLDashEnd');
 		GetACSWatcher().RemoveTimer('TransformationVampireMonsterRDashEnd');
 
-		GetACSTransformationVampireMonster().SetVisibility(true);
+		ACSGetCActor('ACS_Transformation_Vampire_Monster').SetVisibility(true);
 
 		GetACSWatcher().ACSVampireMonsterRemoveMoveTimers();
 
-		if (GetACSTransformationVampireMonster().HasTag('ACS_Vampire_Monster_Ground_Mode'))
+		if (ACSGetCActor('ACS_Transformation_Vampire_Monster').HasTag('ACS_Vampire_Monster_Ground_Mode'))
 		{
-			if ( GetACSTransformationVampireMonster().GetBehaviorGraphInstanceName() != 'DettlaffFlight' )
+			if ( ACSGetCActor('ACS_Transformation_Vampire_Monster').GetBehaviorGraphInstanceName() != 'DettlaffFlight' )
 			{
-				GetACSTransformationVampireMonster().ActivateAndSyncBehavior( 'DettlaffFlight' );
+				ACSGetCActor('ACS_Transformation_Vampire_Monster').ActivateAndSyncBehavior( 'DettlaffFlight' );
 			}
 
 			thePlayer.BreakAttachment();
-			//thePlayer.CreateAttachment( GetACSTransformationVampireMonsterCameraDummy(), 'fx_point', Vector( 0, -2, 0 ), EulerAngles(0,90,0) );
+			//thePlayer.CreateAttachment( ACSGetCEntity('ACS_Transformation_Vampire_Monster_Camera_Dummy'), 'fx_point', Vector( 0, -2, 0 ), EulerAngles(0,90,0) );
 
 			GetACSWatcher().AddTimer('TransformationVampireMonsterHeavyAttackDamageBlast', 0.5, false);
 
 			//GetWitcherPlayer().PlayEffectSingle('smoke_explosion');
 			//GetWitcherPlayer().StopEffect('smoke_explosion');
 
-			GetACSTransformationVampireMonster().DestroyEffect('dive_smoke');
-			GetACSTransformationVampireMonster().PlayEffectSingle('dive_smoke');
-			GetACSTransformationVampireMonster().StopEffect('dive_smoke');
+			ACSGetCActor('ACS_Transformation_Vampire_Monster').DestroyEffect('dive_smoke');
+			ACSGetCActor('ACS_Transformation_Vampire_Monster').PlayEffectSingle('dive_smoke');
+			ACSGetCActor('ACS_Transformation_Vampire_Monster').StopEffect('dive_smoke');
 
-			//GetACSTransformationVampireMonster().PlayEffectSingle('wing_trail');
+			//ACSGetCActor('ACS_Transformation_Vampire_Monster').PlayEffectSingle('wing_trail');
 
 			GetACSWatcher().ACSTransformVampireMonsterPlayAnim('dettlaff_fly_phase2_start', 0.0125f, 0.25f);
 
@@ -18411,29 +17976,29 @@ state ACS_VampireMonsterBehSwitch_Engage in cACS_Transformation_Vampire_Monster
 
 			GetACSWatcher().AddTimer('ACS_Transformation_Vampire_Monster_Delay_Flight_Controls', 2, false);
 
-			GetACSTransformationVampireMonster().AddTag('ACS_Vampire_Monster_Flight_Mode');
+			ACSGetCActor('ACS_Transformation_Vampire_Monster').AddTag('ACS_Vampire_Monster_Flight_Mode');
 
-			GetACSTransformationVampireMonster().RemoveTag('ACS_Vampire_Monster_Ground_Mode');
+			ACSGetCActor('ACS_Transformation_Vampire_Monster').RemoveTag('ACS_Vampire_Monster_Ground_Mode');
 		}
 		else
 		{
-			if ( GetACSTransformationVampireMonster().GetBehaviorGraphInstanceName() != 'DettlaffMinion' )
+			if ( ACSGetCActor('ACS_Transformation_Vampire_Monster').GetBehaviorGraphInstanceName() != 'DettlaffMinion' )
 			{
-				GetACSTransformationVampireMonster().ActivateAndSyncBehavior( 'DettlaffMinion' );
+				ACSGetCActor('ACS_Transformation_Vampire_Monster').ActivateAndSyncBehavior( 'DettlaffMinion' );
 			}
 
 			GetACSWatcher().AddTimer('TransformationVampireMonsterHeavyAttackDamageBlast', 1, false);
 
 			thePlayer.BreakAttachment();
-			thePlayer.CreateAttachment( GetACSTransformationVampireMonster(), 'Trajectory' , Vector( 0, 0, 0.5 ), EulerAngles(0,0,0) );
+			thePlayer.CreateAttachment( ACSGetCActor('ACS_Transformation_Vampire_Monster'), 'Trajectory' , Vector( 0, 0, 0.5 ), EulerAngles(0,0,0) );
 
 			//GetWitcherPlayer().PlayEffectSingle('smoke_explosion');
 			//GetWitcherPlayer().StopEffect('smoke_explosion');
 
-			GetACSTransformationVampireMonster().DestroyEffect('start_effect');
-			GetACSTransformationVampireMonster().PlayEffectSingle('start_effect');
+			ACSGetCActor('ACS_Transformation_Vampire_Monster').DestroyEffect('start_effect');
+			ACSGetCActor('ACS_Transformation_Vampire_Monster').PlayEffectSingle('start_effect');
 
-			//GetACSTransformationVampireMonster().StopEffect('wing_trail');
+			//ACSGetCActor('ACS_Transformation_Vampire_Monster').StopEffect('wing_trail');
 
 			GetACSWatcher().ACSTransformVampireMonsterPlayAnim('dettlaff_construct_diving', 0.25f, 0.25f);
 
@@ -18441,17 +18006,17 @@ state ACS_VampireMonsterBehSwitch_Engage in cACS_Transformation_Vampire_Monster
 
 			GetACSWatcher().AddTimer('ACS_Transformation_Vampire_Monster_Delay_Cancel_Anim', 2, false);
 
-			GetACSTransformationVampireMonster().AddTag('ACS_Vampire_Monster_Ground_Mode');
+			ACSGetCActor('ACS_Transformation_Vampire_Monster').AddTag('ACS_Vampire_Monster_Ground_Mode');
 
-			GetACSTransformationVampireMonster().RemoveTag('ACS_Vampire_Monster_Flight_Mode');
+			ACSGetCActor('ACS_Transformation_Vampire_Monster').RemoveTag('ACS_Vampire_Monster_Flight_Mode');
 
-			vampRot = GetACSTransformationVampireMonster().GetWorldRotation();
+			vampRot = ACSGetCActor('ACS_Transformation_Vampire_Monster').GetWorldRotation();
 
 			adjustedRot = EulerAngles(0,0,0);
 
 			adjustedRot.Yaw = vampRot.Yaw;
 
-			GetACSTransformationVampireMonster().TeleportWithRotation(ACSFixZAxis(GetACSTransformationVampireMonster().GetWorldPosition()), adjustedRot);
+			ACSGetCActor('ACS_Transformation_Vampire_Monster').TeleportWithRotation(ACSFixZAxis(ACSGetCActor('ACS_Transformation_Vampire_Monster').GetWorldPosition()), adjustedRot);
 		}
 	}
 	
@@ -18471,39 +18036,39 @@ state ACS_VampireMonsterFastWalkSwitch_Engage in cACS_Transformation_Vampire_Mon
 
 	entry function Fast_Walk_Switch_Entry()
 	{
-		if (GetACSTransformationVampireMonster().HasTag('ACS_Vampire_Monster_Ground_Mode'))
+		if (ACSGetCActor('ACS_Transformation_Vampire_Monster').HasTag('ACS_Vampire_Monster_Ground_Mode'))
 		{
-			if ( GetACSTransformationVampireMonster().GetBehaviorGraphInstanceName() != 'DettlaffMinionFastWalk' )
+			if ( ACSGetCActor('ACS_Transformation_Vampire_Monster').GetBehaviorGraphInstanceName() != 'DettlaffMinionFastWalk' )
 			{
 				GetACSWatcher().ACSTransformVampireMonsterPlayAnim('dettlaff_weak_walk_forward', 0.875, 0.0125);
 
-				GetACSTransformationVampireMonster().SetVisibility(false);
+				ACSGetCActor('ACS_Transformation_Vampire_Monster').SetVisibility(false);
 
 				GetACSWatcher().RemoveTimer('Vampire_Monster_Reveal_Delay');
 
 				GetACSWatcher().AddTimer('Vampire_Monster_Reveal_Delay', 0.5, false);
 
-				GetACSTransformationVampireMonster().StopEffect('shadowdash_body_blood');
+				ACSGetCActor('ACS_Transformation_Vampire_Monster').StopEffect('shadowdash_body_blood');
 
-				GetACSTransformationVampireMonster().StopEffect('shadowdash_ground_blood');
+				ACSGetCActor('ACS_Transformation_Vampire_Monster').StopEffect('shadowdash_ground_blood');
 
-				GetACSTransformationVampireMonster().PlayEffectSingle('shadowdash_body_blood');
+				ACSGetCActor('ACS_Transformation_Vampire_Monster').PlayEffectSingle('shadowdash_body_blood');
 
-				GetACSTransformationVampireMonster().PlayEffectSingle('shadowdash_ground_blood');
+				ACSGetCActor('ACS_Transformation_Vampire_Monster').PlayEffectSingle('shadowdash_ground_blood');
 
-				GetACSTransformationVampireMonster().DestroyEffect('finisher_sparks');
+				ACSGetCActor('ACS_Transformation_Vampire_Monster').DestroyEffect('finisher_sparks');
 				
-				GetACSTransformationVampireMonster().PlayEffectSingle('finisher_sparks');
+				ACSGetCActor('ACS_Transformation_Vampire_Monster').PlayEffectSingle('finisher_sparks');
 
-				GetACSTransformationVampireMonster().DestroyEffect('body_blood_drip');
-				GetACSTransformationVampireMonster().PlayEffectSingle('body_blood_drip');
-				GetACSTransformationVampireMonster().StopEffect('body_blood_drip');
+				ACSGetCActor('ACS_Transformation_Vampire_Monster').DestroyEffect('body_blood_drip');
+				ACSGetCActor('ACS_Transformation_Vampire_Monster').PlayEffectSingle('body_blood_drip');
+				ACSGetCActor('ACS_Transformation_Vampire_Monster').StopEffect('body_blood_drip');
 
-				GetACSTransformationVampireMonster().DestroyEffect('comming_out');
-				GetACSTransformationVampireMonster().PlayEffectSingle('comming_out');
-				GetACSTransformationVampireMonster().StopEffect('comming_out');
+				ACSGetCActor('ACS_Transformation_Vampire_Monster').DestroyEffect('comming_out');
+				ACSGetCActor('ACS_Transformation_Vampire_Monster').PlayEffectSingle('comming_out');
+				ACSGetCActor('ACS_Transformation_Vampire_Monster').StopEffect('comming_out');
 
-				GetACSTransformationVampireMonster().ActivateAndSyncBehavior( 'DettlaffMinionFastWalk' );
+				ACSGetCActor('ACS_Transformation_Vampire_Monster').ActivateAndSyncBehavior( 'DettlaffMinionFastWalk' );
 			}
 		}
 	}
@@ -18524,45 +18089,45 @@ state ACS_VampireMonsterSlowWalkSwitch_Engage in cACS_Transformation_Vampire_Mon
 	
 	entry function Slow_Walk_Switch_Entry()
 	{
-		if (GetACSTransformationVampireMonster().HasTag('ACS_Vampire_Monster_Ground_Mode'))
+		if (ACSGetCActor('ACS_Transformation_Vampire_Monster').HasTag('ACS_Vampire_Monster_Ground_Mode'))
 		{
-			if ( GetACSTransformationVampireMonster().GetBehaviorGraphInstanceName() != 'DettlaffMinion' )
+			if ( ACSGetCActor('ACS_Transformation_Vampire_Monster').GetBehaviorGraphInstanceName() != 'DettlaffMinion' )
 			{
 				GetACSWatcher().ACSTransformVampireMonsterPlayAnim('dettlaff_construct_walk_forward', 0.875, 0.0125);
 
-				GetACSTransformationVampireMonster().SetVisibility(false);
+				ACSGetCActor('ACS_Transformation_Vampire_Monster').SetVisibility(false);
 
 				GetACSWatcher().RemoveTimer('Vampire_Monster_Reveal_Delay');
 
 				GetACSWatcher().AddTimer('Vampire_Monster_Reveal_Delay', 0.5, false);
 
-				GetACSTransformationVampireMonster().StopEffect('shadowdash_body_blood');
+				ACSGetCActor('ACS_Transformation_Vampire_Monster').StopEffect('shadowdash_body_blood');
 
-				GetACSTransformationVampireMonster().StopEffect('shadowdash_ground_blood');
+				ACSGetCActor('ACS_Transformation_Vampire_Monster').StopEffect('shadowdash_ground_blood');
 
-				GetACSTransformationVampireMonster().PlayEffectSingle('shadowdash_body_blood');
+				ACSGetCActor('ACS_Transformation_Vampire_Monster').PlayEffectSingle('shadowdash_body_blood');
 
-				GetACSTransformationVampireMonster().PlayEffectSingle('shadowdash_ground_blood');
+				ACSGetCActor('ACS_Transformation_Vampire_Monster').PlayEffectSingle('shadowdash_ground_blood');
 
-				GetACSTransformationVampireMonster().DestroyEffect('finisher_sparks');
+				ACSGetCActor('ACS_Transformation_Vampire_Monster').DestroyEffect('finisher_sparks');
 
-				GetACSTransformationVampireMonster().PlayEffectSingle('finisher_sparks');
+				ACSGetCActor('ACS_Transformation_Vampire_Monster').PlayEffectSingle('finisher_sparks');
 
-				GetACSTransformationVampireMonster().DestroyEffect('finisher_sparks');
+				ACSGetCActor('ACS_Transformation_Vampire_Monster').DestroyEffect('finisher_sparks');
 				
-				GetACSTransformationVampireMonster().PlayEffectSingle('finisher_sparks');
+				ACSGetCActor('ACS_Transformation_Vampire_Monster').PlayEffectSingle('finisher_sparks');
 
-				GetACSTransformationVampireMonster().DestroyEffect('body_blood_drip');
-				GetACSTransformationVampireMonster().PlayEffectSingle('body_blood_drip');
-				GetACSTransformationVampireMonster().StopEffect('body_blood_drip');
+				ACSGetCActor('ACS_Transformation_Vampire_Monster').DestroyEffect('body_blood_drip');
+				ACSGetCActor('ACS_Transformation_Vampire_Monster').PlayEffectSingle('body_blood_drip');
+				ACSGetCActor('ACS_Transformation_Vampire_Monster').StopEffect('body_blood_drip');
 
-				GetACSTransformationVampireMonster().DestroyEffect('comming_out');
-				GetACSTransformationVampireMonster().PlayEffectSingle('comming_out');
-				GetACSTransformationVampireMonster().StopEffect('comming_out');
+				ACSGetCActor('ACS_Transformation_Vampire_Monster').DestroyEffect('comming_out');
+				ACSGetCActor('ACS_Transformation_Vampire_Monster').PlayEffectSingle('comming_out');
+				ACSGetCActor('ACS_Transformation_Vampire_Monster').StopEffect('comming_out');
 
 
 
-				GetACSTransformationVampireMonster().ActivateAndSyncBehavior( 'DettlaffMinion' );
+				ACSGetCActor('ACS_Transformation_Vampire_Monster').ActivateAndSyncBehavior( 'DettlaffMinion' );
 			}
 		}
 	}
@@ -18595,9 +18160,9 @@ state ACS_VampireMonsterBatProjectile_Engage in cACS_Transformation_Vampire_Mons
 
 		actors.Clear();
 
-		actors = GetACSTransformationVampireMonster().GetNPCsAndPlayersInRange(attackRange, 10, , FLAG_ExcludePlayer + FLAG_OnlyAliveActors );
+		actors = ACSGetCActor('ACS_Transformation_Vampire_Monster').GetNPCsAndPlayersInRange(attackRange, 10, , FLAG_ExcludePlayer + FLAG_OnlyAliveActors );
 		
-		actors.Remove( GetACSTransformationVampireMonster() );
+		actors.Remove( ACSGetCActor('ACS_Transformation_Vampire_Monster') );
 
 		if( actors.Size() > 0 )
 		{
@@ -18605,7 +18170,7 @@ state ACS_VampireMonsterBatProjectile_Engage in cACS_Transformation_Vampire_Mons
 			{
 				actortarget = (CActor)actors[i];
 
-				if (actortarget == GetACSTransformationVampireMonster()
+				if (actortarget == ACSGetCActor('ACS_Transformation_Vampire_Monster')
 				|| actortarget.HasTag('acs_snow_entity')
 				|| actortarget.HasTag('smokeman') 
 				|| actortarget.HasTag('ACS_Tentacle_1') 
@@ -18630,7 +18195,7 @@ state ACS_VampireMonsterBatProjectile_Engage in cACS_Transformation_Vampire_Mons
 
 				initpos.Z = vampPos.Z;
 
-				rotation = GetACSTransformationVampireMonster().GetWorldRotation();
+				rotation = ACSGetCActor('ACS_Transformation_Vampire_Monster').GetWorldRotation();
 
 				targetPosition = actortarget.PredictWorldPosition( 0.3 );
 				//targetPosition.Z += 1;
@@ -18646,26 +18211,6 @@ state ACS_VampireMonsterBatProjectile_Engage in cACS_Transformation_Vampire_Mons
 			}
 		}
 
-	}
-}
-
-function GetACSVampireMonsterSwarmProjDestroyAll()
-{	
-	var actors 											: array<CEntity>;
-	var i												: int;
-	
-	actors.Clear();
-
-	theGame.GetEntitiesByTag( 'ACS_Transformation_Vampire_Monster_Swarm_Proj', actors );	
-
-	if (actors.Size() <= 0)
-	{
-		return;
-	}
-	
-	for( i = 0; i < actors.Size(); i += 1 )
-	{
-		actors[i].Destroy();
 	}
 }
 
@@ -18691,9 +18236,9 @@ state ACS_VampireMonsterBatProjectileRepeating_Engage in cACS_Transformation_Vam
 
 		actors.Clear();
 
-		actors = GetACSTransformationVampireMonster().GetNPCsAndPlayersInRange(attackRange, 3, , FLAG_ExcludePlayer + FLAG_OnlyAliveActors );
+		actors = ACSGetCActor('ACS_Transformation_Vampire_Monster').GetNPCsAndPlayersInRange(attackRange, 3, , FLAG_ExcludePlayer + FLAG_OnlyAliveActors );
 		
-		actors.Remove( GetACSTransformationVampireMonster() );
+		actors.Remove( ACSGetCActor('ACS_Transformation_Vampire_Monster') );
 
 		if( actors.Size() > 0 )
 		{
@@ -18701,7 +18246,7 @@ state ACS_VampireMonsterBatProjectileRepeating_Engage in cACS_Transformation_Vam
 			{
 				actortarget = (CActor)actors[i];
 
-				if (actortarget == GetACSTransformationVampireMonster()
+				if (actortarget == ACSGetCActor('ACS_Transformation_Vampire_Monster')
 				|| actortarget.HasTag('acs_snow_entity')
 				|| actortarget.HasTag('smokeman') 
 				|| actortarget.HasTag('ACS_Tentacle_1') 
@@ -18726,7 +18271,7 @@ state ACS_VampireMonsterBatProjectileRepeating_Engage in cACS_Transformation_Vam
 
 				initpos.Z = vampPos.Z;
 
-				rotation = GetACSTransformationVampireMonster().GetWorldRotation();
+				rotation = ACSGetCActor('ACS_Transformation_Vampire_Monster').GetWorldRotation();
 
 				targetPosition = actortarget.PredictWorldPosition( 0.3 );
 				//targetPosition.Z += 1;
@@ -18776,6 +18321,8 @@ class W3TransformationVampireMonsterTrap extends CInteractiveEntity
 	
 	event OnSpawned( spawnData : SEntitySpawnData )
 	{
+		super.OnSpawned(spawnData);
+
 		PlayEffect( effectOnSpawn );
 		lifeTime = RandRange(durationTo,durationFrom);
 		AddTimer('DestroyEntityAfter', lifeTime, false );
@@ -18788,8 +18335,8 @@ class W3TransformationVampireMonsterTrap extends CInteractiveEntity
 		if ( 
 		area == (CTriggerAreaComponent)this.GetComponent( "TrapTrigger" ) 
 		&& activator.GetEntity() != thePlayer 
-		&& activator.GetEntity() != GetACSTransformationVampireMonster()
-		&& activator.GetEntity() != GetACSTransformationVampireMonsterCameraDummy()
+		&& activator.GetEntity() != ACSGetCActor('ACS_Transformation_Vampire_Monster')
+		&& activator.GetEntity() != ACSGetCEntity('ACS_Transformation_Vampire_Monster_Camera_Dummy')
 		&& areasActive )
 		{
 			
@@ -18800,7 +18347,7 @@ class W3TransformationVampireMonsterTrap extends CInteractiveEntity
 		{
 			FindGameplayEntitiesInSphere( entities, this.GetWorldPosition(), 4, 50, '', FLAG_ExcludePlayer + FLAG_OnlyAliveActors, this );
 
-			entities.Remove( GetACSTransformationVampireMonster() );
+			entities.Remove( ACSGetCActor('ACS_Transformation_Vampire_Monster') );
 
 			if( entities.Size() > 0 )
 			{
@@ -18810,7 +18357,7 @@ class W3TransformationVampireMonsterTrap extends CInteractiveEntity
 				{
 					actortarget = (CActor)entities[i];
 
-					if (actortarget == GetACSTransformationVampireMonster()
+					if (actortarget == ACSGetCActor('ACS_Transformation_Vampire_Monster')
 					|| actortarget.HasTag('acs_snow_entity')
 					|| actortarget.HasTag('smokeman') 
 					|| actortarget.HasTag('ACS_Tentacle_1') 
@@ -18870,8 +18417,8 @@ class W3TransformationVampireMonsterTrap extends CInteractiveEntity
 	{
 		if ( area == (CTriggerAreaComponent)this.GetComponent( "TrapTrigger" )
 		&& activator.GetEntity() != thePlayer 
-		&& activator.GetEntity() != GetACSTransformationVampireMonster()
-		&& activator.GetEntity() != GetACSTransformationVampireMonsterCameraDummy()
+		&& activator.GetEntity() != ACSGetCActor('ACS_Transformation_Vampire_Monster')
+		&& activator.GetEntity() != ACSGetCEntity('ACS_Transformation_Vampire_Monster_Camera_Dummy')
 		)
 		{
 			StopEffect( effectToPlayOnActivation );
@@ -18895,97 +18442,6 @@ class W3TransformationVampireMonsterTrap extends CInteractiveEntity
 		StopAllEffects();
 		DestroyAfter( 2.0f );
 	}
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-function GetACSTransformationVampireMonster() : CActor
-{
-	var entity 			 : CActor;
-	
-	entity = (CActor)theGame.GetEntityByTag( 'ACS_Transformation_Vampire_Monster' );
-	return entity;
-}
-
-function GetACSTransformationVampireMonsterCameraDummy() : CEntity
-{
-	var entity 			 : CEntity;
-	
-	entity = (CEntity)theGame.GetEntityByTag( 'ACS_Transformation_Vampire_Monster_Camera_Dummy' );
-	return entity;
-}
-
-function GetACSTransformationVampireMonsterSwarm1() : CEntity
-{
-	var entity 			 : CEntity;
-	
-	entity = (CEntity)theGame.GetEntityByTag( 'ACS_Transformation_Vampire_Monster_Swarm_1' );
-	return entity;
-}
-
-function GetACSTransformationVampireMonsterSwarm2() : CEntity
-{
-	var entity 			 : CEntity;
-	
-	entity = (CEntity)theGame.GetEntityByTag( 'ACS_Transformation_Vampire_Monster_Swarm_2' );
-	return entity;
-}
-
-function GetACSTransformationVampireMonsterSwarm3() : CEntity
-{
-	var entity 			 : CEntity;
-	
-	entity = (CEntity)theGame.GetEntityByTag( 'ACS_Transformation_Vampire_Monster_Swarm_3' );
-	return entity;
-}
-
-function GetACSTransformationVampireMonsterAbductionVictim() : CActor
-{
-	var entity 			 : CActor;
-	
-	entity = (CActor)theGame.GetEntityByTag( 'ACS_Transformation_Vampire_Abduction_Victim' );
-	return entity;
-}
-
-function GetACSTransformationVampireMonsterAbductionVictimFX_1() : CEntity
-{
-	var entity 			 : CEntity;
-	
-	entity = (CEntity)theGame.GetEntityByTag( 'ACS_Transformation_Vampire_Mosnter_Abduction_FX_1' );
-	return entity;
-}
-
-function GetACSTransformationVampireMonsterAbductionVictimFX_2() : CEntity
-{
-	var entity 			 : CEntity;
-	
-	entity = (CEntity)theGame.GetEntityByTag( 'ACS_Transformation_Vampire_Mosnter_Abduction_FX_2' );
-	return entity;
-}
-
-function GetACSTransformationVampireMonsterAbductionVictimFX_3() : CEntity
-{
-	var entity 			 : CEntity;
-	
-	entity = (CEntity)theGame.GetEntityByTag( 'ACS_Transformation_Vampire_Mosnter_Abduction_FX_3' );
-	return entity;
-}
-
-function GetACSVampireSprintFX() : CEntity
-{
-	var entity 			 : CEntity;
-	
-	entity = (CEntity)theGame.GetEntityByTag( 'ACS_Vampire_Sprint_FX' );
-	return entity;
-}
-
-function GetACSTransformationVampireMonsterScreamEnt() : CEntity
-{
-	var entity 			 : CEntity;
-	
-	entity = (CEntity)theGame.GetEntityByTag( 'ACS_Transformation_Vampire_Monster_Scream' );
-	return entity;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -19110,7 +18566,7 @@ state Spawn_Transformation_Vampiress_Engage in cACS_Transformation_Vampiress
 	event OnEnterState(prevStateName : name)
 	{
 		super.OnEnterState(prevStateName);
-		GetACSTransformationVampiress().Destroy();
+		ACSGetCActor('ACS_Transformation_Vampiress').Destroy();
 		Spawn_Transformation_Vampiress_Entry();
 	}
 
@@ -19210,7 +18666,7 @@ state Spawn_Transformation_Bruxa_Engage in cACS_Transformation_Vampiress
 	{
 		super.OnEnterState(prevStateName);
 
-		GetACSTransformationVampiress().Destroy();
+		ACSGetCActor('ACS_Transformation_Vampiress').Destroy();
 
 		Spawn_Transformation_Bruxa_Entry();
 	}
@@ -19302,12 +18758,12 @@ state ACS_VampiressBehSwitch_Engage in cACS_Transformation_Vampiress
 	
 	entry function Beh_Switch_Entry()
 	{
-		if (GetACSTransformationVampiress().HasTag('ACS_Transformation_Bruxa'))
+		if (ACSGetCActor('ACS_Transformation_Vampiress').HasTag('ACS_Transformation_Bruxa'))
 		{
 			return;
 		}
 
-		p_actor = GetACSTransformationVampiress();
+		p_actor = ACSGetCActor('ACS_Transformation_Vampiress');
 
 		p_comp = p_actor.GetComponentByClassName( 'CAppearanceComponent' );
 
@@ -19320,11 +18776,11 @@ state ACS_VampiressBehSwitch_Engage in cACS_Transformation_Vampiress
 			GetACSWatcher().ACSTransformVampiressMovementAdjustForward();
 		}
 
-		if (!GetACSTransformationVampiress().HasTag('ACS_Vampiress_Sorceress_Mode'))
+		if (!ACSGetCActor('ACS_Transformation_Vampiress').HasTag('ACS_Vampiress_Sorceress_Mode'))
 		{
-			if ( GetACSTransformationVampiress().GetBehaviorGraphInstanceName() != 'Sorceress_Beh' )
+			if ( ACSGetCActor('ACS_Transformation_Vampiress').GetBehaviorGraphInstanceName() != 'Sorceress_Beh' )
 			{
-				GetACSTransformationVampiress().ActivateAndSyncBehavior( 'Sorceress_Beh' );
+				ACSGetCActor('ACS_Transformation_Vampiress').ActivateAndSyncBehavior( 'Sorceress_Beh' );
 			}
 
 			temp = (CEntityTemplate)LoadResource(
@@ -19362,13 +18818,13 @@ state ACS_VampiressBehSwitch_Engage in cACS_Transformation_Vampiress
 
 			GetACSWatcher().ACSTransformVampiressPlayAnim(vampiress_taunt_anim_names[RandRange(vampiress_taunt_anim_names.Size())], 0.5f, 0.5f);
 
-			GetACSTransformationVampiress().AddTag('ACS_Vampiress_Sorceress_Mode');
+			ACSGetCActor('ACS_Transformation_Vampiress').AddTag('ACS_Vampiress_Sorceress_Mode');
 		}
 		else
 		{
-			if ( GetACSTransformationVampiress().GetBehaviorGraphInstanceName() != 'Exploration' )
+			if ( ACSGetCActor('ACS_Transformation_Vampiress').GetBehaviorGraphInstanceName() != 'Exploration' )
 			{
-				GetACSTransformationVampiress().ActivateAndSyncBehavior( 'Exploration' );
+				ACSGetCActor('ACS_Transformation_Vampiress').ActivateAndSyncBehavior( 'Exploration' );
 			}
 
 			temp = (CEntityTemplate)LoadResource(
@@ -19390,16 +18846,16 @@ state ACS_VampiressBehSwitch_Engage in cACS_Transformation_Vampiress
 			GetWitcherPlayer().PlayEffectSingle('smoke_explosion');
 			GetWitcherPlayer().StopEffect('smoke_explosion');
 
-			GetACSTransformationVampiress().PlayEffectSingle('shadowdash_smoke' );
-			GetACSTransformationVampiress().StopEffect('shadowdash_smoke');
+			ACSGetCActor('ACS_Transformation_Vampiress').PlayEffectSingle('shadowdash_smoke' );
+			ACSGetCActor('ACS_Transformation_Vampiress').StopEffect('shadowdash_smoke');
 
 			GetACSWatcher().RemoveTimer('ACS_Vampiress_Hand_Fx_Delay');
 
-			GetACSTransformationVampiress().StopEffect('hand_fx');
+			ACSGetCActor('ACS_Transformation_Vampiress').StopEffect('hand_fx');
 
-			GetACSTransformationVampiress().StopEffect('hand_fx_l');
+			ACSGetCActor('ACS_Transformation_Vampiress').StopEffect('hand_fx_l');
 
-			GetACSTransformationVampiress().StopEffect('igni_reaction_djinn');
+			ACSGetCActor('ACS_Transformation_Vampiress').StopEffect('igni_reaction_djinn');
 
 			GetACSWatcher().VampiressSpecialAbilityEffectsStop();
 
@@ -19413,7 +18869,7 @@ state ACS_VampiressBehSwitch_Engage in cACS_Transformation_Vampiress
 
 			GetACSWatcher().ACSTransformVampiressPlayAnim(vampiress_taunt_anim_names[RandRange(vampiress_taunt_anim_names.Size())], 0.25f, 0.5f);
 
-			GetACSTransformationVampiress().RemoveTag('ACS_Vampiress_Sorceress_Mode');
+			ACSGetCActor('ACS_Transformation_Vampiress').RemoveTag('ACS_Vampiress_Sorceress_Mode');
 		}
 	}
 	
@@ -19495,7 +18951,7 @@ state Chaos_Meteorite_Single_Summon_Engage in cACS_Transformation_Vampiress
 	
 	latent function Meteor_Single_Summon()
 	{
-		initpos = GetACSTransformationVampiress().GetWorldPosition();			
+		initpos = ACSGetCActor('ACS_Transformation_Vampiress').GetWorldPosition();			
 		initpos.Z += 5;
 				
 		proj_1 = (W3ACSChaosMeteorProjectile)theGame.CreateEntity( 
@@ -19506,7 +18962,7 @@ state Chaos_Meteorite_Single_Summon_Engage in cACS_Transformation_Vampiress
 
 		proj_1.AddTag('ACS_Chaos_Meteorite_Single');
 
-		proj_1.CreateAttachment(GetACSTransformationVampiress(), 'r_weapon');
+		proj_1.CreateAttachment(ACSGetCActor('ACS_Transformation_Vampiress'), 'r_weapon');
 	}
 	
 	event OnLeaveState( nextStateName : name ) 
@@ -19545,7 +19001,7 @@ state Chaos_Meteorite_Single_Fire_Engage in cACS_Transformation_Vampiress
 
 			//targetPosition.Z += 1.1;
 
-			initpos = GetACSTransformationVampiress().GetBoneWorldPosition('r_weapon');	
+			initpos = ACSGetCActor('ACS_Transformation_Vampiress').GetBoneWorldPosition('r_weapon');	
 
 			//initpos.Y += 1.5;
 					
@@ -19559,11 +19015,11 @@ state Chaos_Meteorite_Single_Fire_Engage in cACS_Transformation_Vampiress
 		}
 		else
 		{
-			targetPosition = GetACSTransformationVampiress().GetWorldPosition() + GetACSTransformationVampiress().GetHeadingVector() + GetACSTransformationVampiress().GetWorldForward() * 20;
+			targetPosition = ACSGetCActor('ACS_Transformation_Vampiress').GetWorldPosition() + ACSGetCActor('ACS_Transformation_Vampiress').GetHeadingVector() + ACSGetCActor('ACS_Transformation_Vampiress').GetWorldForward() * 20;
 
 			targetPosition.Z -= 1.1;
 
-			initpos = GetACSTransformationVampiress().GetBoneWorldPosition('r_weapon');	
+			initpos = ACSGetCActor('ACS_Transformation_Vampiress').GetBoneWorldPosition('r_weapon');	
 
 			//initpos.Y += 1.5;
 					
@@ -19611,9 +19067,9 @@ state Chaos_Magma_Summon_Engage in cACS_Transformation_Vampiress
 		
 		GetWitcherPlayer().SoundEvent("monster_golem_dao_cmb_swoosh_light");
 
-		position = GetACSTransformationVampiress().GetWorldPosition() + (GetACSTransformationVampiress().GetWorldForward()) + GetACSTransformationVampiress().GetHeadingVector() * 1.1;
+		position = ACSGetCActor('ACS_Transformation_Vampiress').GetWorldPosition() + (ACSGetCActor('ACS_Transformation_Vampiress').GetWorldForward()) + ACSGetCActor('ACS_Transformation_Vampiress').GetHeadingVector() * 1.1;
 		
-		targetPosition_1 = position + GetACSTransformationVampiress().GetHeadingVector() * 30;
+		targetPosition_1 = position + ACSGetCActor('ACS_Transformation_Vampiress').GetHeadingVector() * 30;
 
 		proj_1 = (W3ACSFireLine)theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\projectiles\elemental_ifryt_proj.w2ent", true ), position );
 		proj_1.Init(GetWitcherPlayer());
@@ -19659,9 +19115,9 @@ state Chaos_Magma_Line_Engage in cACS_Transformation_Vampiress
 		
 		GetWitcherPlayer().SoundEvent("monster_golem_dao_cmb_swoosh_light");
 
-		position = GetACSTransformationVampiress().GetWorldPosition() + (GetACSTransformationVampiress().GetWorldForward() * 1.5) + GetACSTransformationVampiress().GetHeadingVector() * 1.1;
+		position = ACSGetCActor('ACS_Transformation_Vampiress').GetWorldPosition() + (ACSGetCActor('ACS_Transformation_Vampiress').GetWorldForward() * 1.5) + ACSGetCActor('ACS_Transformation_Vampiress').GetHeadingVector() * 1.1;
 		
-		targetPosition_1 = position + GetACSTransformationVampiress().GetHeadingVector() * 30;
+		targetPosition_1 = position + ACSGetCActor('ACS_Transformation_Vampiress').GetHeadingVector() * 30;
 
 		proj_1 = (W3ACSFireLine)theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\projectiles\elemental_ifryt_proj.w2ent", true ), position );
 		proj_1.Init(GetWitcherPlayer());
@@ -19704,8 +19160,8 @@ state Chaos_Tornado_Engage in cACS_Transformation_Vampiress
 			GetACSChaosTornado().RemoveTimer('explode_timer');
 			GetACSChaosTornado().AddTimer('explode_timer', 0.0001, false);
 
-			GetACSChaosTornadoAppearance().PlayEffectSingle('explode');
-			GetACSChaosTornadoAppearance().StopEffect('explode');
+			ACSGetCEntity('ACS_Chaos_Tornado_Appearance').PlayEffectSingle('explode');
+			ACSGetCEntity('ACS_Chaos_Tornado_Appearance').StopEffect('explode');
 
 			GetACSChaosTornado().RemoveTimer('destroy_tornado');
 
@@ -19715,7 +19171,7 @@ state Chaos_Tornado_Engage in cACS_Transformation_Vampiress
 		}
 		else
 		{
-			position = GetACSTransformationVampiress().GetWorldPosition() + GetACSTransformationVampiress().GetHeadingVector() + GetACSTransformationVampiress().GetWorldForward() * 10;
+			position = ACSGetCActor('ACS_Transformation_Vampiress').GetWorldPosition() + ACSGetCActor('ACS_Transformation_Vampiress').GetHeadingVector() + ACSGetCActor('ACS_Transformation_Vampiress').GetWorldForward() * 10;
 
 			tornado = (W3ACSChaosTornado)theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\lillith_magic\chaos_tornado.w2ent" ,true ), ACSPlayerFixZAxis( position ), thePlayer.GetWorldRotation());
 
@@ -19725,7 +19181,7 @@ state Chaos_Tornado_Engage in cACS_Transformation_Vampiress
 
 
 
-			GetACSChaosTornadoAppearance().Destroy();
+			ACSGetCEntity('ACS_Chaos_Tornado_Appearance').Destroy();
 
 			tornadoApp = (CEntity)theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\lillith_magic\chaos_tornado_appearance_1.w2ent" ,true ), position, thePlayer.GetWorldRotation());
 
@@ -19809,7 +19265,7 @@ state Chaos_Lightning_Targeted_Engage in cACS_Transformation_Vampiress
 		}
 		else
 		{
-			playerPos = ACSPlayerFixZAxis(GetACSTransformationVampiress().GetWorldPosition() + GetACSTransformationVampiress().GetHeadingVector() + GetACSTransformationVampiress().GetWorldForward() * 10);
+			playerPos = ACSPlayerFixZAxis(ACSGetCActor('ACS_Transformation_Vampiress').GetWorldPosition() + ACSGetCActor('ACS_Transformation_Vampiress').GetHeadingVector() + ACSGetCActor('ACS_Transformation_Vampiress').GetWorldForward() * 10);
 		}
 
 		playerRot = thePlayer.GetWorldRotation();
@@ -19898,7 +19354,7 @@ state Chaos_Lightning_Targeted_Engage in cACS_Transformation_Vampiress
 			
 			if( actors.Size() > 0 )
 			{	
-				if (actor != GetACSTransformationVampiress())
+				if (actor != ACSGetCActor('ACS_Transformation_Vampiress'))
 				{
 					dmg =  new W3DamageAction in this;
 
@@ -20005,7 +19461,7 @@ state Chaos_Cloud_Summon_Engage in cACS_Transformation_Vampiress
 		}
 		else
 		{
-			playerPos = ACSPlayerFixZAxis(GetACSTransformationVampiress().GetWorldPosition() + GetACSTransformationVampiress().GetHeadingVector() + GetACSTransformationVampiress().GetWorldForward() * 10);
+			playerPos = ACSPlayerFixZAxis(ACSGetCActor('ACS_Transformation_Vampiress').GetWorldPosition() + ACSGetCActor('ACS_Transformation_Vampiress').GetHeadingVector() + ACSGetCActor('ACS_Transformation_Vampiress').GetWorldForward() * 10);
 		}
 
 		playerRot = thePlayer.GetWorldRotation();
@@ -20059,16 +19515,16 @@ state Chaos_Cloud_Summon_Engage in cACS_Transformation_Vampiress
 				
 				if( actors.Size() > 0 )
 				{	
-					if (actor != GetACSTransformationVampiress())
+					if (actor != ACSGetCActor('ACS_Transformation_Vampiress'))
 					{
 						((CNewNPC)ent_5).SetAttitude(actor, AIA_Hostile);
 					}
 				}
 			}
 
-			((CNewNPC)ent_5).SetAttitude(GetACSTransformationVampiress(), AIA_Friendly);
+			((CNewNPC)ent_5).SetAttitude(ACSGetCActor('ACS_Transformation_Vampiress'), AIA_Friendly);
 
-			GetACSTransformationVampiress().SetAttitude(((CNewNPC)ent_5), AIA_Friendly);
+			ACSGetCActor('ACS_Transformation_Vampiress').SetAttitude(((CNewNPC)ent_5), AIA_Friendly);
 
 			((CNewNPC)ent_5).SetAttitude(thePlayer, AIA_Friendly);
 
@@ -20110,9 +19566,9 @@ state Chaos_Root_Projectile_Engage in cACS_Transformation_Vampiress
 
 		//initPos = ACSPlayerFixZAxis((thePlayer.GetDisplayTarget()).GetWorldPosition());
 
-		initPos = GetACSTransformationVampiress().GetWorldPosition() + (GetACSTransformationVampiress().GetWorldForward() * 1.5) + GetACSTransformationVampiress().GetHeadingVector() * 15;
+		initPos = ACSGetCActor('ACS_Transformation_Vampiress').GetWorldPosition() + (ACSGetCActor('ACS_Transformation_Vampiress').GetWorldForward() * 1.5) + ACSGetCActor('ACS_Transformation_Vampiress').GetHeadingVector() * 15;
 
-		playerRot = GetACSTransformationVampiress().GetWorldRotation();
+		playerRot = ACSGetCActor('ACS_Transformation_Vampiress').GetWorldRotation();
 
 		playerRot.Yaw += RandRange(360,0);
 		
@@ -20190,7 +19646,7 @@ state Chaos_Wood_Projectile_Engage in cACS_Transformation_Vampiress
 				GetACSWatcher().ACSTransformVampiressMovementAdjustForward();
 			}
 
-			initpos_1 = GetACSTransformationVampiress().GetWorldPosition() + (GetACSTransformationVampiress().GetWorldForward() * 1.5) + GetACSTransformationVampiress().GetHeadingVector() * 1.1;
+			initpos_1 = ACSGetCActor('ACS_Transformation_Vampiress').GetWorldPosition() + (ACSGetCActor('ACS_Transformation_Vampiress').GetWorldForward() * 1.5) + ACSGetCActor('ACS_Transformation_Vampiress').GetHeadingVector() * 1.1;
 
 			initpos_1.Z += 1.25;
 
@@ -20207,11 +19663,11 @@ state Chaos_Wood_Projectile_Engage in cACS_Transformation_Vampiress
 			proj_1.ShootProjectileAtPosition( 0, 25, targetPosition_1, 500 );
 
 
-			initpos_2 = GetACSTransformationVampiress().GetWorldPosition() + (GetACSTransformationVampiress().GetWorldForward() * 1.1) + GetACSTransformationVampiress().GetWorldRight() * 1.1 + GetACSTransformationVampiress().GetHeadingVector() * 1.1;
+			initpos_2 = ACSGetCActor('ACS_Transformation_Vampiress').GetWorldPosition() + (ACSGetCActor('ACS_Transformation_Vampiress').GetWorldForward() * 1.1) + ACSGetCActor('ACS_Transformation_Vampiress').GetWorldRight() * 1.1 + ACSGetCActor('ACS_Transformation_Vampiress').GetHeadingVector() * 1.1;
 			
 			initpos_2.Z += 1.5;
 
-			targetPosition_2 = initpos_2 + GetACSTransformationVampiress().GetWorldRight() * 1.5 + GetACSTransformationVampiress().GetHeadingVector() * 30;
+			targetPosition_2 = initpos_2 + ACSGetCActor('ACS_Transformation_Vampiress').GetWorldRight() * 1.5 + ACSGetCActor('ACS_Transformation_Vampiress').GetHeadingVector() * 30;
 
 			targetPosition_2.Z -= 1.1;
 
@@ -20224,11 +19680,11 @@ state Chaos_Wood_Projectile_Engage in cACS_Transformation_Vampiress
 			proj_2.ShootProjectileAtPosition( 0, 25, targetPosition_1, 500 );
 
 
-			initpos_3 = GetACSTransformationVampiress().GetWorldPosition() + (GetACSTransformationVampiress().GetWorldForward() * 1.1) + GetACSTransformationVampiress().GetWorldRight() * -1.1 + GetACSTransformationVampiress().GetHeadingVector() * 1.1;
+			initpos_3 = ACSGetCActor('ACS_Transformation_Vampiress').GetWorldPosition() + (ACSGetCActor('ACS_Transformation_Vampiress').GetWorldForward() * 1.1) + ACSGetCActor('ACS_Transformation_Vampiress').GetWorldRight() * -1.1 + ACSGetCActor('ACS_Transformation_Vampiress').GetHeadingVector() * 1.1;
 
 			initpos_3.Z += 1.5;
 
-			targetPosition_3 = initpos_3 + GetACSTransformationVampiress().GetWorldRight() * -1.5 + GetACSTransformationVampiress().GetHeadingVector() * 30;
+			targetPosition_3 = initpos_3 + ACSGetCActor('ACS_Transformation_Vampiress').GetWorldRight() * -1.5 + ACSGetCActor('ACS_Transformation_Vampiress').GetHeadingVector() * 30;
 
 			targetPosition_3.Z -= 1.1;
 
@@ -20242,11 +19698,11 @@ state Chaos_Wood_Projectile_Engage in cACS_Transformation_Vampiress
 		}
 		else
 		{
-			targetPosition_1 = GetACSTransformationVampiress().GetWorldPosition() + GetACSTransformationVampiress().GetHeadingVector() + GetACSTransformationVampiress().GetWorldForward() * 20;
+			targetPosition_1 = ACSGetCActor('ACS_Transformation_Vampiress').GetWorldPosition() + ACSGetCActor('ACS_Transformation_Vampiress').GetHeadingVector() + ACSGetCActor('ACS_Transformation_Vampiress').GetWorldForward() * 20;
 
 			targetPosition_1.Z -= 1.1;
 
-			initpos_1 = GetACSTransformationVampiress().GetWorldPosition() + (GetACSTransformationVampiress().GetWorldForward() * 1.5) + GetACSTransformationVampiress().GetHeadingVector() * 1.1;
+			initpos_1 = ACSGetCActor('ACS_Transformation_Vampiress').GetWorldPosition() + (ACSGetCActor('ACS_Transformation_Vampiress').GetWorldForward() * 1.5) + ACSGetCActor('ACS_Transformation_Vampiress').GetHeadingVector() * 1.1;
 
 			proj_1 = (W3ACSChaosWoodProjectile)theGame.CreateEntity( 
 			(CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\lillith_magic\chaos_wood_proj.w2ent", true ), initpos_1 );
@@ -20292,9 +19748,9 @@ state Chaos_Snowball_Single_Summon_Engage in cACS_Transformation_Vampiress
 		
 		GetWitcherPlayer().SoundEvent("monster_golem_dao_cmb_swoosh_light");
 
-		position = GetACSTransformationVampiress().GetWorldPosition() + (GetACSTransformationVampiress().GetWorldForward()) + GetACSTransformationVampiress().GetHeadingVector() * 1.1;
+		position = ACSGetCActor('ACS_Transformation_Vampiress').GetWorldPosition() + (ACSGetCActor('ACS_Transformation_Vampiress').GetWorldForward()) + ACSGetCActor('ACS_Transformation_Vampiress').GetHeadingVector() * 1.1;
 		
-		targetPosition_1 = position + GetACSTransformationVampiress().GetHeadingVector() * 30;
+		targetPosition_1 = position + ACSGetCActor('ACS_Transformation_Vampiress').GetHeadingVector() * 30;
 
 		proj_1 = (W3ACSEredinFrostLine)theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\projectiles\eredin_frost_proj.w2ent", true ), position );
 		proj_1.Init(GetWitcherPlayer());
@@ -20340,9 +19796,9 @@ state Chaos_Snowball_Engage in cACS_Transformation_Vampiress
 		
 		GetWitcherPlayer().SoundEvent("monster_golem_dao_cmb_swoosh_light");
 
-		position = GetACSTransformationVampiress().GetWorldPosition() + (GetACSTransformationVampiress().GetWorldForward() * 1.5) + GetACSTransformationVampiress().GetHeadingVector() * 1.1;
+		position = ACSGetCActor('ACS_Transformation_Vampiress').GetWorldPosition() + (ACSGetCActor('ACS_Transformation_Vampiress').GetWorldForward() * 1.5) + ACSGetCActor('ACS_Transformation_Vampiress').GetHeadingVector() * 1.1;
 		
-		targetPosition_1 = position + GetACSTransformationVampiress().GetHeadingVector() * 30;
+		targetPosition_1 = position + ACSGetCActor('ACS_Transformation_Vampiress').GetHeadingVector() * 30;
 
 		proj_1 = (W3ACSEredinFrostLine)theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\projectiles\eredin_frost_proj.w2ent", true ), position );
 		proj_1.Init(GetWitcherPlayer());
@@ -20389,9 +19845,9 @@ state Chaos_Ice_Explosion_Engage in cACS_Transformation_Vampiress
 
 		//initPos = ACSPlayerFixZAxis((thePlayer.GetDisplayTarget()).GetWorldPosition());
 
-		initPos = GetACSTransformationVampiress().GetWorldPosition() + (GetACSTransformationVampiress().GetWorldForward() * 1.5) + GetACSTransformationVampiress().GetHeadingVector() * 15;
+		initPos = ACSGetCActor('ACS_Transformation_Vampiress').GetWorldPosition() + (ACSGetCActor('ACS_Transformation_Vampiress').GetWorldForward() * 1.5) + ACSGetCActor('ACS_Transformation_Vampiress').GetHeadingVector() * 15;
 
-		playerRot = GetACSTransformationVampiress().GetWorldRotation();
+		playerRot = ACSGetCActor('ACS_Transformation_Vampiress').GetWorldRotation();
 
 		playerRot.Yaw += RandRange(360,0);
 		
@@ -20464,7 +19920,7 @@ state Chaos_Orb_Small_Engage in cACS_Transformation_Vampiress
 
 		targetPosition.Z += 1.1;
 
-		initpos = GetACSTransformationVampiress().GetBoneWorldPosition('r_weapon');		
+		initpos = ACSGetCActor('ACS_Transformation_Vampiress').GetBoneWorldPosition('r_weapon');		
 
 		initpos.Z += 0.5;
 
@@ -20498,7 +19954,7 @@ state Chaos_Vacuum_Orb_Engage in cACS_Transformation_Vampiress
 		var spawnPos : Vector;
 		var rotation : EulerAngles;
 		
-		spawnPos = GetACSTransformationVampiress().GetWorldPosition() + (GetACSTransformationVampiress().GetWorldForward() * 1.1) + GetACSTransformationVampiress().GetHeadingVector() * 5;
+		spawnPos = ACSGetCActor('ACS_Transformation_Vampiress').GetWorldPosition() + (ACSGetCActor('ACS_Transformation_Vampiress').GetWorldForward() * 1.1) + ACSGetCActor('ACS_Transformation_Vampiress').GetHeadingVector() * 5;
 
 		spawnPos.Z += 1.1;
 
@@ -20542,11 +19998,11 @@ state Chaos_Arena_Engage in cACS_Transformation_Vampiress
 
 		GetACSChaosArena().Destroy();
 
-		GetACSChaosArenaAppearance_01().Destroy();
+		ACSGetCEntity('ACS_Chaos_Arena_Appearance_01').Destroy();
 
-		GetACSChaosArenaAppearance_02().Destroy();
+		ACSGetCEntity('ACS_Chaos_Arena_Appearance_02').Destroy();
 
-		position = GetACSTransformationVampiress().GetWorldPosition();
+		position = ACSGetCActor('ACS_Transformation_Vampiress').GetWorldPosition();
 
 		arena = (W3ACSChaosArena)theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\lillith_magic\chaos_arena.w2ent" ,true ), ACSPlayerFixZAxis( position ), thePlayer.GetWorldRotation());
 
@@ -20563,7 +20019,7 @@ state Chaos_Arena_Engage in cACS_Transformation_Vampiress
 
 
 
-		GetACSChaosArenaAppearance_01().Destroy();
+		ACSGetCEntity('ACS_Chaos_Arena_Appearance_01').Destroy();
 
 		arenaApp1 = (CEntity)theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\lillith_magic\chaos_arena_appearance_01.w2ent" ,true ), position2, thePlayer.GetWorldRotation());
 
@@ -20571,7 +20027,7 @@ state Chaos_Arena_Engage in cACS_Transformation_Vampiress
 
 		arenaApp1.AddTag('ACS_Chaos_Arena_Appearance_01');
 
-		GetACSChaosArenaAppearance_02().Destroy();
+		ACSGetCEntity('ACS_Chaos_Arena_Appearance_02').Destroy();
 
 		arenaApp2 = (CEntity)theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\lillith_magic\chaos_arena_appearance_02.w2ent" ,true ), position2, thePlayer.GetWorldRotation());
 
@@ -20622,7 +20078,7 @@ state Chaos_Drain_Engage in cACS_Transformation_Vampiress
 		
 		//actors = GetWitcherPlayer().GetNPCsAndPlayersInRange( 20, 3, , FLAG_ExcludePlayer + FLAG_Attitude_Hostile + FLAG_OnlyAliveActors);
 
-		actors = GetACSTransformationVampiress().GetNPCsAndPlayersInRange(20, 7, , FLAG_ExcludePlayer + FLAG_OnlyAliveActors );
+		actors = ACSGetCActor('ACS_Transformation_Vampiress').GetNPCsAndPlayersInRange(20, 7, , FLAG_ExcludePlayer + FLAG_OnlyAliveActors );
 
 		if( actors.Size() > 0 )
 		{
@@ -20634,7 +20090,7 @@ state Chaos_Drain_Engage in cACS_Transformation_Vampiress
 			{
 				npc = (CNewNPC)actors[i];
 
-				if (npc == GetACSTransformationVampiress()
+				if (npc == ACSGetCActor('ACS_Transformation_Vampiress')
 				|| npc.HasTag('acs_snow_entity')
 				|| npc.HasTag('smokeman') 
 				|| npc.HasTag('ACS_Tentacle_1') 
@@ -20666,9 +20122,9 @@ state Chaos_Drain_Engage in cACS_Transformation_Vampiress
 				, true );
 
 
-				anchor = (CEntity)theGame.CreateEntity( anchorTemplate2, GetACSTransformationVampiress().GetWorldPosition() + Vector( 0, 0, -10 ) );
+				anchor = (CEntity)theGame.CreateEntity( anchorTemplate2, ACSGetCActor('ACS_Transformation_Vampiress').GetWorldPosition() + Vector( 0, 0, -10 ) );
 
-				anchor.CreateAttachment( GetACSTransformationVampiress(), 'r_weapon' );
+				anchor.CreateAttachment( ACSGetCActor('ACS_Transformation_Vampiress'), 'r_weapon' );
 
 				anchor.AddTag('ACS_Chaos_Life_Drain');
 
@@ -20708,14 +20164,6 @@ state Chaos_Drain_Engage in cACS_Transformation_Vampiress
 	}
 }
 
-function GetACSTransformationVampiress() : CActor
-{
-	var entity 			 : CActor;
-	
-	entity = (CActor)theGame.GetEntityByTag( 'ACS_Transformation_Vampiress' );
-	return entity;
-}
-
 function ACS_Vampiress_Fx_Dummy_Spawn_Left_No_Tether( npc : CActor, pos : Vector )
 {
 	var temp															: CEntityTemplate;
@@ -20733,7 +20181,7 @@ function ACS_Vampiress_Fx_Dummy_Spawn_Left_No_Tether( npc : CActor, pos : Vector
 
 	thePlayer.SoundEvent("monster_dettlaff_vampire_movement_whoosh_claws_small");
 
-	if (GetACSTransformationVampiress().HasTag('ACS_Transformation_Bruxa'))
+	if (ACSGetCActor('ACS_Transformation_Vampiress').HasTag('ACS_Transformation_Bruxa'))
 	{
 		return;
 	}
@@ -20802,8 +20250,8 @@ function ACS_Vampiress_Fx_Dummy_Spawn_Left( npc : CActor, pos : Vector )
 
 	ent.DestroyAfter(1);
 
-	//GetACSTransformationVampiress().PlayEffectSingle('lightning_l', ent );
-	//GetACSTransformationVampiress().StopEffect('lightning_l');
+	//ACSGetCActor('ACS_Transformation_Vampiress').PlayEffectSingle('lightning_l', ent );
+	//ACSGetCActor('ACS_Transformation_Vampiress').StopEffect('lightning_l');
 
 	thePlayer.SoundEvent("magic_sorceress_vfx_arcane_explode");
 }
@@ -20825,7 +20273,7 @@ function ACS_Vampiress_Fx_Dummy_Spawn_Right_No_Tether( npc : CActor, pos : Vecto
 
 	thePlayer.SoundEvent("monster_dettlaff_vampire_movement_whoosh_claws_small");
 
-	if (GetACSTransformationVampiress().HasTag('ACS_Transformation_Bruxa'))
+	if (ACSGetCActor('ACS_Transformation_Vampiress').HasTag('ACS_Transformation_Bruxa'))
 	{
 		return;
 	}
@@ -20894,8 +20342,8 @@ function ACS_Vampiress_Fx_Dummy_Spawn_Right( npc : CActor, pos : Vector )
 
 	ent.DestroyAfter(1);
 
-	//GetACSTransformationVampiress().PlayEffectSingle('lightning_r', ent );
-	//GetACSTransformationVampiress().StopEffect('lightning_r');
+	//ACSGetCActor('ACS_Transformation_Vampiress').PlayEffectSingle('lightning_r', ent );
+	//ACSGetCActor('ACS_Transformation_Vampiress').StopEffect('lightning_r');
 
 	thePlayer.SoundEvent("magic_sorceress_vfx_arcane_explode");
 }
@@ -20943,8 +20391,8 @@ function ACS_Vampiress_Fx_Dummy_Spawn( npc : CActor, pos : Vector )
 
 	ent.DestroyAfter(1);
 
-	GetACSTransformationVampiress().PlayEffectSingle('lightning', ent );
-	GetACSTransformationVampiress().StopEffect('lightning');
+	ACSGetCActor('ACS_Transformation_Vampiress').PlayEffectSingle('lightning', ent );
+	ACSGetCActor('ACS_Transformation_Vampiress').StopEffect('lightning');
 }
 
 function ACS_Vampiress_Fx_Dummy_Spawn_Both_Hands_No_Tether( npc : CActor, pos : Vector )
@@ -20964,7 +20412,7 @@ function ACS_Vampiress_Fx_Dummy_Spawn_Both_Hands_No_Tether( npc : CActor, pos : 
 
 	thePlayer.SoundEvent("monster_dettlaff_vampire_movement_whoosh_claws_small");
 
-	if (GetACSTransformationVampiress().HasTag('ACS_Transformation_Bruxa'))
+	if (ACSGetCActor('ACS_Transformation_Vampiress').HasTag('ACS_Transformation_Bruxa'))
 	{
 		return;
 	}
@@ -21051,11 +20499,11 @@ function ACS_Vampiress_Fx_Dummy_Spawn_Both_Hands( npc : CActor, pos : Vector )
 
 	ent.DestroyAfter(1);
 
-	GetACSTransformationVampiress().PlayEffectSingle('lightning_r', ent );
-	GetACSTransformationVampiress().StopEffect('lightning_r');
+	ACSGetCActor('ACS_Transformation_Vampiress').PlayEffectSingle('lightning_r', ent );
+	ACSGetCActor('ACS_Transformation_Vampiress').StopEffect('lightning_r');
 
-	GetACSTransformationVampiress().PlayEffectSingle('lightning_l', ent );
-	GetACSTransformationVampiress().StopEffect('lightning_l');
+	ACSGetCActor('ACS_Transformation_Vampiress').PlayEffectSingle('lightning_l', ent );
+	ACSGetCActor('ACS_Transformation_Vampiress').StopEffect('lightning_l');
 
 	thePlayer.SoundEvent("magic_sorceress_vfx_arcane_explode");
 }
@@ -21140,114 +20588,114 @@ state ACS_Human_Ice_Breathe_Controller_Engage in cACS_Human_Ice_Breathe_Controll
 
 			Remove_Skellige_Envs();
 
-			GetACSSnowEntity().StopEffect('spiral_snow');
-			GetACSSnowEntity().StopEffect('snow_dust');
-			GetACSSnowEntity().StopEffect('slow_snow');
-			GetACSSnowEntity().StopEffect('snow_low_fx');
-			GetACSSnowEntity().StopEffect('snow_med_fx');
-			GetACSSnowEntity().StopEffect('snow_low_fx_2');
-			GetACSSnowEntity().StopEffect('snow_high_fx');
-			GetACSSnowEntity().StopEffect('spiral_snow');
-			GetACSSnowEntity().StopEffect('everstorm_embers_slow_1');
-			GetACSSnowEntity().StopEffect('everstorm_embers_slow_2');
-			GetACSSnowEntity().StopEffect('everstorm_embers_slow_3');
-			GetACSSnowEntity().StopEffect('everstorm_embers_slow_4');
-			GetACSSnowEntity().StopEffect('spiral_sand');
+			ACSGetCEntity('acs_snow_entity').StopEffect('spiral_snow');
+			ACSGetCEntity('acs_snow_entity').StopEffect('snow_dust');
+			ACSGetCEntity('acs_snow_entity').StopEffect('slow_snow');
+			ACSGetCEntity('acs_snow_entity').StopEffect('snow_low_fx');
+			ACSGetCEntity('acs_snow_entity').StopEffect('snow_med_fx');
+			ACSGetCEntity('acs_snow_entity').StopEffect('snow_low_fx_2');
+			ACSGetCEntity('acs_snow_entity').StopEffect('snow_high_fx');
+			ACSGetCEntity('acs_snow_entity').StopEffect('spiral_snow');
+			ACSGetCEntity('acs_snow_entity').StopEffect('everstorm_embers_slow_1');
+			ACSGetCEntity('acs_snow_entity').StopEffect('everstorm_embers_slow_2');
+			ACSGetCEntity('acs_snow_entity').StopEffect('everstorm_embers_slow_3');
+			ACSGetCEntity('acs_snow_entity').StopEffect('everstorm_embers_slow_4');
+			ACSGetCEntity('acs_snow_entity').StopEffect('spiral_sand');
 		}
 		else
 		{
 			if (
 			((thePlayer.HasTag('ACS_Wild_Hunt_Pursuit')
 			&& ACSWildHuntRiders_CheckDistance())
-			|| GetACSEredin() 
-			|| GetACSCanaris()
+			|| ACSGetCActor('ACS_Eredin') 
+			|| ACSGetCActor('ACS_Canaris')
 			|| thePlayer.HasTag('ACS_Wild_Hunt_Horse_Flying'))
 			&& GetWeatherConditionName() != 'WT_Blizzard'
 			&& GetWeatherConditionName() != 'WT_q501_Blizzard2'
 			)
 			{
-				if (!GetACSSnowEntity().IsEffectActive('spiral_snow', false))
+				if (!ACSGetCEntity('acs_snow_entity').IsEffectActive('spiral_snow', false))
 				{
-					GetACSSnowEntity().PlayEffectSingle('spiral_snow');
+					ACSGetCEntity('acs_snow_entity').PlayEffectSingle('spiral_snow');
 				}
 
 				Snow_Controller();
 			}
 			else
 			{
-				GetACSSnowEntity().StopEffect('spiral_snow');
+				ACSGetCEntity('acs_snow_entity').StopEffect('spiral_snow');
 
 				Snow_Controller();
 			}
 
 			if (thePlayer.HasTag('ACS_Player_In_Everstorm'))
 			{
-				GetACSSnowEntity().DestroyEffect('spiral_snow');
-				GetACSSnowEntity().DestroyEffect('snow_dust');
-				GetACSSnowEntity().DestroyEffect('slow_snow');
-				GetACSSnowEntity().DestroyEffect('snow_low_fx');
-				GetACSSnowEntity().DestroyEffect('snow_med_fx');
-				GetACSSnowEntity().DestroyEffect('snow_low_fx_2');
-				GetACSSnowEntity().DestroyEffect('snow_high_fx');
-				GetACSSnowEntity().DestroyEffect('spiral_snow');
+				ACSGetCEntity('acs_snow_entity').DestroyEffect('spiral_snow');
+				ACSGetCEntity('acs_snow_entity').DestroyEffect('snow_dust');
+				ACSGetCEntity('acs_snow_entity').DestroyEffect('slow_snow');
+				ACSGetCEntity('acs_snow_entity').DestroyEffect('snow_low_fx');
+				ACSGetCEntity('acs_snow_entity').DestroyEffect('snow_med_fx');
+				ACSGetCEntity('acs_snow_entity').DestroyEffect('snow_low_fx_2');
+				ACSGetCEntity('acs_snow_entity').DestroyEffect('snow_high_fx');
+				ACSGetCEntity('acs_snow_entity').DestroyEffect('spiral_snow');
 
-				if (!GetACSSnowEntity().IsEffectActive('spiral_sand', false))
+				if (!ACSGetCEntity('acs_snow_entity').IsEffectActive('spiral_sand', false))
 				{
-					GetACSSnowEntity().PlayEffectSingle('spiral_sand');
+					ACSGetCEntity('acs_snow_entity').PlayEffectSingle('spiral_sand');
 				}
 
 				if (thePlayer.HasTag('ACS_Player_In_Everstorm_Distance_1'))
 				{
-					GetACSSnowEntity().StopEffect('everstorm_embers_slow_1');
-					GetACSSnowEntity().StopEffect('everstorm_embers_slow_2');
-					GetACSSnowEntity().StopEffect('everstorm_embers_slow_3');
+					ACSGetCEntity('acs_snow_entity').StopEffect('everstorm_embers_slow_1');
+					ACSGetCEntity('acs_snow_entity').StopEffect('everstorm_embers_slow_2');
+					ACSGetCEntity('acs_snow_entity').StopEffect('everstorm_embers_slow_3');
 
-					if (!GetACSSnowEntity().IsEffectActive('everstorm_embers_slow_4', false))
+					if (!ACSGetCEntity('acs_snow_entity').IsEffectActive('everstorm_embers_slow_4', false))
 					{
-						GetACSSnowEntity().PlayEffectSingle('everstorm_embers_slow_4');
+						ACSGetCEntity('acs_snow_entity').PlayEffectSingle('everstorm_embers_slow_4');
 					}
 				}
 				else if (thePlayer.HasTag('ACS_Player_In_Everstorm_Distance_2'))
 				{
-					GetACSSnowEntity().StopEffect('everstorm_embers_slow_1');
-					GetACSSnowEntity().StopEffect('everstorm_embers_slow_2');
-					GetACSSnowEntity().StopEffect('everstorm_embers_slow_4');
+					ACSGetCEntity('acs_snow_entity').StopEffect('everstorm_embers_slow_1');
+					ACSGetCEntity('acs_snow_entity').StopEffect('everstorm_embers_slow_2');
+					ACSGetCEntity('acs_snow_entity').StopEffect('everstorm_embers_slow_4');
 
-					if (!GetACSSnowEntity().IsEffectActive('everstorm_embers_slow_3', false))
+					if (!ACSGetCEntity('acs_snow_entity').IsEffectActive('everstorm_embers_slow_3', false))
 					{
-						GetACSSnowEntity().PlayEffectSingle('everstorm_embers_slow_3');
+						ACSGetCEntity('acs_snow_entity').PlayEffectSingle('everstorm_embers_slow_3');
 					}
 				}
 				else if (thePlayer.HasTag('ACS_Player_In_Everstorm_Distance_3'))
 				{
-					GetACSSnowEntity().StopEffect('everstorm_embers_slow_1');
-					GetACSSnowEntity().StopEffect('everstorm_embers_slow_3');
-					GetACSSnowEntity().StopEffect('everstorm_embers_slow_4');
+					ACSGetCEntity('acs_snow_entity').StopEffect('everstorm_embers_slow_1');
+					ACSGetCEntity('acs_snow_entity').StopEffect('everstorm_embers_slow_3');
+					ACSGetCEntity('acs_snow_entity').StopEffect('everstorm_embers_slow_4');
 
-					if (!GetACSSnowEntity().IsEffectActive('everstorm_embers_slow_2', false))
+					if (!ACSGetCEntity('acs_snow_entity').IsEffectActive('everstorm_embers_slow_2', false))
 					{
-						GetACSSnowEntity().PlayEffectSingle('everstorm_embers_slow_2');
+						ACSGetCEntity('acs_snow_entity').PlayEffectSingle('everstorm_embers_slow_2');
 					}
 				}
 				else if (thePlayer.HasTag('ACS_Player_In_Everstorm_Distance_4'))
 				{
-					GetACSSnowEntity().StopEffect('everstorm_embers_slow_2');
-					GetACSSnowEntity().StopEffect('everstorm_embers_slow_3');
-					GetACSSnowEntity().StopEffect('everstorm_embers_slow_4');
+					ACSGetCEntity('acs_snow_entity').StopEffect('everstorm_embers_slow_2');
+					ACSGetCEntity('acs_snow_entity').StopEffect('everstorm_embers_slow_3');
+					ACSGetCEntity('acs_snow_entity').StopEffect('everstorm_embers_slow_4');
 
-					if (!GetACSSnowEntity().IsEffectActive('everstorm_embers_slow_1', false))
+					if (!ACSGetCEntity('acs_snow_entity').IsEffectActive('everstorm_embers_slow_1', false))
 					{
-						GetACSSnowEntity().PlayEffectSingle('everstorm_embers_slow_1');
+						ACSGetCEntity('acs_snow_entity').PlayEffectSingle('everstorm_embers_slow_1');
 					}
 				}
 			}
 			else
 			{
-				GetACSSnowEntity().StopEffect('everstorm_embers_slow_1');
-				GetACSSnowEntity().StopEffect('everstorm_embers_slow_2');
-				GetACSSnowEntity().StopEffect('everstorm_embers_slow_3');
-				GetACSSnowEntity().StopEffect('everstorm_embers_slow_4');
-				GetACSSnowEntity().StopEffect('spiral_sand');
+				ACSGetCEntity('acs_snow_entity').StopEffect('everstorm_embers_slow_1');
+				ACSGetCEntity('acs_snow_entity').StopEffect('everstorm_embers_slow_2');
+				ACSGetCEntity('acs_snow_entity').StopEffect('everstorm_embers_slow_3');
+				ACSGetCEntity('acs_snow_entity').StopEffect('everstorm_embers_slow_4');
+				ACSGetCEntity('acs_snow_entity').StopEffect('spiral_sand');
 			}
 		}
 	}
@@ -21271,19 +20719,19 @@ state ACS_Human_Ice_Breathe_Controller_Engage in cACS_Human_Ice_Breathe_Controll
 					{
 						Skellige_Normal_Env();
 
-						GetACSSnowEntity().StopEffect('snow_dust');
-						GetACSSnowEntity().StopEffect('slow_snow');
-						GetACSSnowEntity().StopEffect('snow_med_fx');
-						GetACSSnowEntity().StopEffect('snow_high_fx');
+						ACSGetCEntity('acs_snow_entity').StopEffect('snow_dust');
+						ACSGetCEntity('acs_snow_entity').StopEffect('slow_snow');
+						ACSGetCEntity('acs_snow_entity').StopEffect('snow_med_fx');
+						ACSGetCEntity('acs_snow_entity').StopEffect('snow_high_fx');
 
-						if (!GetACSSnowEntity().IsEffectActive('snow_low_fx', false))
+						if (!ACSGetCEntity('acs_snow_entity').IsEffectActive('snow_low_fx', false))
 						{
-							GetACSSnowEntity().PlayEffectSingle('snow_low_fx');
+							ACSGetCEntity('acs_snow_entity').PlayEffectSingle('snow_low_fx');
 						}
 
-						if (!GetACSSnowEntity().IsEffectActive('snow_low_fx_2', false))
+						if (!ACSGetCEntity('acs_snow_entity').IsEffectActive('snow_low_fx_2', false))
 						{
-							GetACSSnowEntity().PlayEffectSingle('snow_low_fx_2');
+							ACSGetCEntity('acs_snow_entity').PlayEffectSingle('snow_low_fx_2');
 						}
 
 						FactsAdd("ACS_Skellige_Clear_Low_Snow");
@@ -21295,12 +20743,12 @@ state ACS_Human_Ice_Breathe_Controller_Engage in cACS_Human_Ice_Breathe_Controll
 					{
 						Skellige_Mid_Clouds_Env();
 
-						GetACSSnowEntity().StopEffect('snow_dust');
-						GetACSSnowEntity().StopEffect('slow_snow');
-						GetACSSnowEntity().StopEffect('snow_low_fx');
-						GetACSSnowEntity().StopEffect('snow_low_fx_2');
-						GetACSSnowEntity().StopEffect('snow_med_fx');
-						GetACSSnowEntity().StopEffect('snow_high_fx');
+						ACSGetCEntity('acs_snow_entity').StopEffect('snow_dust');
+						ACSGetCEntity('acs_snow_entity').StopEffect('slow_snow');
+						ACSGetCEntity('acs_snow_entity').StopEffect('snow_low_fx');
+						ACSGetCEntity('acs_snow_entity').StopEffect('snow_low_fx_2');
+						ACSGetCEntity('acs_snow_entity').StopEffect('snow_med_fx');
+						ACSGetCEntity('acs_snow_entity').StopEffect('snow_high_fx');
 
 						FactsAdd("ACS_Skellige_Clear_No_Snow");
 					}
@@ -21316,19 +20764,19 @@ state ACS_Human_Ice_Breathe_Controller_Engage in cACS_Human_Ice_Breathe_Controll
 				{
 					Skellige_Blizzard_Env();
 
-					GetACSSnowEntity().StopEffect('snow_dust');
-					GetACSSnowEntity().StopEffect('slow_snow');
-					GetACSSnowEntity().StopEffect('snow_low_fx');
-					GetACSSnowEntity().StopEffect('snow_low_fx_2');
+					ACSGetCEntity('acs_snow_entity').StopEffect('snow_dust');
+					ACSGetCEntity('acs_snow_entity').StopEffect('slow_snow');
+					ACSGetCEntity('acs_snow_entity').StopEffect('snow_low_fx');
+					ACSGetCEntity('acs_snow_entity').StopEffect('snow_low_fx_2');
 
-					if (!GetACSSnowEntity().IsEffectActive('snow_high_fx', false))
+					if (!ACSGetCEntity('acs_snow_entity').IsEffectActive('snow_high_fx', false))
 					{
-						GetACSSnowEntity().PlayEffectSingle('snow_high_fx');
+						ACSGetCEntity('acs_snow_entity').PlayEffectSingle('snow_high_fx');
 					}
 
-					if (!GetACSSnowEntity().IsEffectActive('snow_med_fx', false))
+					if (!ACSGetCEntity('acs_snow_entity').IsEffectActive('snow_med_fx', false))
 					{
-						GetACSSnowEntity().PlayEffectSingle('snow_med_fx');
+						ACSGetCEntity('acs_snow_entity').PlayEffectSingle('snow_med_fx');
 					}
 				}
 				else if (
@@ -21337,34 +20785,34 @@ state ACS_Human_Ice_Breathe_Controller_Engage in cACS_Human_Ice_Breathe_Controll
 				{
 					Skellige_Blizzard_Env();
 
-					if (!GetACSSnowEntity().IsEffectActive('snow_high_fx', false))
+					if (!ACSGetCEntity('acs_snow_entity').IsEffectActive('snow_high_fx', false))
 					{
-						GetACSSnowEntity().PlayEffectSingle('snow_high_fx');
+						ACSGetCEntity('acs_snow_entity').PlayEffectSingle('snow_high_fx');
 					}
 
-					if (!GetACSSnowEntity().IsEffectActive('snow_med_fx', false))
+					if (!ACSGetCEntity('acs_snow_entity').IsEffectActive('snow_med_fx', false))
 					{
-						GetACSSnowEntity().PlayEffectSingle('snow_med_fx');
+						ACSGetCEntity('acs_snow_entity').PlayEffectSingle('snow_med_fx');
 					}
 
-					if (!GetACSSnowEntity().IsEffectActive('slow_snow', false))
+					if (!ACSGetCEntity('acs_snow_entity').IsEffectActive('slow_snow', false))
 					{
-						GetACSSnowEntity().PlayEffectSingle('slow_snow');
+						ACSGetCEntity('acs_snow_entity').PlayEffectSingle('slow_snow');
 					}
 
-					if (!GetACSSnowEntity().IsEffectActive('snow_dust', false))
+					if (!ACSGetCEntity('acs_snow_entity').IsEffectActive('snow_dust', false))
 					{
-						GetACSSnowEntity().PlayEffectSingle('snow_dust');
+						ACSGetCEntity('acs_snow_entity').PlayEffectSingle('snow_dust');
 					}
 
-					if (!GetACSSnowEntity().IsEffectActive('snow_low_fx', false))
+					if (!ACSGetCEntity('acs_snow_entity').IsEffectActive('snow_low_fx', false))
 					{
-						GetACSSnowEntity().PlayEffectSingle('snow_low_fx');
+						ACSGetCEntity('acs_snow_entity').PlayEffectSingle('snow_low_fx');
 					}
 
-					if (!GetACSSnowEntity().IsEffectActive('snow_low_fx_2', false))
+					if (!ACSGetCEntity('acs_snow_entity').IsEffectActive('snow_low_fx_2', false))
 					{
-						GetACSSnowEntity().PlayEffectSingle('snow_low_fx_2');
+						ACSGetCEntity('acs_snow_entity').PlayEffectSingle('snow_low_fx_2');
 					}
 				}
 				else if (
@@ -21375,25 +20823,25 @@ state ACS_Human_Ice_Breathe_Controller_Engage in cACS_Human_Ice_Breathe_Controll
 				{
 					Skellige_Normal_Env();
 
-					GetACSSnowEntity().StopEffect('snow_high_fx');
+					ACSGetCEntity('acs_snow_entity').StopEffect('snow_high_fx');
 
-					GetACSSnowEntity().StopEffect('slow_snow');
+					ACSGetCEntity('acs_snow_entity').StopEffect('slow_snow');
 
-					GetACSSnowEntity().StopEffect('snow_dust');
+					ACSGetCEntity('acs_snow_entity').StopEffect('snow_dust');
 
-					if (!GetACSSnowEntity().IsEffectActive('snow_med_fx', false))
+					if (!ACSGetCEntity('acs_snow_entity').IsEffectActive('snow_med_fx', false))
 					{
-						GetACSSnowEntity().PlayEffectSingle('snow_med_fx');
+						ACSGetCEntity('acs_snow_entity').PlayEffectSingle('snow_med_fx');
 					}
 
-					if (!GetACSSnowEntity().IsEffectActive('snow_low_fx', false))
+					if (!ACSGetCEntity('acs_snow_entity').IsEffectActive('snow_low_fx', false))
 					{
-						GetACSSnowEntity().PlayEffectSingle('snow_low_fx');
+						ACSGetCEntity('acs_snow_entity').PlayEffectSingle('snow_low_fx');
 					}
 
-					if (!GetACSSnowEntity().IsEffectActive('snow_low_fx_2', false))
+					if (!ACSGetCEntity('acs_snow_entity').IsEffectActive('snow_low_fx_2', false))
 					{
-						GetACSSnowEntity().PlayEffectSingle('snow_low_fx_2');
+						ACSGetCEntity('acs_snow_entity').PlayEffectSingle('snow_low_fx_2');
 					}
 				}
 				else if (
@@ -21402,15 +20850,15 @@ state ACS_Human_Ice_Breathe_Controller_Engage in cACS_Human_Ice_Breathe_Controll
 				{
 					Skellige_Normal_Env();
 
-					GetACSSnowEntity().StopEffect('snow_dust');
-					GetACSSnowEntity().StopEffect('slow_snow');
-					GetACSSnowEntity().StopEffect('snow_med_fx');
-					GetACSSnowEntity().StopEffect('snow_low_fx_2');
-					GetACSSnowEntity().StopEffect('snow_high_fx');
+					ACSGetCEntity('acs_snow_entity').StopEffect('snow_dust');
+					ACSGetCEntity('acs_snow_entity').StopEffect('slow_snow');
+					ACSGetCEntity('acs_snow_entity').StopEffect('snow_med_fx');
+					ACSGetCEntity('acs_snow_entity').StopEffect('snow_low_fx_2');
+					ACSGetCEntity('acs_snow_entity').StopEffect('snow_high_fx');
 
-					if (!GetACSSnowEntity().IsEffectActive('snow_low_fx', false))
+					if (!ACSGetCEntity('acs_snow_entity').IsEffectActive('snow_low_fx', false))
 					{
-						GetACSSnowEntity().PlayEffectSingle('snow_low_fx');
+						ACSGetCEntity('acs_snow_entity').PlayEffectSingle('snow_low_fx');
 					}
 				}
 				else if (
@@ -21419,19 +20867,19 @@ state ACS_Human_Ice_Breathe_Controller_Engage in cACS_Human_Ice_Breathe_Controll
 				{
 					Skellige_Rain_Storm_Env();
 
-					GetACSSnowEntity().StopEffect('snow_dust');
-					GetACSSnowEntity().StopEffect('slow_snow');
-					GetACSSnowEntity().StopEffect('snow_med_fx');
-					GetACSSnowEntity().StopEffect('snow_high_fx');
+					ACSGetCEntity('acs_snow_entity').StopEffect('snow_dust');
+					ACSGetCEntity('acs_snow_entity').StopEffect('slow_snow');
+					ACSGetCEntity('acs_snow_entity').StopEffect('snow_med_fx');
+					ACSGetCEntity('acs_snow_entity').StopEffect('snow_high_fx');
 
-					if (!GetACSSnowEntity().IsEffectActive('snow_low_fx', false))
+					if (!ACSGetCEntity('acs_snow_entity').IsEffectActive('snow_low_fx', false))
 					{
-						GetACSSnowEntity().PlayEffectSingle('snow_low_fx');
+						ACSGetCEntity('acs_snow_entity').PlayEffectSingle('snow_low_fx');
 					}
 
-					if (!GetACSSnowEntity().IsEffectActive('snow_low_fx_2', false))
+					if (!ACSGetCEntity('acs_snow_entity').IsEffectActive('snow_low_fx_2', false))
 					{
-						GetACSSnowEntity().PlayEffectSingle('snow_low_fx_2');
+						ACSGetCEntity('acs_snow_entity').PlayEffectSingle('snow_low_fx_2');
 					}
 				}
 				else if (
@@ -21441,19 +20889,19 @@ state ACS_Human_Ice_Breathe_Controller_Engage in cACS_Human_Ice_Breathe_Controll
 				{
 					Skellige_Blizzard_Env();
 
-					GetACSSnowEntity().StopEffect('slow_snow');
-					GetACSSnowEntity().StopEffect('snow_low_fx');
-					GetACSSnowEntity().StopEffect('snow_low_fx_2');
-					GetACSSnowEntity().StopEffect('snow_dust');
+					ACSGetCEntity('acs_snow_entity').StopEffect('slow_snow');
+					ACSGetCEntity('acs_snow_entity').StopEffect('snow_low_fx');
+					ACSGetCEntity('acs_snow_entity').StopEffect('snow_low_fx_2');
+					ACSGetCEntity('acs_snow_entity').StopEffect('snow_dust');
 
-					if (!GetACSSnowEntity().IsEffectActive('snow_high_fx', false))
+					if (!ACSGetCEntity('acs_snow_entity').IsEffectActive('snow_high_fx', false))
 					{
-						GetACSSnowEntity().PlayEffectSingle('snow_high_fx');
+						ACSGetCEntity('acs_snow_entity').PlayEffectSingle('snow_high_fx');
 					}
 
-					if (!GetACSSnowEntity().IsEffectActive('snow_med_fx', false))
+					if (!ACSGetCEntity('acs_snow_entity').IsEffectActive('snow_med_fx', false))
 					{
-						GetACSSnowEntity().PlayEffectSingle('snow_med_fx');
+						ACSGetCEntity('acs_snow_entity').PlayEffectSingle('snow_med_fx');
 					}
 				}
 				else if (
@@ -21462,12 +20910,12 @@ state ACS_Human_Ice_Breathe_Controller_Engage in cACS_Human_Ice_Breathe_Controll
 				{
 					Skellige_Heavy_Clouds_Dark_Env();
 
-					GetACSSnowEntity().StopEffect('snow_dust');
-					GetACSSnowEntity().StopEffect('slow_snow');
-					GetACSSnowEntity().StopEffect('snow_low_fx');
-					GetACSSnowEntity().StopEffect('snow_med_fx');
-					GetACSSnowEntity().StopEffect('snow_low_fx_2');
-					GetACSSnowEntity().StopEffect('snow_high_fx');
+					ACSGetCEntity('acs_snow_entity').StopEffect('snow_dust');
+					ACSGetCEntity('acs_snow_entity').StopEffect('slow_snow');
+					ACSGetCEntity('acs_snow_entity').StopEffect('snow_low_fx');
+					ACSGetCEntity('acs_snow_entity').StopEffect('snow_med_fx');
+					ACSGetCEntity('acs_snow_entity').StopEffect('snow_low_fx_2');
+					ACSGetCEntity('acs_snow_entity').StopEffect('snow_high_fx');
 				}
 				else if (
 				GetWeatherConditionName() == 'WT_Rain_Storm'
@@ -21475,23 +20923,23 @@ state ACS_Human_Ice_Breathe_Controller_Engage in cACS_Human_Ice_Breathe_Controll
 				{
 					Skellige_Mid_Clouds_Env();
 
-					GetACSSnowEntity().StopEffect('snow_dust');
-					GetACSSnowEntity().StopEffect('slow_snow');
-					GetACSSnowEntity().StopEffect('snow_low_fx');
-					GetACSSnowEntity().StopEffect('snow_med_fx');
-					GetACSSnowEntity().StopEffect('snow_low_fx_2');
-					GetACSSnowEntity().StopEffect('snow_high_fx');
+					ACSGetCEntity('acs_snow_entity').StopEffect('snow_dust');
+					ACSGetCEntity('acs_snow_entity').StopEffect('slow_snow');
+					ACSGetCEntity('acs_snow_entity').StopEffect('snow_low_fx');
+					ACSGetCEntity('acs_snow_entity').StopEffect('snow_med_fx');
+					ACSGetCEntity('acs_snow_entity').StopEffect('snow_low_fx_2');
+					ACSGetCEntity('acs_snow_entity').StopEffect('snow_high_fx');
 				}
 				else
 				{
 					Skellige_Normal_Env();
 
-					GetACSSnowEntity().StopEffect('snow_dust');
-					GetACSSnowEntity().StopEffect('slow_snow');
-					GetACSSnowEntity().StopEffect('snow_low_fx');
-					GetACSSnowEntity().StopEffect('snow_med_fx');
-					GetACSSnowEntity().StopEffect('snow_low_fx_2');
-					GetACSSnowEntity().StopEffect('snow_high_fx');
+					ACSGetCEntity('acs_snow_entity').StopEffect('snow_dust');
+					ACSGetCEntity('acs_snow_entity').StopEffect('slow_snow');
+					ACSGetCEntity('acs_snow_entity').StopEffect('snow_low_fx');
+					ACSGetCEntity('acs_snow_entity').StopEffect('snow_med_fx');
+					ACSGetCEntity('acs_snow_entity').StopEffect('snow_low_fx_2');
+					ACSGetCEntity('acs_snow_entity').StopEffect('snow_high_fx');
 				}
 			}
 		}
@@ -21505,76 +20953,76 @@ state ACS_Human_Ice_Breathe_Controller_Engage in cACS_Human_Ice_Breathe_Controll
 			GetWeatherConditionName() == 'WT_Snow' 
 			)
 			{
-				if (!GetACSSnowEntity().IsEffectActive('snow_high_fx', false))
+				if (!ACSGetCEntity('acs_snow_entity').IsEffectActive('snow_high_fx', false))
 				{
-					GetACSSnowEntity().PlayEffectSingle('snow_high_fx');
+					ACSGetCEntity('acs_snow_entity').PlayEffectSingle('snow_high_fx');
 				}
 
-				if (!GetACSSnowEntity().IsEffectActive('snow_med_fx', false))
+				if (!ACSGetCEntity('acs_snow_entity').IsEffectActive('snow_med_fx', false))
 				{
-					GetACSSnowEntity().PlayEffectSingle('snow_med_fx');
+					ACSGetCEntity('acs_snow_entity').PlayEffectSingle('snow_med_fx');
 				}
 
-				if (!GetACSSnowEntity().IsEffectActive('slow_snow', false))
+				if (!ACSGetCEntity('acs_snow_entity').IsEffectActive('slow_snow', false))
 				{
-					GetACSSnowEntity().PlayEffectSingle('slow_snow');
+					ACSGetCEntity('acs_snow_entity').PlayEffectSingle('slow_snow');
 				}
 
-				if (!GetACSSnowEntity().IsEffectActive('snow_dust', false))
+				if (!ACSGetCEntity('acs_snow_entity').IsEffectActive('snow_dust', false))
 				{
-					GetACSSnowEntity().PlayEffectSingle('snow_dust');
+					ACSGetCEntity('acs_snow_entity').PlayEffectSingle('snow_dust');
 				}
 
-				if (!GetACSSnowEntity().IsEffectActive('snow_low_fx', false))
+				if (!ACSGetCEntity('acs_snow_entity').IsEffectActive('snow_low_fx', false))
 				{
-					GetACSSnowEntity().PlayEffectSingle('snow_low_fx');
+					ACSGetCEntity('acs_snow_entity').PlayEffectSingle('snow_low_fx');
 				}
 
-				if (!GetACSSnowEntity().IsEffectActive('snow_low_fx_2', false))
+				if (!ACSGetCEntity('acs_snow_entity').IsEffectActive('snow_low_fx_2', false))
 				{
-					GetACSSnowEntity().PlayEffectSingle('snow_low_fx_2');
+					ACSGetCEntity('acs_snow_entity').PlayEffectSingle('snow_low_fx_2');
 				}
 			}
 			else if (
 			GetWeatherConditionName() == 'WT_Battle' 
 			)
 			{
-				GetACSSnowEntity().StopEffect('snow_dust');
-				GetACSSnowEntity().StopEffect('slow_snow');
-				GetACSSnowEntity().StopEffect('snow_med_fx');
-				GetACSSnowEntity().StopEffect('snow_high_fx');
+				ACSGetCEntity('acs_snow_entity').StopEffect('snow_dust');
+				ACSGetCEntity('acs_snow_entity').StopEffect('slow_snow');
+				ACSGetCEntity('acs_snow_entity').StopEffect('snow_med_fx');
+				ACSGetCEntity('acs_snow_entity').StopEffect('snow_high_fx');
 
-				if (!GetACSSnowEntity().IsEffectActive('snow_low_fx', false))
+				if (!ACSGetCEntity('acs_snow_entity').IsEffectActive('snow_low_fx', false))
 				{
-					GetACSSnowEntity().PlayEffectSingle('snow_low_fx');
+					ACSGetCEntity('acs_snow_entity').PlayEffectSingle('snow_low_fx');
 				}
 
-				if (!GetACSSnowEntity().IsEffectActive('snow_low_fx_2', false))
+				if (!ACSGetCEntity('acs_snow_entity').IsEffectActive('snow_low_fx_2', false))
 				{
-					GetACSSnowEntity().PlayEffectSingle('snow_low_fx_2');
+					ACSGetCEntity('acs_snow_entity').PlayEffectSingle('snow_low_fx_2');
 				}
 			}
 			else if (
 			GetWeatherConditionName() == 'WT_Battle_Forest'
 			)
 			{
-				GetACSSnowEntity().StopEffect('snow_dust');
-				GetACSSnowEntity().StopEffect('slow_snow');
-				GetACSSnowEntity().StopEffect('snow_high_fx');
+				ACSGetCEntity('acs_snow_entity').StopEffect('snow_dust');
+				ACSGetCEntity('acs_snow_entity').StopEffect('slow_snow');
+				ACSGetCEntity('acs_snow_entity').StopEffect('snow_high_fx');
 
-				if (!GetACSSnowEntity().IsEffectActive('snow_med_fx', false))
+				if (!ACSGetCEntity('acs_snow_entity').IsEffectActive('snow_med_fx', false))
 				{
-					GetACSSnowEntity().PlayEffectSingle('snow_med_fx');
+					ACSGetCEntity('acs_snow_entity').PlayEffectSingle('snow_med_fx');
 				}
 
-				if (!GetACSSnowEntity().IsEffectActive('snow_low_fx', false))
+				if (!ACSGetCEntity('acs_snow_entity').IsEffectActive('snow_low_fx', false))
 				{
-					GetACSSnowEntity().PlayEffectSingle('snow_low_fx');
+					ACSGetCEntity('acs_snow_entity').PlayEffectSingle('snow_low_fx');
 				}
 
-				if (!GetACSSnowEntity().IsEffectActive('snow_low_fx_2', false))
+				if (!ACSGetCEntity('acs_snow_entity').IsEffectActive('snow_low_fx_2', false))
 				{
-					GetACSSnowEntity().PlayEffectSingle('snow_low_fx_2');
+					ACSGetCEntity('acs_snow_entity').PlayEffectSingle('snow_low_fx_2');
 				}
 			}
 			else if (
@@ -21583,71 +21031,71 @@ state ACS_Human_Ice_Breathe_Controller_Engage in cACS_Human_Ice_Breathe_Controll
 			|| GetWeatherConditionName() == 'WT_q501_Blizzard2'
 			)
 			{
-				GetACSSnowEntity().StopEffect('snow_high_fx');
+				ACSGetCEntity('acs_snow_entity').StopEffect('snow_high_fx');
 
-				if (!GetACSSnowEntity().IsEffectActive('slow_snow', false))
+				if (!ACSGetCEntity('acs_snow_entity').IsEffectActive('slow_snow', false))
 				{
-					GetACSSnowEntity().PlayEffectSingle('slow_snow');
+					ACSGetCEntity('acs_snow_entity').PlayEffectSingle('slow_snow');
 				}
 
-				if (!GetACSSnowEntity().IsEffectActive('snow_dust', false))
+				if (!ACSGetCEntity('acs_snow_entity').IsEffectActive('snow_dust', false))
 				{
-					GetACSSnowEntity().PlayEffectSingle('snow_dust');
+					ACSGetCEntity('acs_snow_entity').PlayEffectSingle('snow_dust');
 				}
 
-				if (!GetACSSnowEntity().IsEffectActive('snow_med_fx', false))
+				if (!ACSGetCEntity('acs_snow_entity').IsEffectActive('snow_med_fx', false))
 				{
-					GetACSSnowEntity().PlayEffectSingle('snow_med_fx');
+					ACSGetCEntity('acs_snow_entity').PlayEffectSingle('snow_med_fx');
 				}
 
-				if (!GetACSSnowEntity().IsEffectActive('snow_low_fx', false))
+				if (!ACSGetCEntity('acs_snow_entity').IsEffectActive('snow_low_fx', false))
 				{
-					GetACSSnowEntity().PlayEffectSingle('snow_low_fx');
+					ACSGetCEntity('acs_snow_entity').PlayEffectSingle('snow_low_fx');
 				}
 
-				if (!GetACSSnowEntity().IsEffectActive('snow_low_fx_2', false))
+				if (!ACSGetCEntity('acs_snow_entity').IsEffectActive('snow_low_fx_2', false))
 				{
-					GetACSSnowEntity().PlayEffectSingle('snow_low_fx_2');
+					ACSGetCEntity('acs_snow_entity').PlayEffectSingle('snow_low_fx_2');
 				}
 			}
 			else if (
 			GetWeatherConditionName() == 'WT_q604_Snow'
 			)
 			{
-				GetACSSnowEntity().StopEffect('snow_dust');
-				GetACSSnowEntity().StopEffect('slow_snow');
-				GetACSSnowEntity().StopEffect('snow_low_fx_2');
-				GetACSSnowEntity().StopEffect('snow_med_fx');
-				GetACSSnowEntity().StopEffect('snow_high_fx');
+				ACSGetCEntity('acs_snow_entity').StopEffect('snow_dust');
+				ACSGetCEntity('acs_snow_entity').StopEffect('slow_snow');
+				ACSGetCEntity('acs_snow_entity').StopEffect('snow_low_fx_2');
+				ACSGetCEntity('acs_snow_entity').StopEffect('snow_med_fx');
+				ACSGetCEntity('acs_snow_entity').StopEffect('snow_high_fx');
 
-				if (!GetACSSnowEntity().IsEffectActive('snow_low_fx', false))
+				if (!ACSGetCEntity('acs_snow_entity').IsEffectActive('snow_low_fx', false))
 				{
-					GetACSSnowEntity().PlayEffectSingle('snow_low_fx');
+					ACSGetCEntity('acs_snow_entity').PlayEffectSingle('snow_low_fx');
 				}
 			}
 			else if (
 			GetWeatherConditionName() == 'WT_Fog_Snow'
 			)
 			{
-				GetACSSnowEntity().StopEffect('snow_dust');
-				GetACSSnowEntity().StopEffect('slow_snow');
-				GetACSSnowEntity().StopEffect('snow_low_fx');
-				GetACSSnowEntity().StopEffect('snow_med_fx');
-				GetACSSnowEntity().StopEffect('snow_high_fx');
+				ACSGetCEntity('acs_snow_entity').StopEffect('snow_dust');
+				ACSGetCEntity('acs_snow_entity').StopEffect('slow_snow');
+				ACSGetCEntity('acs_snow_entity').StopEffect('snow_low_fx');
+				ACSGetCEntity('acs_snow_entity').StopEffect('snow_med_fx');
+				ACSGetCEntity('acs_snow_entity').StopEffect('snow_high_fx');
 
-				if (!GetACSSnowEntity().IsEffectActive('snow_low_fx_2', false))
+				if (!ACSGetCEntity('acs_snow_entity').IsEffectActive('snow_low_fx_2', false))
 				{
-					GetACSSnowEntity().PlayEffectSingle('snow_low_fx_2');
+					ACSGetCEntity('acs_snow_entity').PlayEffectSingle('snow_low_fx_2');
 				}
 			}
 			else
 			{
-				GetACSSnowEntity().StopEffect('snow_dust');
-				GetACSSnowEntity().StopEffect('slow_snow');
-				GetACSSnowEntity().StopEffect('snow_low_fx');
-				GetACSSnowEntity().StopEffect('snow_med_fx');
-				GetACSSnowEntity().StopEffect('snow_low_fx_2');
-				GetACSSnowEntity().StopEffect('snow_high_fx');
+				ACSGetCEntity('acs_snow_entity').StopEffect('snow_dust');
+				ACSGetCEntity('acs_snow_entity').StopEffect('slow_snow');
+				ACSGetCEntity('acs_snow_entity').StopEffect('snow_low_fx');
+				ACSGetCEntity('acs_snow_entity').StopEffect('snow_med_fx');
+				ACSGetCEntity('acs_snow_entity').StopEffect('snow_low_fx_2');
+				ACSGetCEntity('acs_snow_entity').StopEffect('snow_high_fx');
 			}
 		}
 	}
@@ -22195,7 +21643,7 @@ state ACS_Human_Ice_Breathe_Controller_Engage in cACS_Human_Ice_Breathe_Controll
 				thePlayer.DestroyEffect('ice_breath_gameplay');
 			}
 			
-			ACS_Ice_Breathe_Destroy();
+			ACSGetCEntityDestroyAll('ACS_Ice_Breathe_Controller');
 
 			ACS_Ice_Breathe_Entity_RemoveTag();
 		}
@@ -22217,21 +21665,6 @@ function ACS_FireSourceCheck ( checkedActor: CActor ): bool
 	}
 
     return false;
-}
-
-function ACS_Ice_Breathe_Destroy()
-{	
-	var ents 											: array<CEntity>;
-	var i												: int;
-	
-	ents.Clear();
-
-	theGame.GetEntitiesByTag( 'ACS_Ice_Breathe_Controller', ents );	
-	
-	for( i = 0; i < ents.Size(); i += 1 )
-	{
-		ents[i].Destroy();
-	}
 }
 
 function ACS_Ice_Breathe_Entity_RemoveTag()
@@ -22282,6 +21715,8 @@ class CACSIceBreatheController extends CEntity
 	
 	event OnSpawned( spawnData : SEntitySpawnData )
 	{
+		super.OnSpawned(spawnData);
+
 		AddTimer('AliveCheckTimer', 0.01, true);
 	}
 	
@@ -22457,16 +21892,6 @@ class CACSIceBreatheController extends CEntity
 	}
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-function GetACSSnowEntity() : CEntity
-{
-	var entity 			 : CEntity;
-	
-	entity = (CEntity)theGame.GetEntityByTag( 'acs_snow_entity' );
-	return entity;
-}
-
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 statemachine class cACS_EtherSword_Summon
@@ -22489,9 +21914,9 @@ state EtherSword_Spawner_Engage in cACS_EtherSword_Summon
 	
 	entry function EtherSword_Spawner_Entry()
 	{
-		GetACSArmorEtherSword().Destroy();
+		ACSGetCEntity('ACS_Armor_Ether_Sword').Destroy();
 		
-		if (!GetACSArmorEtherSword())
+		if (!ACSGetCEntity('ACS_Armor_Ether_Sword'))
 		{
 			ACS_HideSwordWitoutScabbardStuff();
 
@@ -22554,27 +21979,11 @@ state EtherSword_Spawner_Engage in cACS_EtherSword_Summon
 
 }
 
-function GetACSArmorEtherSword() : CEntity
-{
-	var entity 			 : CEntity;
-	
-	entity = (CEntity)theGame.GetEntityByTag( 'ACS_Armor_Ether_Sword' );
-	return entity;
-}
-
 function ACSMeditationCampfire() : W3Campfire
 {
 	var entity 			 : W3Campfire;
 	
 	entity = (W3Campfire)theGame.GetEntityByTag( 'ACS_Meditation_Campfire' );
-	return entity;
-}
-
-function ACS_GPS_Entity() : CActor
-{
-	var entity 			 : CActor;
-	
-	entity = (CActor)theGame.GetEntityByTag( 'ACS_GPS_Entity' );
 	return entity;
 }
 
@@ -22712,56 +22121,6 @@ state ACS_Red_Blade_Projectile_Engage in cACS_Red_Blade_Projectile_Fire
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function GetACSGuidingLightMarker() : CEntity
-{
-	var entity 			 : CEntity;
-	
-	entity = (CEntity)theGame.GetEntityByTag( 'ACS_Guiding_Light_Marker' );
-	return entity;
-}
-
-function GetACSGuidingLightPOIMarker() : CEntity
-{
-	var entity 			 : CEntity;
-	
-	entity = (CEntity)theGame.GetEntityByTag( 'ACS_Guiding_Light_POI_Marker' );
-	return entity;
-}
-
-function GetACSGuidingLightAvailableQuestMarker() : CEntity
-{
-	var entity 			 : CEntity;
-	
-	entity = (CEntity)theGame.GetEntityByTag( 'ACS_Guiding_Light_Available_Quest_Marker' );
-	return entity;
-}
-
-function GetACSGuidingLightUserPinMarker() : CEntity
-{
-	var entity 			 : CEntity;
-	
-	entity = (CEntity)theGame.GetEntityByTag( 'ACS_Guiding_Light_User_Pin_Marker' );
-	return entity;
-}
-
-function GetACSGuidingLightEnemyMarker() : CEntity
-{
-	var entity 			 : CEntity;
-	
-	entity = (CEntity)theGame.GetEntityByTag( 'ACS_Guiding_Light_Enemy_Marker' );
-	return entity;
-}
-
-function GetACSCompassBarEntity() : CEntity
-{
-	var entity 			 : CEntity;
-	
-	entity = (CEntity)theGame.GetEntityByTag( 'ACS_Compass_Bar_Entity' );
-	return entity;
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 statemachine class cACS_Throw_Knife
 {
     function ACS_Throw_Knife_Engage()
@@ -22821,17 +22180,6 @@ state ACS_Throw_Knife_Engage in cACS_Throw_Knife
 	}
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-function GetACSUseableItem() : CEntity
-{
-	var entity 			 : CEntity;
-	
-	entity = (CEntity)theGame.GetEntityByTag( 'ACS_Useable_Item' );
-	return entity;
-}
-
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 statemachine class cACS_Construct_Summon
@@ -22852,12 +22200,12 @@ state Construct_Summon_Engage in cACS_Construct_Summon
 	
 	entry function Construct_Summon_Entry()
 	{
-		if (!GetACSSummonedConstruct_1())
+		if (!ACSGetCActor('ACS_Summoned_Construct_1'))
 		{
 			acsspawnconstruct1();
 		}
 
-		if (!GetACSSummonedConstruct_2())
+		if (!ACSGetCActor('ACS_Summoned_Construct_2'))
 		{
 			acsspawnconstruct2();
 		}
@@ -22877,7 +22225,7 @@ state Construct_Summon_Engage in cACS_Construct_Summon
 		var bone_rot, rot, attach_rot, playerRot, adjustedRot				: EulerAngles;
 		var animatedComponentA												: CAnimatedComponent;
 
-		GetACSSummonedConstruct_1().Destroy();
+		ACSGetCActor('ACS_Summoned_Construct_1').Destroy();
 
 		temp = (CEntityTemplate)LoadResourceAsync( 
 
@@ -22944,7 +22292,7 @@ state Construct_Summon_Engage in cACS_Construct_Summon
 		var bone_rot, rot, attach_rot, playerRot, adjustedRot				: EulerAngles;
 		var animatedComponentA												: CAnimatedComponent;
 			
-		GetACSSummonedConstruct_2().Destroy();
+		ACSGetCActor('ACS_Summoned_Construct_2').Destroy();
 
 		temp = (CEntityTemplate)LoadResourceAsync( 
 
@@ -23004,23 +22352,6 @@ state Construct_Summon_Engage in cACS_Construct_Summon
 	}
 }
 
-
-function GetACSSummonedConstruct_1() : CActor
-{
-	var entity 			 : CActor;
-	
-	entity = (CActor)theGame.GetEntityByTag( 'ACS_Summoned_Construct_1' );
-	return entity;
-}
-
-function GetACSSummonedConstruct_2() : CActor
-{
-	var entity 			 : CActor;
-	
-	entity = (CActor)theGame.GetEntityByTag( 'ACS_Summoned_Construct_2' );
-	return entity;
-}
-
 function GetACSSummonedConstruct1Follow()
 {
 	var movementAdjustorNPC																									: CMovementAdjustor; 
@@ -23031,18 +22362,18 @@ function GetACSSummonedConstruct1Follow()
 	var i																													: int;
 	var npc																													: CNewNPC;
 
-	if (!GetACSSummonedConstruct_1())
+	if (!ACSGetCActor('ACS_Summoned_Construct_1'))
 	{
 		return;
 	}
 
-	targetDistance = VecDistanceSquared2D( GetACSSummonedConstruct_1().GetWorldPosition(), GetWitcherPlayer().GetWorldPosition() );
+	targetDistance = VecDistanceSquared2D( ACSGetCActor('ACS_Summoned_Construct_1').GetWorldPosition(), GetWitcherPlayer().GetWorldPosition() );
 
-	movementAdjustorNPC = GetACSSummonedConstruct_1().GetMovingAgentComponent().GetMovementAdjustor();
+	movementAdjustorNPC = ACSGetCActor('ACS_Summoned_Construct_1').GetMovingAgentComponent().GetMovementAdjustor();
 
-	thePlayer.SetAttitude(GetACSSummonedConstruct_1(), AIA_Friendly);
+	thePlayer.SetAttitude(ACSGetCActor('ACS_Summoned_Construct_1'), AIA_Friendly);
 
-	GetACSSummonedConstruct_1().SetTemporaryAttitudeGroup( 'friendly_to_player', AGP_Default );	
+	ACSGetCActor('ACS_Summoned_Construct_1').SetTemporaryAttitudeGroup( 'friendly_to_player', AGP_Default );	
 
 	ticketNPC = movementAdjustorNPC.GetRequest( 'ACS_Summoned_Construct_Rotate');
 	movementAdjustorNPC.CancelByName( 'ACS_Summoned_Construct_Rotate' );
@@ -23051,34 +22382,34 @@ function GetACSSummonedConstruct1Follow()
 	movementAdjustorNPC.AdjustmentDuration( ticketNPC, 0.25 );
 	movementAdjustorNPC.MaxRotationAdjustmentSpeed( ticketNPC, 500000 );
 
-	if (!GetACSSummonedConstruct_1().IsInCombat())
+	if (!ACSGetCActor('ACS_Summoned_Construct_1').IsInCombat())
 	{
 		if (targetDistance <= 2 * 2)
 		{
-			GetACSSummonedConstruct_1().GetMovingAgentComponent().SetGameplayRelativeMoveSpeed(0);
+			ACSGetCActor('ACS_Summoned_Construct_1').GetMovingAgentComponent().SetGameplayRelativeMoveSpeed(0);
 		}
 		else if (targetDistance > 2 * 2 && targetDistance <= 15 * 15)
 		{
 			movementAdjustorNPC.RotateTowards( ticketNPC, GetWitcherPlayer() );
 
-			GetACSSummonedConstruct_1().GetMovingAgentComponent().SetGameplayRelativeMoveSpeed(2);
+			ACSGetCActor('ACS_Summoned_Construct_1').GetMovingAgentComponent().SetGameplayRelativeMoveSpeed(2);
 		}
 		else if (targetDistance > 15 * 15 && GetWitcherPlayer().IsOnGround())
 		{
-			if (!GetACSSummonedConstruct_1().IsEffectActive('shadowdash_body_blood', false))
+			if (!ACSGetCActor('ACS_Summoned_Construct_1').IsEffectActive('shadowdash_body_blood', false))
 			{
-				GetACSSummonedConstruct_1().PlayEffectSingle('shadowdash_body_blood');
+				ACSGetCActor('ACS_Summoned_Construct_1').PlayEffectSingle('shadowdash_body_blood');
 			}
 
-			if (!GetACSSummonedConstruct_1().HasTag('ACS_Summoned_Construct_Teleport_Start'))
+			if (!ACSGetCActor('ACS_Summoned_Construct_1').HasTag('ACS_Summoned_Construct_Teleport_Start'))
 			{
-				GetACSSummonedConstruct_1().PlayEffectSingle('shadowdash');
-				GetACSSummonedConstruct_1().StopEffect('shadowdash');
+				ACSGetCActor('ACS_Summoned_Construct_1').PlayEffectSingle('shadowdash');
+				ACSGetCActor('ACS_Summoned_Construct_1').StopEffect('shadowdash');
 
 				GetACSWatcher().RemoveTimer('SummonedConstruct1TeleportDelay');
 				GetACSWatcher().AddTimer('SummonedConstruct1TeleportDelay', 0.5, false);
 
-				GetACSSummonedConstruct_1().AddTag('ACS_Summoned_Construct_Teleport_Start');
+				ACSGetCActor('ACS_Summoned_Construct_1').AddTag('ACS_Summoned_Construct_Teleport_Start');
 			}
 		} 
 	}
@@ -23089,11 +22420,11 @@ function GetACSSummonedConstruct1Follow()
 
 	if( actors.Size() > 0 )
 	{
-		GetACSSummonedConstruct_1().GetMovingAgentComponent().SetGameplayRelativeMoveSpeed(0);
+		ACSGetCActor('ACS_Summoned_Construct_1').GetMovingAgentComponent().SetGameplayRelativeMoveSpeed(0);
 
-		if (!GetACSSummonedConstruct_1().IsEffectActive('claws_trail', false))
+		if (!ACSGetCActor('ACS_Summoned_Construct_1').IsEffectActive('claws_trail', false))
 		{
-			GetACSSummonedConstruct_1().PlayEffectSingle('claws_trail');
+			ACSGetCActor('ACS_Summoned_Construct_1').PlayEffectSingle('claws_trail');
 		}
 
 		for( i = 0; i < actors.Size(); i += 1 )
@@ -23102,9 +22433,9 @@ function GetACSSummonedConstruct1Follow()
 
 			actor = actors[i];
 
-			GetACSSummonedConstruct_1().SetAttitude(actor, AIA_Hostile);
+			ACSGetCActor('ACS_Summoned_Construct_1').SetAttitude(actor, AIA_Hostile);
 
-			actor.SetAttitude(GetACSSummonedConstruct_1(), AIA_Hostile);
+			actor.SetAttitude(ACSGetCActor('ACS_Summoned_Construct_1'), AIA_Hostile);
 		}
 	}
 	
@@ -23112,20 +22443,20 @@ function GetACSSummonedConstruct1Follow()
 	{
 		if (targetDistance > 35 * 35 && GetWitcherPlayer().IsOnGround())
 		{
-			if (!GetACSSummonedConstruct_1().IsEffectActive('shadowdash_body_blood', false))
+			if (!ACSGetCActor('ACS_Summoned_Construct_1').IsEffectActive('shadowdash_body_blood', false))
 			{
-				GetACSSummonedConstruct_1().PlayEffectSingle('shadowdash_body_blood');
+				ACSGetCActor('ACS_Summoned_Construct_1').PlayEffectSingle('shadowdash_body_blood');
 			}
 
-			if (!GetACSSummonedConstruct_1().HasTag('ACS_Summoned_Construct_Teleport_Start'))
+			if (!ACSGetCActor('ACS_Summoned_Construct_1').HasTag('ACS_Summoned_Construct_Teleport_Start'))
 			{
-				GetACSSummonedConstruct_1().PlayEffectSingle('shadowdash');
-				GetACSSummonedConstruct_1().StopEffect('shadowdash');
+				ACSGetCActor('ACS_Summoned_Construct_1').PlayEffectSingle('shadowdash');
+				ACSGetCActor('ACS_Summoned_Construct_1').StopEffect('shadowdash');
 
 				GetACSWatcher().RemoveTimer('SummonedConstruct1TeleportDelay');
 				GetACSWatcher().AddTimer('SummonedConstruct1TeleportDelay', 0.5, false);
 
-				GetACSSummonedConstruct_1().AddTag('ACS_Summoned_Construct_Teleport_Start');
+				ACSGetCActor('ACS_Summoned_Construct_1').AddTag('ACS_Summoned_Construct_Teleport_Start');
 			}
 		}
 	}
@@ -23141,18 +22472,18 @@ function GetACSSummonedConstruct2Follow()
 	var i																													: int;
 	var npc																													: CNewNPC;
 
-	if (!GetACSSummonedConstruct_2())
+	if (!ACSGetCActor('ACS_Summoned_Construct_2'))
 	{
 		return;
 	}
 
-	targetDistance = VecDistanceSquared2D( GetACSSummonedConstruct_2().GetWorldPosition(), GetWitcherPlayer().GetWorldPosition() );
+	targetDistance = VecDistanceSquared2D( ACSGetCActor('ACS_Summoned_Construct_2').GetWorldPosition(), GetWitcherPlayer().GetWorldPosition() );
 
-	movementAdjustorNPC = GetACSSummonedConstruct_2().GetMovingAgentComponent().GetMovementAdjustor();
+	movementAdjustorNPC = ACSGetCActor('ACS_Summoned_Construct_2').GetMovingAgentComponent().GetMovementAdjustor();
 
-	thePlayer.SetAttitude(GetACSSummonedConstruct_2(), AIA_Friendly);
+	thePlayer.SetAttitude(ACSGetCActor('ACS_Summoned_Construct_2'), AIA_Friendly);
 
-	GetACSSummonedConstruct_2().SetTemporaryAttitudeGroup( 'friendly_to_player', AGP_Default );	
+	ACSGetCActor('ACS_Summoned_Construct_2').SetTemporaryAttitudeGroup( 'friendly_to_player', AGP_Default );	
 
 	ticketNPC = movementAdjustorNPC.GetRequest( 'ACS_Summoned_Construct_Rotate');
 	movementAdjustorNPC.CancelByName( 'ACS_Summoned_Construct_Rotate' );
@@ -23161,34 +22492,34 @@ function GetACSSummonedConstruct2Follow()
 	movementAdjustorNPC.AdjustmentDuration( ticketNPC, 0.25 );
 	movementAdjustorNPC.MaxRotationAdjustmentSpeed( ticketNPC, 500000 );
 
-	if (!GetACSSummonedConstruct_2().IsInCombat())
+	if (!ACSGetCActor('ACS_Summoned_Construct_2').IsInCombat())
 	{
 		if (targetDistance <= 2 * 2)
 		{
-			GetACSSummonedConstruct_2().GetMovingAgentComponent().SetGameplayRelativeMoveSpeed(0);
+			ACSGetCActor('ACS_Summoned_Construct_2').GetMovingAgentComponent().SetGameplayRelativeMoveSpeed(0);
 		}
 		else if (targetDistance > 2 * 2 && targetDistance <= 15 * 15)
 		{
 			movementAdjustorNPC.RotateTowards( ticketNPC, GetWitcherPlayer() );
 
-			GetACSSummonedConstruct_2().GetMovingAgentComponent().SetGameplayRelativeMoveSpeed(2);
+			ACSGetCActor('ACS_Summoned_Construct_2').GetMovingAgentComponent().SetGameplayRelativeMoveSpeed(2);
 		}
 		else if (targetDistance > 15 * 15 && GetWitcherPlayer().IsOnGround())
 		{
-			if (!GetACSSummonedConstruct_2().IsEffectActive('shadowdash_body_blood', false))
+			if (!ACSGetCActor('ACS_Summoned_Construct_2').IsEffectActive('shadowdash_body_blood', false))
 			{
-				GetACSSummonedConstruct_2().PlayEffectSingle('shadowdash_body_blood');
+				ACSGetCActor('ACS_Summoned_Construct_2').PlayEffectSingle('shadowdash_body_blood');
 			}
 
-			if (!GetACSSummonedConstruct_2().HasTag('ACS_Summoned_Construct_Teleport_Start'))
+			if (!ACSGetCActor('ACS_Summoned_Construct_2').HasTag('ACS_Summoned_Construct_Teleport_Start'))
 			{
-				GetACSSummonedConstruct_2().PlayEffectSingle('shadowdash');
-				GetACSSummonedConstruct_2().StopEffect('shadowdash');
+				ACSGetCActor('ACS_Summoned_Construct_2').PlayEffectSingle('shadowdash');
+				ACSGetCActor('ACS_Summoned_Construct_2').StopEffect('shadowdash');
 
 				GetACSWatcher().RemoveTimer('SummonedConstruct2TeleportDelay');
 				GetACSWatcher().AddTimer('SummonedConstruct2TeleportDelay', 0.5, false);
 
-				GetACSSummonedConstruct_2().AddTag('ACS_Summoned_Construct_Teleport_Start');
+				ACSGetCActor('ACS_Summoned_Construct_2').AddTag('ACS_Summoned_Construct_Teleport_Start');
 			}
 		} 
 	}
@@ -23199,11 +22530,11 @@ function GetACSSummonedConstruct2Follow()
 
 	if( actors.Size() > 0 )
 	{
-		GetACSSummonedConstruct_2().GetMovingAgentComponent().SetGameplayRelativeMoveSpeed(0);
+		ACSGetCActor('ACS_Summoned_Construct_2').GetMovingAgentComponent().SetGameplayRelativeMoveSpeed(0);
 
-		if (!GetACSSummonedConstruct_2().IsEffectActive('claws_trail', false))
+		if (!ACSGetCActor('ACS_Summoned_Construct_2').IsEffectActive('claws_trail', false))
 		{
-			GetACSSummonedConstruct_2().PlayEffectSingle('claws_trail');
+			ACSGetCActor('ACS_Summoned_Construct_2').PlayEffectSingle('claws_trail');
 		}
 
 		for( i = 0; i < actors.Size(); i += 1 )
@@ -23212,9 +22543,9 @@ function GetACSSummonedConstruct2Follow()
 
 			actor = actors[i];
 
-			GetACSSummonedConstruct_2().SetAttitude(actor, AIA_Hostile);
+			ACSGetCActor('ACS_Summoned_Construct_2').SetAttitude(actor, AIA_Hostile);
 
-			actor.SetAttitude(GetACSSummonedConstruct_2(), AIA_Hostile);
+			actor.SetAttitude(ACSGetCActor('ACS_Summoned_Construct_2'), AIA_Hostile);
 		}
 	}
 
@@ -23222,20 +22553,20 @@ function GetACSSummonedConstruct2Follow()
 	{
 		if (targetDistance > 35 * 35 && GetWitcherPlayer().IsOnGround())
 		{
-			if (!GetACSSummonedConstruct_2().IsEffectActive('shadowdash_body_blood', false))
+			if (!ACSGetCActor('ACS_Summoned_Construct_2').IsEffectActive('shadowdash_body_blood', false))
 			{
-				GetACSSummonedConstruct_2().PlayEffectSingle('shadowdash_body_blood');
+				ACSGetCActor('ACS_Summoned_Construct_2').PlayEffectSingle('shadowdash_body_blood');
 			}
 
-			if (!GetACSSummonedConstruct_2().HasTag('ACS_Summoned_Construct_Teleport_Start'))
+			if (!ACSGetCActor('ACS_Summoned_Construct_2').HasTag('ACS_Summoned_Construct_Teleport_Start'))
 			{
-				GetACSSummonedConstruct_2().PlayEffectSingle('shadowdash');
-				GetACSSummonedConstruct_2().StopEffect('shadowdash');
+				ACSGetCActor('ACS_Summoned_Construct_2').PlayEffectSingle('shadowdash');
+				ACSGetCActor('ACS_Summoned_Construct_2').StopEffect('shadowdash');
 
 				GetACSWatcher().RemoveTimer('SummonedConstruct2TeleportDelay');
 				GetACSWatcher().AddTimer('SummonedConstruct2TeleportDelay', 0.5, false);
 
-				GetACSSummonedConstruct_2().AddTag('ACS_Summoned_Construct_Teleport_Start');
+				ACSGetCActor('ACS_Summoned_Construct_2').AddTag('ACS_Summoned_Construct_Teleport_Start');
 			}
 		}
 	}
@@ -23282,7 +22613,7 @@ function ACS_Fog_Generate()
 	}
 	else
 	{
-		ACSDestroyFogEnts();
+		ACSGetCEntityDestroyAll('ACS_Fog_Ent');
 	}
 }
 
@@ -23415,26 +22746,6 @@ state Fog_Generate_Engage in cACS_Fog_Generate
 	event OnLeaveState( nextStateName : name ) 
 	{
 		super.OnLeaveState(nextStateName);
-	}
-}
-
-function ACSDestroyFogEnts()
-{	
-	var ents 											: array<CEntity>;
-	var i												: int;
-
-	ents.Clear();
-
-	theGame.GetEntitiesByTag( 'ACS_Fog_Ent', ents );	
-
-	if (ents.Size()<=0)
-	{
-		return;
-	}
-	
-	for( i = 0; i < ents.Size(); i += 1 )
-	{
-		ents[i].Destroy();
 	}
 }
 
@@ -23776,24 +23087,6 @@ state Volumetric_Clouds_Engage in cACS_Volumetric_Clouds
 	}
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-function GetACSSpiralSky() : CEntity
-{
-	var entity 			 : CEntity;
-	
-	entity = (CEntity)theGame.GetEntityByTag( 'acs_spiral_entity' );
-	return entity;
-}
-
-function GetACSSpiralSkyStars() : CEntity
-{
-	var entity 			 : CEntity;
-	
-	entity = (CEntity)theGame.GetEntityByTag( 'acs_spiral_star_entity' );
-	return entity;
-}
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 statemachine class cACS_Startup_Entity_Spawns
@@ -23834,6 +23127,8 @@ state Startup_Entities_Engage in cACS_Startup_Entity_Spawns
 
 		SpiralStarSpawn();
 
+		SpiralRainbowSpawn();
+
 		if(  hours >= 16 )
 		{
 			EverstormSpawn();
@@ -23859,7 +23154,7 @@ state Startup_Entities_Engage in cACS_Startup_Entity_Spawns
 		headtarget.AddTag('acs_lookat_entity');
 
 		((CActor)thePlayer).DisableLookAt();
-		((CActor)thePlayer).EnableDynamicLookAt(GetACSLookatEntity(), 65535);
+		((CActor)thePlayer).EnableDynamicLookAt(ACSGetCEntity('acs_lookat_entity'), 65535);
 	}
 
 	latent function SnowSpawn()
@@ -23874,11 +23169,6 @@ state Startup_Entities_Engage in cACS_Startup_Entity_Spawns
 		snow_ent = theGame.CreateEntity(temp, thePlayer.GetWorldPosition(), thePlayer.GetWorldRotation());
 
 		snow_ent.CreateAttachment( thePlayer, 'blood_point', Vector( 0, 0, 0 ), EulerAngles(0,0,90) );
-
-		((CActor)snow_ent).SetImmortalityMode( AIM_Invulnerable, AIC_Default ); 
-		((CActor)snow_ent).SetCanPlayHitAnim(false); 
-		((CActor)snow_ent).AddBuffImmunity_AllNegative('acs_snow_entity_buff_all_negative', true); 
-		((CActor)snow_ent).AddBuffImmunity_AllCritical('acs_snow_entity_buff_all_critical', true); 
 
 		snow_ent.AddTag('acs_snow_entity');
 	}
@@ -23921,11 +23211,6 @@ state Startup_Entities_Engage in cACS_Startup_Entity_Spawns
 		spiral_temp = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\fx\acs_ice_breathe_old.w2ent", true);
 		
 		spiral_ent = theGame.CreateEntity(spiral_temp, spiral_vector, spiral_rotation);
-		
-		((CActor)spiral_ent).SetImmortalityMode( AIM_Invulnerable, AIC_Default ); 
-		((CActor)spiral_ent).SetCanPlayHitAnim(false); 
-		((CActor)spiral_ent).AddBuffImmunity_AllNegative('acs_spiral_entity_buff_all_negative', true); 
-		((CActor)spiral_ent).AddBuffImmunity_AllCritical('acs_spiral_entity_buff_all_critical', true); 
 
 		if (ACS_SpiralSkyPlanets_Enabled())
 		{
@@ -23995,11 +23280,6 @@ state Startup_Entities_Engage in cACS_Startup_Entity_Spawns
 
 		spiral_star_ent = theGame.CreateEntity(spiral_star_temp, Vector(0,0,50), spiral_star_rotation);
 
-		((CActor)spiral_star_ent).SetImmortalityMode( AIM_Invulnerable, AIC_Default ); 
-		((CActor)spiral_star_ent).SetCanPlayHitAnim(false); 
-		((CActor)spiral_star_ent).AddBuffImmunity_AllNegative('acs_spiral_entity_buff_all_negative', true); 
-		((CActor)spiral_star_ent).AddBuffImmunity_AllCritical('acs_spiral_entity_buff_all_critical', true); 
-
 		if (ACS_IsNight_Adjustable())
 		{
 			if (FactsQuerySum("ACS_Darkness_Upon_Us") > 0)
@@ -24012,6 +23292,46 @@ state Startup_Entities_Engage in cACS_Startup_Entity_Spawns
 		}
 
 		spiral_star_ent.AddTag('acs_spiral_star_entity');
+	}
+
+	latent function SpiralRainbowSpawn()
+	{
+		var spiral_rainbow_ent         	: CEntity;
+		var spiral_rainbow_temp        	: CEntityTemplate;
+		var spiral_rainbow_rotation		: EulerAngles;
+
+		if (theGame.GetWorld().GetDepotPath() == "levels\novigrad\novigrad.w2w"
+		)
+		{
+			spiral_rainbow_rotation = EulerAngles(0,0,0);
+		}
+		else if (theGame.GetWorld().GetDepotPath() == "levels\prolog_village_winter\prolog_village.w2w"
+		|| theGame.GetWorld().GetDepotPath() == "levels\prolog_village\prolog_village.w2w"
+		)
+		{
+			spiral_rainbow_rotation = EulerAngles(0,0,0);
+		}
+		else if (theGame.GetWorld().GetDepotPath() == "dlc\bob\data\levels\bob\bob.w2w")
+		{
+			spiral_rainbow_rotation = EulerAngles(0,0,0);
+		}
+		else if (theGame.GetWorld().GetDepotPath() == "levels\kaer_morhen\kaer_morhen.w2w"
+		)
+		{
+			spiral_rainbow_rotation = EulerAngles(0,0,0);
+		}
+		else
+		{
+			spiral_rainbow_rotation = EulerAngles(0,0,0);
+		}
+
+		spiral_rainbow_temp = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\fx\acs_ice_breathe_old.w2ent", true);
+
+		spiral_rainbow_ent = theGame.CreateEntity(spiral_rainbow_temp, Vector(0,0,0), spiral_rainbow_rotation);
+
+		//spiral_rainbow_ent.PlayEffectSingle('rainbow');
+
+		spiral_rainbow_ent.AddTag('acs_spiral_rainbow_entity');
 	}
 
 	latent function EverstormSpawn()
@@ -25005,6 +24325,8 @@ statemachine class CACSGoreSpawnerEntity extends CEntity
 
 	event OnSpawned( spawnData : SEntitySpawnData )
 	{
+		super.OnSpawned(spawnData);
+		
 		AddTimer('GoreSpawnCheck', 0.01, false);
 	}
 
@@ -25505,7 +24827,7 @@ state ACS_Wearable_Pocket_Items_Controller_Engage in cACS_Wearable_Pocket_Items_
 			return;
 		}
 
-		if (thePlayer.HasTag('in_wraith')
+		if (thePlayer.HasTag('acs_in_wraith')
 		|| thePlayer.HasTag('ACS_Camo_Active')
 		|| !thePlayer.GetVisibility()
 		|| !GetWitcherPlayer().IsAnyItemEquippedOnSlot(EES_Pants)
@@ -25699,14 +25021,14 @@ state ACS_Wearable_Pocket_Items_Controller_Engage in cACS_Wearable_Pocket_Items_
 
 			if (FactsQuerySum("ACS_Torch_Equipped") <= 0)
 			{
-				if (!GetACSItemPropAnchor())
+				if (!ACSGetCEntity('ACS_Item_Prop_Anchor'))
 				{
 					dummy = (CEntity)theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\entities\other\fx_ent.w2ent", true), thePlayer.GetWorldPosition(), thePlayer.GetWorldRotation() );
 					dummy.AddTag('ACS_Item_Prop_Anchor');
 				}
 				else 
 				{
-					dummy = GetACSItemPropAnchor();
+					dummy = ACSGetCEntity('ACS_Item_Prop_Anchor');
 				}
 				
 				fake = (CEntity)theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync("items\usable\torchleft\torchleft.w2ent", true), thePlayer.GetWorldPosition(), thePlayer.GetWorldRotation() );
@@ -25840,14 +25162,14 @@ state ACS_Wearable_Pocket_Items_Controller_Engage in cACS_Wearable_Pocket_Items_
 
 			if (FactsQuerySum("ACS_Magic_Lamp_Equipped") <= 0)
 			{
-				if (!GetACSItemPropAnchor())
+				if (!ACSGetCEntity('ACS_Item_Prop_Anchor'))
 				{
 					dummy = (CEntity)theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\entities\other\fx_ent.w2ent", true), thePlayer.GetWorldPosition(), thePlayer.GetWorldRotation() );
 					dummy.AddTag('ACS_Item_Prop_Anchor');
 				}
 				else 
 				{
-					dummy = GetACSItemPropAnchor();
+					dummy = ACSGetCEntity('ACS_Item_Prop_Anchor');
 				}
 				
 				fake = (CEntity)theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\entities\other\q106_magic_oillamp_dummy.w2ent", true), thePlayer.GetWorldPosition(), thePlayer.GetWorldRotation() );
@@ -25981,14 +25303,14 @@ state ACS_Wearable_Pocket_Items_Controller_Engage in cACS_Wearable_Pocket_Items_
 
 			if (FactsQuerySum("ACS_Oil_Lamp_Equipped") <= 0)
 			{
-				if (!GetACSItemPropAnchor())
+				if (!ACSGetCEntity('ACS_Item_Prop_Anchor'))
 				{
 					dummy = (CEntity)theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\entities\other\fx_ent.w2ent", true), thePlayer.GetWorldPosition(), thePlayer.GetWorldRotation() );
 					dummy.AddTag('ACS_Item_Prop_Anchor');
 				}
 				else 
 				{
-					dummy = GetACSItemPropAnchor();
+					dummy = ACSGetCEntity('ACS_Item_Prop_Anchor');
 				}
 				
 				fake = (CEntity)theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\entities\other\oillamp_dummy.w2ent", true), thePlayer.GetWorldPosition(), thePlayer.GetWorldRotation() );
@@ -26122,14 +25444,14 @@ state ACS_Wearable_Pocket_Items_Controller_Engage in cACS_Wearable_Pocket_Items_
 
 			if (FactsQuerySum("ACS_Censer_Equipped") <= 0)
 			{
-				if (!GetACSItemPropAnchor())
+				if (!ACSGetCEntity('ACS_Item_Prop_Anchor'))
 				{
 					dummy = (CEntity)theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\entities\other\fx_ent.w2ent", true), thePlayer.GetWorldPosition(), thePlayer.GetWorldRotation() );
 					dummy.AddTag('ACS_Item_Prop_Anchor');
 				}
 				else 
 				{
-					dummy = GetACSItemPropAnchor();
+					dummy = ACSGetCEntity('ACS_Item_Prop_Anchor');
 				}
 				
 				fake = (CEntity)theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync("dlc\ep1\data\items\quest_items\q602\q602_item__censer_scene_prop.w2ent", true), thePlayer.GetWorldPosition(), thePlayer.GetWorldRotation() );
@@ -26263,14 +25585,14 @@ state ACS_Wearable_Pocket_Items_Controller_Engage in cACS_Wearable_Pocket_Items_
 
 			if (FactsQuerySum("ACS_Navigator_Horn_Equipped") <= 0)
 			{
-				if (!GetACSItemPropAnchor())
+				if (!ACSGetCEntity('ACS_Item_Prop_Anchor'))
 				{
 					dummy = (CEntity)theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\entities\other\fx_ent.w2ent", true), thePlayer.GetWorldPosition(), thePlayer.GetWorldRotation() );
 					dummy.AddTag('ACS_Item_Prop_Anchor');
 				}
 				else 
 				{
-					dummy = GetACSItemPropAnchor();
+					dummy = ACSGetCEntity('ACS_Item_Prop_Anchor');
 				}
 				
 				fake = (CEntity)theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync("items\usable\q202_hornval_horn.w2ent", true), thePlayer.GetWorldPosition(), thePlayer.GetWorldRotation() );
@@ -26404,14 +25726,14 @@ state ACS_Wearable_Pocket_Items_Controller_Engage in cACS_Wearable_Pocket_Items_
 
 			if (FactsQuerySum("ACS_Lure_Equipped") <= 0)
 			{
-				if (!GetACSItemPropAnchor())
+				if (!ACSGetCEntity('ACS_Item_Prop_Anchor'))
 				{
 					dummy = (CEntity)theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\entities\other\fx_ent.w2ent", true), thePlayer.GetWorldPosition(), thePlayer.GetWorldRotation() );
 					dummy.AddTag('ACS_Item_Prop_Anchor');
 				}
 				else 
 				{
-					dummy = GetACSItemPropAnchor();
+					dummy = ACSGetCEntity('ACS_Item_Prop_Anchor');
 				}
 				
 				fake = (CEntity)theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync("items\quest_items\mh107\mh107_item_czart_lure_potion.w2ent", true), thePlayer.GetWorldPosition(), thePlayer.GetWorldRotation() );
@@ -26545,14 +25867,14 @@ state ACS_Wearable_Pocket_Items_Controller_Engage in cACS_Wearable_Pocket_Items_
 
 			if (FactsQuerySum("ACS_Bell_Equipped") <= 0)
 			{
-				if (!GetACSItemPropAnchor())
+				if (!ACSGetCEntity('ACS_Item_Prop_Anchor'))
 				{
 					dummy = (CEntity)theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\entities\other\fx_ent.w2ent", true), thePlayer.GetWorldPosition(), thePlayer.GetWorldRotation() );
 					dummy.AddTag('ACS_Item_Prop_Anchor');
 				}
 				else 
 				{
-					dummy = GetACSItemPropAnchor();
+					dummy = ACSGetCEntity('ACS_Item_Prop_Anchor');
 				}
 				
 				fake = (CEntity)theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync("items\usable\q103_bell.w2ent", true), thePlayer.GetWorldPosition(), thePlayer.GetWorldRotation() );
@@ -26686,14 +26008,14 @@ state ACS_Wearable_Pocket_Items_Controller_Engage in cACS_Wearable_Pocket_Items_
 
 			if (FactsQuerySum("ACS_Potestaquisitor_Equipped") <= 0)
 			{
-				if (!GetACSItemPropAnchor())
+				if (!ACSGetCEntity('ACS_Item_Prop_Anchor'))
 				{
 					dummy = (CEntity)theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\entities\other\fx_ent.w2ent", true), thePlayer.GetWorldPosition(), thePlayer.GetWorldRotation() );
 					dummy.AddTag('ACS_Item_Prop_Anchor');
 				}
 				else 
 				{
-					dummy = GetACSItemPropAnchor();
+					dummy = ACSGetCEntity('ACS_Item_Prop_Anchor');
 				}
 				
 				fake = (CEntity)theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync("items\usable\potestaquisitor\potestaquisitor.w2ent", true), thePlayer.GetWorldPosition(), thePlayer.GetWorldRotation() );
@@ -26827,14 +26149,14 @@ state ACS_Wearable_Pocket_Items_Controller_Engage in cACS_Wearable_Pocket_Items_
 
 			if (FactsQuerySum("ACS_Eye_Of_Loki_Equipped") <= 0)
 			{
-				if (!GetACSItemPropAnchor())
+				if (!ACSGetCEntity('ACS_Item_Prop_Anchor'))
 				{
 					dummy = (CEntity)theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\entities\other\fx_ent.w2ent", true), thePlayer.GetWorldPosition(), thePlayer.GetWorldRotation() );
 					dummy.AddTag('ACS_Item_Prop_Anchor');
 				}
 				else 
 				{
-					dummy = GetACSItemPropAnchor();
+					dummy = ACSGetCEntity('ACS_Item_Prop_Anchor');
 				}
 				
 				fake = (CEntity)theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync("items\usable\q203_eyeofloki.w2ent", true), thePlayer.GetWorldPosition(), thePlayer.GetWorldRotation() );
@@ -26968,14 +26290,14 @@ state ACS_Wearable_Pocket_Items_Controller_Engage in cACS_Wearable_Pocket_Items_
 
 			if (FactsQuerySum("ACS_Pouch_Equipped") <= 0)
 			{
-				if (!GetACSItemPropAnchor())
+				if (!ACSGetCEntity('ACS_Item_Prop_Anchor'))
 				{
 					dummy = (CEntity)theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\entities\other\fx_ent.w2ent", true), thePlayer.GetWorldPosition(), thePlayer.GetWorldRotation() );
 					dummy.AddTag('ACS_Item_Prop_Anchor');
 				}
 				else 
 				{
-					dummy = GetACSItemPropAnchor();
+					dummy = ACSGetCEntity('ACS_Item_Prop_Anchor');
 				}
 				
 				fake = (CEntity)theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync(
@@ -27059,9 +26381,9 @@ state ACS_Wearable_Pocket_Items_Controller_Engage in cACS_Wearable_Pocket_Items_
 
 	latent function Remove_All_Items()
 	{
-		if (GetACSItemPropAnchor())
+		if (ACSGetCEntity('ACS_Item_Prop_Anchor'))
 		{
-			GetACSItemPropAnchor().Destroy();
+			ACSGetCEntity('ACS_Item_Prop_Anchor').Destroy();
 		}
 		
 		if (FactsQuerySum("ACS_Torch_Equipped") > 0)
@@ -27344,14 +26666,14 @@ state ACS_Wearable_Pocket_Items_Controller_Engage in cACS_Wearable_Pocket_Items_
 
 		if (FactsQuerySum("ACS_Dancing_Star_Equipped") <= 0)
 		{
-			if (!GetACSBombPropAnchor())
+			if (!ACSGetCEntity('ACS_Bomb_Prop_Anchor'))
 			{
 				dummy = (CEntity)theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\entities\other\fx_ent.w2ent", true), thePlayer.GetWorldPosition(), thePlayer.GetWorldRotation() );
 				dummy.AddTag('ACS_Bomb_Prop_Anchor');
 			}
 			else 
 			{
-				dummy = GetACSBombPropAnchor();
+				dummy = ACSGetCEntity('ACS_Bomb_Prop_Anchor');
 			}
 
 			if (ACS_Ard_Bombs_Installed() && ACS_Ard_Bombs_Enabled())
@@ -27539,14 +26861,14 @@ state ACS_Wearable_Pocket_Items_Controller_Engage in cACS_Wearable_Pocket_Items_
 
 		if (FactsQuerySum("ACS_Devils_Puffball_Equipped") <= 0)
 		{
-			if (!GetACSBombPropAnchor())
+			if (!ACSGetCEntity('ACS_Bomb_Prop_Anchor'))
 			{
 				dummy = (CEntity)theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\entities\other\fx_ent.w2ent", true), thePlayer.GetWorldPosition(), thePlayer.GetWorldRotation() );
 				dummy.AddTag('ACS_Bomb_Prop_Anchor');
 			}
 			else 
 			{
-				dummy = GetACSBombPropAnchor();
+				dummy = ACSGetCEntity('ACS_Bomb_Prop_Anchor');
 			}
 
 			if (ACS_Ard_Bombs_Installed() && ACS_Ard_Bombs_Enabled())
@@ -27738,14 +27060,14 @@ state ACS_Wearable_Pocket_Items_Controller_Engage in cACS_Wearable_Pocket_Items_
 
 		if (FactsQuerySum("ACS_Dwimeritium_Bomb_Equipped") <= 0)
 		{
-			if (!GetACSBombPropAnchor())
+			if (!ACSGetCEntity('ACS_Bomb_Prop_Anchor'))
 			{
 				dummy = (CEntity)theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\entities\other\fx_ent.w2ent", true), thePlayer.GetWorldPosition(), thePlayer.GetWorldRotation() );
 				dummy.AddTag('ACS_Bomb_Prop_Anchor');
 			}
 			else 
 			{
-				dummy = GetACSBombPropAnchor();
+				dummy = ACSGetCEntity('ACS_Bomb_Prop_Anchor');
 			}
 
 			if (ACS_Ard_Bombs_Installed() && ACS_Ard_Bombs_Enabled())
@@ -27937,14 +27259,14 @@ state ACS_Wearable_Pocket_Items_Controller_Engage in cACS_Wearable_Pocket_Items_
 
 		if (FactsQuerySum("ACS_Dragons_Dream_Equipped") <= 0)
 		{
-			if (!GetACSBombPropAnchor())
+			if (!ACSGetCEntity('ACS_Bomb_Prop_Anchor'))
 			{
 				dummy = (CEntity)theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\entities\other\fx_ent.w2ent", true), thePlayer.GetWorldPosition(), thePlayer.GetWorldRotation() );
 				dummy.AddTag('ACS_Bomb_Prop_Anchor');
 			}
 			else 
 			{
-				dummy = GetACSBombPropAnchor();
+				dummy = ACSGetCEntity('ACS_Bomb_Prop_Anchor');
 			}
 
 			if (ACS_Ard_Bombs_Installed() && ACS_Ard_Bombs_Enabled())
@@ -28136,14 +27458,14 @@ state ACS_Wearable_Pocket_Items_Controller_Engage in cACS_Wearable_Pocket_Items_
 
 		if (FactsQuerySum("ACS_Grapeshot_Equipped") <= 0)
 		{
-			if (!GetACSBombPropAnchor())
+			if (!ACSGetCEntity('ACS_Bomb_Prop_Anchor'))
 			{
 				dummy = (CEntity)theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\entities\other\fx_ent.w2ent", true), thePlayer.GetWorldPosition(), thePlayer.GetWorldRotation() );
 				dummy.AddTag('ACS_Bomb_Prop_Anchor');
 			}
 			else 
 			{
-				dummy = GetACSBombPropAnchor();
+				dummy = ACSGetCEntity('ACS_Bomb_Prop_Anchor');
 			}
 			
 			if (ACS_Ard_Bombs_Installed() && ACS_Ard_Bombs_Enabled())
@@ -28335,14 +27657,14 @@ state ACS_Wearable_Pocket_Items_Controller_Engage in cACS_Wearable_Pocket_Items_
 
 		if (FactsQuerySum("ACS_Silver_Dust_Equipped") <= 0)
 		{
-			if (!GetACSBombPropAnchor())
+			if (!ACSGetCEntity('ACS_Bomb_Prop_Anchor'))
 			{
 				dummy = (CEntity)theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\entities\other\fx_ent.w2ent", true), thePlayer.GetWorldPosition(), thePlayer.GetWorldRotation() );
 				dummy.AddTag('ACS_Bomb_Prop_Anchor');
 			}
 			else 
 			{
-				dummy = GetACSBombPropAnchor();
+				dummy = ACSGetCEntity('ACS_Bomb_Prop_Anchor');
 			}
 
 			if (ACS_Ard_Bombs_Installed() && ACS_Ard_Bombs_Enabled())
@@ -28534,14 +27856,14 @@ state ACS_Wearable_Pocket_Items_Controller_Engage in cACS_Wearable_Pocket_Items_
 
 		if (FactsQuerySum("ACS_White_Frost_Equipped") <= 0)
 		{
-			if (!GetACSBombPropAnchor())
+			if (!ACSGetCEntity('ACS_Bomb_Prop_Anchor'))
 			{
 				dummy = (CEntity)theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\entities\other\fx_ent.w2ent", true), thePlayer.GetWorldPosition(), thePlayer.GetWorldRotation() );
 				dummy.AddTag('ACS_Bomb_Prop_Anchor');
 			}
 			else 
 			{
-				dummy = GetACSBombPropAnchor();
+				dummy = ACSGetCEntity('ACS_Bomb_Prop_Anchor');
 			}
 
 			if (ACS_Ard_Bombs_Installed() && ACS_Ard_Bombs_Enabled())
@@ -28733,14 +28055,14 @@ state ACS_Wearable_Pocket_Items_Controller_Engage in cACS_Wearable_Pocket_Items_
 
 		if (FactsQuerySum("ACS_Samum_Equipped") <= 0)
 		{
-			if (!GetACSBombPropAnchor())
+			if (!ACSGetCEntity('ACS_Bomb_Prop_Anchor'))
 			{
 				dummy = (CEntity)theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\entities\other\fx_ent.w2ent", true), thePlayer.GetWorldPosition(), thePlayer.GetWorldRotation() );
 				dummy.AddTag('ACS_Bomb_Prop_Anchor');
 			}
 			else 
 			{
-				dummy = GetACSBombPropAnchor();
+				dummy = ACSGetCEntity('ACS_Bomb_Prop_Anchor');
 			}
 
 			if (ACS_Ard_Bombs_Installed() && ACS_Ard_Bombs_Enabled())
@@ -28932,14 +28254,14 @@ state ACS_Wearable_Pocket_Items_Controller_Engage in cACS_Wearable_Pocket_Items_
 
 		if (FactsQuerySum("ACS_Salt_Bomb_Equipped") <= 0)
 		{
-			if (!GetACSBombPropAnchor())
+			if (!ACSGetCEntity('ACS_Bomb_Prop_Anchor'))
 			{
 				dummy = (CEntity)theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\entities\other\fx_ent.w2ent", true), thePlayer.GetWorldPosition(), thePlayer.GetWorldRotation() );
 				dummy.AddTag('ACS_Bomb_Prop_Anchor');
 			}
 			else 
 			{
-				dummy = GetACSBombPropAnchor();
+				dummy = ACSGetCEntity('ACS_Bomb_Prop_Anchor');
 			}
 			
 			fake = (CEntity)theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync("dlc\dlcardbombs\data\items\weapons\projectiles\petards\bomb_salt.w2ent", true), thePlayer.GetWorldPosition(), thePlayer.GetWorldRotation() );
@@ -29111,14 +28433,14 @@ state ACS_Wearable_Pocket_Items_Controller_Engage in cACS_Wearable_Pocket_Items_
 
 		if (FactsQuerySum("ACS_Glue_Bomb_Equipped") <= 0)
 		{
-			if (!GetACSBombPropAnchor())
+			if (!ACSGetCEntity('ACS_Bomb_Prop_Anchor'))
 			{
 				dummy = (CEntity)theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\entities\other\fx_ent.w2ent", true), thePlayer.GetWorldPosition(), thePlayer.GetWorldRotation() );
 				dummy.AddTag('ACS_Bomb_Prop_Anchor');
 			}
 			else 
 			{
-				dummy = GetACSBombPropAnchor();
+				dummy = ACSGetCEntity('ACS_Bomb_Prop_Anchor');
 			}
 			
 			fake = (CEntity)theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync("dlc\dlcardbombs\data\items\weapons\projectiles\petards\bomb_glue.w2ent", true), thePlayer.GetWorldPosition(), thePlayer.GetWorldRotation() );
@@ -29290,14 +28612,14 @@ state ACS_Wearable_Pocket_Items_Controller_Engage in cACS_Wearable_Pocket_Items_
 
 		if (FactsQuerySum("ACS_Fungi_Bomb_Equipped") <= 0)
 		{
-			if (!GetACSBombPropAnchor())
+			if (!ACSGetCEntity('ACS_Bomb_Prop_Anchor'))
 			{
 				dummy = (CEntity)theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\entities\other\fx_ent.w2ent", true), thePlayer.GetWorldPosition(), thePlayer.GetWorldRotation() );
 				dummy.AddTag('ACS_Bomb_Prop_Anchor');
 			}
 			else 
 			{
-				dummy = GetACSBombPropAnchor();
+				dummy = ACSGetCEntity('ACS_Bomb_Prop_Anchor');
 			}
 			
 			fake = (CEntity)theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync("dlc\dlcardbombs\data\items\weapons\projectiles\petards\bomb_fungi.w2ent", true), thePlayer.GetWorldPosition(), thePlayer.GetWorldRotation() );
@@ -29469,14 +28791,14 @@ state ACS_Wearable_Pocket_Items_Controller_Engage in cACS_Wearable_Pocket_Items_
 
 		if (FactsQuerySum("ACS_Shrapnel_Bomb_Equipped") <= 0)
 		{
-			if (!GetACSBombPropAnchor())
+			if (!ACSGetCEntity('ACS_Bomb_Prop_Anchor'))
 			{
 				dummy = (CEntity)theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\entities\other\fx_ent.w2ent", true), thePlayer.GetWorldPosition(), thePlayer.GetWorldRotation() );
 				dummy.AddTag('ACS_Bomb_Prop_Anchor');
 			}
 			else 
 			{
-				dummy = GetACSBombPropAnchor();
+				dummy = ACSGetCEntity('ACS_Bomb_Prop_Anchor');
 			}
 			
 			fake = (CEntity)theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync("dlc\dlcardbombs\data\items\weapons\projectiles\petards\bomb_shrapnel.w2ent", true), thePlayer.GetWorldPosition(), thePlayer.GetWorldRotation() );
@@ -29648,14 +28970,14 @@ state ACS_Wearable_Pocket_Items_Controller_Engage in cACS_Wearable_Pocket_Items_
 
 		if (FactsQuerySum("ACS_Virus_Bomb_Equipped") <= 0)
 		{
-			if (!GetACSBombPropAnchor())
+			if (!ACSGetCEntity('ACS_Bomb_Prop_Anchor'))
 			{
 				dummy = (CEntity)theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\entities\other\fx_ent.w2ent", true), thePlayer.GetWorldPosition(), thePlayer.GetWorldRotation() );
 				dummy.AddTag('ACS_Bomb_Prop_Anchor');
 			}
 			else 
 			{
-				dummy = GetACSBombPropAnchor();
+				dummy = ACSGetCEntity('ACS_Bomb_Prop_Anchor');
 			}
 			
 			fake = (CEntity)theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync("dlc\dlcardbombs\data\items\weapons\projectiles\petards\bomb_virus.w2ent", true), thePlayer.GetWorldPosition(), thePlayer.GetWorldRotation() );
@@ -29735,9 +29057,9 @@ state ACS_Wearable_Pocket_Items_Controller_Engage in cACS_Wearable_Pocket_Items_
 
 	latent function Remove_All_Bombs()
 	{
-		if (GetACSBombPropAnchor())
+		if (ACSGetCEntity('ACS_Bomb_Prop_Anchor'))
 		{
-			GetACSBombPropAnchor().Destroy();
+			ACSGetCEntity('ACS_Bomb_Prop_Anchor').Destroy();
 		}
 		
 		if (FactsQuerySum("ACS_Dancing_Star_Equipped") > 0)
@@ -29831,14 +29153,6 @@ state ACS_Wearable_Pocket_Items_Controller_Engage in cACS_Wearable_Pocket_Items_
 			FactsRemove("ACS_Virus_Bomb_Equipped");
 		}
 	}
-}
-
-function GetACSBombPropAnchor() : CEntity
-{
-	var ent 				 : CEntity;
-	
-	ent = (CEntity)theGame.GetEntityByTag( 'ACS_Bomb_Prop_Anchor' );
-	return ent;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -30104,14 +29418,6 @@ function GetACSVirusBombPropDestroyAll()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function GetACSItemPropAnchor() : CEntity
-{
-	var ent 				 : CEntity;
-	
-	ent = (CEntity)theGame.GetEntityByTag( 'ACS_Item_Prop_Anchor' );
-	return ent;
-}
-
 function GetACSTorchPropDestroyAll()
 {	
 	var item 											: array<CEntity>;
@@ -30374,6 +29680,8 @@ statemachine class CACSEverstorm extends CGameplayEntity
 
 	event OnSpawned( spawnData : SEntitySpawnData )
 	{
+		super.OnSpawned(spawnData);
+
 		pos = this.GetWorldPosition();
 
 		//PlayEffectSingle('502_barrier_hold');
@@ -30883,13 +30191,13 @@ function ACS_Player_Tentacles(i:int)
 	var bone_rot														: EulerAngles;
 	var anchor_temp, ent_2_temp											: CEntityTemplate;
 
-	GetPlayerTentacle_1().Destroy();
+	ACSGetCActor('ACS_Player_Tentacle_1').Destroy();
 
-	GetPlayerTentacle_2().Destroy();
+	ACSGetCActor('ACS_Player_Tentacle_2').Destroy();
 
-	GetPlayerTentacle_3().Destroy();
+	ACSGetCActor('ACS_Player_Tentacle_3').Destroy();
 
-	GetPlayerTentacleAnchor().Destroy();
+	ACSGetCEntity('acs_player_tentacle_anchor').Destroy();
 
 	rot = thePlayer.GetWorldRotation();
 
@@ -31046,38 +30354,6 @@ function ACS_Player_Tentacles(i:int)
 	ent_2.DestroyAfter(2);
 
 	ent_3.DestroyAfter(2);
-}
-
-function GetPlayerTentacle_1() : CActor
-{
-	var entity 			 : CActor;
-	
-	entity = (CActor)theGame.GetEntityByTag( 'ACS_Player_Tentacle_1' );
-	return entity;
-}
-
-function GetPlayerTentacle_2() : CActor
-{
-	var entity 			 : CActor;
-	
-	entity = (CActor)theGame.GetEntityByTag( 'ACS_Player_Tentacle_2' );
-	return entity;
-}
-
-function GetPlayerTentacle_3() : CActor
-{
-	var entity 			 : CActor;
-	
-	entity = (CActor)theGame.GetEntityByTag( 'ACS_Player_Tentacle_3' );
-	return entity;
-}
-
-function GetPlayerTentacleAnchor() : CEntity
-{
-	var entity 			 : CEntity;
-	
-	entity = (CEntity)theGame.GetEntityByTag( 'acs_player_tentacle_anchor' );
-	return entity;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -31318,7 +30594,7 @@ function ACSCreateFrostSwordFX()
 	var rot                        						 				: EulerAngles;
 	var pos																: Vector;
 
-	ACSFrostSwordEnt().Destroy();
+	ACSGetCEntity('ACS_Frost_Sword_Ent').Destroy();
 
 	rot = thePlayer.GetWorldRotation();
 
@@ -31337,12 +30613,4 @@ function ACSCreateFrostSwordFX()
 	ent.PlayEffectSingle('frost_sword_1');
 
 	ent.PlayEffectSingle('frost_sword_1_1');
-}
-
-function ACSFrostSwordEnt() : CEntity
-{
-	var entity 			 : CEntity;
-	
-	entity = (CEntity)theGame.GetEntityByTag( 'ACS_Frost_Sword_Ent' );
-	return entity;
 }

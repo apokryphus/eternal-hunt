@@ -214,78 +214,78 @@ statemachine class ACSTransformationCamera extends CStaticCamera
 		FactsQuerySum("acs_wolven_curse_activated") > 0
 		)
 		{
-			targetPos = GetACSTransformationWerewolf().GetWorldPosition();
+			targetPos = ACSGetCActor('ACS_Transformation_Werewolf').GetWorldPosition();
 
 			targetPos.Z += 1.75;
 			targetPos += VecConeRand(currentHeading, 0, -4.5, -4.5);
 
-			targetRot = GetACSTransformationWerewolf().GetWorldRotation();
+			targetRot = ACSGetCActor('ACS_Transformation_Werewolf').GetWorldRotation();
 		}
 		else if (
 		FactsQuerySum("acs_vampireess_transformation_activated") > 0
 		)
 		{
-			targetPos = GetACSTransformationVampiress().GetWorldPosition();
+			targetPos = ACSGetCActor('ACS_Transformation_Vampiress').GetWorldPosition();
 
 			targetPos.Z += 1.5;
 			targetPos += VecConeRand(currentHeading, 0, -4.5, -4.5);
 
-			targetRot = GetACSTransformationVampiress().GetWorldRotation();
+			targetRot = ACSGetCActor('ACS_Transformation_Vampiress').GetWorldRotation();
 		}
 		else if (
 		FactsQuerySum("acs_vampire_monster_transformation_activated") > 0
 		)
 		{
-			targetPos = GetACSTransformationVampireMonster().GetWorldPosition();
+			targetPos = ACSGetCActor('ACS_Transformation_Vampire_Monster').GetWorldPosition();
 
 			targetPos.Z += 1.5;
 			targetPos += VecConeRand(currentHeading, 0, -4.5, -4.5);
 
-			targetRot = GetACSTransformationVampireMonster().GetWorldRotation();
+			targetRot = ACSGetCActor('ACS_Transformation_Vampire_Monster').GetWorldRotation();
 		}
 		else if (
 		FactsQuerySum("acs_toad_transformation_activated") > 0
 		)
 		{
-			targetPos = GetACSTransformationToad().GetWorldPosition();
+			targetPos = ACSGetCActor('ACS_Transformation_Toad').GetWorldPosition();
 
 			targetPos.Z += 2.25;
 			targetPos += VecConeRand(currentHeading, 0, -7.75, -7.75);
 
-			targetRot = GetACSTransformationToad().GetWorldRotation();
+			targetRot = ACSGetCActor('ACS_Transformation_Toad').GetWorldRotation();
 		}
 		else if (
 		FactsQuerySum("acs_red_miasmal_curse_activated") > 0
 		)
 		{
-			targetPos = GetACSTransformationRedMiasmal().GetWorldPosition();
+			targetPos = ACSGetCActor('ACS_Transformation_Red_Miasmal').GetWorldPosition();
 
 			targetPos.Z += 1.625;
 			targetPos += VecConeRand(currentHeading, 0, -4.5, -4.5);
 
-			targetRot = GetACSTransformationRedMiasmal().GetWorldRotation();
+			targetRot = ACSGetCActor('ACS_Transformation_Red_Miasmal').GetWorldRotation();
 		}
 		else if (
 		FactsQuerySum("acs_sharley_curse_activated") > 0
 		)
 		{
-			targetPos = GetACSTransformationSharley().GetWorldPosition();
+			targetPos = ACSGetCActor('ACS_Transformation_Sharley').GetWorldPosition();
 
 			targetPos.Z += 1.625;
 			targetPos += VecConeRand(currentHeading, 0, -5.5, -5.5);
 
-			targetRot = GetACSTransformationSharley().GetWorldRotation();
+			targetRot = ACSGetCActor('ACS_Transformation_Sharley').GetWorldRotation();
 		}
 		else if (
 		FactsQuerySum("acs_black_wolf_curse_activated") > 0
 		)
 		{
-			targetPos = GetACSTransformationBlackWolf().GetWorldPosition();
+			targetPos = ACSGetCActor('ACS_Transformation_Black_Wolf').GetWorldPosition();
 
 			targetPos.Z += 1.625;
 			targetPos += VecConeRand(currentHeading, 0, -6.5, -6.5);
 
-			targetRot = GetACSTransformationBlackWolf().GetWorldRotation();
+			targetRot = ACSGetCActor('ACS_Transformation_Black_Wolf').GetWorldRotation();
 		}
 		else
 		{
@@ -352,14 +352,14 @@ statemachine class ACSTransformationCamera extends CStaticCamera
 		FactsQuerySum("acs_wolven_curse_activated") > 0
 		)
 		{
-			vampPos = GetACSTransformationWerewolf().GetWorldPosition();
+			vampPos = ACSGetCActor('ACS_Transformation_Werewolf').GetWorldPosition();
 			vampPos.Z += 1.75;
 		}
 		else if (
 		FactsQuerySum("acs_vampireess_transformation_activated") > 0
 		)
 		{
-			vampPos = GetACSTransformationVampiress().GetWorldPosition();
+			vampPos = ACSGetCActor('ACS_Transformation_Vampiress').GetWorldPosition();
 
 			vampPos.Z += 1.5;
 		}
@@ -367,16 +367,16 @@ statemachine class ACSTransformationCamera extends CStaticCamera
 		FactsQuerySum("acs_vampire_monster_transformation_activated") > 0
 		)
 		{
-			//vampPos = GetACSTransformationVampireMonster().GetWorldPosition();
+			//vampPos = ACSGetCActor('ACS_Transformation_Vampire_Monster').GetWorldPosition();
 
-			vampPos = GetACSTransformationVampireMonsterCameraDummy().GetWorldPosition();
+			vampPos = ACSGetCEntity('ACS_Transformation_Vampire_Monster_Camera_Dummy').GetWorldPosition();
 
-			if (GetACSTransformationVampireMonster().HasTag('ACS_Vampire_Monster_Flight_Mode'))
+			if (ACSGetCActor('ACS_Transformation_Vampire_Monster').HasTag('ACS_Vampire_Monster_Flight_Mode'))
 			{
 				//vampPos.Z += 7;
 				vampPos.Z += 1;
 			}
-			else if (GetACSTransformationVampireMonster().HasTag('ACS_Vampire_Monster_Ground_Mode'))
+			else if (ACSGetCActor('ACS_Transformation_Vampire_Monster').HasTag('ACS_Vampire_Monster_Ground_Mode'))
 			{
 				//vampPos.Z += 1.75;
 
@@ -387,28 +387,28 @@ statemachine class ACSTransformationCamera extends CStaticCamera
 		FactsQuerySum("acs_toad_transformation_activated") > 0
 		)
 		{
-			vampPos = GetACSTransformationToad().GetWorldPosition();
+			vampPos = ACSGetCActor('ACS_Transformation_Toad').GetWorldPosition();
 			vampPos.Z += 2.25;
 		}
 		else if (
 		FactsQuerySum("acs_red_miasmal_curse_activated") > 0
 		)
 		{
-			vampPos = GetACSTransformationRedMiasmal().GetWorldPosition();
+			vampPos = ACSGetCActor('ACS_Transformation_Red_Miasmal').GetWorldPosition();
 			vampPos.Z += 1.625;
 		}
 		else if (
 		FactsQuerySum("acs_sharley_curse_activated") > 0
 		)
 		{
-			vampPos = GetACSTransformationSharley().GetWorldPosition();
+			vampPos = ACSGetCActor('ACS_Transformation_Sharley').GetWorldPosition();
 			vampPos.Z += 1.625;
 		}
 		else if (
 		FactsQuerySum("acs_black_wolf_curse_activated") > 0
 		)
 		{
-			vampPos = GetACSTransformationBlackWolf().GetWorldPosition();
+			vampPos = ACSGetCActor('ACS_Transformation_Black_Wolf').GetWorldPosition();
 
 			vampPos.Z += 1.625;
 		}
@@ -470,14 +470,14 @@ statemachine class ACSTransformationCamera extends CStaticCamera
 		FactsQuerySum("acs_vampire_monster_transformation_activated") > 0
 		)
 		{
-			if (GetACSTransformationVampireMonster().HasTag('ACS_Vampire_Monster_Flight_Mode'))
+			if (ACSGetCActor('ACS_Transformation_Vampire_Monster').HasTag('ACS_Vampire_Monster_Flight_Mode'))
 			{
 				cameraPos = vampPos + VecConeRand(currentHeading, 0, -7.75, -7.75);
 
 				cameraPos = cameraPos + VecConeRand(currentHeading, 0, LerpF( AbsF(currentPitch)  , 0 , 3.0)/75, LerpF(AbsF(currentPitch)  , 0 , 3.0)/75);
 				cameraPos.Z = vampPos.Z + LerpF(currentPitch  , 1.0 , -1.0)/30;
 			}
-			else if (GetACSTransformationVampireMonster().HasTag('ACS_Vampire_Monster_Ground_Mode'))
+			else if (ACSGetCActor('ACS_Transformation_Vampire_Monster').HasTag('ACS_Vampire_Monster_Ground_Mode'))
 			{
 				cameraPos = vampPos + VecConeRand(currentHeading, 0, -4.5, -4.5);
 

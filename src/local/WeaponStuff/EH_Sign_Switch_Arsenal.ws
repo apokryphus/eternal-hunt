@@ -3,7 +3,7 @@ function ACS_SignSwitchArsenalInit()
 	if (!GetWitcherPlayer().IsPerformingFinisher() 
 	&& !GetWitcherPlayer().IsCrossbowHeld() 
 	&& !GetWitcherPlayer().IsInHitAnim() 
-	&& !GetWitcherPlayer().HasTag('blood_sucking')
+	&& !GetWitcherPlayer().HasTag('acs_blood_sucking')
 	)		
 	{
 		GetWitcherPlayer().ClearAnimationSpeedMultipliers();

@@ -62,10 +62,10 @@ state WildHuntBlink_Engage in cWildHuntBlink
 
 		//GetACSWatcher().ACS_Combo_Mode_Reset_Hard();
 
-		if (ACS_Bruxa_Camo_Trail())
+		if (ACSGetCEntity('ACS_Bruxa_Camo_Trail'))
 		{
-			ACS_Bruxa_Camo_Trail().StopEffect('smoke');
-			ACS_Bruxa_Camo_Trail().PlayEffectSingle('smoke');
+			ACSGetCEntity('ACS_Bruxa_Camo_Trail').StopEffect('smoke');
+			ACSGetCEntity('ACS_Bruxa_Camo_Trail').PlayEffectSingle('smoke');
 		}
 
 		if (ACS_Armor_Equipped_Check())
@@ -84,8 +84,10 @@ state WildHuntBlink_Engage in cWildHuntBlink
 		}
 		else
 		{
-			if (GetWitcherPlayer().HasTag('vampire_claws_equipped')
-			|| GetWitcherPlayer().HasTag('aard_sword_equipped'))
+			if (GetWitcherPlayer().HasTag('acs_vampire_claws_equipped')
+			|| GetWitcherPlayer().HasTag('acs_aard_sword_equipped')
+			|| GetWitcherPlayer().HasTag('acs_sorc_fists_equipped')
+			)
 			{
 				if (ACS_can_special_dodge())
 				{
@@ -99,7 +101,7 @@ state WildHuntBlink_Engage in cWildHuntBlink
 				}
 			}
 			else if (
-			GetWitcherPlayer().HasTag('yrden_sword_equipped')
+			GetWitcherPlayer().HasTag('acs_yrden_sword_equipped')
 			)
 			{
 				TeleportWeaponSpawn();
@@ -127,7 +129,7 @@ state WildHuntBlink_Engage in cWildHuntBlink
 				}
 			}
 			else if (
-			GetWitcherPlayer().HasTag('yrden_secondary_sword_equipped')
+			GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped')
 			)
 			{
 				TeleportWeaponSpawn();
@@ -155,7 +157,7 @@ state WildHuntBlink_Engage in cWildHuntBlink
 				}
 			}
 			else if (
-			GetWitcherPlayer().HasTag('axii_secondary_sword_equipped')
+			GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped')
 			)
 			{
 				TeleportWeaponSpawn();
@@ -183,7 +185,7 @@ state WildHuntBlink_Engage in cWildHuntBlink
 				}
 			}
 			else if (
-			GetWitcherPlayer().HasTag('quen_secondary_sword_equipped')
+			GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped')
 			)
 			{
 				TeleportWeaponSpawn();
@@ -211,7 +213,7 @@ state WildHuntBlink_Engage in cWildHuntBlink
 				}
 			}
 			else if (
-			GetWitcherPlayer().HasTag('aard_secondary_sword_equipped')
+			GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped')
 			)
 			{
 				TeleportWeaponSpawn();
@@ -239,7 +241,7 @@ state WildHuntBlink_Engage in cWildHuntBlink
 				}
 			}
 			else if (
-			GetWitcherPlayer().HasTag('quen_sword_equipped')
+			GetWitcherPlayer().HasTag('acs_quen_sword_equipped')
 			)
 			{
 				TeleportWeaponSpawn();
@@ -267,8 +269,8 @@ state WildHuntBlink_Engage in cWildHuntBlink
 				}
 			}
 			else if (
-			GetWitcherPlayer().HasTag('igni_sword_equipped')
-			|| GetWitcherPlayer().HasTag('igni_secondary_sword_equipped')
+			GetWitcherPlayer().HasTag('acs_igni_sword_equipped')
+			|| GetWitcherPlayer().HasTag('acs_igni_secondary_sword_equipped')
 			)
 			{
 				TeleportWeaponSpawn();
@@ -296,7 +298,7 @@ state WildHuntBlink_Engage in cWildHuntBlink
 				}
 			}
 			else if (
-			GetWitcherPlayer().HasTag('axii_sword_equipped')
+			GetWitcherPlayer().HasTag('acs_axii_sword_equipped')
 			)
 			{
 				TeleportWeaponSpawn();
@@ -316,7 +318,7 @@ state WildHuntBlink_Engage in cWildHuntBlink
 	latent function TeleportWeaponSpawn()
 	{
 		if (GetWitcherPlayer().HasTag('ACS_HideWeaponOnDodge') 
-		&& !GetWitcherPlayer().HasTag('blood_sucking')
+		&& !GetWitcherPlayer().HasTag('acs_blood_sucking')
 		)
 		{
 			ACS_Weapon_Respawn();
@@ -507,7 +509,7 @@ state WildHuntBlink_Engage in cWildHuntBlink
 
 			GetWitcherPlayer().AddTag('ACS_wildhunt_teleport_init');
 			
-			ACS_wh_teleport_entity().Destroy();
+			ACSGetCEntity('wh_teleportfx').Destroy();
 
 			thePlayer.PlayEffectSingle('eredin_disappear');
 			thePlayer.StopEffect('eredin_disappear');
@@ -599,7 +601,7 @@ state WildHuntBlink_Engage in cWildHuntBlink
 						
 			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_roll_flip_rp_b_01', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
 			
-			ACS_Marker_Fire();
+			GetACSWatcher().Marker_Fire();
 
 			GetWitcherPlayer().SoundEvent('monster_dracolizard_combat_fireball_flyby');
 
@@ -935,7 +937,7 @@ state WildHuntBlink_Engage in cWildHuntBlink
 
 			pos = GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetHeadingVector() * 1.3;
 
-			ACS_dolphin_teleport_entity().Destroy();
+			ACSGetCEntity('acs_dolphin_fx').Destroy();
 
 			ent = theGame.CreateEntity( (CEntityTemplate)LoadResource( 
 
@@ -1022,7 +1024,7 @@ state WildHuntBlink_Engage in cWildHuntBlink
 
 			pos = GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetHeadingVector() * 1.3;
 
-			ACS_lightning_teleport_entity().Destroy();
+			ACSGetCEntity('acs_lightning_teleport_fx').Destroy();
 
 			ent = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( 
 
@@ -1044,7 +1046,7 @@ state WildHuntBlink_Engage in cWildHuntBlink
 
 			ent.PlayEffectSingle('lighgtning');
 
-			ACS_Marker_Lightning();
+			GetACSWatcher().Marker_Lightning();
 
 			GetWitcherPlayer().PlayEffectSingle('hit_lightning');
 			GetWitcherPlayer().StopEffect('hit_lightning');
@@ -1134,7 +1136,7 @@ state WildHuntBlink_Engage in cWildHuntBlink
 
 			GetWitcherPlayer().PlayEffectSingle('special_attack_fx');
 
-			ACS_Marker_Smoke();
+			GetACSWatcher().Marker_Smoke();
 
 			TeleportBlockAction();
 			
@@ -1191,7 +1193,7 @@ state WildHuntBlink_Engage in cWildHuntBlink
 
 			pos = GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetHeadingVector() * 1.3;
 
-			//ACS_explosion_teleport_entity().Destroy();
+			//ACSGetCEntity('acs_explosion_teleport_fx').Destroy();
 
 			//ent = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( 
 
@@ -1277,7 +1279,7 @@ state WildHuntBlink_Engage in cWildHuntBlink
 
 			pos = GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetHeadingVector() * 1.3;
 
-			ACS_fountain_portal_teleport_entity().Destroy();
+			ACSGetCEntity('acs_fountain_portal_teleport_fx').Destroy();
 
 			ent = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( 
 
@@ -1703,8 +1705,8 @@ function ACS_RollInit()
 	if ( ACS_Enabled()
 	&& !GetWitcherPlayer().IsCiri()
 	&& !GetWitcherPlayer().IsPerformingFinisher()
-	&& !GetWitcherPlayer().HasTag('in_wraith')
-	&& !GetWitcherPlayer().HasTag('blood_sucking')
+	&& !GetWitcherPlayer().HasTag('acs_in_wraith')
+	&& !GetWitcherPlayer().HasTag('acs_blood_sucking')
 	&& ACS_BuffCheck()
 	&& GetWitcherPlayer().IsActionAllowed(EIAB_Roll)
 	)
@@ -1798,43 +1800,45 @@ state ACS_RollInit_Engage in cACS_RollInit
 		}
 		else
 		{
-			if (GetWitcherPlayer().HasTag('vampire_claws_equipped')
-			|| GetWitcherPlayer().HasTag('aard_sword_equipped'))
+			if (GetWitcherPlayer().HasTag('acs_vampire_claws_equipped')
+			|| GetWitcherPlayer().HasTag('acs_aard_sword_equipped')
+			|| GetWitcherPlayer().HasTag('acs_sorc_fists_equipped')
+			)
 			{
 				vampire_claws_rolls();
 			}
 			else if (
-			GetWitcherPlayer().HasTag('yrden_sword_equipped')
+			GetWitcherPlayer().HasTag('acs_yrden_sword_equipped')
 			)
 			{
 				yrden_sword_rolls();
 			}
 			else if (
-			GetWitcherPlayer().HasTag('yrden_secondary_sword_equipped')
+			GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped')
 			)
 			{
 				yrden_secondary_sword_rolls();
 			}
 			else if (
-			GetWitcherPlayer().HasTag('axii_secondary_sword_equipped')
+			GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped')
 			)
 			{
 				axii_secondary_sword_rolls();
 			}
 			else if (
-			GetWitcherPlayer().HasTag('quen_secondary_sword_equipped')
+			GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped')
 			)
 			{
 				quen_secondary_sword_rolls();
 			}
 			else if (
-			GetWitcherPlayer().HasTag('aard_secondary_sword_equipped')
+			GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped')
 			)
 			{
 				aard_secondary_sword_rolls();
 			}
 			else if (
-			GetWitcherPlayer().HasTag('igni_sword_equipped') || GetWitcherPlayer().HasTag('igni_secondary_sword_equipped')
+			GetWitcherPlayer().HasTag('acs_igni_sword_equipped') || GetWitcherPlayer().HasTag('acs_igni_secondary_sword_equipped')
 			)
 			{
 				ignii_sword_rolls();
@@ -1945,7 +1949,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 					else
 					{
 						if (GetWitcherPlayer().HasTag('ACS_HideWeaponOnDodge') 
-						&& !GetWitcherPlayer().HasTag('blood_sucking')
+						&& !GetWitcherPlayer().HasTag('acs_blood_sucking')
 						)
 						{
 							ACS_Weapon_Respawn();
@@ -1976,7 +1980,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				else
 				{
 					if (GetWitcherPlayer().HasTag('ACS_HideWeaponOnDodge') 
-					&& !GetWitcherPlayer().HasTag('blood_sucking')
+					&& !GetWitcherPlayer().HasTag('acs_blood_sucking')
 					)
 					{
 						ACS_Weapon_Respawn();
@@ -2270,7 +2274,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 	latent function yrden_sword_rolls()
 	{
 		if (GetWitcherPlayer().HasTag('ACS_HideWeaponOnDodge') 
-		&& !GetWitcherPlayer().HasTag('blood_sucking')
+		&& !GetWitcherPlayer().HasTag('acs_blood_sucking')
 		)
 		{
 			ACS_Weapon_Respawn();
@@ -2478,7 +2482,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 	latent function yrden_secondary_sword_rolls()
 	{
 		if (GetWitcherPlayer().HasTag('ACS_HideWeaponOnDodge') 
-		&& !GetWitcherPlayer().HasTag('blood_sucking')
+		&& !GetWitcherPlayer().HasTag('acs_blood_sucking')
 		)
 		{
 			ACS_Weapon_Respawn();
@@ -2679,7 +2683,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 	latent function axii_secondary_sword_rolls()
 	{
 		if (GetWitcherPlayer().HasTag('ACS_HideWeaponOnDodge') 
-		&& !GetWitcherPlayer().HasTag('blood_sucking')
+		&& !GetWitcherPlayer().HasTag('acs_blood_sucking')
 		)
 		{
 			ACS_Weapon_Respawn();
@@ -2887,7 +2891,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 	latent function quen_secondary_sword_rolls()
 	{
 		if (GetWitcherPlayer().HasTag('ACS_HideWeaponOnDodge') 
-		&& !GetWitcherPlayer().HasTag('blood_sucking')
+		&& !GetWitcherPlayer().HasTag('acs_blood_sucking')
 		)
 		{
 			ACS_Weapon_Respawn();
@@ -3095,7 +3099,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 	latent function aard_secondary_sword_rolls()
 	{
 		if (GetWitcherPlayer().HasTag('ACS_HideWeaponOnDodge') 
-		&& !GetWitcherPlayer().HasTag('blood_sucking')
+		&& !GetWitcherPlayer().HasTag('acs_blood_sucking')
 		)
 		{
 			ACS_Weapon_Respawn();
@@ -3296,7 +3300,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 	latent function ignii_sword_rolls()
 	{
 		if (GetWitcherPlayer().HasTag('ACS_HideWeaponOnDodge') 
-		&& !GetWitcherPlayer().HasTag('blood_sucking')
+		&& !GetWitcherPlayer().HasTag('acs_blood_sucking')
 		)
 		{
 			ACS_Weapon_Respawn();
@@ -3446,7 +3450,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 					else
 					{
 						if (GetWitcherPlayer().HasTag('ACS_HideWeaponOnDodge') 
-						&& !GetWitcherPlayer().HasTag('blood_sucking')
+						&& !GetWitcherPlayer().HasTag('acs_blood_sucking')
 						)
 						{
 							ACS_Weapon_Respawn();
@@ -3485,7 +3489,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 					else
 					{
 						if (GetWitcherPlayer().HasTag('ACS_HideWeaponOnDodge') 
-						&& !GetWitcherPlayer().HasTag('blood_sucking')
+						&& !GetWitcherPlayer().HasTag('acs_blood_sucking')
 						)
 						{
 							ACS_Weapon_Respawn();
@@ -8304,7 +8308,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		}
 
 		if (!GetWitcherPlayer().HasTag('ACS_Camo_Active')
-		&& !GetWitcherPlayer().HasTag('blood_sucking')
+		&& !GetWitcherPlayer().HasTag('acs_blood_sucking')
 		&& ACS_DodgeEffects_Enabled())
 		{
 			GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails_backup' );
@@ -8915,8 +8919,8 @@ state BlinkHitReaction_Engage in cACS_BlinkHitReaction
 	{		
 		if (!GetWitcherPlayer().IsCiri()
 		&& !GetWitcherPlayer().IsPerformingFinisher()
-		&& !GetWitcherPlayer().HasTag('in_wraith')
-		&& !GetWitcherPlayer().HasTag('blood_sucking')
+		&& !GetWitcherPlayer().HasTag('acs_in_wraith')
+		&& !GetWitcherPlayer().HasTag('acs_blood_sucking')
 		)
 		{
 			BlinkHitReaction_Latent();
@@ -8966,7 +8970,7 @@ state BlinkHitReaction_Engage in cACS_BlinkHitReaction
 
 			GetWitcherPlayer().AddTag('ACS_wildhunt_teleport_init');
 			
-			ACS_wh_teleport_entity().Destroy();
+			ACSGetCEntity('wh_teleportfx').Destroy();
 
 			thePlayer.PlayEffectSingle('eredin_disappear');
 			thePlayer.StopEffect('eredin_disappear');
@@ -9000,44 +9004,4 @@ state BlinkHitReaction_Engage in cACS_BlinkHitReaction
 			*/
 		}
 	}
-}
-
-function ACS_wh_teleport_entity() : CEntity
-{
-	var teleport_fx 			 : CEntity;
-	
-	teleport_fx = (CEntity)theGame.GetEntityByTag( 'wh_teleportfx' );
-	return teleport_fx;
-}
-
-function ACS_dolphin_teleport_entity() : CEntity
-{
-	var teleport_fx 			 : CEntity;
-	
-	teleport_fx = (CEntity)theGame.GetEntityByTag( 'acs_dolphin_fx' );
-	return teleport_fx;
-}
-
-function ACS_explosion_teleport_entity() : CEntity
-{
-	var teleport_fx 			 : CEntity;
-	
-	teleport_fx = (CEntity)theGame.GetEntityByTag( 'acs_explosion_teleport_fx' );
-	return teleport_fx;
-}
-
-function ACS_fountain_portal_teleport_entity() : CEntity
-{
-	var teleport_fx 			 : CEntity;
-	
-	teleport_fx = (CEntity)theGame.GetEntityByTag( 'acs_fountain_portal_teleport_fx' );
-	return teleport_fx;
-}
-
-function ACS_lightning_teleport_entity() : CEntity
-{
-	var teleport_fx 			 : CEntity;
-	
-	teleport_fx = (CEntity)theGame.GetEntityByTag( 'acs_lightning_teleport_fx' );
-	return teleport_fx;
 }

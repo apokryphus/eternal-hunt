@@ -6,21 +6,13 @@ function ACS_Hijack_Marker_Destroy()
 
 	marks.Clear();
 		
-	theGame.GetEntitiesByTag( 'Hijack_Marker', marks );
+	theGame.GetEntitiesByTag( 'ACS_Hijack_Marker', marks );
 
 	for( i=0; i<marks.Size(); i+=1 )
 	{	
 		mark = (CEntity)marks[i];	
 		mark.DestroyAfter(2);
 	}
-}
-
-function ACS_Hijack_Marker_Get() : CEntity
-{
-	var marker 			 : CEntity;
-	
-	marker = (CEntity)theGame.GetEntityByTag( 'Hijack_Marker' );
-	return marker;
 }
 
 function ACS_Hijack_Marker_2_Destroy()
@@ -31,21 +23,13 @@ function ACS_Hijack_Marker_2_Destroy()
 
 	marks.Clear();
 		
-	theGame.GetEntitiesByTag( 'Hijack_Marker_2', marks );
+	theGame.GetEntitiesByTag( 'ACS_Hijack_Marker_2', marks );
 
 	for( i=0; i<marks.Size(); i+=1 )
 	{	
 		mark = (CEntity)marks[i];	
 		mark.DestroyAfter(2);
 	}
-}
-
-function ACS_Hijack_Marker_2_Get() : CEntity
-{
-	var marker 			 : CEntity;
-	
-	marker = (CEntity)theGame.GetEntityByTag( 'Hijack_Marker_2' );
-	return marker;
 }
 
 function ACS_Hijack_YAxis_Up_Forward()
@@ -163,7 +147,7 @@ state Hijack_YAxis_Engage in cHijackYAxis
 						GetACSWatcher().AddTimer('ACS_HijackMoveForward', 0.001, true);
 					}
 
-					//markerNPC.AddTag('Hijack_Marker');
+					//markerNPC.AddTag('ACS_Hijack_Marker');
 				}
 				else
 				{

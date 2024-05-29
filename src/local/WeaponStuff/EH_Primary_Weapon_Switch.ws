@@ -24,16 +24,22 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 	private var inv 																																																																																							: CInventoryComponent;
 	private var tags 																																																																																							: array<name>;
 	private var animatedComponent_extra_arms 																																																																																	: CAnimatedComponent;
-	private var stupidArray_extra_arms 																																																																																			: array< name >;
 	private var h 																																																																																								: float;
 	private var d_comp																																																																																							: array<CComponent>;							
 	private var i, manual_sword_check																																																																																			: int;								
 	private var watcher																																																																																							: W3ACSWatcher;
 	private var steelswordentity, silverswordentity 																																																																															: CEntity;	
 	private var physicalComponent 																																																																																				: CMeshComponent;
+	private var stupidArray 																																																																																					: array< name >;
 
 	event OnEnterState(prevStateName : name)
 	{
+		if (ACS_New_Replacers_Female_Active()
+		)
+		{
+			return false;
+		}
+
 		LockEntryFunction(true);
 		PrimaryWeaponSwitch();
 		UpdateBehGraph();
@@ -71,14 +77,16 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 		
 		GetWitcherPlayer().SetBehaviorVariable( 'WeaponType', 0);
 		
-		if ( GetWitcherPlayer().HasTag('vampire_claws_equipped') && GetWitcherPlayer().IsInCombat() )
+		if ( (GetWitcherPlayer().HasTag('acs_vampire_claws_equipped') 
+		|| GetWitcherPlayer().HasTag('acs_sorc_fists_equipped')) 
+		&& GetWitcherPlayer().IsInCombat() )
 		{
 			GetWitcherPlayer().SetBehaviorVariable( 'playerWeapon', (int) PW_Steel );
 			GetWitcherPlayer().SetBehaviorVariable( 'playerWeaponForOverlay', (int) PW_Steel );
 		}
 		else
 		{
-			GetWitcherPlayer().SetBehaviorVariable( 'playerWeapon', (int) weapontype ); ACS_Theft_Prevention_9 ();
+			GetWitcherPlayer().SetBehaviorVariable( 'playerWeapon', (int) weapontype ); 
 			GetWitcherPlayer().SetBehaviorVariable( 'playerWeaponForOverlay', (int) weapontype );
 		}
 		
@@ -124,7 +132,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 			{
 				if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 0)
 				{
-					if (!GetWitcherPlayer().HasTag('igni_sword_equipped'))
+					if (!GetWitcherPlayer().HasTag('acs_igni_sword_equipped'))
 					{
 						IgniSword();
 
@@ -133,7 +141,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				}
 				else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 1)
 				{
-					if (!GetWitcherPlayer().HasTag('quen_sword_equipped'))
+					if (!GetWitcherPlayer().HasTag('acs_quen_sword_equipped'))
 					{
 						ArmigerModeQuenSword();
 
@@ -142,7 +150,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				}
 				else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 2)
 				{
-					if (!GetWitcherPlayer().HasTag('axii_sword_equipped'))
+					if (!GetWitcherPlayer().HasTag('acs_axii_sword_equipped'))
 					{
 						ArmigerModeAxiiSword();
 
@@ -151,7 +159,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				}
 				else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 3)
 				{
-					if (!GetWitcherPlayer().HasTag('aard_sword_equipped'))
+					if (!GetWitcherPlayer().HasTag('acs_aard_sword_equipped'))
 					{
 						ArmigerModeAardSword();
 
@@ -160,7 +168,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				}
 				else if (ACS_Armiger_Igni_Set_Sign_Weapon_Type() == 4)
 				{
-					if (!GetWitcherPlayer().HasTag('yrden_sword_equipped'))
+					if (!GetWitcherPlayer().HasTag('acs_yrden_sword_equipped'))
 					{
 						ArmigerModeYrdenSword();
 
@@ -177,7 +185,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 			{
 				if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 0)
 				{
-					if (!GetWitcherPlayer().HasTag('igni_sword_equipped'))
+					if (!GetWitcherPlayer().HasTag('acs_igni_sword_equipped'))
 					{
 						IgniSword();
 
@@ -186,7 +194,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				}
 				else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 1)
 				{
-					if (!GetWitcherPlayer().HasTag('quen_sword_equipped'))
+					if (!GetWitcherPlayer().HasTag('acs_quen_sword_equipped'))
 					{
 						ArmigerModeQuenSword();
 
@@ -195,7 +203,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				}
 				else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 2)
 				{
-					if (!GetWitcherPlayer().HasTag('axii_sword_equipped'))
+					if (!GetWitcherPlayer().HasTag('acs_axii_sword_equipped'))
 					{
 						ArmigerModeAxiiSword();
 
@@ -204,7 +212,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				}
 				else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 3)
 				{
-					if (!GetWitcherPlayer().HasTag('aard_sword_equipped'))
+					if (!GetWitcherPlayer().HasTag('acs_aard_sword_equipped'))
 					{
 						ArmigerModeAardSword();
 
@@ -213,7 +221,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				}
 				else if (ACS_Armiger_Quen_Set_Sign_Weapon_Type() == 4)
 				{
-					if (!GetWitcherPlayer().HasTag('yrden_sword_equipped'))
+					if (!GetWitcherPlayer().HasTag('acs_yrden_sword_equipped'))
 					{
 						ArmigerModeYrdenSword();
 
@@ -230,7 +238,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 			{
 				if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 0)
 				{
-					if (!GetWitcherPlayer().HasTag('igni_sword_equipped'))
+					if (!GetWitcherPlayer().HasTag('acs_igni_sword_equipped'))
 					{
 						IgniSword();
 
@@ -239,7 +247,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				}
 				else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 1)
 				{
-					if (!GetWitcherPlayer().HasTag('quen_sword_equipped'))
+					if (!GetWitcherPlayer().HasTag('acs_quen_sword_equipped'))
 					{
 						ArmigerModeQuenSword();
 
@@ -248,7 +256,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				}
 				else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 2)
 				{
-					if (!GetWitcherPlayer().HasTag('axii_sword_equipped'))
+					if (!GetWitcherPlayer().HasTag('acs_axii_sword_equipped'))
 					{
 						ArmigerModeAxiiSword();
 
@@ -257,7 +265,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				}
 				else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 3)
 				{
-					if (!GetWitcherPlayer().HasTag('aard_sword_equipped'))
+					if (!GetWitcherPlayer().HasTag('acs_aard_sword_equipped'))
 					{
 						ArmigerModeAardSword();
 
@@ -266,7 +274,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				}
 				else if (ACS_Armiger_Aard_Set_Sign_Weapon_Type() == 4)
 				{
-					if (!GetWitcherPlayer().HasTag('yrden_sword_equipped'))
+					if (!GetWitcherPlayer().HasTag('acs_yrden_sword_equipped'))
 					{
 						ArmigerModeYrdenSword();
 
@@ -283,7 +291,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 			{
 				if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 0)
 				{
-					if (!GetWitcherPlayer().HasTag('igni_sword_equipped'))
+					if (!GetWitcherPlayer().HasTag('acs_igni_sword_equipped'))
 					{
 						IgniSword();
 
@@ -292,7 +300,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				}
 				else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 1)
 				{
-					if (!GetWitcherPlayer().HasTag('quen_sword_equipped'))
+					if (!GetWitcherPlayer().HasTag('acs_quen_sword_equipped'))
 					{
 						ArmigerModeQuenSword();
 
@@ -301,7 +309,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				}
 				else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 2)
 				{
-					if (!GetWitcherPlayer().HasTag('axii_sword_equipped'))
+					if (!GetWitcherPlayer().HasTag('acs_axii_sword_equipped'))
 					{
 						ArmigerModeAxiiSword();
 
@@ -310,7 +318,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				}
 				else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 3)
 				{
-					if (!GetWitcherPlayer().HasTag('aard_sword_equipped'))
+					if (!GetWitcherPlayer().HasTag('acs_aard_sword_equipped'))
 					{
 						ArmigerModeAardSword();
 
@@ -319,7 +327,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				}
 				else if (ACS_Armiger_Axii_Set_Sign_Weapon_Type() == 4)
 				{
-					if (!GetWitcherPlayer().HasTag('yrden_sword_equipped'))
+					if (!GetWitcherPlayer().HasTag('acs_yrden_sword_equipped'))
 					{
 						ArmigerModeYrdenSword();
 
@@ -336,7 +344,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 			{
 				if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 0)
 				{
-					if (!GetWitcherPlayer().HasTag('igni_sword_equipped'))
+					if (!GetWitcherPlayer().HasTag('acs_igni_sword_equipped'))
 					{
 						IgniSword();
 
@@ -345,7 +353,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				}
 				else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 1)
 				{
-					if (!GetWitcherPlayer().HasTag('quen_sword_equipped'))
+					if (!GetWitcherPlayer().HasTag('acs_quen_sword_equipped'))
 					{
 						ArmigerModeQuenSword();
 
@@ -354,16 +362,16 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				}
 				else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 2)
 				{
-					if (!GetWitcherPlayer().HasTag('axii_sword_equipped'))
+					if (!GetWitcherPlayer().HasTag('acs_axii_sword_equipped'))
 					{
-						ArmigerModeAxiiSword(); ACS_Theft_Prevention_9 ();
+						ArmigerModeAxiiSword(); 
 
 						AxiiSwordSwitch();			
 					}
 				}
 				else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 3)
 				{
-					if (!GetWitcherPlayer().HasTag('aard_sword_equipped'))
+					if (!GetWitcherPlayer().HasTag('acs_aard_sword_equipped'))
 					{
 						ArmigerModeAardSword();
 
@@ -372,7 +380,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				}
 				else if (ACS_Armiger_Yrden_Set_Sign_Weapon_Type() == 4)
 				{
-					if (!GetWitcherPlayer().HasTag('yrden_sword_equipped'))
+					if (!GetWitcherPlayer().HasTag('acs_yrden_sword_equipped'))
 					{
 						ArmigerModeYrdenSword();
 
@@ -385,16 +393,21 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				GetWitcherPlayer().IsWeaponHeld( 'fist' )
 			)
 			{
-				if (ACS_GetFistMode() == 0
-				|| ACS_GetFistMode() == 2 )
+				if (ACS_GetFistMode() == 0)
 				{
 					NormalFistsSwitch();
 				}
-				else if (ACS_GetFistMode() == 1 && !GetWitcherPlayer().HasTag('vampire_claws_equipped') )
+				else if (ACS_GetFistMode() == 1 && !GetWitcherPlayer().HasTag('acs_vampire_claws_equipped') )
 				{
 					VampireClaws();
 
 					VampireClawsSwitch();
+				}
+				else if (ACS_GetFistMode() == 2 && !GetWitcherPlayer().HasTag('acs_sorc_fists_equipped') )
+				{
+					SorcFists();
+
+					SorcFistsSwitch();
 				}
 			}
 
@@ -406,8 +419,8 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 		{
 			if 
 			(
-				( ACS_GetFocusModeSilverWeapon() == 0 && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('igni_sword_equipped') )
-				|| ( ACS_GetFocusModeSteelWeapon() == 0 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('igni_sword_equipped') )
+				( ACS_GetFocusModeSilverWeapon() == 0 && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('acs_igni_sword_equipped') )
+				|| ( ACS_GetFocusModeSteelWeapon() == 0 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('acs_igni_sword_equipped') )
 			)
 			{
 				IgniSword();
@@ -417,8 +430,8 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 			
 			else if  
 			(
-				( ACS_GetFocusModeSilverWeapon() == 3 && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('axii_sword_equipped') )
-				|| ( ACS_GetFocusModeSteelWeapon() == 3 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('axii_sword_equipped') )
+				( ACS_GetFocusModeSilverWeapon() == 3 && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('acs_axii_sword_equipped') )
+				|| ( ACS_GetFocusModeSteelWeapon() == 3 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('acs_axii_sword_equipped') )
 			)
 			{
 				FocusModeAxiiSword();
@@ -428,8 +441,8 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 			
 			else if  
 			(
-				( ACS_GetFocusModeSilverWeapon() == 7 && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('aard_sword_equipped') )
-				|| ( ACS_GetFocusModeSteelWeapon() == 7 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('aard_sword_equipped') )
+				( ACS_GetFocusModeSilverWeapon() == 7 && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('acs_aard_sword_equipped') )
+				|| ( ACS_GetFocusModeSteelWeapon() == 7 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('acs_aard_sword_equipped') )
 			)
 			{
 				FocusModeAardSword();
@@ -439,8 +452,8 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 			
 			else if  
 			(
-				( ACS_GetFocusModeSilverWeapon() == 5 && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('yrden_sword_equipped') )
-				|| ( ACS_GetFocusModeSteelWeapon() == 5 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('yrden_sword_equipped') )
+				( ACS_GetFocusModeSilverWeapon() == 5 && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('acs_yrden_sword_equipped') )
+				|| ( ACS_GetFocusModeSteelWeapon() == 5 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('acs_yrden_sword_equipped') )
 			)
 			{
 				FocusModeYrdenSword();
@@ -450,8 +463,8 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 			
 			else if 
 			(
-				( ACS_GetFocusModeSilverWeapon() == 1 && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('quen_sword_equipped') )
-				|| ( ACS_GetFocusModeSteelWeapon() == 1 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('quen_sword_equipped') )
+				( ACS_GetFocusModeSilverWeapon() == 1 && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('acs_quen_sword_equipped') )
+				|| ( ACS_GetFocusModeSteelWeapon() == 1 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('acs_quen_sword_equipped') )
 			)
 			{
 				FocusModeQuenSword();
@@ -464,16 +477,21 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				GetWitcherPlayer().IsWeaponHeld( 'fist' ) 
 			)
 			{
-				if (ACS_GetFistMode() == 0
-				|| ACS_GetFistMode() == 2 )
+				if (ACS_GetFistMode() == 0)
 				{
 					NormalFistsSwitch();
 				}
-				else if (ACS_GetFistMode() == 1 && !GetWitcherPlayer().HasTag('vampire_claws_equipped'))
+				else if (ACS_GetFistMode() == 1 && !GetWitcherPlayer().HasTag('acs_vampire_claws_equipped'))
 				{
 					VampireClaws();
 
 					VampireClawsSwitch();
+				}
+				else if (ACS_GetFistMode() == 2 && !GetWitcherPlayer().HasTag('acs_sorc_fists_equipped') )
+				{
+					SorcFists();
+
+					SorcFistsSwitch();
 				}
 			}
 
@@ -488,14 +506,14 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				GetWitcherPlayer().HasTag('HybridDefaultWeaponTicket')
 			)
 			{
-				if (!GetWitcherPlayer().HasTag('igni_sword_equipped') )
+				if (!GetWitcherPlayer().HasTag('acs_igni_sword_equipped') )
 				{
 					IgniSword();
 
 					IgniSwordSwitch();
 				}	
 
-				HybridTagRemoval();
+				ACS_HybridTagRemoval();
 			}
 			
 			else if  
@@ -503,14 +521,14 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				GetWitcherPlayer().HasTag('HybridEredinWeaponTicket') 
 			)
 			{
-				if (!GetWitcherPlayer().HasTag('axii_sword_equipped') )
+				if (!GetWitcherPlayer().HasTag('acs_axii_sword_equipped') )
 				{
 					HybridModeAxiiSword();
 
 					AxiiSwordSwitch();
 				}
 
-				HybridTagRemoval();
+				ACS_HybridTagRemoval();
 			}
 			
 			else if  
@@ -518,14 +536,14 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				GetWitcherPlayer().HasTag('HybridClawWeaponTicket') 
 			)
 			{
-				if (!GetWitcherPlayer().HasTag('aard_sword_equipped') )
+				if (!GetWitcherPlayer().HasTag('acs_aard_sword_equipped') )
 				{
 					HybridModeAardSword();
 
 					AardSwordSwitch();
 				}
 
-				HybridTagRemoval();
+				ACS_HybridTagRemoval();
 			}
 			
 			else if  
@@ -533,14 +551,14 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				GetWitcherPlayer().HasTag('HybridImlerithWeaponTicket')
 			)
 			{
-				if (!GetWitcherPlayer().HasTag('yrden_sword_equipped') )
+				if (!GetWitcherPlayer().HasTag('acs_yrden_sword_equipped') )
 				{
 					HybridModeYrdenSword();
 
 					YrdenSwordSwitch();
 				}
 
-				HybridTagRemoval();
+				ACS_HybridTagRemoval();
 			}
 			
 			else if 
@@ -548,14 +566,14 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				GetWitcherPlayer().HasTag('HybridOlgierdWeaponTicket') 
 			)
 			{
-				if (!GetWitcherPlayer().HasTag('quen_sword_equipped') )
+				if (!GetWitcherPlayer().HasTag('acs_quen_sword_equipped') )
 				{
 					HybridModeQuenSword();
 
 					QuenSwordSwitch();
 				}
 
-				HybridTagRemoval();
+				ACS_HybridTagRemoval();
 			}
 			
 			else if 
@@ -563,16 +581,21 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				GetWitcherPlayer().IsWeaponHeld( 'fist' )
 			)
 			{
-				if (ACS_GetFistMode() == 0
-				|| ACS_GetFistMode() == 2 )
+				if (ACS_GetFistMode() == 0)
 				{
 					NormalFistsSwitch();
 				}
-				else if (ACS_GetFistMode() == 1 && !GetWitcherPlayer().HasTag('vampire_claws_equipped'))
+				else if (ACS_GetFistMode() == 1 && !GetWitcherPlayer().HasTag('acs_vampire_claws_equipped'))
 				{
 					VampireClaws();
 
 					VampireClawsSwitch();
+				}
+				else if (ACS_GetFistMode() == 2 && !GetWitcherPlayer().HasTag('acs_sorc_fists_equipped') )
+				{
+					SorcFists();
+
+					SorcFistsSwitch();
 				}
 			}
 
@@ -585,8 +608,8 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 		{
 			if 
 			(
-				( ACS_GetItem_Eredin_Silver() && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('axii_sword_equipped') )
-				|| ( ACS_GetItem_Eredin_Steel() && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('axii_sword_equipped') )
+				( ACS_GetItem_Eredin_Silver() && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('acs_axii_sword_equipped') )
+				|| ( ACS_GetItem_Eredin_Steel() && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('acs_axii_sword_equipped') )
 			)
 			{
 				ACS_WeaponDestroyInit();
@@ -629,15 +652,15 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				sword_trail_3.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 				sword_trail_3.AddTag('acs_sword_trail_3');
 
-				GetWitcherPlayer().AddTag('axii_sword_equipped');
+				GetWitcherPlayer().AddTag('acs_axii_sword_equipped');
 
 				AxiiSwordSwitch();
 			}
 			
 			else if 
 			(
-				( ACS_GetItem_Claws_Silver() && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('aard_sword_equipped') )
-				|| ( ACS_GetItem_Claws_Steel() && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('aard_sword_equipped') )
+				( ACS_GetItem_Claws_Silver() && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('acs_aard_sword_equipped') )
+				|| ( ACS_GetItem_Claws_Steel() && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('acs_aard_sword_equipped') )
 			)
 			{
 				EquipmentModeAardSword();
@@ -651,9 +674,9 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 			
 			else if 
 			(
-				( ACS_GetItem_Imlerith_Silver() && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('yrden_sword_equipped') )
-				|| ( ACS_GetItem_Imlerith_Steel() && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('yrden_sword_equipped') )
-				|| ( ACS_GetItem_MageStaff_Steel() && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('yrden_sword_equipped') )
+				( ACS_GetItem_Imlerith_Silver() && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('acs_yrden_sword_equipped') )
+				|| ( ACS_GetItem_Imlerith_Steel() && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('acs_yrden_sword_equipped') )
+				|| ( ACS_GetItem_MageStaff_Steel() && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('acs_yrden_sword_equipped') )
 			)
 			{
 				ACS_WeaponDestroyInit();
@@ -696,15 +719,15 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				sword_trail_3.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 				sword_trail_3.AddTag('acs_sword_trail_3');
 
-				GetWitcherPlayer().AddTag('yrden_sword_equipped');
+				GetWitcherPlayer().AddTag('acs_yrden_sword_equipped');
 
 				YrdenSwordSwitch();
 			}
 			
 			else if 
 			(
-				( ACS_GetItem_Olgierd_Silver() && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('quen_sword_equipped') )
-				|| ( ACS_GetItem_Olgierd_Steel() && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('quen_sword_equipped') )
+				( ACS_GetItem_Olgierd_Silver() && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('acs_quen_sword_equipped') )
+				|| ( ACS_GetItem_Olgierd_Steel() && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('acs_quen_sword_equipped') )
 			)
 			{
 				ACS_WeaponDestroyInit();
@@ -747,23 +770,23 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				sword_trail_3.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 				sword_trail_3.AddTag('acs_sword_trail_3');
 
-				GetWitcherPlayer().AddTag('quen_sword_equipped');
+				GetWitcherPlayer().AddTag('acs_quen_sword_equipped');
 
 				if (ACS_GetItem_Iris() && !ACS_IconicSwordVFXOff_Enabled())
 				{
-					ACS_Sword_Trail_2().StopEffect('red_charge_10');
-					ACS_Sword_Trail_2().PlayEffectSingle('red_charge_10');
+					ACSGetCEntity('acs_sword_trail_2').StopEffect('red_charge_10');
+					ACSGetCEntity('acs_sword_trail_2').PlayEffectSingle('red_charge_10');
 
-					ACS_Sword_Trail_2().StopEffect('red_aerondight_special_trail');
-					ACS_Sword_Trail_2().PlayEffectSingle('red_aerondight_special_trail');
+					ACSGetCEntity('acs_sword_trail_2').StopEffect('red_aerondight_special_trail');
+					ACSGetCEntity('acs_sword_trail_2').PlayEffectSingle('red_aerondight_special_trail');
 				}
 
 				QuenSwordSwitch();
 			}
 			else if 
 			(
-				( ACS_GetItem_Katana_Silver() && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('axii_secondary_sword_equipped') )
-				|| ( ACS_GetItem_Katana_Steel() && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('axii_secondary_sword_equipped') )
+				( ACS_GetItem_Katana_Silver() && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped') )
+				|| ( ACS_GetItem_Katana_Steel() && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped') )
 			)
 			{
 				GetACSWatcher().SecondaryWeaponSwitch();
@@ -771,7 +794,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 
 			else if 
 			(
-				ACS_GetItem_MageStaff_Steel() && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('yrden_sword_equipped') 
+				ACS_GetItem_MageStaff_Steel() && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('acs_yrden_sword_equipped') 
 			)
 			{
 				ACS_WeaponDestroyInit();
@@ -814,7 +837,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				sword_trail_3.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 				sword_trail_3.AddTag('acs_sword_trail_3');
 
-				GetWitcherPlayer().AddTag('yrden_sword_equipped');
+				GetWitcherPlayer().AddTag('acs_yrden_sword_equipped');
 
 				YrdenSwordSwitch();
 			}
@@ -831,7 +854,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				{
 					if 
 					(
-						!GetWitcherPlayer().HasTag('vampire_claws_equipped')
+						!GetWitcherPlayer().HasTag('acs_vampire_claws_equipped')
 					)
 					{
 						ACS_WeaponDestroyInit();
@@ -839,6 +862,23 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 						VampireClaws();
 
 						VampireClawsSwitch();
+					}
+				}
+				else if 
+				(
+					ACS_GetItem_SorcFists()
+				)
+				{
+					if 
+					(
+						!GetWitcherPlayer().HasTag('acs_sorc_fists_equipped')
+					)
+					{
+						ACS_WeaponDestroyInit();
+
+						SorcFists();
+
+						SorcFistsSwitch();
 					}
 				}
 				else
@@ -853,102 +893,70 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 	{
 		GetWitcherPlayer().RemoveTimer('ACS_Weapon_Summon_Delay');
 		
-		if (GetWitcherPlayer().HasTag('igni_sword_equipped')
-		&& !GetWitcherPlayer().HasTag('igni_sword_effect_played'))
+		if (GetWitcherPlayer().HasTag('acs_igni_sword_equipped')
+		&& !GetWitcherPlayer().HasTag('acs_igni_sword_effect_played'))
 		{
-			igni_sword_summon();
+			acs_igni_sword_summon();
 
 			GetACSWatcher().AddTimer('ACS_Weapon_Summon_Delay', 0.125, false);
 
-			GetWitcherPlayer().AddTag('igni_sword_effect_played');
-			GetWitcherPlayer().AddTag('igni_secondary_sword_effect_played');
+			GetWitcherPlayer().AddTag('acs_igni_sword_effect_played');
+			GetWitcherPlayer().AddTag('acs_igni_secondary_sword_effect_played');
 		}
-		else if (GetWitcherPlayer().HasTag('axii_sword_equipped')
-		&& !GetWitcherPlayer().HasTag('axii_sword_effect_played'))
+		else if (GetWitcherPlayer().HasTag('acs_axii_sword_equipped')
+		&& !GetWitcherPlayer().HasTag('acs_axii_sword_effect_played'))
 		{
-			igni_sword_summon();
+			acs_igni_sword_summon();
 
-			//axii_sword_summon();
+			//acs_axii_sword_summon();
 
 			GetACSWatcher().AddTimer('ACS_Weapon_Summon_Delay', 0.125, false);
 
-			GetWitcherPlayer().AddTag('axii_sword_effect_played');
+			GetWitcherPlayer().AddTag('acs_axii_sword_effect_played');
 		}
-		else if (GetWitcherPlayer().HasTag('aard_sword_equipped')
-		&& !GetWitcherPlayer().HasTag('aard_sword_effect_played'))
+		else if (GetWitcherPlayer().HasTag('acs_aard_sword_equipped')
+		&& !GetWitcherPlayer().HasTag('acs_aard_sword_effect_played'))
 		{
-			//aard_sword_summon();
+			//acs_aard_sword_summon();
 
 			GetACSWatcher().AddTimer('ACS_Weapon_Summon_Delay', 0.125, false);
 
-			GetWitcherPlayer().AddTag('aard_sword_effect_played');
+			GetWitcherPlayer().AddTag('acs_aard_sword_effect_played');
 		}
-		else if (GetWitcherPlayer().HasTag('yrden_sword_equipped')
-		&& !GetWitcherPlayer().HasTag('yrden_sword_effect_played'))
+		else if (GetWitcherPlayer().HasTag('acs_yrden_sword_equipped')
+		&& !GetWitcherPlayer().HasTag('acs_yrden_sword_effect_played'))
 		{
-			igni_sword_summon();
+			acs_igni_sword_summon();
 
-			//yrden_sword_summon();
+			//acs_yrden_sword_summon();
 
 			GetACSWatcher().AddTimer('ACS_Weapon_Summon_Delay', 0.125, false);
 
-			GetWitcherPlayer().AddTag('yrden_sword_effect_played');
+			GetWitcherPlayer().AddTag('acs_yrden_sword_effect_played');
 		}
-		else if (GetWitcherPlayer().HasTag('quen_sword_equipped')
-		&& !GetWitcherPlayer().HasTag('quen_sword_effect_played'))
+		else if (GetWitcherPlayer().HasTag('acs_quen_sword_equipped')
+		&& !GetWitcherPlayer().HasTag('acs_quen_sword_effect_played'))
 		{
-			igni_sword_summon();
+			acs_igni_sword_summon();
 
-			//quen_sword_summon();
+			//acs_quen_sword_summon();
 
 			GetACSWatcher().AddTimer('ACS_Weapon_Summon_Delay', 0.125, false);
 
-			GetWitcherPlayer().AddTag('quen_sword_effect_played');
-		}
-	}
-
-	latent function WeaponSummonAnimation()
-	{
-		if (GetWitcherPlayer().IsInCombat())
-		{
-			ACS_BruxaDodgeSlideBackInitForWeaponSwitching();
-		}
-		else
-		{
-			if ( GetWitcherPlayer().GetCurrentStateName() == 'Combat' ) 
-			{
-				ACS_BruxaDodgeSlideBackInitForWeaponSwitching();
-			}
-			else
-			{
-				if (theInput.GetActionValue('GI_AxisLeftY') != 0
-				|| theInput.GetActionValue('GI_AxisLeftX') != 0)
-				{
-					ACS_BruxaDodgeSlideBackInitForWeaponSwitching();
-				}
-				else
-				{
-					if (!GetWitcherPlayer().IsCiri()
-					&& !GetWitcherPlayer().IsPerformingFinisher()
-					&& !GetWitcherPlayer().HasTag('in_wraith')
-					&& !GetWitcherPlayer().HasTag('blood_sucking')
-					&& ACS_BuffCheck()
-					&& GetWitcherPlayer().IsActionAllowed(EIAB_Dodge)
-					&& !GetWitcherPlayer().IsInAir()
-					)
-					{
-						GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync( '', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0, 1) );
-					}
-				}
-			}
+			GetWitcherPlayer().AddTag('acs_quen_sword_effect_played');
 		}
 	}
 
 	latent function NormalFistsSwitch()
 	{
-		if (GetWitcherPlayer().HasTag('vampire_claws_equipped'))
+		if (GetWitcherPlayer().HasTag('acs_vampire_claws_equipped'))
 		{
-			ClawDestroy_WITH_EFFECT();
+			GetACSWatcher().ClawDestroy_WITH_EFFECT();
+		}
+
+		if (GetWitcherPlayer().HasTag('acs_sorc_fists_equipped'))
+		{
+			GetACSWatcher().SorcFistDestroy();
 		}
 
 		if (!theGame.IsDialogOrCutscenePlaying() 
@@ -967,14 +975,17 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					{
 						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' )
 						{
-							GetWitcherPlayer().ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' );
+							
+
+							stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' );
 						}
 					}
 					else
 					{
 						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_swordwalk' )
 						{
-							GetWitcherPlayer().ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_swordwalk' );
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk' );
 						}
 					}
 				}
@@ -984,14 +995,16 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					{
 						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_passive_taunt' )
 						{
-							GetWitcherPlayer().ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_passive_taunt' );
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_passive_taunt' );
 						}
 					}
 					else
 					{
 						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR' )
 						{
-							GetWitcherPlayer().ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR' );
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR' );
 						}
 					}
 				}
@@ -1004,14 +1017,16 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					{
 						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' )
 						{
-							GetWitcherPlayer().ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' );
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' );
 						}
 					}
 					else
 					{
 						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_swordwalk' )
 						{
-							GetWitcherPlayer().ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_swordwalk' );
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk' );
 						}
 					}
 				}
@@ -1021,14 +1036,16 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					{
 						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_passive_taunt' )
 						{
-							GetWitcherPlayer().ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_passive_taunt' );
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_passive_taunt' );
 						}
 					}
 					else
 					{
 						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP' )
 						{
-							GetWitcherPlayer().ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP' );
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP' );
 						}
 					}
 				}
@@ -1041,14 +1058,16 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					{
 						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'igni_primary_beh_swordwalk_passive_taunt' )
 						{
-							GetWitcherPlayer().ActivateAndSyncBehavior( 'igni_primary_beh_swordwalk_passive_taunt' );
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_swordwalk_passive_taunt' );
 						}
 					}
 					else
 					{
 						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'igni_primary_beh_swordwalk' )
 						{
-							GetWitcherPlayer().ActivateAndSyncBehavior( 'igni_primary_beh_swordwalk' );
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_swordwalk' );
 						}
 					}
 				}
@@ -1058,29 +1077,38 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					{
 						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'igni_primary_beh_passive_taunt' )
 						{
-							GetWitcherPlayer().ActivateAndSyncBehavior( 'igni_primary_beh_passive_taunt' );
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_passive_taunt' );
 						}
 					}
 					else
 					{
 						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'igni_primary_beh' )
 						{
-							GetWitcherPlayer().ActivateAndSyncBehavior( 'igni_primary_beh' );
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh' );
 						}
 					}
 				}
 			}
 			
-			if ( GetWitcherPlayer().IsInCombat() && GetWitcherPlayer().GetCurrentStateName() != 'Combat') 
+			if (stupidArray.Size() > 0)
 			{
-				GetWitcherPlayer().GotoState( 'Combat' );
+				thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+				thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+				thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0 );
+				thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+				thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+				thePlayer.RaiseForceEvent( 'Climb' );
+
+				thePlayer.ActivateBehaviors(stupidArray);
 			}
 		}
 	}
 
 	latent function VampireClawsSwitch()
 	{
-		ACS_Theft_Prevention_9 ();
 		if (!theGame.IsDialogOrCutscenePlaying() 
 		&& !GetWitcherPlayer().IsInNonGameplayCutscene() 
 		&& !GetWitcherPlayer().IsInGameplayScene()
@@ -1095,42 +1123,105 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 			{
 				if (ACS_PassiveTaunt_Enabled())
 				{
-					GetWitcherPlayer().ActivateAndSyncBehavior( 'claw_beh_SCAAR_passive_taunt' );
+					if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'claw_beh_SCAAR_passive_taunt' )
+					{
+						
+						stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_SCAAR_passive_taunt' );
+					}
 				}
 				else
 				{
-					GetWitcherPlayer().ActivateAndSyncBehavior( 'claw_beh_SCAAR' );
+					if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'claw_beh_SCAAR' )
+					{
+						
+						stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_SCAAR' );
+					}
 				}
 			}
 			else if (ACS_E3ARP_Installed() && ACS_E3ARP_Enabled() && !ACS_SCAAR_Enabled())
 			{
 				if (ACS_PassiveTaunt_Enabled())
 				{
-					GetWitcherPlayer().ActivateAndSyncBehavior( 'claw_beh_E3ARP_passive_taunt' );
+					if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'claw_beh_E3ARP_passive_taunt' )
+					{
+						
+						stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_E3ARP_passive_taunt' );
+					}
 				}
 				else
 				{
-					GetWitcherPlayer().ActivateAndSyncBehavior( 'claw_beh_E3ARP' );
+					if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'claw_beh_E3ARP' )
+					{
+						
+						stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_E3ARP' );
+					}
 				}
 			}
 			else
 			{
 				if (ACS_PassiveTaunt_Enabled())
 				{
-					GetWitcherPlayer().ActivateAndSyncBehavior( 'claw_beh_passive_taunt' );
+					if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'claw_beh_passive_taunt' )
+					{
+						
+						stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_passive_taunt' );
+					}
 				}
 				else
 				{
-					GetWitcherPlayer().ActivateAndSyncBehavior( 'claw_beh' );
-				}
-
-				if ( GetWitcherPlayer().IsInCombat() && GetWitcherPlayer().GetCurrentStateName() != 'Combat') 
-				{
-					GetWitcherPlayer().GotoState( 'Combat' );
+					if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'claw_beh' )
+					{
+						
+						stupidArray.Clear(); stupidArray.PushBack( 'claw_beh' );
+					}
 				}
 			}
 
-			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync( 'locomotion_walkstart_forward_dettlaff_ACS', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0, 1) );
+			if (stupidArray.Size() > 0)
+			{
+				thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+				thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+				thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0 );
+				thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+				thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+				thePlayer.RaiseForceEvent( 'Climb' );
+
+				thePlayer.ActivateBehaviors(stupidArray);
+			}
+		}
+	}
+
+	latent function SorcFistsSwitch()
+	{
+		if (!theGame.IsDialogOrCutscenePlaying() 
+		&& !GetWitcherPlayer().IsInNonGameplayCutscene() 
+		&& !GetWitcherPlayer().IsInGameplayScene()
+		&& !GetWitcherPlayer().IsSwimming()
+		&& !GetWitcherPlayer().IsUsingHorse()
+		&& !GetWitcherPlayer().IsUsingVehicle()
+		)
+		{
+			if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
+			{
+				
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' );
+			}
+
+			if (stupidArray.Size() > 0)
+			{
+				thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+				thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+				thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0 );
+				thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+				thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+				thePlayer.RaiseForceEvent( 'Climb' );
+
+				thePlayer.ActivateBehaviors(stupidArray);
+			}
+
+			UpdateBehGraph();
 		}
 	}
 
@@ -1152,14 +1243,16 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					{
 						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' )
 						{
-							GetWitcherPlayer().ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' );
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk_passive_taunt' );
 						}
 					}
 					else
 					{
 						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_swordwalk' )
 						{
-							GetWitcherPlayer().ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_swordwalk' );
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_swordwalk' );
 						}
 					}
 				}
@@ -1169,14 +1262,16 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					{
 						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_passive_taunt' )
 						{
-							GetWitcherPlayer().ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR_passive_taunt' );
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_passive_taunt' );
 						}
 					}
 					else
 					{
 						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR' )
 						{
-							GetWitcherPlayer().ActivateAndSyncBehavior( 'igni_primary_beh_SCAAR' );
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR' );
 						}
 					}
 				}
@@ -1189,14 +1284,16 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					{
 						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' )
 						{
-							GetWitcherPlayer().ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' );
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk_passive_taunt' );
 						}
 					}
 					else
 					{
 						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_swordwalk' )
 						{
-							GetWitcherPlayer().ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_swordwalk' );
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_swordwalk' );
 						}
 					}
 				}
@@ -1206,14 +1303,16 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					{
 						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_passive_taunt' )
 						{
-							GetWitcherPlayer().ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP_passive_taunt' );
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_passive_taunt' );
 						}
 					}
 					else
 					{
 						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP' )
 						{
-							GetWitcherPlayer().ActivateAndSyncBehavior( 'igni_primary_beh_E3ARP' );
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP' );
 						}
 					}
 				}
@@ -1226,14 +1325,16 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					{
 						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'igni_primary_beh_swordwalk_passive_taunt' )
 						{
-							GetWitcherPlayer().ActivateAndSyncBehavior( 'igni_primary_beh_swordwalk_passive_taunt' );
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_swordwalk_passive_taunt' );
 						}
 					}
 					else
 					{
 						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'igni_primary_beh_swordwalk' )
 						{
-							GetWitcherPlayer().ActivateAndSyncBehavior( 'igni_primary_beh_swordwalk' );
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_swordwalk' );
 						}
 					}
 				}
@@ -1243,33 +1344,35 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					{
 						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'igni_primary_beh_passive_taunt' )
 						{
-							GetWitcherPlayer().ActivateAndSyncBehavior( 'igni_primary_beh_passive_taunt' );
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_passive_taunt' );
 						}
 					}
 					else
 					{
 						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'igni_primary_beh' )
 						{
-							GetWitcherPlayer().ActivateAndSyncBehavior( 'igni_primary_beh' );
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh' );
 						}
 					}
 				}
 			}
 
-			if ( GetWitcherPlayer().IsInCombat() && GetWitcherPlayer().GetCurrentStateName() != 'Combat') 
+			if (stupidArray.Size() > 0)
 			{
-				GetWitcherPlayer().GotoState( 'Combat' );
+				thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+				thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+				thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0 );
+				thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+				thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+				thePlayer.RaiseForceEvent( 'Climb' );
+
+				thePlayer.ActivateBehaviors(stupidArray);
 			}
 
 			UpdateBehGraph();
-
-			if ( 
-			ACS_GetWeaponMode() == 0
-			|| ACS_GetWeaponMode() == 1
-			)
-			{
-				WeaponSummonAnimation();
-			}
 		}
 	}
 
@@ -1289,22 +1392,38 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				{
 					if (ACS_PassiveTaunt_Enabled())
 					{
-						GetWitcherPlayer().ActivateAndSyncBehavior( 'axii_primary_beh_SCAAR_swordwalk_passive_taunt' );
+						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'axii_primary_beh_SCAAR_swordwalk_passive_taunt' )
+						{
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR_swordwalk_passive_taunt' );
+						}
 					}
 					else
 					{
-						GetWitcherPlayer().ActivateAndSyncBehavior( 'axii_primary_beh_SCAAR_swordwalk' );
+						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'axii_primary_beh_SCAAR_swordwalk' )
+						{
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR_swordwalk' );
+						}
 					}
 				}
 				else
 				{
 					if (ACS_PassiveTaunt_Enabled())
 					{
-						GetWitcherPlayer().ActivateAndSyncBehavior( 'axii_primary_beh_SCAAR_passive_taunt' );
+						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'axii_primary_beh_SCAAR_passive_taunt' )
+						{
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR_passive_taunt' );
+						}
 					}
 					else
 					{
-						GetWitcherPlayer().ActivateAndSyncBehavior( 'axii_primary_beh_SCAAR' );
+						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'axii_primary_beh_SCAAR' )
+						{
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_SCAAR' );
+						}
 					}
 				}
 			}
@@ -1314,22 +1433,38 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				{
 					if (ACS_PassiveTaunt_Enabled())
 					{
-						GetWitcherPlayer().ActivateAndSyncBehavior( 'axii_primary_beh_E3ARP_swordwalk_passive_taunt' );
+						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'axii_primary_beh_E3ARP_swordwalk_passive_taunt' )
+						{
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP_swordwalk_passive_taunt' );
+						}
 					}
 					else
 					{
-						GetWitcherPlayer().ActivateAndSyncBehavior( 'axii_primary_beh_E3ARP_swordwalk' );
+						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'axii_primary_beh_E3ARP_swordwalk' )
+						{
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP_swordwalk' );
+						}
 					}
 				}
 				else
 				{
 					if (ACS_PassiveTaunt_Enabled())
 					{
-						GetWitcherPlayer().ActivateAndSyncBehavior( 'axii_primary_beh_E3ARP_passive_taunt' );
+						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'axii_primary_beh_E3ARP_passive_taunt' )
+						{
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP_passive_taunt' );
+						}
 					}
 					else
 					{
-						GetWitcherPlayer().ActivateAndSyncBehavior( 'axii_primary_beh_E3ARP' );
+						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'axii_primary_beh_E3ARP' )
+						{
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_E3ARP' );
+						}
 					}
 				}
 			}
@@ -1339,34 +1474,56 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				{
 					if (ACS_PassiveTaunt_Enabled())
 					{
-						GetWitcherPlayer().ActivateAndSyncBehavior( 'axii_primary_beh_swordwalk_passive_taunt' );
+						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'axii_primary_beh_swordwalk_passive_taunt' )
+						{
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_swordwalk_passive_taunt' );
+						}
 					}
 					else
 					{
-						GetWitcherPlayer().ActivateAndSyncBehavior( 'axii_primary_beh_swordwalk' );
+						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'axii_primary_beh_swordwalk' )
+						{
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_swordwalk' );
+						}
 					}
 				}
 				else
 				{
 					if (ACS_PassiveTaunt_Enabled())
 					{
-						GetWitcherPlayer().ActivateAndSyncBehavior( 'axii_primary_beh_passive_taunt' );
+						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'axii_primary_beh_passive_taunt' )
+						{
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh_passive_taunt' );
+						}
 					}
 					else
 					{
-						GetWitcherPlayer().ActivateAndSyncBehavior( 'axii_primary_beh' );
+						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'axii_primary_beh' )
+						{
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'axii_primary_beh' );
+						}
 					}
 				}
 			}
 
-			if ( GetWitcherPlayer().IsInCombat() && GetWitcherPlayer().GetCurrentStateName() != 'Combat') 
+			if (stupidArray.Size() > 0)
 			{
-				GetWitcherPlayer().GotoState( 'Combat' );
+				thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+				thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+				thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0 );
+				thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+				thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+				thePlayer.RaiseForceEvent( 'Climb' );
+
+				thePlayer.ActivateBehaviors(stupidArray);
 			}
 
 			UpdateBehGraph();
-
-			WeaponSummonAnimation();
 		}
 	}
 			
@@ -1384,44 +1541,74 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 			{
 				if (ACS_PassiveTaunt_Enabled())
 				{
-					GetWitcherPlayer().ActivateAndSyncBehavior( 'aard_primary_beh_SCAAR_passive_taunt' );
+					if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'aard_primary_beh_SCAAR_passive_taunt' )
+					{
+						
+						stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR_passive_taunt' );
+					}
 				}
 				else
 				{
-					GetWitcherPlayer().ActivateAndSyncBehavior( 'aard_primary_beh_SCAAR' );
+					if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'aard_primary_beh_SCAAR' )
+					{
+						
+						stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_SCAAR' );
+					}
 				}
 			}
 			else if (ACS_E3ARP_Installed() && ACS_E3ARP_Enabled() && !ACS_SCAAR_Enabled())
 			{
 				if (ACS_PassiveTaunt_Enabled())
 				{
-					GetWitcherPlayer().ActivateAndSyncBehavior( 'aard_primary_beh_E3ARP_passive_taunt' );
+					if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'aard_primary_beh_E3ARP_passive_taunt' )
+					{
+						
+						stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP_passive_taunt' );
+					}
 				}
 				else
 				{
-					GetWitcherPlayer().ActivateAndSyncBehavior( 'aard_primary_beh_E3ARP' );
+					if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'aard_primary_beh_E3ARP' )
+					{
+						
+						stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_E3ARP' );
+					}
 				}
 			}
 			else
 			{
 				if (ACS_PassiveTaunt_Enabled())
 				{
-					GetWitcherPlayer().ActivateAndSyncBehavior( 'aard_primary_beh_passive_taunt' );
+					if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'aard_primary_beh_passive_taunt' )
+					{
+						
+						stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh_passive_taunt' );
+					}
 				}
 				else
 				{
-					GetWitcherPlayer().ActivateAndSyncBehavior( 'aard_primary_beh' );
+					if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'aard_primary_beh' )
+					{
+						
+						stupidArray.Clear(); stupidArray.PushBack( 'aard_primary_beh' );
+					}
 				}
 			}
 
-			if ( GetWitcherPlayer().IsInCombat() && GetWitcherPlayer().GetCurrentStateName() != 'Combat') 
+			if (stupidArray.Size() > 0)
 			{
-				GetWitcherPlayer().GotoState( 'Combat' );
+				thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+				thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+				thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0 );
+				thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+				thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+				thePlayer.RaiseForceEvent( 'Climb' );
+
+				thePlayer.ActivateBehaviors(stupidArray);
 			}
 
 			UpdateBehGraph();
-
-			WeaponSummonAnimation();
 		}
 	}
 			
@@ -1441,22 +1628,38 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				{
 					if (ACS_PassiveTaunt_Enabled())
 					{
-						GetWitcherPlayer().ActivateAndSyncBehavior( 'yrden_primary_beh_SCAAR_swordwalk_passive_taunt' );
+						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'yrden_primary_beh_SCAAR_swordwalk_passive_taunt' )
+						{
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR_swordwalk_passive_taunt' );
+						}
 					}
 					else
 					{
-						GetWitcherPlayer().ActivateAndSyncBehavior( 'yrden_primary_beh_SCAAR_swordwalk' );
+						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'yrden_primary_beh_SCAAR_swordwalk' )
+						{
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR_swordwalk' );
+						}
 					}
 				}
 				else
 				{
 					if (ACS_PassiveTaunt_Enabled())
 					{
-						GetWitcherPlayer().ActivateAndSyncBehavior( 'yrden_primary_beh_SCAAR_passive_taunt' );
+						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'yrden_primary_beh_SCAAR_passive_taunt' )
+						{
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR_passive_taunt' );
+						}
 					}
 					else
 					{
-						GetWitcherPlayer().ActivateAndSyncBehavior( 'yrden_primary_beh_SCAAR' );
+						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'yrden_primary_beh_SCAAR' )
+						{
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_SCAAR' );
+						}
 					}
 				}
 			}
@@ -1466,22 +1669,38 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				{
 					if (ACS_PassiveTaunt_Enabled())
 					{
-						GetWitcherPlayer().ActivateAndSyncBehavior( 'yrden_primary_beh_E3ARP_swordwalk_passive_taunt' );
+						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'yrden_primary_beh_E3ARP_swordwalk_passive_taunt' )
+						{
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP_swordwalk_passive_taunt' );
+						}
 					}
 					else
 					{
-						GetWitcherPlayer().ActivateAndSyncBehavior( 'yrden_primary_beh_E3ARP_swordwalk' );
+						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'yrden_primary_beh_E3ARP_swordwalk' )
+						{
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP_swordwalk' );
+						}
 					}
 				}
 				else
 				{
 					if (ACS_PassiveTaunt_Enabled())
 					{
-						GetWitcherPlayer().ActivateAndSyncBehavior( 'yrden_primary_beh_E3ARP_passive_taunt' );
+						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'yrden_primary_beh_E3ARP_passive_taunt' )
+						{
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP_passive_taunt' );
+						}
 					}
 					else
 					{
-						GetWitcherPlayer().ActivateAndSyncBehavior( 'yrden_primary_beh_E3ARP' );
+						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'yrden_primary_beh_E3ARP' )
+						{
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_E3ARP' );
+						}
 					}
 				}
 			}
@@ -1491,40 +1710,61 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				{
 					if (ACS_PassiveTaunt_Enabled())
 					{
-						GetWitcherPlayer().ActivateAndSyncBehavior( 'yrden_primary_beh_swordwalk_passive_taunt' );
+						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'yrden_primary_beh_swordwalk_passive_taunt' )
+						{
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_swordwalk_passive_taunt' );
+						}
 					}
 					else
 					{
-						GetWitcherPlayer().ActivateAndSyncBehavior( 'yrden_primary_beh_swordwalk' );
+						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'yrden_primary_beh_swordwalk' )
+						{
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_swordwalk' );
+						}
 					}
 				}
 				else
 				{
 					if (ACS_PassiveTaunt_Enabled())
 					{
-						GetWitcherPlayer().ActivateAndSyncBehavior( 'yrden_primary_beh_passive_taunt' );
+						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'yrden_primary_beh_passive_taunt' )
+						{
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh_passive_taunt' );
+						}
 					}
 					else
 					{
-						GetWitcherPlayer().ActivateAndSyncBehavior( 'yrden_primary_beh' );
+						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'yrden_primary_beh' )
+						{
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'yrden_primary_beh' );
+						}
 					}
 				}
 			}
 
-			if ( GetWitcherPlayer().IsInCombat() && GetWitcherPlayer().GetCurrentStateName() != 'Combat') 
+			if (stupidArray.Size() > 0)
 			{
-				GetWitcherPlayer().GotoState( 'Combat' );
+				thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+				thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+				thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0 );
+				thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+				thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+				thePlayer.RaiseForceEvent( 'Climb' );
+
+				thePlayer.ActivateBehaviors(stupidArray);
 			}
 
 			UpdateBehGraph();
-
-			WeaponSummonAnimation();
 		}
 	}
 			
 	latent function QuenSwordSwitch()
 	{		
-		ACS_Theft_Prevention_9 ();
 		if (!theGame.IsDialogOrCutscenePlaying() 
 		&& !GetWitcherPlayer().IsInNonGameplayCutscene() 
 		&& !GetWitcherPlayer().IsInGameplayScene()
@@ -1539,22 +1779,38 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				{
 					if (ACS_PassiveTaunt_Enabled())
 					{
-						GetWitcherPlayer().ActivateAndSyncBehavior( 'quen_primary_beh_SCAAR_swordwalk_passive_taunt' );
+						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'quen_primary_beh_SCAAR_swordwalk_passive_taunt' )
+						{
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR_swordwalk_passive_taunt' );
+						}
 					}
 					else
 					{
-						GetWitcherPlayer().ActivateAndSyncBehavior( 'quen_primary_beh_SCAAR_swordwalk' );
+						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'quen_primary_beh_SCAAR_swordwalk' )
+						{
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR_swordwalk' );
+						}
 					}
 				}
 				else
 				{
 					if (ACS_PassiveTaunt_Enabled())
 					{
-						GetWitcherPlayer().ActivateAndSyncBehavior( 'quen_primary_beh_SCAAR_passive_taunt' );
+						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'quen_primary_beh_SCAAR_passive_taunt' )
+						{
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR_passive_taunt' );
+						}
 					}
 					else
 					{
-						GetWitcherPlayer().ActivateAndSyncBehavior( 'quen_primary_beh_SCAAR' );
+						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'quen_primary_beh_SCAAR' )
+						{
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_SCAAR' );
+						}
 					}
 				}
 			}
@@ -1564,22 +1820,38 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				{
 					if (ACS_PassiveTaunt_Enabled())
 					{
-						GetWitcherPlayer().ActivateAndSyncBehavior( 'quen_primary_beh_E3ARP_swordwalk_passive_taunt' );
+						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'quen_primary_beh_E3ARP_swordwalk_passive_taunt' )
+						{
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP_swordwalk_passive_taunt' );
+						}
 					}
 					else
 					{
-						GetWitcherPlayer().ActivateAndSyncBehavior( 'quen_primary_beh_E3ARP_swordwalk' );
+						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'quen_primary_beh_E3ARP_swordwalk' )
+						{
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP_swordwalk' );
+						}
 					}
 				}
 				else
 				{
 					if (ACS_PassiveTaunt_Enabled())
 					{
-						GetWitcherPlayer().ActivateAndSyncBehavior( 'quen_primary_beh_E3ARP_passive_taunt' );
+						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'quen_primary_beh_E3ARP_passive_taunt' )
+						{
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP_passive_taunt' );
+						}
 					}
 					else
 					{
-						GetWitcherPlayer().ActivateAndSyncBehavior( 'quen_primary_beh_E3ARP' );
+						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'quen_primary_beh_E3ARP' )
+						{
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_E3ARP' );
+						}
 					}
 				}
 			}
@@ -1589,70 +1861,88 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				{
 					if (ACS_PassiveTaunt_Enabled())
 					{
-						GetWitcherPlayer().ActivateAndSyncBehavior( 'quen_primary_beh_swordwalk_passive_taunt' );
+						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'quen_primary_beh_swordwalk_passive_taunt' )
+						{
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_swordwalk_passive_taunt' );
+						}
 					}
 					else
 					{
-						GetWitcherPlayer().ActivateAndSyncBehavior( 'quen_primary_beh_swordwalk' );
+						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'quen_primary_beh_swordwalk' )
+						{
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_swordwalk' );
+						}
 					}
 				}
 				else
 				{
 					if (ACS_PassiveTaunt_Enabled())
 					{
-						GetWitcherPlayer().ActivateAndSyncBehavior( 'quen_primary_beh_passive_taunt' );
+						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'quen_primary_beh_passive_taunt' )
+						{
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh_passive_taunt' );
+						}
 					}
 					else
 					{
-						GetWitcherPlayer().ActivateAndSyncBehavior( 'quen_primary_beh' );
+						if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'quen_primary_beh' )
+						{
+							
+							stupidArray.Clear(); stupidArray.PushBack( 'quen_primary_beh' );
+						}
 					}
 				}
 			}
 					
-			if ( GetWitcherPlayer().IsInCombat() && GetWitcherPlayer().GetCurrentStateName() != 'Combat') 
+			if (stupidArray.Size() > 0)
 			{
-				GetWitcherPlayer().GotoState( 'Combat' );
+				thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+				thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+				thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0 );
+				thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+				thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+				thePlayer.RaiseForceEvent( 'Climb' );
+
+				thePlayer.ActivateBehaviors(stupidArray);
 			}
 
 			UpdateBehGraph();
-
-			WeaponSummonAnimation();
 		}
 	}
 	
 	latent function VampireClaws()
 	{
-		stupidArray_extra_arms.PushBack( 'Cutscene' );
-
 		//ACS_WeaponDestroyInit();
 		//
 
-		ACS_Sword_Trail_1().Destroy();
-		ACS_Sword_Trail_2().Destroy();
-		ACS_Sword_Trail_3().Destroy();
-		ACS_Sword_Trail_4().Destroy();
-		ACS_Sword_Trail_5().Destroy();
-		ACS_Sword_Trail_6().Destroy();
-		ACS_Sword_Trail_7().Destroy();
-		ACS_Sword_Trail_8().Destroy();
+		ACSGetCEntity('acs_sword_trail_1').Destroy();
+		ACSGetCEntity('acs_sword_trail_2').Destroy();
+		ACSGetCEntity('acs_sword_trail_3').Destroy();
+		ACSGetCEntity('acs_sword_trail_4').Destroy();
+		ACSGetCEntity('acs_sword_trail_5').Destroy();
+		ACSGetCEntity('acs_sword_trail_6').Destroy();
+		ACSGetCEntity('acs_sword_trail_7').Destroy();
+		ACSGetCEntity('acs_sword_trail_8').Destroy();
 
-		ACS_Vampire_Arms_1_Get().Destroy();
+		ACSGetCEntity('acs_vampire_extra_arms_1').Destroy();
 
-		ACS_Vampire_Arms_2_Get().Destroy();
+		ACSGetCEntity('acs_vampire_extra_arms_2').Destroy();
 
-		ACS_Vampire_Arms_3_Get().Destroy();
+		ACSGetCEntity('acs_vampire_extra_arms_3').Destroy();
 
-		ACS_Vampire_Arms_4_Get().Destroy();
+		ACSGetCEntity('acs_vampire_extra_arms_4').Destroy();
 
-		ACS_Vampire_Arms_Anchor_L_Get().Destroy();
+		ACSGetCEntity('acs_extra_arms_anchor_l').Destroy();
 
-		ACS_Vampire_Arms_Anchor_R_Get().Destroy();
+		ACSGetCEntity('acs_extra_arms_anchor_r').Destroy();
 
-		ACS_Vampire_Head_Anchor_Get().Destroy();
+		ACSGetCEntity('acs_vampire_head_anchor').Destroy();
 
-		ACS_Vampire_Head_Get().Destroy();
-
-		stupidArray_extra_arms.PushBack( 'Cutscene' );
+		ACSGetCEntity('acs_vampire_head').Destroy();
 
 		extra_arms_anchor_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\entities\other\fx_ent.w2ent", true );
 
@@ -1892,13 +2182,13 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 
 			animatedComponent_extra_arms.PlaySkeletalAnimationAsync( 'cs704_detlaff_morphs' );
 
-			ACS_Vampire_Arms_1_Get().GetRootAnimatedComponent().PlaySkeletalAnimationAsync( 'cs704_detlaff_morphs' );
+			ACSGetCEntity('acs_vampire_extra_arms_1').GetRootAnimatedComponent().PlaySkeletalAnimationAsync( 'cs704_detlaff_morphs' );
 
-			ACS_Vampire_Arms_2_Get().GetRootAnimatedComponent().PlaySkeletalAnimationAsync( 'cs704_detlaff_morphs' );
+			ACSGetCEntity('acs_vampire_extra_arms_2').GetRootAnimatedComponent().PlaySkeletalAnimationAsync( 'cs704_detlaff_morphs' );
 
-			ACS_Vampire_Arms_3_Get().GetRootAnimatedComponent().PlaySkeletalAnimationAsync( 'cs704_detlaff_morphs' );
+			ACSGetCEntity('acs_vampire_extra_arms_3').GetRootAnimatedComponent().PlaySkeletalAnimationAsync( 'cs704_detlaff_morphs' );
 
-			ACS_Vampire_Arms_4_Get().GetRootAnimatedComponent().PlaySkeletalAnimationAsync( 'cs704_detlaff_morphs' );
+			ACSGetCEntity('acs_vampire_extra_arms_4').GetRootAnimatedComponent().PlaySkeletalAnimationAsync( 'cs704_detlaff_morphs' );
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1975,7 +2265,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
-		GetWitcherPlayer().AddTag('vampire_claws_equipped');
+		GetWitcherPlayer().AddTag('acs_vampire_claws_equipped');
 
 		/*
 		if (!ACS_DisableAutomaticSwordSheathe_Enabled())
@@ -2001,8 +2291,48 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 			((CDrawableComponent)d_comp[ i ]).SetCastingShadows( false );
 		}
 
-		GetWitcherPlayer().BlockAction(EIAB_SpecialAttackLight,	'ACS_Vamp_Claws_Block_Action');
-		GetWitcherPlayer().BlockAction(EIAB_SpecialAttackHeavy,	'ACS_Vamp_Claws_Block_Action');
+		UpdateBehGraph();
+	}
+
+	latent function SorcFists()
+	{
+		var ent_1, ent_2            : CEntity;
+		var rot                     : EulerAngles;
+		var pos						: Vector;
+
+		ACSGetCEntity('ACS_Sorc_Fist_Fx_1').Destroy();
+
+		ACSGetCEntity('ACS_Sorc_Fist_Fx_2').Destroy();
+
+		rot = thePlayer.GetWorldRotation();
+
+		pos = thePlayer.GetWorldPosition();
+
+		ent_1 = theGame.CreateEntity( (CEntityTemplate)LoadResource( 
+
+		"dlc\dlc_acs\data\fx\acs_ice_breathe_old.w2ent"
+
+		, true ), pos, rot );
+
+		ent_1.PlayEffectSingle('sorc_hand_fx');
+
+		ent_1.AddTag('ACS_Sorc_Fist_Fx_1');
+
+		ent_1.CreateAttachment( GetWitcherPlayer(), 'r_weapon' );
+
+		ent_2 = theGame.CreateEntity( (CEntityTemplate)LoadResource( 
+
+		"dlc\dlc_acs\data\fx\acs_ice_breathe_old.w2ent"
+
+		, true ), pos, rot );
+
+		ent_2.PlayEffectSingle('sorc_hand_fx');
+
+		ent_2.AddTag('ACS_Sorc_Fist_Fx_2');
+
+		ent_2.CreateAttachment( GetWitcherPlayer(), 'l_weapon' );
+
+		GetWitcherPlayer().AddTag('acs_sorc_fists_equipped');
 
 		UpdateBehGraph();
 	}
@@ -2092,10 +2422,10 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 			}
 		}
 
-		GetWitcherPlayer().AddTag('igni_sword_equipped');
-		GetWitcherPlayer().AddTag('igni_secondary_sword_equipped');
+		GetWitcherPlayer().AddTag('acs_igni_sword_equipped');
+		GetWitcherPlayer().AddTag('acs_igni_secondary_sword_equipped');
 
-		GetWitcherPlayer().AddTag('igni_sword_equipped_TAG');
+		GetWitcherPlayer().AddTag('acs_igni_sword_equipped_TAG');
 	}
 
 	latent function ArmigerModeAxiiSword()
@@ -2109,7 +2439,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 			AxiiSwordStatic();
 		}
 		
-		GetWitcherPlayer().AddTag('axii_sword_equipped');
+		GetWitcherPlayer().AddTag('acs_axii_sword_equipped');
 	}
 
 	latent function FocusModeAxiiSword()
@@ -2123,7 +2453,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 			AxiiSwordStatic();
 		}
 		
-		GetWitcherPlayer().AddTag('axii_sword_equipped');
+		GetWitcherPlayer().AddTag('acs_axii_sword_equipped');
 	}
 
 	latent function HybridModeAxiiSword()
@@ -2137,7 +2467,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 			AxiiSwordStatic();
 		}
 		
-		GetWitcherPlayer().AddTag('axii_sword_equipped');
+		GetWitcherPlayer().AddTag('acs_axii_sword_equipped');
 	}
 
 	latent function AxiiSwordEvolving()
@@ -2207,7 +2537,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = 0;
 					
 					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('axii_sword_1');
+					sword1.AddTag('acs_axii_sword_1');
 				}
 				else if ( GetWitcherPlayer().GetInventory().GetItemLevel( silverID ) <= 11 && GetWitcherPlayer().GetInventory().GetItemLevel(silverID) <= 20 && GetWitcherPlayer().GetInventory().GetItemQuality( silverID ) > 1 )
 				{
@@ -2227,7 +2557,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = 0.05;
 					
 					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('axii_sword_1');
+					sword1.AddTag('acs_axii_sword_1');
 
 					sword2 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 			
@@ -2245,7 +2575,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = 0;
 					
 					sword2.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword2.AddTag('axii_sword_2');
+					sword2.AddTag('acs_axii_sword_2');
 
 					sword3 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 			
@@ -2263,7 +2593,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = 0;
 			
 					sword3.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword3.AddTag('axii_sword_3');
+					sword3.AddTag('acs_axii_sword_3');
 				}
 				else if ( GetWitcherPlayer().GetInventory().GetItemLevel( silverID ) >= 21 && GetWitcherPlayer().GetInventory().GetItemQuality( silverID ) >= 2 ) 
 				{
@@ -2283,7 +2613,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = 0.05;
 					
 					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('axii_sword_1');
+					sword1.AddTag('acs_axii_sword_1');
 					
 					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 					
@@ -2303,7 +2633,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = 0;
 					
 					sword2.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword2.AddTag('axii_sword_2');
+					sword2.AddTag('acs_axii_sword_2');
 					
 					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 					
@@ -2323,7 +2653,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = 0;
 					
 					sword3.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword3.AddTag('axii_sword_3');
+					sword3.AddTag('acs_axii_sword_3');
 					
 					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 					
@@ -2343,7 +2673,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = 0.35;
 						
 					sword4.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword4.AddTag('axii_sword_4');
+					sword4.AddTag('acs_axii_sword_4');
 
 					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 					
@@ -2363,7 +2693,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = 0.35;
 						
 					sword5.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword5.AddTag('axii_sword_5');
+					sword5.AddTag('acs_axii_sword_5');
 				}
 				else
 				{
@@ -2383,7 +2713,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = 0.05;
 					
 					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('axii_sword_1');
+					sword1.AddTag('acs_axii_sword_1');
 
 					sword2 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 			
@@ -2401,7 +2731,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = 0;
 					
 					sword2.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword2.AddTag('axii_sword_2');
+					sword2.AddTag('acs_axii_sword_2');
 
 					sword3 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 			
@@ -2419,7 +2749,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = 0;
 			
 					sword3.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword3.AddTag('axii_sword_3');
+					sword3.AddTag('acs_axii_sword_3');
 				}
 			}
 			else if ( GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) )
@@ -2442,7 +2772,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = -0.055;
 					
 					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('axii_sword_1');
+					sword1.AddTag('acs_axii_sword_1');
 				}
 				else if ( GetWitcherPlayer().GetInventory().GetItemLevel( steelID ) >= 11 && GetWitcherPlayer().GetInventory().GetItemLevel( steelID ) <= 20 && GetWitcherPlayer().GetInventory().GetItemQuality( steelID ) > 1 )
 				{
@@ -2462,7 +2792,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = -0.055;
 					
 					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('axii_sword_1');
+					sword1.AddTag('acs_axii_sword_1');
 					
 					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 					
@@ -2482,7 +2812,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = -0.055;
 					
 					sword2.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword2.AddTag('axii_sword_2');
+					sword2.AddTag('acs_axii_sword_2');
 
 					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 					
@@ -2502,7 +2832,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = -0.055;
 					
 					sword3.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword3.AddTag('axii_sword_3');
+					sword3.AddTag('acs_axii_sword_3');
 				}
 				else if ( GetWitcherPlayer().GetInventory().GetItemLevel( steelID ) >= 21 && GetWitcherPlayer().GetInventory().GetItemQuality( steelID ) >= 2 )
 				{
@@ -2522,7 +2852,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = -0.055;
 					
 					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('axii_sword_1');
+					sword1.AddTag('acs_axii_sword_1');
 					
 					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 					
@@ -2542,7 +2872,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = -0.055;
 					
 					sword2.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword2.AddTag('axii_sword_2');
+					sword2.AddTag('acs_axii_sword_2');
 
 					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 					
@@ -2562,7 +2892,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = -0.055;
 					
 					sword3.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword3.AddTag('axii_sword_3');
+					sword3.AddTag('acs_axii_sword_3');
 
 					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 					
@@ -2582,7 +2912,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = 0.045;
 					
 					sword4.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword4.AddTag('axii_sword_4');
+					sword4.AddTag('acs_axii_sword_4');
 
 					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 					
@@ -2602,7 +2932,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = 0.045;
 					
 					sword5.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword5.AddTag('axii_sword_5');
+					sword5.AddTag('acs_axii_sword_5');
 				}
 				else
 				{
@@ -2622,7 +2952,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = -0.055;
 					
 					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('axii_sword_1');
+					sword1.AddTag('acs_axii_sword_1');
 					
 					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 					
@@ -2642,7 +2972,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = -0.055;
 					
 					sword2.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword2.AddTag('axii_sword_2');
+					sword2.AddTag('acs_axii_sword_2');
 
 					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 					
@@ -2662,7 +2992,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = -0.055;
 					
 					sword3.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword3.AddTag('axii_sword_3');
+					sword3.AddTag('acs_axii_sword_3');
 				}
 			}
 		}
@@ -2686,7 +3016,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = 0.1;
 						
 					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('axii_sword_1');
+					sword1.AddTag('acs_axii_sword_1');
 
 					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -2704,7 +3034,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = 0.16;
 						
 					sword2.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword2.AddTag('axii_sword_2');
+					sword2.AddTag('acs_axii_sword_2');
 				}
 				else if ( GetWitcherPlayer().GetInventory().GetItemLevel( silverID ) <= 11 && GetWitcherPlayer().GetInventory().GetItemLevel(silverID) <= 20 && GetWitcherPlayer().GetInventory().GetItemQuality( silverID ) > 1 )
 				{
@@ -2722,7 +3052,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = 0.1;
 						
 					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('axii_sword_1');
+					sword1.AddTag('acs_axii_sword_1');
 
 					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -2740,7 +3070,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = 0.16;
 						
 					sword2.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword2.AddTag('axii_sword_2');
+					sword2.AddTag('acs_axii_sword_2');
 					
 					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 					
@@ -2760,7 +3090,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = 0;
 					
 					sword3.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword3.AddTag('axii_sword_3');
+					sword3.AddTag('acs_axii_sword_3');
 				}
 				else if ( GetWitcherPlayer().GetInventory().GetItemLevel( silverID ) >= 21 && GetWitcherPlayer().GetInventory().GetItemQuality( silverID ) >= 2 ) 
 				{
@@ -2780,7 +3110,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = 0.2;
 					
 					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('axii_sword_1');
+					sword1.AddTag('acs_axii_sword_1');
 					
 					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 					
@@ -2800,7 +3130,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = 0.2;
 					
 					sword2.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword2.AddTag('axii_sword_2');
+					sword2.AddTag('acs_axii_sword_2');
 					
 					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 					
@@ -2820,7 +3150,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = 0;
 					
 					sword3.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword3.AddTag('axii_sword_3');
+					sword3.AddTag('acs_axii_sword_3');
 					
 					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 					
@@ -2840,7 +3170,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = 0;
 					
 					sword4.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword4.AddTag('axii_sword_4');
+					sword4.AddTag('acs_axii_sword_4');
 				}
 				else
 				{
@@ -2860,7 +3190,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = 0.2;
 					
 					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('axii_sword_1');
+					sword1.AddTag('acs_axii_sword_1');
 					
 					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 					
@@ -2880,7 +3210,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = 0;
 					
 					sword2.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword2.AddTag('axii_sword_2');
+					sword2.AddTag('acs_axii_sword_2');
 				}
 			}
 			else if ( GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) )
@@ -2901,7 +3231,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = 0.1;
 						
 					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('axii_sword_1');
+					sword1.AddTag('acs_axii_sword_1');
 
 					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -2919,7 +3249,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = 0.16;
 						
 					sword2.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword2.AddTag('axii_sword_2');
+					sword2.AddTag('acs_axii_sword_2');
 				}
 				else if ( GetWitcherPlayer().GetInventory().GetItemLevel( steelID ) >= 11 && GetWitcherPlayer().GetInventory().GetItemLevel( steelID ) <= 20 && GetWitcherPlayer().GetInventory().GetItemQuality( steelID ) > 1 )
 				{
@@ -2937,7 +3267,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = 0.1;
 						
 					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('axii_sword_1');
+					sword1.AddTag('acs_axii_sword_1');
 
 					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -2955,7 +3285,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = 0.16;
 						
 					sword2.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword2.AddTag('axii_sword_2');
+					sword2.AddTag('acs_axii_sword_2');
 					
 					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 					
@@ -2975,7 +3305,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = 0;
 					
 					sword3.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword3.AddTag('axii_sword_3');
+					sword3.AddTag('acs_axii_sword_3');
 				}
 				else if ( GetWitcherPlayer().GetInventory().GetItemLevel( steelID ) >= 21 && GetWitcherPlayer().GetInventory().GetItemQuality( steelID ) >= 2 )
 				{
@@ -2995,7 +3325,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = 0.2;
 					
 					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('axii_sword_1');
+					sword1.AddTag('acs_axii_sword_1');
 					
 					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 					
@@ -3015,7 +3345,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = 0.2;
 					
 					sword2.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword2.AddTag('axii_sword_2');
+					sword2.AddTag('acs_axii_sword_2');
 					
 					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 					
@@ -3035,7 +3365,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = 0;
 					
 					sword3.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword3.AddTag('axii_sword_3');
+					sword3.AddTag('acs_axii_sword_3');
 					
 					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 					
@@ -3055,7 +3385,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = 0;
 					
 					sword4.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword4.AddTag('axii_sword_4');
+					sword4.AddTag('acs_axii_sword_4');
 				}
 				else
 				{
@@ -3075,7 +3405,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = 0.2;
 					
 					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('axii_sword_1');
+					sword1.AddTag('acs_axii_sword_1');
 					
 					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 					
@@ -3095,7 +3425,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = 0;
 					
 					sword2.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword2.AddTag('axii_sword_2');
+					sword2.AddTag('acs_axii_sword_2');
 				}
 			}
 		}
@@ -3164,7 +3494,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 			attach_vec.Z = 0.1;
 				
 			sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-			sword1.AddTag('axii_sword_1');
+			sword1.AddTag('acs_axii_sword_1');
 
 			sword2 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 		
@@ -3182,7 +3512,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 			attach_vec.Z = 0.16;
 				
 			sword2.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-			sword2.AddTag('axii_sword_2');
+			sword2.AddTag('acs_axii_sword_2');
 		}
 		else if ( GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) )
 		{
@@ -3202,7 +3532,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 			attach_vec.Z = 0.1;
 				
 			sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-			sword1.AddTag('axii_sword_1');
+			sword1.AddTag('acs_axii_sword_1');
 
 			sword2 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 		
@@ -3220,7 +3550,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 			attach_vec.Z = 0.16;
 				
 			sword2.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-			sword2.AddTag('axii_sword_2');
+			sword2.AddTag('acs_axii_sword_2');
 		}
 	}
 
@@ -3235,7 +3565,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 			AardSwordStatic();
 		}
 
-		GetWitcherPlayer().AddTag('aard_sword_equipped');
+		GetWitcherPlayer().AddTag('acs_aard_sword_equipped');
 	}
 
 	latent function FocusModeAardSword()
@@ -3249,7 +3579,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 			AardSwordStatic();
 		}
 
-		GetWitcherPlayer().AddTag('aard_sword_equipped');
+		GetWitcherPlayer().AddTag('acs_aard_sword_equipped');
 	}
 
 	latent function HybridModeAardSword()
@@ -3263,7 +3593,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 			AardSwordStatic();
 		}
 
-		GetWitcherPlayer().AddTag('aard_sword_equipped'); 
+		GetWitcherPlayer().AddTag('acs_aard_sword_equipped'); 
 	}
 
 	latent function EquipmentModeAardSword()
@@ -3344,7 +3674,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 		sword_trail_1.AddTag('acs_sword_trail_1');
 		sword_trail_2.AddTag('acs_sword_trail_2');
 
-		GetWitcherPlayer().AddTag('aard_sword_equipped');
+		GetWitcherPlayer().AddTag('acs_aard_sword_equipped');
 	}
 
 	latent function AardSwordEvolving()
@@ -6394,7 +6724,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 			YrdenSwordStatic();
 		}
 
-		GetWitcherPlayer().AddTag('yrden_sword_equipped'); 
+		GetWitcherPlayer().AddTag('acs_yrden_sword_equipped'); 
 	}
 
 	latent function FocusModeYrdenSword()
@@ -6408,7 +6738,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 			YrdenSwordStatic();
 		}
 
-		GetWitcherPlayer().AddTag('yrden_sword_equipped'); 
+		GetWitcherPlayer().AddTag('acs_yrden_sword_equipped'); 
 	}
 
 	latent function HybridModeYrdenSword()
@@ -6422,7 +6752,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 			YrdenSwordStatic();
 		}
 		
-		GetWitcherPlayer().AddTag('yrden_sword_equipped');
+		GetWitcherPlayer().AddTag('acs_yrden_sword_equipped');
 	}
 	
 	latent function YrdenSwordEvolving()
@@ -6469,7 +6799,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = -0.1;
 						
 					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('yrden_sword_1');
+					sword1.AddTag('acs_yrden_sword_1');
 					
 					/*
 					sword2 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
@@ -6490,7 +6820,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_1.AddTag('acs_sword_trail_1');
 
-					sword2.AddTag('yrden_sword_2');
+					sword2.AddTag('acs_yrden_sword_2');
 					
 					sword3 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 					
@@ -6510,7 +6840,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_2.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_2.AddTag('acs_sword_trail_2');
 					
-					sword3.AddTag('yrden_sword_3');	
+					sword3.AddTag('acs_yrden_sword_3');	
 					*/
 
 					sword2 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
@@ -6531,7 +6861,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_1.AddTag('acs_sword_trail_1');
 
-					sword2.AddTag('yrden_sword_2');
+					sword2.AddTag('acs_yrden_sword_2');
 				}
 				else if ( GetWitcherPlayer().GetInventory().GetItemLevel( silverID ) <= 11 && GetWitcherPlayer().GetInventory().GetItemLevel(silverID) <= 20 && GetWitcherPlayer().GetInventory().GetItemQuality( silverID ) > 1 )
 				{
@@ -6562,7 +6892,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = -0.1;
 						
 					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('yrden_sword_1');
+					sword1.AddTag('acs_yrden_sword_1');
 					
 					/*
 					sword2 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
@@ -6583,7 +6913,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_1.AddTag('acs_sword_trail_1');
 
-					sword2.AddTag('yrden_sword_2');
+					sword2.AddTag('acs_yrden_sword_2');
 					
 					sword3 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 					
@@ -6603,7 +6933,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_2.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_2.AddTag('acs_sword_trail_2');
 					
-					sword3.AddTag('yrden_sword_3');
+					sword3.AddTag('acs_yrden_sword_3');
 					*/
 					
 					sword5 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
@@ -6624,7 +6954,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_4.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_4.AddTag('acs_sword_trail_4');
 
-					sword5.AddTag('yrden_sword_5');
+					sword5.AddTag('acs_yrden_sword_5');
 					
 					sword6 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 					
@@ -6644,7 +6974,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_3.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_3.AddTag('acs_sword_trail_3');
 
-					sword6.AddTag('yrden_sword_6');
+					sword6.AddTag('acs_yrden_sword_6');
 				}
 				else if ( GetWitcherPlayer().GetInventory().GetItemLevel( silverID ) >= 21 && GetWitcherPlayer().GetInventory().GetItemQuality( silverID ) >= 2 ) 
 				{
@@ -6676,7 +7006,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = -0.1;
 						
 					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('yrden_sword_1');
+					sword1.AddTag('acs_yrden_sword_1');
 					
 					/*
 					sword2 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
@@ -6697,7 +7027,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_1.AddTag('acs_sword_trail_1');
 
-					sword2.AddTag('yrden_sword_2');
+					sword2.AddTag('acs_yrden_sword_2');
 					
 					sword3 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 					
@@ -6717,7 +7047,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_2.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_2.AddTag('acs_sword_trail_2');
 					
-					sword3.AddTag('yrden_sword_3');
+					sword3.AddTag('acs_yrden_sword_3');
 					*/
 
 					sword4 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
@@ -6738,7 +7068,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_5.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_5.AddTag('acs_sword_trail_5');
 
-					sword4.AddTag('yrden_sword_4');
+					sword4.AddTag('acs_yrden_sword_4');
 					
 					sword5 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 					
@@ -6758,7 +7088,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_4.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_4.AddTag('acs_sword_trail_4');
 
-					sword5.AddTag('yrden_sword_5');
+					sword5.AddTag('acs_yrden_sword_5');
 					
 					sword6 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 					
@@ -6778,7 +7108,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_3.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_3.AddTag('acs_sword_trail_3');
 
-					sword6.AddTag('yrden_sword_6');
+					sword6.AddTag('acs_yrden_sword_6');
 				}
 				else
 				{
@@ -6809,7 +7139,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = -0.1;
 						
 					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('yrden_sword_1');
+					sword1.AddTag('acs_yrden_sword_1');
 					
 					/*
 					sword2 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
@@ -6830,7 +7160,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_1.AddTag('acs_sword_trail_1');
 
-					sword2.AddTag('yrden_sword_2');
+					sword2.AddTag('acs_yrden_sword_2');
 					
 					sword3 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 					
@@ -6850,7 +7180,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_2.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_2.AddTag('acs_sword_trail_2');
 					
-					sword3.AddTag('yrden_sword_3');
+					sword3.AddTag('acs_yrden_sword_3');
 					*/
 					
 					sword5 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
@@ -6871,7 +7201,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_4.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_4.AddTag('acs_sword_trail_4');
 
-					sword5.AddTag('yrden_sword_5');
+					sword5.AddTag('acs_yrden_sword_5');
 					
 					sword6 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 					
@@ -6891,7 +7221,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_3.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_3.AddTag('acs_sword_trail_3');
 
-					sword6.AddTag('yrden_sword_6');
+					sword6.AddTag('acs_yrden_sword_6');
 				}
 			}
 			else if ( GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) )
@@ -6923,7 +7253,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = -0.1;
 						
 					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('yrden_sword_1');
+					sword1.AddTag('acs_yrden_sword_1');
 					
 					sword6 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 					
@@ -6943,7 +7273,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_3.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_3.AddTag('acs_sword_trail_3');
 
-					sword6.AddTag('yrden_sword_6');
+					sword6.AddTag('acs_yrden_sword_6');
 				}
 				else if ( GetWitcherPlayer().GetInventory().GetItemLevel( steelID ) >= 11 && GetWitcherPlayer().GetInventory().GetItemLevel( steelID ) <= 20 && GetWitcherPlayer().GetInventory().GetItemQuality( steelID ) > 1 )
 				{
@@ -6974,7 +7304,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = -0.1;
 						
 					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('yrden_sword_1');
+					sword1.AddTag('acs_yrden_sword_1');
 					
 					sword5 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 					
@@ -6994,7 +7324,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_4.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_4.AddTag('acs_sword_trail_4');
 
-					sword5.AddTag('yrden_sword_5');
+					sword5.AddTag('acs_yrden_sword_5');
 					
 					sword6 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 					
@@ -7014,7 +7344,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_3.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_3.AddTag('acs_sword_trail_3');
 
-					sword6.AddTag('yrden_sword_6');
+					sword6.AddTag('acs_yrden_sword_6');
 				}
 				else if ( GetWitcherPlayer().GetInventory().GetItemLevel( steelID ) >= 21 && GetWitcherPlayer().GetInventory().GetItemQuality( steelID ) >= 2 )
 				{
@@ -7046,7 +7376,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = -0.1;
 						
 					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('yrden_sword_1');
+					sword1.AddTag('acs_yrden_sword_1');
 
 					sword4 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 					
@@ -7066,7 +7396,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_5.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_5.AddTag('acs_sword_trail_5');
 
-					sword4.AddTag('yrden_sword_4');
+					sword4.AddTag('acs_yrden_sword_4');
 					
 					sword5 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 					
@@ -7086,7 +7416,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_4.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_4.AddTag('acs_sword_trail_4');
 
-					sword5.AddTag('yrden_sword_5');
+					sword5.AddTag('acs_yrden_sword_5');
 					
 					sword6 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 					
@@ -7106,7 +7436,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_3.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_3.AddTag('acs_sword_trail_3');
 
-					sword6.AddTag('yrden_sword_6');
+					sword6.AddTag('acs_yrden_sword_6');
 				}
 				else
 				{
@@ -7137,7 +7467,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = -0.1;
 						
 					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('yrden_sword_1');
+					sword1.AddTag('acs_yrden_sword_1');
 					
 					sword5 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 					
@@ -7157,7 +7487,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_4.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_4.AddTag('acs_sword_trail_4');
 
-					sword5.AddTag('yrden_sword_5');
+					sword5.AddTag('acs_yrden_sword_5');
 					
 					sword6 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 					
@@ -7177,7 +7507,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_3.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_3.AddTag('acs_sword_trail_3');
 
-					sword6.AddTag('yrden_sword_6');
+					sword6.AddTag('acs_yrden_sword_6');
 				}
 			}
 		}
@@ -7212,7 +7542,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = -0.1;
 						
 					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('yrden_sword_1');
+					sword1.AddTag('acs_yrden_sword_1');
 					
 					/*
 					sword2 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
@@ -7233,7 +7563,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_1.AddTag('acs_sword_trail_1');
 
-					sword2.AddTag('yrden_sword_2');
+					sword2.AddTag('acs_yrden_sword_2');
 					
 					sword3 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 					
@@ -7253,7 +7583,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_2.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_2.AddTag('acs_sword_trail_2');
 					
-					sword3.AddTag('yrden_sword_3');	
+					sword3.AddTag('acs_yrden_sword_3');	
 					*/
 
 					sword2 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
@@ -7274,7 +7604,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_1.AddTag('acs_sword_trail_1');
 
-					sword2.AddTag('yrden_sword_2');
+					sword2.AddTag('acs_yrden_sword_2');
 				}
 				else if ( GetWitcherPlayer().GetInventory().GetItemLevel( silverID ) <= 11 && GetWitcherPlayer().GetInventory().GetItemLevel(silverID) <= 20 && GetWitcherPlayer().GetInventory().GetItemQuality( silverID ) > 1 )
 				{
@@ -7305,7 +7635,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = -0.1;
 						
 					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('yrden_sword_1');
+					sword1.AddTag('acs_yrden_sword_1');
 					
 					/*
 					sword2 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
@@ -7326,7 +7656,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_1.AddTag('acs_sword_trail_1');
 
-					sword2.AddTag('yrden_sword_2');
+					sword2.AddTag('acs_yrden_sword_2');
 					
 					sword3 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 					
@@ -7346,7 +7676,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_2.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_2.AddTag('acs_sword_trail_2');
 					
-					sword3.AddTag('yrden_sword_3');
+					sword3.AddTag('acs_yrden_sword_3');
 					*/
 					
 					sword5 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
@@ -7367,7 +7697,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_4.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_4.AddTag('acs_sword_trail_4');
 
-					sword5.AddTag('yrden_sword_5');
+					sword5.AddTag('acs_yrden_sword_5');
 					
 					sword6 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 					
@@ -7387,7 +7717,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_3.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_3.AddTag('acs_sword_trail_3');
 
-					sword6.AddTag('yrden_sword_6');
+					sword6.AddTag('acs_yrden_sword_6');
 				}
 				else if ( GetWitcherPlayer().GetInventory().GetItemLevel( silverID ) >= 21 && GetWitcherPlayer().GetInventory().GetItemQuality( silverID ) >= 2 ) 
 				{
@@ -7419,7 +7749,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = -0.1;
 						
 					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('yrden_sword_1');
+					sword1.AddTag('acs_yrden_sword_1');
 					
 					/*
 					sword2 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
@@ -7440,7 +7770,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_1.AddTag('acs_sword_trail_1');
 
-					sword2.AddTag('yrden_sword_2');
+					sword2.AddTag('acs_yrden_sword_2');
 					
 					sword3 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 					
@@ -7460,7 +7790,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_2.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_2.AddTag('acs_sword_trail_2');
 					
-					sword3.AddTag('yrden_sword_3');
+					sword3.AddTag('acs_yrden_sword_3');
 					*/
 
 					sword4 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
@@ -7481,7 +7811,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_5.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_5.AddTag('acs_sword_trail_5');
 
-					sword4.AddTag('yrden_sword_4');
+					sword4.AddTag('acs_yrden_sword_4');
 					
 					sword5 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 					
@@ -7501,7 +7831,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_4.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_4.AddTag('acs_sword_trail_4');
 
-					sword5.AddTag('yrden_sword_5');
+					sword5.AddTag('acs_yrden_sword_5');
 					
 					sword6 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 					
@@ -7521,7 +7851,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_3.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_3.AddTag('acs_sword_trail_3');
 
-					sword6.AddTag('yrden_sword_6');
+					sword6.AddTag('acs_yrden_sword_6');
 				}
 				else
 				{
@@ -7552,7 +7882,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = -0.1;
 						
 					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('yrden_sword_1');
+					sword1.AddTag('acs_yrden_sword_1');
 					
 					/*
 					sword2 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
@@ -7573,7 +7903,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_1.AddTag('acs_sword_trail_1');
 
-					sword2.AddTag('yrden_sword_2');
+					sword2.AddTag('acs_yrden_sword_2');
 					
 					sword3 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 					
@@ -7593,7 +7923,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_2.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_2.AddTag('acs_sword_trail_2');
 					
-					sword3.AddTag('yrden_sword_3');
+					sword3.AddTag('acs_yrden_sword_3');
 					*/
 					
 					sword5 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
@@ -7614,7 +7944,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_4.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_4.AddTag('acs_sword_trail_4');
 
-					sword5.AddTag('yrden_sword_5');
+					sword5.AddTag('acs_yrden_sword_5');
 					
 					sword6 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 					
@@ -7634,7 +7964,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_3.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_3.AddTag('acs_sword_trail_3');
 
-					sword6.AddTag('yrden_sword_6');
+					sword6.AddTag('acs_yrden_sword_6');
 				}
 			}
 			else if ( GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) )
@@ -7666,7 +7996,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = -0.1;
 						
 					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('yrden_sword_1');
+					sword1.AddTag('acs_yrden_sword_1');
 					
 					sword6 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 					
@@ -7686,7 +8016,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_3.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_3.AddTag('acs_sword_trail_3');
 
-					sword6.AddTag('yrden_sword_6');
+					sword6.AddTag('acs_yrden_sword_6');
 				}
 				else if ( GetWitcherPlayer().GetInventory().GetItemLevel( steelID ) >= 11 && GetWitcherPlayer().GetInventory().GetItemLevel( steelID ) <= 20 && GetWitcherPlayer().GetInventory().GetItemQuality( steelID ) > 1 )
 				{
@@ -7717,7 +8047,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = -0.1;
 						
 					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('yrden_sword_1');
+					sword1.AddTag('acs_yrden_sword_1');
 					
 					sword5 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 					
@@ -7737,7 +8067,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_4.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_4.AddTag('acs_sword_trail_4');
 
-					sword5.AddTag('yrden_sword_5');
+					sword5.AddTag('acs_yrden_sword_5');
 					
 					sword6 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 					
@@ -7757,7 +8087,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_3.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_3.AddTag('acs_sword_trail_3');
 
-					sword6.AddTag('yrden_sword_6');
+					sword6.AddTag('acs_yrden_sword_6');
 				}
 				else if ( GetWitcherPlayer().GetInventory().GetItemLevel( steelID ) >= 21 && GetWitcherPlayer().GetInventory().GetItemQuality( steelID ) >= 2 )
 				{
@@ -7789,7 +8119,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = -0.1;
 						
 					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('yrden_sword_1');
+					sword1.AddTag('acs_yrden_sword_1');
 
 					sword4 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 					
@@ -7809,7 +8139,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_5.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_5.AddTag('acs_sword_trail_5');
 
-					sword4.AddTag('yrden_sword_4');
+					sword4.AddTag('acs_yrden_sword_4');
 					
 					sword5 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 					
@@ -7829,7 +8159,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_4.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_4.AddTag('acs_sword_trail_4');
 
-					sword5.AddTag('yrden_sword_5');
+					sword5.AddTag('acs_yrden_sword_5');
 					
 					sword6 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 					
@@ -7849,7 +8179,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_3.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_3.AddTag('acs_sword_trail_3');
 
-					sword6.AddTag('yrden_sword_6');
+					sword6.AddTag('acs_yrden_sword_6');
 				}
 				else
 				{
@@ -7880,7 +8210,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					attach_vec.Z = -0.1;
 						
 					sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-					sword1.AddTag('yrden_sword_1');
+					sword1.AddTag('acs_yrden_sword_1');
 					
 					sword5 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 					
@@ -7900,7 +8230,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_4.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_4.AddTag('acs_sword_trail_4');
 
-					sword5.AddTag('yrden_sword_5');
+					sword5.AddTag('acs_yrden_sword_5');
 					
 					sword6 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
 					
@@ -7920,7 +8250,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					sword_trail_3.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 					sword_trail_3.AddTag('acs_sword_trail_3');
 
-					sword6.AddTag('yrden_sword_6');
+					sword6.AddTag('acs_yrden_sword_6');
 				}
 			}
 		}
@@ -7992,7 +8322,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					
 			sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 
-			sword1.AddTag('yrden_sword_1');
+			sword1.AddTag('acs_yrden_sword_1');
 		}
 		else if ( GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) )
 		{
@@ -8015,7 +8345,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					
 			sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
 
-			sword1.AddTag('yrden_sword_1');
+			sword1.AddTag('acs_yrden_sword_1');
 		}
 	}
 
@@ -8030,7 +8360,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 			QuenSwordStatic();
 		}
 
-		GetWitcherPlayer().AddTag('quen_sword_equipped'); 
+		GetWitcherPlayer().AddTag('acs_quen_sword_equipped'); 
 	}
 
 	latent function FocusModeQuenSword()
@@ -8044,7 +8374,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 			QuenSwordStatic();
 		}
 	
-		GetWitcherPlayer().AddTag('quen_sword_equipped'); 
+		GetWitcherPlayer().AddTag('acs_quen_sword_equipped'); 
 	}
 
 	latent function HybridModeQuenSword()
@@ -8058,7 +8388,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 			QuenSwordStatic();
 		}
 	
-		GetWitcherPlayer().AddTag('quen_sword_equipped'); 
+		GetWitcherPlayer().AddTag('acs_quen_sword_equipped'); 
 	}
 
 	latent function QuenSwordEvolving()
@@ -8124,7 +8454,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				attach_vec.Z = 0.025;
 						
 				sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-				sword1.AddTag('quen_sword_1');
+				sword1.AddTag('acs_quen_sword_1');
 			}
 			else if ( GetWitcherPlayer().GetInventory().GetItemLevel( silverID ) <= 11 && GetWitcherPlayer().GetInventory().GetItemLevel(silverID) <= 20 && GetWitcherPlayer().GetInventory().GetItemQuality( silverID ) > 1 )
 			{
@@ -8142,9 +8472,9 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				attach_vec.Z = 0.025;
 						
 				sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-				sword1.AddTag('quen_sword_1');
+				sword1.AddTag('acs_quen_sword_1');
 
-				sword1.AddTag('quen_sword_upgraded_1');	
+				sword1.AddTag('acs_quen_sword_upgraded_1');	
 			}
 			else if ( GetWitcherPlayer().GetInventory().GetItemLevel( silverID ) >= 21 && GetWitcherPlayer().GetInventory().GetItemQuality( silverID ) >= 2 ) 
 			{
@@ -8162,7 +8492,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				attach_vec.Z = 0.025;
 						
 				sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-				sword1.AddTag('quen_sword_1');
+				sword1.AddTag('acs_quen_sword_1');
 
 				physicalComponent = (CMeshComponent)(sword1.GetComponentByClassName('CRigidMeshComponent'));
 		
@@ -8171,7 +8501,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					physicalComponent.SetVisible(false);
 				}
 
-				sword1.AddTag('quen_sword_upgraded_2');	
+				sword1.AddTag('acs_quen_sword_upgraded_2');	
 			}
 			else
 			{
@@ -8189,9 +8519,9 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				attach_vec.Z = 0.025;
 						
 				sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-				sword1.AddTag('quen_sword_1');
+				sword1.AddTag('acs_quen_sword_1');
 
-				sword1.AddTag('quen_sword_upgraded_1');	
+				sword1.AddTag('acs_quen_sword_upgraded_1');	
 			}
 		}
 		else if ( GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) )
@@ -8212,7 +8542,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				attach_vec.Z = 0.025;
 						
 				sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-				sword1.AddTag('quen_sword_1');
+				sword1.AddTag('acs_quen_sword_1');
 			}
 			else if ( GetWitcherPlayer().GetInventory().GetItemLevel( steelID ) >= 11 && GetWitcherPlayer().GetInventory().GetItemLevel( steelID ) <= 20 && GetWitcherPlayer().GetInventory().GetItemQuality( steelID ) > 1 )
 			{
@@ -8230,9 +8560,9 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				attach_vec.Z = 0.025;
 						
 				sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-				sword1.AddTag('quen_sword_1');
+				sword1.AddTag('acs_quen_sword_1');
 
-				sword1.AddTag('quen_sword_upgraded_1');	
+				sword1.AddTag('acs_quen_sword_upgraded_1');	
 			}
 			else if ( GetWitcherPlayer().GetInventory().GetItemLevel( steelID ) >= 21 && GetWitcherPlayer().GetInventory().GetItemQuality( steelID ) >= 2 )
 			{
@@ -8250,7 +8580,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				attach_vec.Z = 0.025;
 						
 				sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-				sword1.AddTag('quen_sword_1');	
+				sword1.AddTag('acs_quen_sword_1');	
 
 				physicalComponent = (CMeshComponent)(sword1.GetComponentByClassName('CRigidMeshComponent'));
 		
@@ -8259,7 +8589,7 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 					physicalComponent.SetVisible(false);
 				}
 
-				sword1.AddTag('quen_sword_upgraded_2');	
+				sword1.AddTag('acs_quen_sword_upgraded_2');	
 			}
 			else
 			{
@@ -8277,9 +8607,9 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 				attach_vec.Z = 0.025;
 						
 				sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-				sword1.AddTag('quen_sword_1');
+				sword1.AddTag('acs_quen_sword_1');
 
-				sword1.AddTag('quen_sword_upgraded_1');	
+				sword1.AddTag('acs_quen_sword_upgraded_1');	
 			}
 		}
 	}
@@ -8345,9 +8675,9 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 			attach_vec.Z = 0.025;
 						
 			sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-			sword1.AddTag('quen_sword_1');
+			sword1.AddTag('acs_quen_sword_1');
 
-			sword1.AddTag('quen_sword_upgraded_1');	
+			sword1.AddTag('acs_quen_sword_upgraded_1');	
 		}
 		else if ( GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) )
 		{
@@ -8365,9 +8695,9 @@ state Primary_Weapon_Switch_Engage in cACS_PrimaryWeaponSwitch
 			attach_vec.Z = 0.025;
 					
 			sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-			sword1.AddTag('quen_sword_1');	
+			sword1.AddTag('acs_quen_sword_1');	
 
-			sword1.AddTag('quen_sword_upgraded_1');	
+			sword1.AddTag('acs_quen_sword_upgraded_1');	
 		}
 	}
 	
@@ -8391,7 +8721,6 @@ state Claw_Equip_Standalone_Engage in cClawEquipStandalone
 	private var p_actor 																																									: CActor;
 	private var p_comp, meshcompHead, p_comp_2																																				: CComponent;
 	private var animatedComponent_extra_arms 																																				: CAnimatedComponent;
-	private var stupidArray_extra_arms 																																						: array< name >;
 	private var attach_vec, bone_vec																																						: Vector;
 	private var attach_rot, bone_rot																																						: EulerAngles;
 	private var extra_arms_anchor_r, extra_arms_anchor_l, extra_arms_1, extra_arms_2, extra_arms_3, extra_arms_4, vampire_head_anchor, vampire_head, back_claw, vampire_claw_anchor			: CEntity;
@@ -8400,6 +8729,8 @@ state Claw_Equip_Standalone_Engage in cClawEquipStandalone
 	private var watcher																																										: W3ACSWatcher;
 	private var sword_trail_1, sword_trail_2, sword_trail_3, sword_trail_4, sword_trail_5, sword_trail_6, sword_trail_7, sword_trail_8 														: CEntity;
 	private var trail_temp																																									: CEntityTemplate;
+	private var stupidArray 																																								: array< name >;
+
 	
 	event OnEnterState(prevStateName : name)
 	{
@@ -8409,32 +8740,30 @@ state Claw_Equip_Standalone_Engage in cClawEquipStandalone
 
 	entry function ClawEquipStandalone_Entry()
 	{
-		ACS_Sword_Trail_1().Destroy();
-		ACS_Sword_Trail_2().Destroy();
-		ACS_Sword_Trail_3().Destroy();
-		ACS_Sword_Trail_4().Destroy();
-		ACS_Sword_Trail_5().Destroy();
-		ACS_Sword_Trail_6().Destroy();
-		ACS_Sword_Trail_7().Destroy();
-		ACS_Sword_Trail_8().Destroy();
+		ACSGetCEntity('acs_sword_trail_1').Destroy();
+		ACSGetCEntity('acs_sword_trail_2').Destroy();
+		ACSGetCEntity('acs_sword_trail_3').Destroy();
+		ACSGetCEntity('acs_sword_trail_4').Destroy();
+		ACSGetCEntity('acs_sword_trail_5').Destroy();
+		ACSGetCEntity('acs_sword_trail_6').Destroy();
+		ACSGetCEntity('acs_sword_trail_7').Destroy();
+		ACSGetCEntity('acs_sword_trail_8').Destroy();
 
-		ACS_Vampire_Arms_1_Get().Destroy();
+		ACSGetCEntity('acs_vampire_extra_arms_1').Destroy();
 
-		ACS_Vampire_Arms_2_Get().Destroy();
+		ACSGetCEntity('acs_vampire_extra_arms_2').Destroy();
 
-		ACS_Vampire_Arms_3_Get().Destroy();
+		ACSGetCEntity('acs_vampire_extra_arms_3').Destroy();
 
-		ACS_Vampire_Arms_4_Get().Destroy();
+		ACSGetCEntity('acs_vampire_extra_arms_4').Destroy();
 
-		ACS_Vampire_Arms_Anchor_L_Get().Destroy();
+		ACSGetCEntity('acs_extra_arms_anchor_l').Destroy();
 
-		ACS_Vampire_Arms_Anchor_R_Get().Destroy();
+		ACSGetCEntity('acs_extra_arms_anchor_r').Destroy();
 
-		ACS_Vampire_Head_Anchor_Get().Destroy();
+		ACSGetCEntity('acs_vampire_head_anchor').Destroy();
 
-		ACS_Vampire_Head_Get().Destroy();
-
-		stupidArray_extra_arms.PushBack( 'Cutscene' );
+		ACSGetCEntity('acs_vampire_head').Destroy();
 
 		extra_arms_anchor_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\entities\other\fx_ent.w2ent", true );
 
@@ -8674,13 +9003,13 @@ state Claw_Equip_Standalone_Engage in cClawEquipStandalone
 
 			animatedComponent_extra_arms.PlaySkeletalAnimationAsync( 'cs704_detlaff_morphs' );
 
-			ACS_Vampire_Arms_1_Get().GetRootAnimatedComponent().PlaySkeletalAnimationAsync( 'cs704_detlaff_morphs' );
+			ACSGetCEntity('acs_vampire_extra_arms_1').GetRootAnimatedComponent().PlaySkeletalAnimationAsync( 'cs704_detlaff_morphs' );
 
-			ACS_Vampire_Arms_2_Get().GetRootAnimatedComponent().PlaySkeletalAnimationAsync( 'cs704_detlaff_morphs' );
+			ACSGetCEntity('acs_vampire_extra_arms_2').GetRootAnimatedComponent().PlaySkeletalAnimationAsync( 'cs704_detlaff_morphs' );
 
-			ACS_Vampire_Arms_3_Get().GetRootAnimatedComponent().PlaySkeletalAnimationAsync( 'cs704_detlaff_morphs' );
+			ACSGetCEntity('acs_vampire_extra_arms_3').GetRootAnimatedComponent().PlaySkeletalAnimationAsync( 'cs704_detlaff_morphs' );
 
-			ACS_Vampire_Arms_4_Get().GetRootAnimatedComponent().PlaySkeletalAnimationAsync( 'cs704_detlaff_morphs' );
+			ACSGetCEntity('acs_vampire_extra_arms_4').GetRootAnimatedComponent().PlaySkeletalAnimationAsync( 'cs704_detlaff_morphs' );
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -8758,7 +9087,7 @@ state Claw_Equip_Standalone_Engage in cClawEquipStandalone
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			
-		GetWitcherPlayer().AddTag('vampire_claws_equipped');	
+		GetWitcherPlayer().AddTag('acs_vampire_claws_equipped');	
 
 		/*
 		if (!ACS_DisableAutomaticSwordSheathe_Enabled())
@@ -8781,9 +9110,6 @@ state Claw_Equip_Standalone_Engage in cClawEquipStandalone
 
 		((CDrawableComponent)p_comp_2).SetCastingShadows ( false );
 
-		GetWitcherPlayer().BlockAction(EIAB_SpecialAttackLight,	'ACS_Vamp_Claws_Block_Action');
-		GetWitcherPlayer().BlockAction(EIAB_SpecialAttackHeavy,	'ACS_Vamp_Claws_Block_Action');
-
 		if (!theGame.IsDialogOrCutscenePlaying()
 		&& !GetWitcherPlayer().IsThrowingItemWithAim()
 		&& !GetWitcherPlayer().IsThrowingItem()
@@ -8798,42 +9124,66 @@ state Claw_Equip_Standalone_Engage in cClawEquipStandalone
 			{
 				if (ACS_PassiveTaunt_Enabled())
 				{
-					GetWitcherPlayer().ActivateAndSyncBehavior( 'claw_beh_SCAAR_passive_taunt' );
+					if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'claw_beh_SCAAR_passive_taunt' )
+					{
+						stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_SCAAR_passive_taunt' );
+					}
 				}
 				else
 				{
-					GetWitcherPlayer().ActivateAndSyncBehavior( 'claw_beh_SCAAR' );
+					if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'claw_beh_SCAAR' )
+					{
+						stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_SCAAR' );
+					}
 				}
 			}
 			else if (ACS_E3ARP_Installed() && ACS_E3ARP_Enabled() && !ACS_SCAAR_Enabled())
 			{
 				if (ACS_PassiveTaunt_Enabled())
 				{
-					GetWitcherPlayer().ActivateAndSyncBehavior( 'claw_beh_E3ARP_passive_taunt' );
+					if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'claw_beh_E3ARP_passive_taunt' )
+					{
+						stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_E3ARP_passive_taunt' );
+					}
 				}
 				else
 				{
-					GetWitcherPlayer().ActivateAndSyncBehavior( 'claw_beh_E3ARP' );
+					if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'claw_beh_E3ARP' )
+					{
+						stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_E3ARP' );
+					}
 				}
 			}
 			else
 			{
 				if (ACS_PassiveTaunt_Enabled())
 				{
-					GetWitcherPlayer().ActivateAndSyncBehavior( 'claw_beh_passive_taunt' );
+					if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'claw_beh_passive_taunt' )
+					{
+						stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_passive_taunt' );
+					}
 				}
 				else
 				{
-					GetWitcherPlayer().ActivateAndSyncBehavior( 'claw_beh' );
+					if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'claw_beh' )
+					{
+						stupidArray.Clear(); stupidArray.PushBack( 'claw_beh' );
+					}
 				}
 
-				if ( GetWitcherPlayer().IsInCombat() && GetWitcherPlayer().GetCurrentStateName() != 'Combat') 
+				if (stupidArray.Size() > 0)
 				{
-					GetWitcherPlayer().GotoState( 'Combat' );
+					thePlayer.SetBehaviorVariable( 'ClimbCanEndMode', 	1 );
+					thePlayer.SetBehaviorVariable( 'ClimbHeightType', 	1 );
+					thePlayer.SetBehaviorVariable( 'ClimbVaultType', 	0 );
+					thePlayer.SetBehaviorVariable( 'ClimbPlatformType', 1 );
+					thePlayer.SetBehaviorVariable( 'ClimbStateType', 	0 );
+
+					thePlayer.RaiseForceEvent( 'Climb' );
+
+					thePlayer.ActivateBehaviors(stupidArray);
 				}
 			}
-
-			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync( 'locomotion_walkstart_forward_dettlaff_ACS', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0, 1) );
 		}
 	}
 }
@@ -8843,7 +9193,7 @@ function ACS_BloodArmorStandalone()
 	var vBloodArmorStandalone : cBloodArmorStandalone;
 	vBloodArmorStandalone = new cBloodArmorStandalone in theGame;
 
-	if (GetWitcherPlayer().HasTag('vampire_claws_equipped'))
+	if (GetWitcherPlayer().HasTag('acs_vampire_claws_equipped'))
 	{
 		if (
 		( ACS_GetWeaponMode() == 0 && ACS_GetFistMode() == 1 )
@@ -8871,7 +9221,6 @@ state Blood_Armor_Standalone_Engage in cBloodArmorStandalone
 	private var p_actor 																																									: CActor;
 	private var p_comp, meshcompHead																																						: CComponent;
 	private var animatedComponent_extra_arms 																																				: CAnimatedComponent;
-	private var stupidArray_extra_arms 																																						: array< name >;
 	private var attach_vec, bone_vec																																						: Vector;
 	private var attach_rot, bone_rot																																						: EulerAngles;
 	private var extra_arms_anchor_r, extra_arms_anchor_l, extra_arms_1, extra_arms_2, extra_arms_3, extra_arms_4, vampire_head_anchor, vampire_head, back_claw, vampire_claw_anchor			: CEntity;
@@ -8885,21 +9234,21 @@ state Blood_Armor_Standalone_Engage in cBloodArmorStandalone
 	
 	entry function Blood_Armor_Standalone_Entry()
 	{
-		ACS_Vampire_Arms_1_Get().Destroy();
+		ACSGetCEntity('acs_vampire_extra_arms_1').Destroy();
 
-		ACS_Vampire_Arms_2_Get().Destroy();
+		ACSGetCEntity('acs_vampire_extra_arms_2').Destroy();
 
-		ACS_Vampire_Arms_3_Get().Destroy();
+		ACSGetCEntity('acs_vampire_extra_arms_3').Destroy();
 
-		ACS_Vampire_Arms_4_Get().Destroy();
+		ACSGetCEntity('acs_vampire_extra_arms_4').Destroy();
 
-		ACS_Vampire_Arms_Anchor_L_Get().Destroy();
+		ACSGetCEntity('acs_extra_arms_anchor_l').Destroy();
 
-		ACS_Vampire_Arms_Anchor_R_Get().Destroy();
+		ACSGetCEntity('acs_extra_arms_anchor_r').Destroy();
 
-		ACS_Vampire_Head_Anchor_Get().Destroy();
+		ACSGetCEntity('acs_vampire_head_anchor').Destroy();
 
-		ACS_Vampire_Head_Get().Destroy();
+		ACSGetCEntity('acs_vampire_head').Destroy();
 
 		extra_arms_anchor_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\entities\other\fx_ent.w2ent", true );
 
@@ -9055,13 +9404,13 @@ state Blood_Armor_Standalone_Engage in cBloodArmorStandalone
 
 			animatedComponent_extra_arms.PlaySkeletalAnimationAsync( 'cs704_detlaff_morphs' );
 
-			ACS_Vampire_Arms_1_Get().GetRootAnimatedComponent().PlaySkeletalAnimationAsync( 'cs704_detlaff_morphs' );
+			ACSGetCEntity('acs_vampire_extra_arms_1').GetRootAnimatedComponent().PlaySkeletalAnimationAsync( 'cs704_detlaff_morphs' );
 
-			ACS_Vampire_Arms_2_Get().GetRootAnimatedComponent().PlaySkeletalAnimationAsync( 'cs704_detlaff_morphs' );
+			ACSGetCEntity('acs_vampire_extra_arms_2').GetRootAnimatedComponent().PlaySkeletalAnimationAsync( 'cs704_detlaff_morphs' );
 
-			ACS_Vampire_Arms_3_Get().GetRootAnimatedComponent().PlaySkeletalAnimationAsync( 'cs704_detlaff_morphs' );
+			ACSGetCEntity('acs_vampire_extra_arms_3').GetRootAnimatedComponent().PlaySkeletalAnimationAsync( 'cs704_detlaff_morphs' );
 
-			ACS_Vampire_Arms_4_Get().GetRootAnimatedComponent().PlaySkeletalAnimationAsync( 'cs704_detlaff_morphs' );
+			ACSGetCEntity('acs_vampire_extra_arms_4').GetRootAnimatedComponent().PlaySkeletalAnimationAsync( 'cs704_detlaff_morphs' );
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

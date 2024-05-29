@@ -118,10 +118,8 @@ struct ACS_Cooldown_Manager
 	var canaris_teleport_cooldown						: float;
 
 	var last_lightning_time								: float;
-	var lightning_cooldown								: float;
 
 	var last_fire_gargoyle_ability_time					: float;
-	var fire_gargoyle_ability_cooldown					: float;
 
 	var last_fog_ent_spawn_time							: float;
 	var fog_ent_spawn_cooldown							: float;
@@ -269,12 +267,6 @@ struct ACS_Cooldown_Manager
 	default canaris_ability_cooldown	= 5;
 	default canaris_teleport_cooldown	= 1.5;
 
-	// Lightning Cooldown
-	default lightning_cooldown			= 30;
-
-	// Fire Gargoyle Cooldown
-	default fire_gargoyle_ability_cooldown	= 7;
-
 	// Fog Ent Cooldown
 	default fog_ent_spawn_cooldown			= 10;
 
@@ -316,14 +308,17 @@ function ACS_can_perform_light_attack(): bool
 function ACS_refresh_light_attack_cooldown() 
 {
 	var watcher: W3ACSWatcher;
-
+	var animatedComponentA 	: CAnimatedComponent;
+	
 	watcher = (W3ACSWatcher)theGame.GetEntityByTag( 'acswatcher' );
 
 	watcher.vACS_Cooldown_Manager.last_light_attack_time = theGame.GetEngineTimeAsSeconds();
 
 	ACS_Size_Revert_And_Enable_Interrupt();
 
-	
+	animatedComponentA = (CAnimatedComponent)thePlayer.GetComponentByClassName( 'CAnimatedComponent' );
+
+	animatedComponentA.UnfreezePose(); animatedComponentA.UnfreezePoseFadeOut(0.01f);
 }
 
 function ACS_can_perform_heavy_attack(): bool 
@@ -338,6 +333,7 @@ function ACS_can_perform_heavy_attack(): bool
 function ACS_refresh_heavy_attack_cooldown() 
 {
 	var watcher: W3ACSWatcher;
+	var animatedComponentA 	: CAnimatedComponent;
 
 	watcher = (W3ACSWatcher)theGame.GetEntityByTag( 'acswatcher' );
 
@@ -345,7 +341,9 @@ function ACS_refresh_heavy_attack_cooldown()
 
 	ACS_Size_Revert_And_Enable_Interrupt();
 
-	
+	animatedComponentA = (CAnimatedComponent)thePlayer.GetComponentByClassName( 'CAnimatedComponent' );
+
+	animatedComponentA.UnfreezePose(); animatedComponentA.UnfreezePoseFadeOut(0.01f);
 }
 
 function ACS_can_perform_parry_skill(): bool 
@@ -360,12 +358,17 @@ function ACS_can_perform_parry_skill(): bool
 function ACS_refresh_parry_skill_cooldown() 
 {
 	var watcher: W3ACSWatcher;
+	var animatedComponentA 	: CAnimatedComponent;
 
 	watcher = (W3ACSWatcher)theGame.GetEntityByTag( 'acswatcher' );
 
 	watcher.vACS_Cooldown_Manager.last_parry_skill_time = theGame.GetEngineTimeAsSeconds();
 
 	ACS_Size_Revert_And_Enable_Interrupt();
+
+	animatedComponentA = (CAnimatedComponent)thePlayer.GetComponentByClassName( 'CAnimatedComponent' );
+
+	animatedComponentA.UnfreezePose(); animatedComponentA.UnfreezePoseFadeOut(0.01f);
 }
 
 function ACS_can_perform_parry_skill_doubletap(): bool 
@@ -380,12 +383,17 @@ function ACS_can_perform_parry_skill_doubletap(): bool
 function ACS_refresh_parry_skill_doubletap_cooldown() 
 {
 	var watcher: W3ACSWatcher;
+	var animatedComponentA 	: CAnimatedComponent;
 
 	watcher = (W3ACSWatcher)theGame.GetEntityByTag( 'acswatcher' );
 
 	watcher.vACS_Cooldown_Manager.last_parry_skill_doubletap_time = theGame.GetEngineTimeAsSeconds();
 
 	ACS_Size_Revert_And_Enable_Interrupt();
+
+	animatedComponentA = (CAnimatedComponent)thePlayer.GetComponentByClassName( 'CAnimatedComponent' );
+
+	animatedComponentA.UnfreezePose(); animatedComponentA.UnfreezePoseFadeOut(0.01f);
 }
 
 function ACS_can_perform_guard_attack(): bool 
@@ -400,12 +408,17 @@ function ACS_can_perform_guard_attack(): bool
 function ACS_refresh_guard_attack_cooldown() 
 {
 	var watcher: W3ACSWatcher;
+	var animatedComponentA 	: CAnimatedComponent;
 
 	watcher = (W3ACSWatcher)theGame.GetEntityByTag( 'acswatcher' );
 
 	watcher.vACS_Cooldown_Manager.last_guard_attack_time = theGame.GetEngineTimeAsSeconds();
 
 	ACS_Size_Revert_And_Enable_Interrupt();
+
+	animatedComponentA = (CAnimatedComponent)thePlayer.GetComponentByClassName( 'CAnimatedComponent' );
+
+	animatedComponentA.UnfreezePose(); animatedComponentA.UnfreezePoseFadeOut(0.01f);
 }
 
 function ACS_can_perform_guard_doubletap_attack(): bool 
@@ -420,12 +433,17 @@ function ACS_can_perform_guard_doubletap_attack(): bool
 function ACS_refresh_guard_doubletap_attack_cooldown() 
 {
 	var watcher: W3ACSWatcher;
+	var animatedComponentA 	: CAnimatedComponent;
 
 	watcher = (W3ACSWatcher)theGame.GetEntityByTag( 'acswatcher' );
 
 	watcher.vACS_Cooldown_Manager.last_guard_doubletap_attack_time = theGame.GetEngineTimeAsSeconds();
 
 	ACS_Size_Revert_And_Enable_Interrupt();
+
+	animatedComponentA = (CAnimatedComponent)thePlayer.GetComponentByClassName( 'CAnimatedComponent' );
+
+	animatedComponentA.UnfreezePose(); animatedComponentA.UnfreezePoseFadeOut(0.01f);
 }
 
 function ACS_can_perform_special_attack(): bool 
@@ -440,6 +458,7 @@ function ACS_can_perform_special_attack(): bool
 function ACS_refresh_special_attack_cooldown() 
 {
 	var watcher: W3ACSWatcher;
+	var animatedComponentA 	: CAnimatedComponent;
 
 	watcher = (W3ACSWatcher)theGame.GetEntityByTag( 'acswatcher' );
 
@@ -447,6 +466,9 @@ function ACS_refresh_special_attack_cooldown()
 
 	ACS_Size_Revert_And_Enable_Interrupt();
 
+	animatedComponentA = (CAnimatedComponent)thePlayer.GetComponentByClassName( 'CAnimatedComponent' );
+
+	animatedComponentA.UnfreezePose(); animatedComponentA.UnfreezePoseFadeOut(0.01f);
 	
 }
 
@@ -484,6 +506,7 @@ function ACS_can_dodge(): bool
 function ACS_refresh_dodge_cooldown() 
 {
 	var watcher: W3ACSWatcher;
+	var animatedComponentA 	: CAnimatedComponent;
 
 	watcher = (W3ACSWatcher)theGame.GetEntityByTag( 'acswatcher' );
 
@@ -491,7 +514,9 @@ function ACS_refresh_dodge_cooldown()
 
 	ACS_Size_Revert_And_Enable_Interrupt();
 
-	
+	animatedComponentA = (CAnimatedComponent)thePlayer.GetComponentByClassName( 'CAnimatedComponent' );
+
+	animatedComponentA.UnfreezePose(); animatedComponentA.UnfreezePoseFadeOut(0.01f);
 }
 
 function ACS_can_special_dodge(): bool 
@@ -506,6 +531,7 @@ function ACS_can_special_dodge(): bool
 function ACS_refresh_special_dodge_cooldown() 
 {
 	var watcher: W3ACSWatcher;
+	var animatedComponentA 	: CAnimatedComponent;
 
 	watcher = (W3ACSWatcher)theGame.GetEntityByTag( 'acswatcher' );
 
@@ -513,7 +539,9 @@ function ACS_refresh_special_dodge_cooldown()
 
 	ACS_Size_Revert_And_Enable_Interrupt();
 
-	
+	animatedComponentA = (CAnimatedComponent)thePlayer.GetComponentByClassName( 'CAnimatedComponent' );
+
+	animatedComponentA.UnfreezePose(); animatedComponentA.UnfreezePoseFadeOut(0.01f);
 }
 
 function ACS_can_perform_beam_attack(): bool 
@@ -1173,7 +1201,7 @@ function ACS_can_lightning(): bool
 
 	property = GetACSWatcher().vACS_Cooldown_Manager;
 
-	return theGame.GetEngineTimeAsSeconds() - property.last_lightning_time > property.lightning_cooldown;
+	return theGame.GetEngineTimeAsSeconds() - property.last_lightning_time > RandRangeF(45, 15);
 }
 
 function ACS_refresh_lightning_cooldown() 
@@ -1191,7 +1219,7 @@ function ACS_fire_gargoyle_abilities(): bool
 
 	property = GetACSWatcher().vACS_Cooldown_Manager;
 
-	return theGame.GetEngineTimeAsSeconds() - property.last_fire_gargoyle_ability_time > property.fire_gargoyle_ability_cooldown;
+	return theGame.GetEngineTimeAsSeconds() - property.last_fire_gargoyle_ability_time > RandRangeF(14, 7);
 }
 
 function ACS_refresh_fire_gargoyle_abilities_cooldown() 
@@ -1370,7 +1398,7 @@ function ACS_melusine_ability_switch(): bool
 
 	cooldownAdjusted = property.melusine_ability_switch_cooldown;
 
-	if (GetACSMelusineCloud().HasAbility('DjinnRage'))
+	if (ACSGetCActor('ACS_Melusine_Cloud').HasAbility('DjinnRage'))
 	{
 		cooldownAdjusted += 20;
 	}

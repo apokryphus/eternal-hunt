@@ -59,11 +59,11 @@ state ACS_TK_Engage in cACS_TK
 	{
 		GetWitcherPlayer().DestroyEffect('mind_control');	
 
-		ACS_pull_anchor1().Destroy();
-		ACS_pull_anchor2().Destroy();
-		ACS_pull_anchor3().Destroy();
-		ACS_pull_anchor4().Destroy();
-		ACS_pull_anchor5().Destroy();
+		ACSGetCEntity('ACS_pull_anchor1').Destroy();
+		ACSGetCEntity('ACS_pull_anchor2').Destroy();
+		ACSGetCEntity('ACS_pull_anchor3').Destroy();
+		ACSGetCEntity('ACS_pull_anchor4').Destroy();
+		ACSGetCEntity('ACS_pull_anchor5').Destroy();
 		
 		settings.blendIn = 0.175f;
 		settings.blendOut = 1.f;
@@ -489,9 +489,9 @@ state ACS_TK_Engage in cACS_TK
 	{
 		GetWitcherPlayer().DestroyEffect('mind_control');	
 
-		ACS_pull_anchor1().Destroy();
-		ACS_pull_anchor2().Destroy();
-		ACS_pull_anchor3().Destroy();
+		ACSGetCEntity('ACS_pull_anchor1').Destroy();
+		ACSGetCEntity('ACS_pull_anchor2').Destroy();
+		ACSGetCEntity('ACS_pull_anchor3').Destroy();
 		
 		settings.blendIn = 0.175f;
 		settings.blendOut = 1.f;
@@ -866,44 +866,4 @@ state ACS_TK_Engage in cACS_TK
 			}
 		}
 	}
-}
-
-function ACS_pull_anchor1() : CEntity
-{
-	var anchor 			 : CEntity;
-	
-	anchor = (CEntity)theGame.GetEntityByTag( 'ACS_pull_anchor1' );
-	return anchor;
-}
-
-function ACS_pull_anchor2() : CEntity
-{
-	var anchor 			 : CEntity;
-	
-	anchor = (CEntity)theGame.GetEntityByTag( 'ACS_pull_anchor2' );
-	return anchor;
-}
-
-function ACS_pull_anchor3() : CEntity
-{
-	var anchor 			 : CEntity;
-	
-	anchor = (CEntity)theGame.GetEntityByTag( 'ACS_pull_anchor3' );
-	return anchor;
-}
-
-function ACS_pull_anchor4() : CEntity
-{
-	var anchor 			 : CEntity;
-	
-	anchor = (CEntity)theGame.GetEntityByTag( 'ACS_pull_anchor4' );
-	return anchor;
-}
-
-function ACS_pull_anchor5() : CEntity
-{
-	var anchor 			 : CEntity;
-	
-	anchor = (CEntity)theGame.GetEntityByTag( 'ACS_pull_anchor5' );
-	return anchor;
 }

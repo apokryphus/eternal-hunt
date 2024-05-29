@@ -6,7 +6,7 @@ function ACS_Jump_Extend_Init( type : EJumpType )
 	if ( 
 	ACS_Enabled() 
 	&& ACS_JumpExtend_Enabled() 
-	&& !GetWitcherPlayer().HasTag('in_wraith') 
+	&& !GetWitcherPlayer().HasTag('acs_in_wraith') 
 	&& !ACS_Transformation_Activated_Check()
 	&& GetWitcherPlayer().IsAlive()
 	&& !GetWitcherPlayer().IsInAir()
@@ -78,7 +78,7 @@ state ACS_JumpExtendState in cACS_JumpExtend
 		velocity = VecLength( ((CMovingPhysicalAgentComponent)GetWitcherPlayer().GetComponentByClassName( 'CMovingPhysicalAgentComponent' ) ).GetPhysicalObjectLinearVelocity() );
 		momentum = mass * velocity;
 		
-		if (!GetWitcherPlayer().HasTag('in_wraith')
+		if (!GetWitcherPlayer().HasTag('acs_in_wraith')
 		&& ACS_JumpExtend_Effect_Enabled())
 		{
 			GetWitcherPlayer().PlayEffect( 'bruxa_dash_trails_backup' );
@@ -96,8 +96,8 @@ state ACS_JumpExtendState in cACS_JumpExtend
 
 		if (
 		!GetWitcherPlayer().GetIsSprinting() 
-		&& !GetWitcherPlayer().HasTag('in_wraith') 
-		&& !GetWitcherPlayer().HasTag('igni_sword_equipped')
+		&& !GetWitcherPlayer().HasTag('acs_in_wraith') 
+		&& !GetWitcherPlayer().HasTag('acs_igni_sword_equipped')
 		&& !ACS_SwordWalk_Enabled()
 		)
 		{
@@ -132,7 +132,7 @@ state ACS_JumpExtendState in cACS_JumpExtend
 			if (
 			(ACS_Sprinting_JumpExtend_GetDistance() >= 15 
 			|| ACS_Sprinting_JumpExtend_GetHeight() >= 15)
-			&& !GetWitcherPlayer().HasTag('in_wraith')
+			&& !GetWitcherPlayer().HasTag('acs_in_wraith')
 			&& ACS_JumpExtend_Effect_Enabled()
 			)
 			{
@@ -154,7 +154,7 @@ state ACS_JumpExtendState in cACS_JumpExtend
 			if (
 			(ACS_Normal_JumpExtend_GetDistance() >= 15 
 			|| ACS_Normal_JumpExtend_GetHeight() >= 15)
-			&& !GetWitcherPlayer().HasTag('in_wraith')
+			&& !GetWitcherPlayer().HasTag('acs_in_wraith')
 			&& ACS_JumpExtend_Effect_Enabled()
 			)
 			{
