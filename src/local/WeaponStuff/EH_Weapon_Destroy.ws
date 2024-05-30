@@ -62,6 +62,9 @@ function ACS_WeaponDestroyInit()
 	ACSGetCEntity('acs_sword_trail_7').Destroy();
 	ACSGetCEntity('acs_sword_trail_8').Destroy();
 
+	ACSGetCEntity('ACS_Frost_Sword_Ent').Destroy();
+	ACSGetCEntity('ACS_Fire_Sword_Ent').Destroy();
+
 	if (ACSGetCEntity('ACS_Armor_Ether_Sword'))
 	{
 		ACSGetCEntity('ACS_Armor_Ether_Sword').Destroy();
@@ -134,6 +137,9 @@ function ACS_WeaponDestroyIMMEDIATEInit()
 	ACSGetCEntity('acs_sword_trail_7').Destroy();
 	ACSGetCEntity('acs_sword_trail_8').Destroy();
 
+	ACSGetCEntity('ACS_Frost_Sword_Ent').Destroy();
+	ACSGetCEntity('ACS_Fire_Sword_Ent').Destroy();
+
 	if (ACSGetCEntity('ACS_Armor_Ether_Sword'))
 	{
 		ACSGetCEntity('ACS_Armor_Ether_Sword').Destroy();
@@ -190,6 +196,9 @@ function ACS_WeaponDestroyInit_WITHOUT_HIDESWORD()
 	ACSGetCEntity('acs_sword_trail_7').Destroy();
 	ACSGetCEntity('acs_sword_trail_8').Destroy();
 
+	ACSGetCEntity('ACS_Frost_Sword_Ent').Destroy();
+	ACSGetCEntity('ACS_Fire_Sword_Ent').Destroy();
+
 	if (ACSGetCEntity('ACS_Armor_Ether_Sword'))
 	{
 		ACSGetCEntity('ACS_Armor_Ether_Sword').Destroy();
@@ -245,6 +254,9 @@ function ACS_WeaponDestroyInit_WITHOUT_HIDESWORD_IMMEDIATE()
 	ACSGetCEntity('acs_sword_trail_6').Destroy();
 	ACSGetCEntity('acs_sword_trail_7').Destroy();
 	ACSGetCEntity('acs_sword_trail_8').Destroy();
+
+	ACSGetCEntity('ACS_Frost_Sword_Ent').Destroy();
+	ACSGetCEntity('ACS_Fire_Sword_Ent').Destroy();
 
 	if (ACSGetCEntity('ACS_Armor_Ether_Sword'))
 	{

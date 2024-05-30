@@ -3,7 +3,7 @@
 
 function ACS_GetVersion() : float
 {
-	return 2.27;
+	return 2.28;
 }
 
 statemachine abstract class W3ACSWatcher extends CEntity
@@ -1595,6 +1595,8 @@ statemachine abstract class W3ACSWatcher extends CEntity
 
 		GetWitcherPlayer().RemoveTag('ACS_Red_Lightning_Enabled');
 
+		GetWitcherPlayer().RemoveTag('ACS_Flammable_Oil_Enabled');
+
 		if (FactsQuerySum("ACS_Helm_Equipped") > 0)
 		{
 			FactsRemove("ACS_Helm_Equipped");
@@ -2278,6 +2280,8 @@ statemachine abstract class W3ACSWatcher extends CEntity
 	public timer function LynxWitcherRemoveStealth( time : float , id : int ){ACSLynxWitcherRemoveStealth();}
 
 	public timer function MelusineSpawnDelay( time : float , id : int ){ACS_MelusineSpawner();}
+
+	public timer function RemoveFlammabeOilTag( time : float , id : int ){thePlayer.RemoveTag('ACS_Flammable_Oil_Enabled');}
 
 	function SpawnManager()
 	{
@@ -16391,7 +16395,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 
 		fear_actors.Clear();
 			
-		fear_actors = thePlayer.GetNPCsAndPlayersInRange( 20, 2, , FLAG_ExcludePlayer + FLAG_OnlyAliveActors + FLAG_Attitude_Hostile);
+		fear_actors = thePlayer.GetNPCsAndPlayersInRange( 20, 3, , FLAG_ExcludePlayer + FLAG_OnlyAliveActors + FLAG_Attitude_Hostile);
 
 		if( fear_actors.Size() > 0 )
 		{
@@ -16421,21 +16425,7 @@ statemachine abstract class W3ACSWatcher extends CEntity
 				&& !fear_actor.HasAbility('MonsterMHBoss')
 				)
 				{
-					if (!fear_actor.HasTag('ACS_1st_Fear_Stack')
-					&& !fear_actor.HasTag('ACS_2nd_Fear_Stack')
-					)
-					{
-						fear_actor.AddTag('ACS_1st_Fear_Stack');
-					}
-					else if (fear_actor.HasTag('ACS_1st_Fear_Stack')
-					&& !fear_actor.HasTag('ACS_2nd_Fear_Stack')
-					)
-					{
-						fear_actor.AddTag('ACS_2nd_Fear_Stack');
-					}
-					else if (fear_actor.HasTag('ACS_1st_Fear_Stack')
-					&& fear_actor.HasTag('ACS_2nd_Fear_Stack')	
-					)
+					if (thePlayer.HasTag('ACS_Flammable_Oil_Enabled') && RandF() < 0.875)
 					{
 						if (!fear_actor.HasTag('ACS_Final_Fear_Stack'))
 						{
@@ -16559,6 +16549,149 @@ statemachine abstract class W3ACSWatcher extends CEntity
 
 							fear_actor.AddTag('ACS_Final_Fear_Stack');
 						}
+					}
+					else
+					{
+						if (!fear_actor.HasTag('ACS_1st_Fear_Stack')
+						&& !fear_actor.HasTag('ACS_2nd_Fear_Stack')
+						)
+						{
+							fear_actor.AddTag('ACS_1st_Fear_Stack');
+						}
+						else if (fear_actor.HasTag('ACS_1st_Fear_Stack')
+						&& !fear_actor.HasTag('ACS_2nd_Fear_Stack')
+						)
+						{
+							fear_actor.AddTag('ACS_2nd_Fear_Stack');
+						}
+						else if (fear_actor.HasTag('ACS_1st_Fear_Stack')
+						&& fear_actor.HasTag('ACS_2nd_Fear_Stack')	
+						)
+						{
+							if (!fear_actor.HasTag('ACS_Final_Fear_Stack'))
+							{
+								if (!fear_actor.HasAbility('DisableFinishers'))
+								{
+									fear_actor.AddAbility( 'DisableFinishers', true);
+								}
+
+								if (fear_actor.HasAbility('ForceFinisher'))
+								{
+									fear_actor.RemoveAbility( 'ForceFinisher');
+								} 
+
+								fear_actor.SignalGameplayEvent('DisableFinisher');
+
+								if( ((CNewNPC)fear_actor).IsShielded( NULL ) )
+								{
+									((CNewNPC)fear_actor).ProcessShieldDestruction();
+								}
+
+								//fear_actor.SignalGameplayEvent('LeaveCurrentCombatStyle');
+
+								//fear_actor.SetBehaviorVariable( 'combatTauntType', 0.f );
+
+								(fear_actor.GetInventory().GetItemEntityUnsafe( fear_actor.GetInventory().GetItemFromSlot( 'r_weapon' ) )).SetHideInGame(true);
+
+								fear_actor.AddEffectDefault( EET_Blindness, fear_actor, 'console' );
+
+								ticketFearActor = movementAdjustorFearActor.GetRequest( 'ACS_NPC_Fear_Rotate');
+								movementAdjustorFearActor.CancelByName( 'ACS_NPC_Fear_Rotate' );
+								movementAdjustorFearActor.CancelAll();
+
+								ticketFearActor = movementAdjustorFearActor.CreateNewRequest( 'ACS_NPC_Fear_Rotate' );
+								movementAdjustorFearActor.AdjustmentDuration( ticketFearActor, 0.25 );
+								movementAdjustorFearActor.MaxRotationAdjustmentSpeed( ticketFearActor, 500000 );
+
+								if( targetDistance <= 3 * 3 ) 
+								{
+									if (RandF() < 0.33)
+									{
+										fear_actor.AddTag('ACS_Scared_On_Ground');
+
+										movementAdjustorFearActor.RotateTowards( ticketFearActor, thePlayer );
+
+										if (RandF() < 0.5)
+										{
+											animatedComponentFearActor.PlaySlotAnimationAsync ( 'man_ex_scared_ground_start_1', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
+										}
+										else
+										{
+											animatedComponentFearActor.PlaySlotAnimationAsync ( 'man_ex_scared_ground_start_2', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
+										}
+									}
+									else
+									{
+										fear_actor.AddTag('ACS_Scared_Standing');
+
+										if (RandF() < 0.5)
+										{
+											movementAdjustorFearActor.RotateTowards( ticketFearActor, thePlayer, RandRangeF(225,135) );
+
+											animatedComponentFearActor.PlaySlotAnimationAsync ( 'dialogue_man_ex_scared_run_loop', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
+										}
+										else
+										{
+											movementAdjustorFearActor.RotateTowards( ticketFearActor, thePlayer );
+
+											if (RandF() < 0.5)
+											{
+												animatedComponentFearActor.PlaySlotAnimationAsync ( 'man_ex_scared_loop_1', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
+											}
+											else
+											{
+												animatedComponentFearActor.PlaySlotAnimationAsync ( 'man_ex_scared_loop_2', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
+											}
+										}
+									}
+								}
+								else if( targetDistance > 3 * 3 && targetDistance <= 20 * 20 ) 
+								{
+									if (RandF() < 0.25)
+									{
+										fear_actor.AddTag('ACS_Scared_On_Ground');
+
+										movementAdjustorFearActor.RotateTowards( ticketFearActor, thePlayer );
+
+										if (RandF() < 0.5)
+										{
+											animatedComponentFearActor.PlaySlotAnimationAsync ( 'man_ex_scared_ground_start_1', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
+										}
+										else
+										{
+											animatedComponentFearActor.PlaySlotAnimationAsync ( 'man_ex_scared_ground_start_2', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
+										}
+									}
+									else
+									{
+										fear_actor.AddTag('ACS_Scared_Standing');
+
+										if (RandF() < 0.5)
+										{
+											movementAdjustorFearActor.RotateTowards( ticketFearActor, thePlayer, RandRangeF(225,135) );
+
+											animatedComponentFearActor.PlaySlotAnimationAsync ( 'dialogue_man_ex_scared_run_loop', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
+										}
+										else
+										{
+											movementAdjustorFearActor.RotateTowards( ticketFearActor, thePlayer );
+
+											if (RandF() < 0.5)
+											{
+												animatedComponentFearActor.PlaySlotAnimationAsync ( 'man_ex_scared_loop_1', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
+											}
+											else
+											{
+												animatedComponentFearActor.PlaySlotAnimationAsync ( 'man_ex_scared_loop_2', 'NPC_ANIM_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));
+											}
+										}
+									}
+								}
+
+								fear_actor.AddTag('ACS_Final_Fear_Stack');
+							}
+						}
+					
 					}
 				}
 			}
@@ -16789,6 +16922,12 @@ statemachine abstract class W3ACSWatcher extends CEntity
 					}
 				}
 
+				if (thePlayer.HasTag('ACS_Flammable_Oil_Enabled'))
+				{
+					npc.DestroyEffect('critical_burning');
+					npc.PlayEffectSingle('critical_burning');
+				}
+
 				return;
 			}
 			else if (
@@ -16873,6 +17012,12 @@ statemachine abstract class W3ACSWatcher extends CEntity
 							npc.DestroyEffect('critical_burning');
 							npc.PlayEffectSingle('critical_burning');
 						}
+					}
+
+					if (thePlayer.HasTag('ACS_Flammable_Oil_Enabled'))
+					{
+						npc.DestroyEffect('critical_burning');
+						npc.PlayEffectSingle('critical_burning');
 					}
 
 					//ACS_EventHack_Attack();
@@ -17173,6 +17318,12 @@ statemachine abstract class W3ACSWatcher extends CEntity
 							npc.PlayEffectSingle('critical_burning');
 						}
 					}
+
+					if (thePlayer.HasTag('ACS_Flammable_Oil_Enabled'))
+					{
+						npc.DestroyEffect('critical_burning');
+						npc.PlayEffectSingle('critical_burning');
+					}
 				}
 				else if ( npc.UsesEssence() && npc.GetStat( BCS_Essence ) <= 0 )
 				{	
@@ -17338,6 +17489,12 @@ statemachine abstract class W3ACSWatcher extends CEntity
 							npc.DestroyEffect('critical_burning');
 							npc.PlayEffectSingle('critical_burning');
 						}
+					}
+
+					if (thePlayer.HasTag('ACS_Flammable_Oil_Enabled'))
+					{
+						npc.DestroyEffect('critical_burning');
+						npc.PlayEffectSingle('critical_burning');
 					}
 				}
 			}
@@ -17505,6 +17662,12 @@ statemachine abstract class W3ACSWatcher extends CEntity
 							npc.DestroyEffect('critical_burning');
 							npc.PlayEffectSingle('critical_burning');
 						}
+					}
+
+					if (thePlayer.HasTag('ACS_Flammable_Oil_Enabled'))
+					{
+						npc.DestroyEffect('critical_burning');
+						npc.PlayEffectSingle('critical_burning');
 					}
 				}
 				else if ( npc.UsesEssence() && npc.GetStat( BCS_Essence ) <= 0 )
@@ -17674,6 +17837,12 @@ statemachine abstract class W3ACSWatcher extends CEntity
 							npc.DestroyEffect('critical_burning');
 							npc.PlayEffectSingle('critical_burning');
 						}
+					}
+
+					if (thePlayer.HasTag('ACS_Flammable_Oil_Enabled'))
+					{
+						npc.DestroyEffect('critical_burning');
+						npc.PlayEffectSingle('critical_burning');
 					}
 				}
 			}
@@ -18829,7 +18998,44 @@ statemachine abstract class W3ACSWatcher extends CEntity
 				ACSGetCEntity('ACS_Frost_Sword_Ent').Destroy();
 			}
 		}
+		else
+		{
+			ACSGetCEntity('ACS_Frost_Sword_Ent').Destroy();
+		}
 
+		if (thePlayer.HasTag('ACS_Flammable_Oil_Enabled')
+		&& (thePlayer.HasTag('acs_igni_sword_equipped') 
+		|| thePlayer.HasTag('acs_igni_sword_equipped_TAG') 
+		|| thePlayer.HasTag('acs_igni_secondary_sword_equipped')
+		|| thePlayer.HasTag('acs_igni_secondary_sword_equipped_TAG')
+		)
+		)
+		{
+			if (thePlayer.IsAnyWeaponHeld() && !thePlayer.IsWeaponHeld('fist'))
+			{
+				if (Can_Play_Sword_FX())
+				{
+					Refresh_Sword_FX_Cooldown();
+
+					ACSGetCEntity('ACS_Fire_Sword_Ent').StopEffect('fire_sword_1');
+					ACSGetCEntity('ACS_Fire_Sword_Ent').PlayEffectSingle('fire_sword_1');
+				}
+			}
+			else
+			{
+				ACSGetCEntity('ACS_Fire_Sword_Ent').Destroy();
+
+				ACSGetCEntity('ACS_Fire_Sword_Ground_Fx_Ent').Destroy();
+
+				thePlayer.RemoveTag('ACS_Flammable_Oil_Enabled');
+			}
+		}
+		else
+		{
+			ACSGetCEntity('ACS_Fire_Sword_Ent').Destroy();
+
+			ACSGetCEntity('ACS_Fire_Sword_Ground_Fx_Ent').Destroy();
+		}
 
 		/*
 		else if (!thePlayer.HasTag('acs_vampire_claws_equipped'))
@@ -47034,7 +47240,32 @@ statemachine abstract class W3ACSWatcher extends CEntity
 
 							RemoveTimer('RollDelay');
 
-							if (thePlayer.HasTag('acs_quen_sword_equipped'))
+							if (thePlayer.HasTag('acs_igni_sword_equipped')
+							|| thePlayer.HasTag('acs_igni_secondary_sword_equipped'))
+							{
+								if ( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus ) * 1/3 )
+								{
+									ACSCreateFireSwordFX();
+
+									if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus )/3
+									&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus ) * 2/3) 
+									{	
+										
+										thePlayer.DrainFocus( thePlayer.GetStatMax( BCS_Focus ) );
+									}
+									else if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus ) * 2/3
+									&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus )) 
+									{	
+										
+										thePlayer.DrainFocus( thePlayer.GetStatMax( BCS_Focus ) * 1/3);
+									}
+									else if( thePlayer.GetStat( BCS_Focus ) == thePlayer.GetStatMax(BCS_Focus) ) 
+									{
+										thePlayer.DrainFocus( thePlayer.GetStatMax( BCS_Focus ) * 1/3);
+									}
+								}
+							}
+							else if (thePlayer.HasTag('acs_quen_sword_equipped'))
 							{
 								if (thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus ) * 1/3 )
 								{
@@ -49815,6 +50046,32 @@ statemachine abstract class W3ACSWatcher extends CEntity
 					{
 						geraltRandomGeraltLightAttackForward_Wolf();
 					}
+					else if (theInput.GetActionValue('Dodge') > 0.7
+					&& thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus ) * 1/3 )
+					{
+						ACS_Tutorial_Display_Check('ACS_Weapon_Arts_Tutorial_Shown');
+
+						RemoveTimer('RollDelay');
+
+						ACSCreateFireSwordFX();
+
+						if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus )/3
+						&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus ) * 2/3) 
+						{	
+							
+							thePlayer.DrainFocus( thePlayer.GetStatMax( BCS_Focus ) );
+						}
+						else if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus ) * 2/3
+						&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus )) 
+						{	
+							
+							thePlayer.DrainFocus( thePlayer.GetStatMax( BCS_Focus ) * 1/3);
+						}
+						else if( thePlayer.GetStat( BCS_Focus ) == thePlayer.GetStatMax(BCS_Focus) ) 
+						{
+							thePlayer.DrainFocus( thePlayer.GetStatMax( BCS_Focus ) * 1/3);
+						}
+					}
 					else
 					{
 						geraltRandomGeraltLightAttack_Wolf();
@@ -49983,6 +50240,32 @@ statemachine abstract class W3ACSWatcher extends CEntity
 					{
 						geraltRandomGeraltLightAttackForward_Bear();
 					}
+					else if (theInput.GetActionValue('Dodge') > 0.7
+					&& thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus ) * 1/3 )
+					{
+						ACS_Tutorial_Display_Check('ACS_Weapon_Arts_Tutorial_Shown');
+
+						RemoveTimer('RollDelay');
+
+						ACSCreateFireSwordFX();
+
+						if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus )/3
+						&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus ) * 2/3) 
+						{	
+							
+							thePlayer.DrainFocus( thePlayer.GetStatMax( BCS_Focus ) );
+						}
+						else if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus ) * 2/3
+						&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus )) 
+						{	
+							
+							thePlayer.DrainFocus( thePlayer.GetStatMax( BCS_Focus ) * 1/3);
+						}
+						else if( thePlayer.GetStat( BCS_Focus ) == thePlayer.GetStatMax(BCS_Focus) ) 
+						{
+							thePlayer.DrainFocus( thePlayer.GetStatMax( BCS_Focus ) * 1/3);
+						}
+					}
 					else
 					{
 						geraltRandomGeraltLightAttack_Bear();
@@ -50146,6 +50429,32 @@ statemachine abstract class W3ACSWatcher extends CEntity
 						if( thePlayer.IsAlive()) {thePlayer.ClearAnimationSpeedMultipliers();}	
 
 						geraltRandomGeraltLightAttackForward_Cat();
+					}
+					else if (theInput.GetActionValue('Dodge') > 0.7
+					&& thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus ) * 1/3 )
+					{
+						ACS_Tutorial_Display_Check('ACS_Weapon_Arts_Tutorial_Shown');
+
+						RemoveTimer('RollDelay');
+
+						ACSCreateFireSwordFX();
+
+						if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus )/3
+						&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus ) * 2/3) 
+						{	
+							
+							thePlayer.DrainFocus( thePlayer.GetStatMax( BCS_Focus ) );
+						}
+						else if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus ) * 2/3
+						&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus )) 
+						{	
+							
+							thePlayer.DrainFocus( thePlayer.GetStatMax( BCS_Focus ) * 1/3);
+						}
+						else if( thePlayer.GetStat( BCS_Focus ) == thePlayer.GetStatMax(BCS_Focus) ) 
+						{
+							thePlayer.DrainFocus( thePlayer.GetStatMax( BCS_Focus ) * 1/3);
+						}
 					}
 					else
 					{
@@ -50327,6 +50636,32 @@ statemachine abstract class W3ACSWatcher extends CEntity
 
 						geraltRandomGeraltLightAttackForward_Griffin();
 					}
+					else if (theInput.GetActionValue('Dodge') > 0.7
+					&& thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus ) * 1/3 )
+					{
+						ACS_Tutorial_Display_Check('ACS_Weapon_Arts_Tutorial_Shown');
+
+						RemoveTimer('RollDelay');
+
+						ACSCreateFireSwordFX();
+
+						if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus )/3
+						&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus ) * 2/3) 
+						{	
+							
+							thePlayer.DrainFocus( thePlayer.GetStatMax( BCS_Focus ) );
+						}
+						else if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus ) * 2/3
+						&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus )) 
+						{	
+							
+							thePlayer.DrainFocus( thePlayer.GetStatMax( BCS_Focus ) * 1/3);
+						}
+						else if( thePlayer.GetStat( BCS_Focus ) == thePlayer.GetStatMax(BCS_Focus) ) 
+						{
+							thePlayer.DrainFocus( thePlayer.GetStatMax( BCS_Focus ) * 1/3);
+						}
+					}
 					else
 					{
 						if( thePlayer.IsAlive()) {thePlayer.ClearAnimationSpeedMultipliers();}	
@@ -50491,6 +50826,32 @@ statemachine abstract class W3ACSWatcher extends CEntity
 
 						geraltRandomGeraltLightAttackForward_Manticore();
 					}
+					else if (theInput.GetActionValue('Dodge') > 0.7
+					&& thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus ) * 1/3 )
+					{
+						ACS_Tutorial_Display_Check('ACS_Weapon_Arts_Tutorial_Shown');
+
+						RemoveTimer('RollDelay');
+
+						ACSCreateFireSwordFX();
+
+						if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus )/3
+						&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus ) * 2/3) 
+						{	
+							
+							thePlayer.DrainFocus( thePlayer.GetStatMax( BCS_Focus ) );
+						}
+						else if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus ) * 2/3
+						&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus )) 
+						{	
+							
+							thePlayer.DrainFocus( thePlayer.GetStatMax( BCS_Focus ) * 1/3);
+						}
+						else if( thePlayer.GetStat( BCS_Focus ) == thePlayer.GetStatMax(BCS_Focus) ) 
+						{
+							thePlayer.DrainFocus( thePlayer.GetStatMax( BCS_Focus ) * 1/3);
+						}
+					}
 					else
 					{
 						if( thePlayer.IsAlive()) {thePlayer.ClearAnimationSpeedMultipliers();}	
@@ -50645,6 +51006,32 @@ statemachine abstract class W3ACSWatcher extends CEntity
 						if( thePlayer.IsAlive()) {thePlayer.ClearAnimationSpeedMultipliers();}	
 
 						geraltRandomGeraltLightAttackForward_Viper();
+					}
+					else if (theInput.GetActionValue('Dodge') > 0.7
+					&& thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus ) * 1/3 )
+					{
+						ACS_Tutorial_Display_Check('ACS_Weapon_Arts_Tutorial_Shown');
+
+						RemoveTimer('RollDelay');
+
+						ACSCreateFireSwordFX();
+
+						if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus )/3
+						&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus ) * 2/3) 
+						{	
+							
+							thePlayer.DrainFocus( thePlayer.GetStatMax( BCS_Focus ) );
+						}
+						else if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus ) * 2/3
+						&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus )) 
+						{	
+							
+							thePlayer.DrainFocus( thePlayer.GetStatMax( BCS_Focus ) * 1/3);
+						}
+						else if( thePlayer.GetStat( BCS_Focus ) == thePlayer.GetStatMax(BCS_Focus) ) 
+						{
+							thePlayer.DrainFocus( thePlayer.GetStatMax( BCS_Focus ) * 1/3);
+						}
 					}
 					else
 					{
@@ -50810,6 +51197,32 @@ statemachine abstract class W3ACSWatcher extends CEntity
 					{
 						geraltRandomGeraltLightAttackForward_Wolf();
 					}
+					else if (theInput.GetActionValue('Dodge') > 0.7
+					&& thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus ) * 1/3 )
+					{
+						ACS_Tutorial_Display_Check('ACS_Weapon_Arts_Tutorial_Shown');
+
+						RemoveTimer('RollDelay');
+
+						ACSCreateFireSwordFX();
+
+						if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus )/3
+						&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus ) * 2/3) 
+						{	
+							
+							thePlayer.DrainFocus( thePlayer.GetStatMax( BCS_Focus ) );
+						}
+						else if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus ) * 2/3
+						&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus )) 
+						{	
+							
+							thePlayer.DrainFocus( thePlayer.GetStatMax( BCS_Focus ) * 1/3);
+						}
+						else if( thePlayer.GetStat( BCS_Focus ) == thePlayer.GetStatMax(BCS_Focus) ) 
+						{
+							thePlayer.DrainFocus( thePlayer.GetStatMax( BCS_Focus ) * 1/3);
+						}
+					}
 					else
 					{
 						geraltRandomGeraltLightAttack_Wolf();
@@ -50974,6 +51387,32 @@ statemachine abstract class W3ACSWatcher extends CEntity
 					{
 						geraltRandomGeraltLightAttackForward_ACSArmor();
 					}
+					else if (theInput.GetActionValue('Dodge') > 0.7
+					&& thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus ) * 1/3 )
+					{
+						ACS_Tutorial_Display_Check('ACS_Weapon_Arts_Tutorial_Shown');
+
+						RemoveTimer('RollDelay');
+
+						ACSCreateFireSwordFX();
+
+						if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus )/3
+						&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus ) * 2/3) 
+						{	
+							
+							thePlayer.DrainFocus( thePlayer.GetStatMax( BCS_Focus ) );
+						}
+						else if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus ) * 2/3
+						&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus )) 
+						{	
+							
+							thePlayer.DrainFocus( thePlayer.GetStatMax( BCS_Focus ) * 1/3);
+						}
+						else if( thePlayer.GetStat( BCS_Focus ) == thePlayer.GetStatMax(BCS_Focus) ) 
+						{
+							thePlayer.DrainFocus( thePlayer.GetStatMax( BCS_Focus ) * 1/3);
+						}
+					}
 					else
 					{
 						geraltRandomGeraltLightAttack_Wolf();
@@ -51030,6 +51469,32 @@ statemachine abstract class W3ACSWatcher extends CEntity
 					if (theInput.GetActionValue('GI_AxisLeftY') > 0.5)
 					{
 						geraltRandomGeraltLightAttackForward_ACSArmor();
+					}
+					else if (theInput.GetActionValue('Dodge') > 0.7
+					&& thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus ) * 1/3 )
+					{
+						ACS_Tutorial_Display_Check('ACS_Weapon_Arts_Tutorial_Shown');
+
+						RemoveTimer('RollDelay');
+
+						ACSCreateFireSwordFX();
+
+						if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus )/3
+						&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus ) * 2/3) 
+						{	
+							
+							thePlayer.DrainFocus( thePlayer.GetStatMax( BCS_Focus ) );
+						}
+						else if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus ) * 2/3
+						&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus )) 
+						{	
+							
+							thePlayer.DrainFocus( thePlayer.GetStatMax( BCS_Focus ) * 1/3);
+						}
+						else if( thePlayer.GetStat( BCS_Focus ) == thePlayer.GetStatMax(BCS_Focus) ) 
+						{
+							thePlayer.DrainFocus( thePlayer.GetStatMax( BCS_Focus ) * 1/3);
+						}
 					}
 					else
 					{
@@ -52369,6 +52834,32 @@ statemachine abstract class W3ACSWatcher extends CEntity
 					if (theInput.GetActionValue('GI_AxisLeftY') > 0.5)
 					{
 						geraltRandomGeraltLightAttackForward_Wolf();
+					}
+					else if (theInput.GetActionValue('Dodge') > 0.7
+					&& thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus ) * 1/3 )
+					{
+						ACS_Tutorial_Display_Check('ACS_Weapon_Arts_Tutorial_Shown');
+
+						RemoveTimer('RollDelay');
+
+						ACSCreateFireSwordFX();
+
+						if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus )/3
+						&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus ) * 2/3) 
+						{	
+							
+							thePlayer.DrainFocus( thePlayer.GetStatMax( BCS_Focus ) );
+						}
+						else if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus ) * 2/3
+						&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus )) 
+						{	
+							
+							thePlayer.DrainFocus( thePlayer.GetStatMax( BCS_Focus ) * 1/3);
+						}
+						else if( thePlayer.GetStat( BCS_Focus ) == thePlayer.GetStatMax(BCS_Focus) ) 
+						{
+							thePlayer.DrainFocus( thePlayer.GetStatMax( BCS_Focus ) * 1/3);
+						}
 					}
 					else
 					{

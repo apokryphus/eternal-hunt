@@ -9171,6 +9171,18 @@ function ACS_Pre_Attack( animEventName : name, animEventType : EAnimationEventTy
 			ACS_Frost_Cone();
 		}
 	}
+
+	if (thePlayer.HasTag('ACS_Flammable_Oil_Enabled'))
+	{
+		if (thePlayer.IsAnyWeaponHeld() && !thePlayer.IsWeaponHeld('fist'))
+		{
+			ACSGetCEntity('ACS_Fire_Sword_Ent').StopEffect('fire_sparks_trail');
+			ACSGetCEntity('ACS_Fire_Sword_Ent').PlayEffect('fire_sparks_trail');
+
+			ACSCreateGolemGroundFireFX(thePlayer.GetWorldPosition() + thePlayer.GetWorldForward(), thePlayer.GetWorldRotation());
+		}
+	}
+	
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -30596,6 +30596,10 @@ function ACSCreateFrostSwordFX()
 
 	ACSGetCEntity('ACS_Frost_Sword_Ent').Destroy();
 
+	ACSGetCEntity('ACS_Fire_Sword_Ent').Destroy();
+
+	ACSGetCEntity('ACS_Fire_Sword_Ground_Fx_Ent').Destroy();
+
 	rot = thePlayer.GetWorldRotation();
 
 	pos = thePlayer.GetWorldPosition();
@@ -30613,4 +30617,130 @@ function ACSCreateFrostSwordFX()
 	ent.PlayEffectSingle('frost_sword_1');
 
 	ent.PlayEffectSingle('frost_sword_1_1');
+}
+
+function ACSCreateFireSwordFX()
+{
+	var ent, ent_flame_fx, ent_ground_fx							    : CEntity;
+	var rot                        						 				: EulerAngles;
+	var pos																: Vector;
+
+	ACSGetCEntity('ACS_Frost_Sword_Ent').Destroy();
+
+	ACSGetCEntity('ACS_Fire_Sword_Ent').Destroy();
+
+	ACSGetCEntity('ACS_Fire_Sword_Ground_Fx_Ent').Destroy();
+
+	rot = thePlayer.GetWorldRotation();
+
+	pos = thePlayer.GetWorldPosition();
+
+	ent = theGame.CreateEntity( (CEntityTemplate)LoadResource( 
+
+	"dlc\dlc_acs\data\fx\acs_sword_trail.w2ent"
+
+	, true ), pos, rot );
+
+	ent.AddTag('ACS_Fire_Sword_Ent');
+
+	ent.CreateAttachment( thePlayer, 'r_weapon', Vector( 0, 0, 0.125 ), EulerAngles(0,0,0) );
+
+	ent.PlayEffectSingle('fire_sword_1');
+
+	ent.PlayEffectSingle('fire_sparks_trail');
+
+	ent.PlayEffectSingle('runeword1_fire_trail_large');
+
+	ent.PlayEffectSingle('runeword_igni_large');
+
+	thePlayer.AddTag('ACS_Flammable_Oil_Enabled');
+
+	GetACSWatcher().RemoveTimer('RemoveFlammabeOilTag');
+	GetACSWatcher().AddTimer('RemoveFlammabeOilTag', 10, false);
+
+	ent.SoundEvent("fx_fire_geralt_fire_hit");
+
+	ent.SoundEvent("fx_fire_burning_body_strong_loop");
+
+	ent.SoundEvent("fx_fire_burning_strong_end");
+
+
+	ent_flame_fx = theGame.CreateEntity( (CEntityTemplate)LoadResource( 
+
+	"dlc\dlc_acs\data\entities\other\fx_dummy_entity_ifrit.w2ent"
+
+	, true ), ent.GetWorldPosition(), ent.GetWorldRotation() );
+
+	ent_flame_fx.CreateAttachment( thePlayer, 'r_weapon', Vector( 0, 0, 0.125 ), EulerAngles(0,0,0) );
+
+	ent_flame_fx.PlayEffectSingle('hit_fire');
+
+	ent_flame_fx.DestroyAfter(5);
+
+
+
+
+	ent_ground_fx = theGame.CreateEntity( (CEntityTemplate)LoadResource( 
+
+	"dlc\dlc_acs\data\fx\acs_sword_trail.w2ent"
+
+	, true ), pos, rot );
+
+	ent_ground_fx.AddTag('ACS_Fire_Sword_Ground_Fx_Ent');
+
+	ent_ground_fx.CreateAttachment( thePlayer, , Vector( 1.5, 0, 0 ), EulerAngles(0,0,0) );
+
+	ent_ground_fx.PlayEffectSingle('golem_ground_fire_fx');
+
+	if ( !theSound.SoundIsBankLoaded("mq_nml_1035.bnk") )
+	{
+		theSound.SoundLoadBank( "mq_nml_1035.bnk", false );
+	}
+
+	GetWitcherPlayer().SoundEvent("scene_weapon_sword_unsheat_fast");
+	GetWitcherPlayer().SoundEvent("scene_weapon_sword_unsheat_fast");
+	GetWitcherPlayer().SoundEvent("scene_weapon_sword_unsheat_fast");
+	GetWitcherPlayer().SoundEvent("scene_weapon_sword_unsheat_fast");
+	GetWitcherPlayer().SoundEvent("scene_weapon_sword_unsheat_fast");
+}
+
+function ACSCreateGolemGroundFireFX( pos: Vector, rot: EulerAngles )
+{
+	var ent_ground_fx									          	  	: CEntity;
+	
+	pos.X += 1.5;
+
+	ent_ground_fx = theGame.CreateEntity( (CEntityTemplate)LoadResource( 
+
+	"dlc\dlc_acs\data\fx\acs_sword_trail.w2ent"
+
+	, true ), pos, rot );
+
+	if (RandF()<0.5)
+	{
+		ent_ground_fx.PlayEffectSingle('golem_fire_fx');
+	}
+	else
+	{
+		ent_ground_fx.PlayEffectSingle('golem_ground_fire_fx');
+	}
+
+	ent_ground_fx.DestroyAfter(5);
+}
+
+function ACSCreateFireHitFX( pos: Vector, rot: EulerAngles )
+{
+	var ent_ground_fx									          	  	: CEntity;
+	
+	pos.Z += 1.5;
+
+	ent_ground_fx = theGame.CreateEntity( (CEntityTemplate)LoadResource( 
+
+	"dlc\dlc_acs\data\entities\other\fx_dummy_entity_ifrit.w2ent"
+
+	, true ), pos, rot );
+
+	ent_ground_fx.PlayEffectSingle('hit_fire');
+
+	ent_ground_fx.DestroyAfter(5);
 }

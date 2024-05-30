@@ -9829,6 +9829,36 @@ function ACS_Player_Attack(action: W3DamageAction)
 			return;
 		}
 
+		if (thePlayer.HasTag('ACS_Flammable_Oil_Enabled')
+		&& !action.IsDoTDamage() 
+		&& action.IsActionMelee() 
+		)
+		{
+			ACSCreateGolemGroundFireFX(npc.GetWorldPosition(), npc.GetWorldRotation());
+
+			ACSCreateFireHitFX(npc.GetWorldPosition(), npc.GetWorldRotation());
+
+			npc.SoundEvent("fx_fire_geralt_fire_hit");
+
+			npc.SoundEvent("fx_fire_burning_strong_begin");
+
+			npc.SoundEvent("fx_fire_burning_strong_end");
+			
+			dmg = new W3DamageAction in theGame.damageMgr;
+		
+			dmg.Initialize(GetWitcherPlayer(), npc, NULL, GetWitcherPlayer().GetName(), EHRT_Heavy, CPS_Undefined, false, false, true, false);
+			
+			dmg.SetProcessBuffsIfNoDamage(true);
+
+			dmg.AddDamage( theGame.params.DAMAGE_NAME_FIRE, 1 );
+
+			dmg.AddEffectInfo( EET_Burning, 1 );
+				
+			theGame.damageMgr.ProcessAction( dmg );
+				
+			delete dmg;	
+		}
+
 		if (ACS_Armor_Equipped_Check() 
 		&& !action.IsDoTDamage() 
 		&& action.IsActionMelee() 
