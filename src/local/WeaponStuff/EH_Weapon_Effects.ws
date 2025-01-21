@@ -1533,125 +1533,125 @@ function ACSAardSwordUpdateEnhancements()
 
 	if ( runeCount > 0 && ( ( runeCount - 1 ) < enhancements.Size() ) )
 	{
-		ACSGetCEntity('aard_blade_1').StopEffect( ACS_GetRuneLevel( runeCount ) );
-		ACSGetCEntity('aard_blade_1').StopEffect( ACS_GetRuneFxName( enhancements[ runeCount - 1 ] ) );
+		ACSGetCEntity('acs_aard_blade_1').StopEffect( ACS_GetRuneLevel( runeCount ) );
+		ACSGetCEntity('acs_aard_blade_1').StopEffect( ACS_GetRuneFxName( enhancements[ runeCount - 1 ] ) );
 
-		ACSGetCEntity('aard_blade_2').StopEffect( ACS_GetRuneLevel( runeCount ) );
-		ACSGetCEntity('aard_blade_2').StopEffect( ACS_GetRuneFxName( enhancements[ runeCount - 1 ] ) );
+		ACSGetCEntity('acs_aard_blade_2').StopEffect( ACS_GetRuneLevel( runeCount ) );
+		ACSGetCEntity('acs_aard_blade_2').StopEffect( ACS_GetRuneFxName( enhancements[ runeCount - 1 ] ) );
 
-		ACSGetCEntity('aard_blade_3').StopEffect( ACS_GetRuneLevel( runeCount ) );
-		ACSGetCEntity('aard_blade_3').StopEffect( ACS_GetRuneFxName( enhancements[ runeCount - 1 ] ) );
+		ACSGetCEntity('acs_aard_blade_3').StopEffect( ACS_GetRuneLevel( runeCount ) );
+		ACSGetCEntity('acs_aard_blade_3').StopEffect( ACS_GetRuneFxName( enhancements[ runeCount - 1 ] ) );
 
-		ACSGetCEntity('aard_blade_4').StopEffect( ACS_GetRuneLevel( runeCount ) );
-		ACSGetCEntity('aard_blade_4').StopEffect( ACS_GetRuneFxName( enhancements[ runeCount - 1 ] ) );
+		ACSGetCEntity('acs_aard_blade_4').StopEffect( ACS_GetRuneLevel( runeCount ) );
+		ACSGetCEntity('acs_aard_blade_4').StopEffect( ACS_GetRuneFxName( enhancements[ runeCount - 1 ] ) );
 
-		ACSGetCEntity('aard_blade_5').StopEffect( ACS_GetRuneLevel( runeCount ) );
-		ACSGetCEntity('aard_blade_5').StopEffect( ACS_GetRuneFxName( enhancements[ runeCount - 1 ] ) );
+		ACSGetCEntity('acs_aard_blade_5').StopEffect( ACS_GetRuneLevel( runeCount ) );
+		ACSGetCEntity('acs_aard_blade_5').StopEffect( ACS_GetRuneFxName( enhancements[ runeCount - 1 ] ) );
 
-		ACSGetCEntity('aard_blade_6').StopEffect( ACS_GetRuneLevel( runeCount ) );
-		ACSGetCEntity('aard_blade_6').StopEffect( ACS_GetRuneFxName( enhancements[ runeCount - 1 ] ) );
+		ACSGetCEntity('acs_aard_blade_6').StopEffect( ACS_GetRuneLevel( runeCount ) );
+		ACSGetCEntity('acs_aard_blade_6').StopEffect( ACS_GetRuneFxName( enhancements[ runeCount - 1 ] ) );
 
-		ACSGetCEntity('aard_blade_7').StopEffect( ACS_GetRuneLevel( runeCount ) );
-		ACSGetCEntity('aard_blade_7').StopEffect( ACS_GetRuneFxName( enhancements[ runeCount - 1 ] ) );
+		ACSGetCEntity('acs_aard_blade_7').StopEffect( ACS_GetRuneLevel( runeCount ) );
+		ACSGetCEntity('acs_aard_blade_7').StopEffect( ACS_GetRuneFxName( enhancements[ runeCount - 1 ] ) );
 
-		ACSGetCEntity('aard_blade_8').StopEffect( ACS_GetRuneLevel( runeCount ) );
-		ACSGetCEntity('aard_blade_8').StopEffect( ACS_GetRuneFxName( enhancements[ runeCount - 1 ] ) );
+		ACSGetCEntity('acs_aard_blade_8').StopEffect( ACS_GetRuneLevel( runeCount ) );
+		ACSGetCEntity('acs_aard_blade_8').StopEffect( ACS_GetRuneFxName( enhancements[ runeCount - 1 ] ) );
 
-		ACSGetCEntity('aard_blade_1').PlayEffectSingle( ACS_GetRuneLevel( runeCount ) );
-		ACSGetCEntity('aard_blade_1').PlayEffectSingle( ACS_GetRuneFxName( enhancements[ runeCount - 1 ] ) );
+		ACSGetCEntity('acs_aard_blade_1').PlayEffectSingle( ACS_GetRuneLevel( runeCount ) );
+		ACSGetCEntity('acs_aard_blade_1').PlayEffectSingle( ACS_GetRuneFxName( enhancements[ runeCount - 1 ] ) );
 
-		ACSGetCEntity('aard_blade_2').PlayEffectSingle( ACS_GetRuneLevel( runeCount ) );
-		ACSGetCEntity('aard_blade_2').PlayEffectSingle( ACS_GetRuneFxName( enhancements[ runeCount - 1 ] ) );
+		ACSGetCEntity('acs_aard_blade_2').PlayEffectSingle( ACS_GetRuneLevel( runeCount ) );
+		ACSGetCEntity('acs_aard_blade_2').PlayEffectSingle( ACS_GetRuneFxName( enhancements[ runeCount - 1 ] ) );
 
-		ACSGetCEntity('aard_blade_3').PlayEffectSingle( ACS_GetRuneLevel( runeCount ) );
-		ACSGetCEntity('aard_blade_3').PlayEffectSingle( ACS_GetRuneFxName( enhancements[ runeCount - 1 ] ) );
+		ACSGetCEntity('acs_aard_blade_3').PlayEffectSingle( ACS_GetRuneLevel( runeCount ) );
+		ACSGetCEntity('acs_aard_blade_3').PlayEffectSingle( ACS_GetRuneFxName( enhancements[ runeCount - 1 ] ) );
 
-		ACSGetCEntity('aard_blade_4').PlayEffectSingle( ACS_GetRuneLevel( runeCount ) );
-		ACSGetCEntity('aard_blade_4').PlayEffectSingle( ACS_GetRuneFxName( enhancements[ runeCount - 1 ] ) );
+		ACSGetCEntity('acs_aard_blade_4').PlayEffectSingle( ACS_GetRuneLevel( runeCount ) );
+		ACSGetCEntity('acs_aard_blade_4').PlayEffectSingle( ACS_GetRuneFxName( enhancements[ runeCount - 1 ] ) );
 
-		ACSGetCEntity('aard_blade_5').PlayEffectSingle( ACS_GetRuneLevel( runeCount ) );
-		ACSGetCEntity('aard_blade_5').PlayEffectSingle( ACS_GetRuneFxName( enhancements[ runeCount - 1 ] ) );
+		ACSGetCEntity('acs_aard_blade_5').PlayEffectSingle( ACS_GetRuneLevel( runeCount ) );
+		ACSGetCEntity('acs_aard_blade_5').PlayEffectSingle( ACS_GetRuneFxName( enhancements[ runeCount - 1 ] ) );
 
-		ACSGetCEntity('aard_blade_6').PlayEffectSingle( ACS_GetRuneLevel( runeCount ) );
-		ACSGetCEntity('aard_blade_6').PlayEffectSingle( ACS_GetRuneFxName( enhancements[ runeCount - 1 ] ) );
+		ACSGetCEntity('acs_aard_blade_6').PlayEffectSingle( ACS_GetRuneLevel( runeCount ) );
+		ACSGetCEntity('acs_aard_blade_6').PlayEffectSingle( ACS_GetRuneFxName( enhancements[ runeCount - 1 ] ) );
 
-		ACSGetCEntity('aard_blade_7').PlayEffectSingle( ACS_GetRuneLevel( runeCount ) );
-		ACSGetCEntity('aard_blade_7').PlayEffectSingle( ACS_GetRuneFxName( enhancements[ runeCount - 1 ] ) );
+		ACSGetCEntity('acs_aard_blade_7').PlayEffectSingle( ACS_GetRuneLevel( runeCount ) );
+		ACSGetCEntity('acs_aard_blade_7').PlayEffectSingle( ACS_GetRuneFxName( enhancements[ runeCount - 1 ] ) );
 
-		ACSGetCEntity('aard_blade_8').PlayEffectSingle( ACS_GetRuneLevel( runeCount ) );
-		ACSGetCEntity('aard_blade_8').PlayEffectSingle( ACS_GetRuneFxName( enhancements[ runeCount - 1 ] ) );
+		ACSGetCEntity('acs_aard_blade_8').PlayEffectSingle( ACS_GetRuneLevel( runeCount ) );
+		ACSGetCEntity('acs_aard_blade_8').PlayEffectSingle( ACS_GetRuneFxName( enhancements[ runeCount - 1 ] ) );
 	}
 	else if ( 3 == runeCount && 1 == enhancements.Size() )
 	{
-		ACSGetCEntity('aard_blade_1').StopEffect( ACS_GetRuneLevel( runeCount ) );
-		ACSGetCEntity('aard_blade_1').StopEffect( ACS_GetEnchantmentFxName( enhancements[ 0 ] ) );
+		ACSGetCEntity('acs_aard_blade_1').StopEffect( ACS_GetRuneLevel( runeCount ) );
+		ACSGetCEntity('acs_aard_blade_1').StopEffect( ACS_GetEnchantmentFxName( enhancements[ 0 ] ) );
 
-		ACSGetCEntity('aard_blade_2').StopEffect( ACS_GetRuneLevel( runeCount ) );
-		ACSGetCEntity('aard_blade_2').StopEffect( ACS_GetEnchantmentFxName( enhancements[ 0 ] ) );
+		ACSGetCEntity('acs_aard_blade_2').StopEffect( ACS_GetRuneLevel( runeCount ) );
+		ACSGetCEntity('acs_aard_blade_2').StopEffect( ACS_GetEnchantmentFxName( enhancements[ 0 ] ) );
 
-		ACSGetCEntity('aard_blade_3').StopEffect( ACS_GetRuneLevel( runeCount ) );
-		ACSGetCEntity('aard_blade_3').StopEffect( ACS_GetEnchantmentFxName( enhancements[ 0 ] ) );
+		ACSGetCEntity('acs_aard_blade_3').StopEffect( ACS_GetRuneLevel( runeCount ) );
+		ACSGetCEntity('acs_aard_blade_3').StopEffect( ACS_GetEnchantmentFxName( enhancements[ 0 ] ) );
 
-		ACSGetCEntity('aard_blade_4').StopEffect( ACS_GetRuneLevel( runeCount ) );
-		ACSGetCEntity('aard_blade_4').StopEffect( ACS_GetEnchantmentFxName( enhancements[ 0 ] ) );
+		ACSGetCEntity('acs_aard_blade_4').StopEffect( ACS_GetRuneLevel( runeCount ) );
+		ACSGetCEntity('acs_aard_blade_4').StopEffect( ACS_GetEnchantmentFxName( enhancements[ 0 ] ) );
 
-		ACSGetCEntity('aard_blade_5').StopEffect( ACS_GetRuneLevel( runeCount ) );
-		ACSGetCEntity('aard_blade_5').StopEffect( ACS_GetEnchantmentFxName( enhancements[ 0 ] ) );
+		ACSGetCEntity('acs_aard_blade_5').StopEffect( ACS_GetRuneLevel( runeCount ) );
+		ACSGetCEntity('acs_aard_blade_5').StopEffect( ACS_GetEnchantmentFxName( enhancements[ 0 ] ) );
 
-		ACSGetCEntity('aard_blade_6').StopEffect( ACS_GetRuneLevel( runeCount ) );
-		ACSGetCEntity('aard_blade_6').StopEffect( ACS_GetEnchantmentFxName( enhancements[ 0 ] ) );
+		ACSGetCEntity('acs_aard_blade_6').StopEffect( ACS_GetRuneLevel( runeCount ) );
+		ACSGetCEntity('acs_aard_blade_6').StopEffect( ACS_GetEnchantmentFxName( enhancements[ 0 ] ) );
 
-		ACSGetCEntity('aard_blade_7').StopEffect( ACS_GetRuneLevel( runeCount ) );
-		ACSGetCEntity('aard_blade_7').StopEffect( ACS_GetEnchantmentFxName( enhancements[ 0 ] ) );
+		ACSGetCEntity('acs_aard_blade_7').StopEffect( ACS_GetRuneLevel( runeCount ) );
+		ACSGetCEntity('acs_aard_blade_7').StopEffect( ACS_GetEnchantmentFxName( enhancements[ 0 ] ) );
 
-		ACSGetCEntity('aard_blade_8').StopEffect( ACS_GetRuneLevel( runeCount ) );
-		ACSGetCEntity('aard_blade_8').StopEffect( ACS_GetEnchantmentFxName( enhancements[ 0 ] ) );
+		ACSGetCEntity('acs_aard_blade_8').StopEffect( ACS_GetRuneLevel( runeCount ) );
+		ACSGetCEntity('acs_aard_blade_8').StopEffect( ACS_GetEnchantmentFxName( enhancements[ 0 ] ) );
 
-		ACSGetCEntity('aard_blade_1').PlayEffectSingle( ACS_GetRuneLevel( runeCount ) );
-		ACSGetCEntity('aard_blade_1').PlayEffectSingle( ACS_GetEnchantmentFxName( enhancements[ 0 ] ) );
+		ACSGetCEntity('acs_aard_blade_1').PlayEffectSingle( ACS_GetRuneLevel( runeCount ) );
+		ACSGetCEntity('acs_aard_blade_1').PlayEffectSingle( ACS_GetEnchantmentFxName( enhancements[ 0 ] ) );
 
-		ACSGetCEntity('aard_blade_2').PlayEffectSingle( ACS_GetRuneLevel( runeCount ) );
-		ACSGetCEntity('aard_blade_2').PlayEffectSingle( ACS_GetEnchantmentFxName( enhancements[ 0 ] ) );
+		ACSGetCEntity('acs_aard_blade_2').PlayEffectSingle( ACS_GetRuneLevel( runeCount ) );
+		ACSGetCEntity('acs_aard_blade_2').PlayEffectSingle( ACS_GetEnchantmentFxName( enhancements[ 0 ] ) );
 
-		ACSGetCEntity('aard_blade_3').PlayEffectSingle( ACS_GetRuneLevel( runeCount ) );
-		ACSGetCEntity('aard_blade_3').PlayEffectSingle( ACS_GetEnchantmentFxName( enhancements[ 0 ] ) );
+		ACSGetCEntity('acs_aard_blade_3').PlayEffectSingle( ACS_GetRuneLevel( runeCount ) );
+		ACSGetCEntity('acs_aard_blade_3').PlayEffectSingle( ACS_GetEnchantmentFxName( enhancements[ 0 ] ) );
 
-		ACSGetCEntity('aard_blade_4').PlayEffectSingle( ACS_GetRuneLevel( runeCount ) );
-		ACSGetCEntity('aard_blade_4').PlayEffectSingle( ACS_GetEnchantmentFxName( enhancements[ 0 ] ) );
+		ACSGetCEntity('acs_aard_blade_4').PlayEffectSingle( ACS_GetRuneLevel( runeCount ) );
+		ACSGetCEntity('acs_aard_blade_4').PlayEffectSingle( ACS_GetEnchantmentFxName( enhancements[ 0 ] ) );
 
-		ACSGetCEntity('aard_blade_5').PlayEffectSingle( ACS_GetRuneLevel( runeCount ) );
-		ACSGetCEntity('aard_blade_5').PlayEffectSingle( ACS_GetEnchantmentFxName( enhancements[ 0 ] ) );
+		ACSGetCEntity('acs_aard_blade_5').PlayEffectSingle( ACS_GetRuneLevel( runeCount ) );
+		ACSGetCEntity('acs_aard_blade_5').PlayEffectSingle( ACS_GetEnchantmentFxName( enhancements[ 0 ] ) );
 
-		ACSGetCEntity('aard_blade_6').PlayEffectSingle( ACS_GetRuneLevel( runeCount ) );
-		ACSGetCEntity('aard_blade_6').PlayEffectSingle( ACS_GetEnchantmentFxName( enhancements[ 0 ] ) );
+		ACSGetCEntity('acs_aard_blade_6').PlayEffectSingle( ACS_GetRuneLevel( runeCount ) );
+		ACSGetCEntity('acs_aard_blade_6').PlayEffectSingle( ACS_GetEnchantmentFxName( enhancements[ 0 ] ) );
 
-		ACSGetCEntity('aard_blade_7').PlayEffectSingle( ACS_GetRuneLevel( runeCount ) );
-		ACSGetCEntity('aard_blade_7').PlayEffectSingle( ACS_GetEnchantmentFxName( enhancements[ 0 ] ) );
+		ACSGetCEntity('acs_aard_blade_7').PlayEffectSingle( ACS_GetRuneLevel( runeCount ) );
+		ACSGetCEntity('acs_aard_blade_7').PlayEffectSingle( ACS_GetEnchantmentFxName( enhancements[ 0 ] ) );
 
-		ACSGetCEntity('aard_blade_8').PlayEffectSingle( ACS_GetRuneLevel( runeCount ) );
-		ACSGetCEntity('aard_blade_8').PlayEffectSingle( ACS_GetEnchantmentFxName( enhancements[ 0 ] ) );
+		ACSGetCEntity('acs_aard_blade_8').PlayEffectSingle( ACS_GetRuneLevel( runeCount ) );
+		ACSGetCEntity('acs_aard_blade_8').PlayEffectSingle( ACS_GetEnchantmentFxName( enhancements[ 0 ] ) );
 	}
 
-	ACSGetCEntity('aard_blade_1').PlayEffectSingle('rune_blast_loop');
-	ACSGetCEntity('aard_blade_2').PlayEffectSingle('rune_blast_loop');
-	ACSGetCEntity('aard_blade_3').PlayEffectSingle('rune_blast_loop');
-	ACSGetCEntity('aard_blade_4').PlayEffectSingle('rune_blast_loop');
-	ACSGetCEntity('aard_blade_5').PlayEffectSingle('rune_blast_loop');
-	ACSGetCEntity('aard_blade_6').PlayEffectSingle('rune_blast_loop');
-	ACSGetCEntity('aard_blade_7').PlayEffectSingle('rune_blast_loop');
-	ACSGetCEntity('aard_blade_8').PlayEffectSingle('rune_blast_loop');
+	ACSGetCEntity('acs_aard_blade_1').PlayEffectSingle('rune_blast_loop');
+	ACSGetCEntity('acs_aard_blade_2').PlayEffectSingle('rune_blast_loop');
+	ACSGetCEntity('acs_aard_blade_3').PlayEffectSingle('rune_blast_loop');
+	ACSGetCEntity('acs_aard_blade_4').PlayEffectSingle('rune_blast_loop');
+	ACSGetCEntity('acs_aard_blade_5').PlayEffectSingle('rune_blast_loop');
+	ACSGetCEntity('acs_aard_blade_6').PlayEffectSingle('rune_blast_loop');
+	ACSGetCEntity('acs_aard_blade_7').PlayEffectSingle('rune_blast_loop');
+	ACSGetCEntity('acs_aard_blade_8').PlayEffectSingle('rune_blast_loop');
 }
 
 function acs_aard_blade_stop_effects()
 {
-	ACSGetCEntity('aard_blade_1').StopAllEffects();
-	ACSGetCEntity('aard_blade_2').StopAllEffects();
-	ACSGetCEntity('aard_blade_3').StopAllEffects();
-	ACSGetCEntity('aard_blade_4').StopAllEffects();
-	ACSGetCEntity('aard_blade_5').StopAllEffects();
-	ACSGetCEntity('aard_blade_6').StopAllEffects();
-	ACSGetCEntity('aard_blade_7').StopAllEffects();
-	ACSGetCEntity('aard_blade_8').StopAllEffects();
+	ACSGetCEntity('acs_aard_blade_1').StopAllEffects();
+	ACSGetCEntity('acs_aard_blade_2').StopAllEffects();
+	ACSGetCEntity('acs_aard_blade_3').StopAllEffects();
+	ACSGetCEntity('acs_aard_blade_4').StopAllEffects();
+	ACSGetCEntity('acs_aard_blade_5').StopAllEffects();
+	ACSGetCEntity('acs_aard_blade_6').StopAllEffects();
+	ACSGetCEntity('acs_aard_blade_7').StopAllEffects();
+	ACSGetCEntity('acs_aard_blade_8').StopAllEffects();
 
 	ACSAardSwordUpdateEnhancements();
 }
@@ -1660,145 +1660,145 @@ function acs_aard_blade_trail()
 {
 	acs_aard_blade_stop_effects();
 
-	ACSGetCEntity('aard_blade_1').PlayEffectSingle('special_trail_fx');
-	ACSGetCEntity('aard_blade_2').PlayEffectSingle('special_trail_fx');
-	ACSGetCEntity('aard_blade_3').PlayEffectSingle('special_trail_fx');
-	ACSGetCEntity('aard_blade_4').PlayEffectSingle('special_trail_fx');
-	ACSGetCEntity('aard_blade_5').PlayEffectSingle('special_trail_fx');
-	ACSGetCEntity('aard_blade_6').PlayEffectSingle('special_trail_fx');
-	ACSGetCEntity('aard_blade_7').PlayEffectSingle('special_trail_fx');
-	ACSGetCEntity('aard_blade_8').PlayEffectSingle('special_trail_fx');
+	ACSGetCEntity('acs_aard_blade_1').PlayEffectSingle('special_trail_fx');
+	ACSGetCEntity('acs_aard_blade_2').PlayEffectSingle('special_trail_fx');
+	ACSGetCEntity('acs_aard_blade_3').PlayEffectSingle('special_trail_fx');
+	ACSGetCEntity('acs_aard_blade_4').PlayEffectSingle('special_trail_fx');
+	ACSGetCEntity('acs_aard_blade_5').PlayEffectSingle('special_trail_fx');
+	ACSGetCEntity('acs_aard_blade_6').PlayEffectSingle('special_trail_fx');
+	ACSGetCEntity('acs_aard_blade_7').PlayEffectSingle('special_trail_fx');
+	ACSGetCEntity('acs_aard_blade_8').PlayEffectSingle('special_trail_fx');
 
 	if (GetWitcherPlayer().GetEquippedSign() == ST_Igni)
 	{
-		ACSGetCEntity('aard_blade_1').PlayEffectSingle('fire_sparks_trail');
-		ACSGetCEntity('aard_blade_2').PlayEffectSingle('fire_sparks_trail');
-		ACSGetCEntity('aard_blade_3').PlayEffectSingle('fire_sparks_trail');
-		ACSGetCEntity('aard_blade_4').PlayEffectSingle('fire_sparks_trail');
-		ACSGetCEntity('aard_blade_5').PlayEffectSingle('fire_sparks_trail');
-		ACSGetCEntity('aard_blade_6').PlayEffectSingle('fire_sparks_trail');
-		ACSGetCEntity('aard_blade_7').PlayEffectSingle('fire_sparks_trail');
-		ACSGetCEntity('aard_blade_8').PlayEffectSingle('fire_sparks_trail');
+		ACSGetCEntity('acs_aard_blade_1').PlayEffectSingle('fire_sparks_trail');
+		ACSGetCEntity('acs_aard_blade_2').PlayEffectSingle('fire_sparks_trail');
+		ACSGetCEntity('acs_aard_blade_3').PlayEffectSingle('fire_sparks_trail');
+		ACSGetCEntity('acs_aard_blade_4').PlayEffectSingle('fire_sparks_trail');
+		ACSGetCEntity('acs_aard_blade_5').PlayEffectSingle('fire_sparks_trail');
+		ACSGetCEntity('acs_aard_blade_6').PlayEffectSingle('fire_sparks_trail');
+		ACSGetCEntity('acs_aard_blade_7').PlayEffectSingle('fire_sparks_trail');
+		ACSGetCEntity('acs_aard_blade_8').PlayEffectSingle('fire_sparks_trail');
 
-		ACSGetCEntity('aard_blade_1').PlayEffectSingle('runeword1_fire_trail');
-		ACSGetCEntity('aard_blade_2').PlayEffectSingle('runeword1_fire_trail');
-		ACSGetCEntity('aard_blade_3').PlayEffectSingle('runeword1_fire_trail');
-		ACSGetCEntity('aard_blade_4').PlayEffectSingle('runeword1_fire_trail');
-		ACSGetCEntity('aard_blade_5').PlayEffectSingle('runeword1_fire_trail');
-		ACSGetCEntity('aard_blade_6').PlayEffectSingle('runeword1_fire_trail');
-		ACSGetCEntity('aard_blade_7').PlayEffectSingle('runeword1_fire_trail');
-		ACSGetCEntity('aard_blade_8').PlayEffectSingle('runeword1_fire_trail');
+		ACSGetCEntity('acs_aard_blade_1').PlayEffectSingle('runeword1_fire_trail');
+		ACSGetCEntity('acs_aard_blade_2').PlayEffectSingle('runeword1_fire_trail');
+		ACSGetCEntity('acs_aard_blade_3').PlayEffectSingle('runeword1_fire_trail');
+		ACSGetCEntity('acs_aard_blade_4').PlayEffectSingle('runeword1_fire_trail');
+		ACSGetCEntity('acs_aard_blade_5').PlayEffectSingle('runeword1_fire_trail');
+		ACSGetCEntity('acs_aard_blade_6').PlayEffectSingle('runeword1_fire_trail');
+		ACSGetCEntity('acs_aard_blade_7').PlayEffectSingle('runeword1_fire_trail');
+		ACSGetCEntity('acs_aard_blade_8').PlayEffectSingle('runeword1_fire_trail');
 		
-		ACSGetCEntity('aard_blade_1').PlayEffectSingle('runeword_igni');
-		ACSGetCEntity('aard_blade_2').PlayEffectSingle('runeword_igni');
-		ACSGetCEntity('aard_blade_3').PlayEffectSingle('runeword_igni');
-		ACSGetCEntity('aard_blade_4').PlayEffectSingle('runeword_igni');
-		ACSGetCEntity('aard_blade_5').PlayEffectSingle('runeword_igni');
-		ACSGetCEntity('aard_blade_6').PlayEffectSingle('runeword_igni');
-		ACSGetCEntity('aard_blade_7').PlayEffectSingle('runeword_igni');
-		ACSGetCEntity('aard_blade_8').PlayEffectSingle('runeword_igni');
+		ACSGetCEntity('acs_aard_blade_1').PlayEffectSingle('runeword_igni');
+		ACSGetCEntity('acs_aard_blade_2').PlayEffectSingle('runeword_igni');
+		ACSGetCEntity('acs_aard_blade_3').PlayEffectSingle('runeword_igni');
+		ACSGetCEntity('acs_aard_blade_4').PlayEffectSingle('runeword_igni');
+		ACSGetCEntity('acs_aard_blade_5').PlayEffectSingle('runeword_igni');
+		ACSGetCEntity('acs_aard_blade_6').PlayEffectSingle('runeword_igni');
+		ACSGetCEntity('acs_aard_blade_7').PlayEffectSingle('runeword_igni');
+		ACSGetCEntity('acs_aard_blade_8').PlayEffectSingle('runeword_igni');
 	}
 	else if (GetWitcherPlayer().GetEquippedSign() == ST_Axii)
 	{
-		ACSGetCEntity('aard_blade_1').PlayEffectSingle('ice_sparks_trail');
-		ACSGetCEntity('aard_blade_2').PlayEffectSingle('ice_sparks_trail');
-		ACSGetCEntity('aard_blade_3').PlayEffectSingle('ice_sparks_trail');
-		ACSGetCEntity('aard_blade_4').PlayEffectSingle('ice_sparks_trail');
-		ACSGetCEntity('aard_blade_5').PlayEffectSingle('ice_sparks_trail');
-		ACSGetCEntity('aard_blade_6').PlayEffectSingle('ice_sparks_trail');
-		ACSGetCEntity('aard_blade_7').PlayEffectSingle('ice_sparks_trail');
-		ACSGetCEntity('aard_blade_8').PlayEffectSingle('ice_sparks_trail');
+		ACSGetCEntity('acs_aard_blade_1').PlayEffectSingle('ice_sparks_trail');
+		ACSGetCEntity('acs_aard_blade_2').PlayEffectSingle('ice_sparks_trail');
+		ACSGetCEntity('acs_aard_blade_3').PlayEffectSingle('ice_sparks_trail');
+		ACSGetCEntity('acs_aard_blade_4').PlayEffectSingle('ice_sparks_trail');
+		ACSGetCEntity('acs_aard_blade_5').PlayEffectSingle('ice_sparks_trail');
+		ACSGetCEntity('acs_aard_blade_6').PlayEffectSingle('ice_sparks_trail');
+		ACSGetCEntity('acs_aard_blade_7').PlayEffectSingle('ice_sparks_trail');
+		ACSGetCEntity('acs_aard_blade_8').PlayEffectSingle('ice_sparks_trail');
 		
-		ACSGetCEntity('aard_blade_1').PlayEffectSingle('runeword_axii');
-		ACSGetCEntity('aard_blade_2').PlayEffectSingle('runeword_axii');
-		ACSGetCEntity('aard_blade_3').PlayEffectSingle('runeword_axii');
-		ACSGetCEntity('aard_blade_4').PlayEffectSingle('runeword_axii');
-		ACSGetCEntity('aard_blade_5').PlayEffectSingle('runeword_axii');
-		ACSGetCEntity('aard_blade_6').PlayEffectSingle('runeword_axii');
-		ACSGetCEntity('aard_blade_7').PlayEffectSingle('runeword_axii');
-		ACSGetCEntity('aard_blade_8').PlayEffectSingle('runeword_axii');
+		ACSGetCEntity('acs_aard_blade_1').PlayEffectSingle('runeword_axii');
+		ACSGetCEntity('acs_aard_blade_2').PlayEffectSingle('runeword_axii');
+		ACSGetCEntity('acs_aard_blade_3').PlayEffectSingle('runeword_axii');
+		ACSGetCEntity('acs_aard_blade_4').PlayEffectSingle('runeword_axii');
+		ACSGetCEntity('acs_aard_blade_5').PlayEffectSingle('runeword_axii');
+		ACSGetCEntity('acs_aard_blade_6').PlayEffectSingle('runeword_axii');
+		ACSGetCEntity('acs_aard_blade_7').PlayEffectSingle('runeword_axii');
+		ACSGetCEntity('acs_aard_blade_8').PlayEffectSingle('runeword_axii');
 	}
 	else if (GetWitcherPlayer().GetEquippedSign() == ST_Aard)
 	{
-		ACSGetCEntity('aard_blade_1').PlayEffectSingle('aard_power');
-		ACSGetCEntity('aard_blade_2').PlayEffectSingle('aard_power');
-		ACSGetCEntity('aard_blade_3').PlayEffectSingle('aard_power');
-		ACSGetCEntity('aard_blade_4').PlayEffectSingle('aard_power');
-		ACSGetCEntity('aard_blade_5').PlayEffectSingle('aard_power');
-		ACSGetCEntity('aard_blade_6').PlayEffectSingle('aard_power');
-		ACSGetCEntity('aard_blade_7').PlayEffectSingle('aard_power');
-		ACSGetCEntity('aard_blade_8').PlayEffectSingle('aard_power');
+		ACSGetCEntity('acs_aard_blade_1').PlayEffectSingle('aard_power');
+		ACSGetCEntity('acs_aard_blade_2').PlayEffectSingle('aard_power');
+		ACSGetCEntity('acs_aard_blade_3').PlayEffectSingle('aard_power');
+		ACSGetCEntity('acs_aard_blade_4').PlayEffectSingle('aard_power');
+		ACSGetCEntity('acs_aard_blade_5').PlayEffectSingle('aard_power');
+		ACSGetCEntity('acs_aard_blade_6').PlayEffectSingle('aard_power');
+		ACSGetCEntity('acs_aard_blade_7').PlayEffectSingle('aard_power');
+		ACSGetCEntity('acs_aard_blade_8').PlayEffectSingle('aard_power');
 		
-		ACSGetCEntity('aard_blade_1').PlayEffectSingle('runeword_aard');
-		ACSGetCEntity('aard_blade_2').PlayEffectSingle('runeword_aard');
-		ACSGetCEntity('aard_blade_3').PlayEffectSingle('runeword_aard');
-		ACSGetCEntity('aard_blade_4').PlayEffectSingle('runeword_aard');
-		ACSGetCEntity('aard_blade_5').PlayEffectSingle('runeword_aard');
-		ACSGetCEntity('aard_blade_6').PlayEffectSingle('runeword_aard');
-		ACSGetCEntity('aard_blade_7').PlayEffectSingle('runeword_aard');
-		ACSGetCEntity('aard_blade_8').PlayEffectSingle('runeword_aard');
+		ACSGetCEntity('acs_aard_blade_1').PlayEffectSingle('runeword_aard');
+		ACSGetCEntity('acs_aard_blade_2').PlayEffectSingle('runeword_aard');
+		ACSGetCEntity('acs_aard_blade_3').PlayEffectSingle('runeword_aard');
+		ACSGetCEntity('acs_aard_blade_4').PlayEffectSingle('runeword_aard');
+		ACSGetCEntity('acs_aard_blade_5').PlayEffectSingle('runeword_aard');
+		ACSGetCEntity('acs_aard_blade_6').PlayEffectSingle('runeword_aard');
+		ACSGetCEntity('acs_aard_blade_7').PlayEffectSingle('runeword_aard');
+		ACSGetCEntity('acs_aard_blade_8').PlayEffectSingle('runeword_aard');
 	}
 	else if (GetWitcherPlayer().GetEquippedSign() == ST_Yrden)
 	{
-		ACSGetCEntity('aard_blade_1').PlayEffectSingle('yrden_power');
-		ACSGetCEntity('aard_blade_2').PlayEffectSingle('yrden_power');
-		ACSGetCEntity('aard_blade_3').PlayEffectSingle('yrden_power');
-		ACSGetCEntity('aard_blade_4').PlayEffectSingle('yrden_power');
-		ACSGetCEntity('aard_blade_5').PlayEffectSingle('yrden_power');
-		ACSGetCEntity('aard_blade_6').PlayEffectSingle('yrden_power');
-		ACSGetCEntity('aard_blade_7').PlayEffectSingle('yrden_power');
-		ACSGetCEntity('aard_blade_8').PlayEffectSingle('yrden_power');
+		ACSGetCEntity('acs_aard_blade_1').PlayEffectSingle('yrden_power');
+		ACSGetCEntity('acs_aard_blade_2').PlayEffectSingle('yrden_power');
+		ACSGetCEntity('acs_aard_blade_3').PlayEffectSingle('yrden_power');
+		ACSGetCEntity('acs_aard_blade_4').PlayEffectSingle('yrden_power');
+		ACSGetCEntity('acs_aard_blade_5').PlayEffectSingle('yrden_power');
+		ACSGetCEntity('acs_aard_blade_6').PlayEffectSingle('yrden_power');
+		ACSGetCEntity('acs_aard_blade_7').PlayEffectSingle('yrden_power');
+		ACSGetCEntity('acs_aard_blade_8').PlayEffectSingle('yrden_power');
 		
-		ACSGetCEntity('aard_blade_1').PlayEffectSingle('runeword_yrden');
-		ACSGetCEntity('aard_blade_2').PlayEffectSingle('runeword_yrden');
-		ACSGetCEntity('aard_blade_3').PlayEffectSingle('runeword_yrden');
-		ACSGetCEntity('aard_blade_4').PlayEffectSingle('runeword_yrden');
-		ACSGetCEntity('aard_blade_5').PlayEffectSingle('runeword_yrden');
-		ACSGetCEntity('aard_blade_6').PlayEffectSingle('runeword_yrden');
-		ACSGetCEntity('aard_blade_7').PlayEffectSingle('runeword_yrden');
-		ACSGetCEntity('aard_blade_8').PlayEffectSingle('runeword_yrden');
+		ACSGetCEntity('acs_aard_blade_1').PlayEffectSingle('runeword_yrden');
+		ACSGetCEntity('acs_aard_blade_2').PlayEffectSingle('runeword_yrden');
+		ACSGetCEntity('acs_aard_blade_3').PlayEffectSingle('runeword_yrden');
+		ACSGetCEntity('acs_aard_blade_4').PlayEffectSingle('runeword_yrden');
+		ACSGetCEntity('acs_aard_blade_5').PlayEffectSingle('runeword_yrden');
+		ACSGetCEntity('acs_aard_blade_6').PlayEffectSingle('runeword_yrden');
+		ACSGetCEntity('acs_aard_blade_7').PlayEffectSingle('runeword_yrden');
+		ACSGetCEntity('acs_aard_blade_8').PlayEffectSingle('runeword_yrden');
 	}
 	else if (GetWitcherPlayer().GetEquippedSign() == ST_Quen)
 	{
-		ACSGetCEntity('aard_blade_1').PlayEffectSingle('quen_power');
-		ACSGetCEntity('aard_blade_2').PlayEffectSingle('quen_power');
-		ACSGetCEntity('aard_blade_3').PlayEffectSingle('quen_power');
-		ACSGetCEntity('aard_blade_4').PlayEffectSingle('quen_power');
-		ACSGetCEntity('aard_blade_5').PlayEffectSingle('quen_power');
-		ACSGetCEntity('aard_blade_6').PlayEffectSingle('quen_power');
-		ACSGetCEntity('aard_blade_7').PlayEffectSingle('quen_power');
-		ACSGetCEntity('aard_blade_8').PlayEffectSingle('quen_power');
+		ACSGetCEntity('acs_aard_blade_1').PlayEffectSingle('quen_power');
+		ACSGetCEntity('acs_aard_blade_2').PlayEffectSingle('quen_power');
+		ACSGetCEntity('acs_aard_blade_3').PlayEffectSingle('quen_power');
+		ACSGetCEntity('acs_aard_blade_4').PlayEffectSingle('quen_power');
+		ACSGetCEntity('acs_aard_blade_5').PlayEffectSingle('quen_power');
+		ACSGetCEntity('acs_aard_blade_6').PlayEffectSingle('quen_power');
+		ACSGetCEntity('acs_aard_blade_7').PlayEffectSingle('quen_power');
+		ACSGetCEntity('acs_aard_blade_8').PlayEffectSingle('quen_power');
 		
-		ACSGetCEntity('aard_blade_1').PlayEffectSingle('runeword_quen');
-		ACSGetCEntity('aard_blade_2').PlayEffectSingle('runeword_quen');
-		ACSGetCEntity('aard_blade_3').PlayEffectSingle('runeword_quen');
-		ACSGetCEntity('aard_blade_4').PlayEffectSingle('runeword_quen');
-		ACSGetCEntity('aard_blade_5').PlayEffectSingle('runeword_quen');
-		ACSGetCEntity('aard_blade_6').PlayEffectSingle('runeword_quen');
-		ACSGetCEntity('aard_blade_7').PlayEffectSingle('runeword_quen');
-		ACSGetCEntity('aard_blade_8').PlayEffectSingle('runeword_quen');
+		ACSGetCEntity('acs_aard_blade_1').PlayEffectSingle('runeword_quen');
+		ACSGetCEntity('acs_aard_blade_2').PlayEffectSingle('runeword_quen');
+		ACSGetCEntity('acs_aard_blade_3').PlayEffectSingle('runeword_quen');
+		ACSGetCEntity('acs_aard_blade_4').PlayEffectSingle('runeword_quen');
+		ACSGetCEntity('acs_aard_blade_5').PlayEffectSingle('runeword_quen');
+		ACSGetCEntity('acs_aard_blade_6').PlayEffectSingle('runeword_quen');
+		ACSGetCEntity('acs_aard_blade_7').PlayEffectSingle('runeword_quen');
+		ACSGetCEntity('acs_aard_blade_8').PlayEffectSingle('runeword_quen');
 	}
 }
 
 function acs_aard_sword_summon()
 {
-	ACSGetCEntity('aard_blade_1').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('aard_blade_2').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('aard_blade_3').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('aard_blade_4').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('aard_blade_5').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('aard_blade_6').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('aard_blade_7').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('aard_blade_8').PlayEffectSingle('fire_sparks_trail');
+	ACSGetCEntity('acs_aard_blade_1').PlayEffectSingle('fire_sparks_trail');
+	ACSGetCEntity('acs_aard_blade_2').PlayEffectSingle('fire_sparks_trail');
+	ACSGetCEntity('acs_aard_blade_3').PlayEffectSingle('fire_sparks_trail');
+	ACSGetCEntity('acs_aard_blade_4').PlayEffectSingle('fire_sparks_trail');
+	ACSGetCEntity('acs_aard_blade_5').PlayEffectSingle('fire_sparks_trail');
+	ACSGetCEntity('acs_aard_blade_6').PlayEffectSingle('fire_sparks_trail');
+	ACSGetCEntity('acs_aard_blade_7').PlayEffectSingle('fire_sparks_trail');
+	ACSGetCEntity('acs_aard_blade_8').PlayEffectSingle('fire_sparks_trail');
 
-	ACSGetCEntity('aard_blade_1').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('aard_blade_2').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('aard_blade_3').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('aard_blade_4').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('aard_blade_5').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('aard_blade_6').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('aard_blade_7').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('aard_blade_8').PlayEffectSingle('runeword1_fire_trail');
+	ACSGetCEntity('acs_aard_blade_1').PlayEffectSingle('runeword1_fire_trail');
+	ACSGetCEntity('acs_aard_blade_2').PlayEffectSingle('runeword1_fire_trail');
+	ACSGetCEntity('acs_aard_blade_3').PlayEffectSingle('runeword1_fire_trail');
+	ACSGetCEntity('acs_aard_blade_4').PlayEffectSingle('runeword1_fire_trail');
+	ACSGetCEntity('acs_aard_blade_5').PlayEffectSingle('runeword1_fire_trail');
+	ACSGetCEntity('acs_aard_blade_6').PlayEffectSingle('runeword1_fire_trail');
+	ACSGetCEntity('acs_aard_blade_7').PlayEffectSingle('runeword1_fire_trail');
+	ACSGetCEntity('acs_aard_blade_8').PlayEffectSingle('runeword1_fire_trail');
 
 	ACSAardSwordUpdateEnhancements();
 }
@@ -2260,9 +2260,9 @@ function acs_yrden_sword_effect_small()
 		|| ACS_GetWeaponMode() == 1
 		|| ACS_GetWeaponMode() == 2 )
 		{
-			if (ACS_GetArmigerModeWeaponType() == 1
-			|| ACS_GetFocusModeWeaponType() == 1
-			|| ACS_GetHybridModeWeaponType() == 1)
+			if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerModeWeaponType', 0) == 1
+			|| ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeWeaponType', 0) == 1
+			|| ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeWeaponType', 0) == 1)
 			{
 				acs_yrden_sword_stop_effects();
 		
@@ -2301,9 +2301,9 @@ function acs_yrden_sword_effect_big()
 		|| ACS_GetWeaponMode() == 1
 		|| ACS_GetWeaponMode() == 2 )
 		{
-			if (ACS_GetArmigerModeWeaponType() == 1
-			|| ACS_GetFocusModeWeaponType() == 1
-			|| ACS_GetHybridModeWeaponType() == 1)
+			if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerModeWeaponType', 0) == 1
+			|| ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeWeaponType', 0) == 1
+			|| ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeWeaponType', 0) == 1)
 			{
 				acs_yrden_sword_stop_effects();
 		
@@ -2363,9 +2363,9 @@ function acs_yrden_sword_effect_around()
 		|| ACS_GetWeaponMode() == 1
 		|| ACS_GetWeaponMode() == 2 )
 		{
-			if (ACS_GetArmigerModeWeaponType() == 1
-			|| ACS_GetFocusModeWeaponType() == 1
-			|| ACS_GetHybridModeWeaponType() == 1)
+			if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerModeWeaponType', 0) == 1
+			|| ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeWeaponType', 0) == 1
+			|| ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeWeaponType', 0) == 1)
 			{
 				acs_yrden_sword_stop_effects();
 
@@ -2861,23 +2861,23 @@ function ACS_Light_Attack_Extended_Trail()
 		
 		if (GetWitcherPlayer().HasTag('acs_aard_sword_equipped'))
 		{
-			ACSGetCEntity('aard_blade_1').PlayEffectSingle('light_trail_extended_fx');
-			ACSGetCEntity('aard_blade_2').PlayEffectSingle('light_trail_extended_fx');
-			ACSGetCEntity('aard_blade_3').PlayEffectSingle('light_trail_extended_fx');
-			ACSGetCEntity('aard_blade_4').PlayEffectSingle('light_trail_extended_fx');
-			ACSGetCEntity('aard_blade_5').PlayEffectSingle('light_trail_extended_fx');
-			ACSGetCEntity('aard_blade_6').PlayEffectSingle('light_trail_extended_fx');
-			ACSGetCEntity('aard_blade_7').PlayEffectSingle('light_trail_extended_fx');
-			ACSGetCEntity('aard_blade_8').PlayEffectSingle('light_trail_extended_fx');
+			ACSGetCEntity('acs_aard_blade_1').PlayEffectSingle('light_trail_extended_fx');
+			ACSGetCEntity('acs_aard_blade_2').PlayEffectSingle('light_trail_extended_fx');
+			ACSGetCEntity('acs_aard_blade_3').PlayEffectSingle('light_trail_extended_fx');
+			ACSGetCEntity('acs_aard_blade_4').PlayEffectSingle('light_trail_extended_fx');
+			ACSGetCEntity('acs_aard_blade_5').PlayEffectSingle('light_trail_extended_fx');
+			ACSGetCEntity('acs_aard_blade_6').PlayEffectSingle('light_trail_extended_fx');
+			ACSGetCEntity('acs_aard_blade_7').PlayEffectSingle('light_trail_extended_fx');
+			ACSGetCEntity('acs_aard_blade_8').PlayEffectSingle('light_trail_extended_fx');
 
-			ACSGetCEntity('aard_blade_1').StopEffect('light_trail_extended_fx');
-			ACSGetCEntity('aard_blade_2').StopEffect('light_trail_extended_fx');
-			ACSGetCEntity('aard_blade_3').StopEffect('light_trail_extended_fx');
-			ACSGetCEntity('aard_blade_4').StopEffect('light_trail_extended_fx');
-			ACSGetCEntity('aard_blade_5').StopEffect('light_trail_extended_fx');
-			ACSGetCEntity('aard_blade_6').StopEffect('light_trail_extended_fx');
-			ACSGetCEntity('aard_blade_7').StopEffect('light_trail_extended_fx');
-			ACSGetCEntity('aard_blade_8').StopEffect('light_trail_extended_fx');
+			ACSGetCEntity('acs_aard_blade_1').StopEffect('light_trail_extended_fx');
+			ACSGetCEntity('acs_aard_blade_2').StopEffect('light_trail_extended_fx');
+			ACSGetCEntity('acs_aard_blade_3').StopEffect('light_trail_extended_fx');
+			ACSGetCEntity('acs_aard_blade_4').StopEffect('light_trail_extended_fx');
+			ACSGetCEntity('acs_aard_blade_5').StopEffect('light_trail_extended_fx');
+			ACSGetCEntity('acs_aard_blade_6').StopEffect('light_trail_extended_fx');
+			ACSGetCEntity('acs_aard_blade_7').StopEffect('light_trail_extended_fx');
+			ACSGetCEntity('acs_aard_blade_8').StopEffect('light_trail_extended_fx');
 		}
 		
 		if (GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped'))
@@ -2971,23 +2971,23 @@ function ACS_Light_Attack_Extended_Trail()
 		
 		if (GetWitcherPlayer().HasTag('acs_aard_sword_equipped'))
 		{
-			ACSGetCEntity('aard_blade_1').PlayEffectSingle('light_trail_extended_fx');
-			ACSGetCEntity('aard_blade_2').PlayEffectSingle('light_trail_extended_fx');
-			ACSGetCEntity('aard_blade_3').PlayEffectSingle('light_trail_extended_fx');
-			ACSGetCEntity('aard_blade_4').PlayEffectSingle('light_trail_extended_fx');
-			ACSGetCEntity('aard_blade_5').PlayEffectSingle('light_trail_extended_fx');
-			ACSGetCEntity('aard_blade_6').PlayEffectSingle('light_trail_extended_fx');
-			ACSGetCEntity('aard_blade_7').PlayEffectSingle('light_trail_extended_fx');
-			ACSGetCEntity('aard_blade_8').PlayEffectSingle('light_trail_extended_fx');
+			ACSGetCEntity('acs_aard_blade_1').PlayEffectSingle('light_trail_extended_fx');
+			ACSGetCEntity('acs_aard_blade_2').PlayEffectSingle('light_trail_extended_fx');
+			ACSGetCEntity('acs_aard_blade_3').PlayEffectSingle('light_trail_extended_fx');
+			ACSGetCEntity('acs_aard_blade_4').PlayEffectSingle('light_trail_extended_fx');
+			ACSGetCEntity('acs_aard_blade_5').PlayEffectSingle('light_trail_extended_fx');
+			ACSGetCEntity('acs_aard_blade_6').PlayEffectSingle('light_trail_extended_fx');
+			ACSGetCEntity('acs_aard_blade_7').PlayEffectSingle('light_trail_extended_fx');
+			ACSGetCEntity('acs_aard_blade_8').PlayEffectSingle('light_trail_extended_fx');
 
-			ACSGetCEntity('aard_blade_1').StopEffect('light_trail_extended_fx');
-			ACSGetCEntity('aard_blade_2').StopEffect('light_trail_extended_fx');
-			ACSGetCEntity('aard_blade_3').StopEffect('light_trail_extended_fx');
-			ACSGetCEntity('aard_blade_4').StopEffect('light_trail_extended_fx');
-			ACSGetCEntity('aard_blade_5').StopEffect('light_trail_extended_fx');
-			ACSGetCEntity('aard_blade_6').StopEffect('light_trail_extended_fx');
-			ACSGetCEntity('aard_blade_7').StopEffect('light_trail_extended_fx');
-			ACSGetCEntity('aard_blade_8').StopEffect('light_trail_extended_fx');
+			ACSGetCEntity('acs_aard_blade_1').StopEffect('light_trail_extended_fx');
+			ACSGetCEntity('acs_aard_blade_2').StopEffect('light_trail_extended_fx');
+			ACSGetCEntity('acs_aard_blade_3').StopEffect('light_trail_extended_fx');
+			ACSGetCEntity('acs_aard_blade_4').StopEffect('light_trail_extended_fx');
+			ACSGetCEntity('acs_aard_blade_5').StopEffect('light_trail_extended_fx');
+			ACSGetCEntity('acs_aard_blade_6').StopEffect('light_trail_extended_fx');
+			ACSGetCEntity('acs_aard_blade_7').StopEffect('light_trail_extended_fx');
+			ACSGetCEntity('acs_aard_blade_8').StopEffect('light_trail_extended_fx');
 		}
 		
 		if (GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped'))
@@ -3099,23 +3099,23 @@ function ACS_Heavy_Attack_Extended_Trail()
 	
 	if (GetWitcherPlayer().HasTag('acs_aard_sword_equipped'))
 	{
-		ACSGetCEntity('aard_blade_1').PlayEffectSingle('heavy_trail_extended_fx');
-		ACSGetCEntity('aard_blade_2').PlayEffectSingle('heavy_trail_extended_fx');
-		ACSGetCEntity('aard_blade_3').PlayEffectSingle('heavy_trail_extended_fx');
-		ACSGetCEntity('aard_blade_4').PlayEffectSingle('heavy_trail_extended_fx');
-		ACSGetCEntity('aard_blade_5').PlayEffectSingle('heavy_trail_extended_fx');
-		ACSGetCEntity('aard_blade_6').PlayEffectSingle('heavy_trail_extended_fx');
-		ACSGetCEntity('aard_blade_7').PlayEffectSingle('heavy_trail_extended_fx');
-		ACSGetCEntity('aard_blade_8').PlayEffectSingle('heavy_trail_extended_fx');
+		ACSGetCEntity('acs_aard_blade_1').PlayEffectSingle('heavy_trail_extended_fx');
+		ACSGetCEntity('acs_aard_blade_2').PlayEffectSingle('heavy_trail_extended_fx');
+		ACSGetCEntity('acs_aard_blade_3').PlayEffectSingle('heavy_trail_extended_fx');
+		ACSGetCEntity('acs_aard_blade_4').PlayEffectSingle('heavy_trail_extended_fx');
+		ACSGetCEntity('acs_aard_blade_5').PlayEffectSingle('heavy_trail_extended_fx');
+		ACSGetCEntity('acs_aard_blade_6').PlayEffectSingle('heavy_trail_extended_fx');
+		ACSGetCEntity('acs_aard_blade_7').PlayEffectSingle('heavy_trail_extended_fx');
+		ACSGetCEntity('acs_aard_blade_8').PlayEffectSingle('heavy_trail_extended_fx');
 
-		ACSGetCEntity('aard_blade_1').StopEffect('heavy_trail_extended_fx');
-		ACSGetCEntity('aard_blade_2').StopEffect('heavy_trail_extended_fx');
-		ACSGetCEntity('aard_blade_3').StopEffect('heavy_trail_extended_fx');
-		ACSGetCEntity('aard_blade_4').StopEffect('heavy_trail_extended_fx');
-		ACSGetCEntity('aard_blade_5').StopEffect('heavy_trail_extended_fx');
-		ACSGetCEntity('aard_blade_6').StopEffect('heavy_trail_extended_fx');
-		ACSGetCEntity('aard_blade_7').StopEffect('heavy_trail_extended_fx');
-		ACSGetCEntity('aard_blade_8').StopEffect('heavy_trail_extended_fx');
+		ACSGetCEntity('acs_aard_blade_1').StopEffect('heavy_trail_extended_fx');
+		ACSGetCEntity('acs_aard_blade_2').StopEffect('heavy_trail_extended_fx');
+		ACSGetCEntity('acs_aard_blade_3').StopEffect('heavy_trail_extended_fx');
+		ACSGetCEntity('acs_aard_blade_4').StopEffect('heavy_trail_extended_fx');
+		ACSGetCEntity('acs_aard_blade_5').StopEffect('heavy_trail_extended_fx');
+		ACSGetCEntity('acs_aard_blade_6').StopEffect('heavy_trail_extended_fx');
+		ACSGetCEntity('acs_aard_blade_7').StopEffect('heavy_trail_extended_fx');
+		ACSGetCEntity('acs_aard_blade_8').StopEffect('heavy_trail_extended_fx');
 	}
 	
 	if (GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped'))
@@ -3263,23 +3263,23 @@ function ACS_Light_Attack_Trail()
 	
 	if (GetWitcherPlayer().HasTag('acs_aard_sword_equipped'))
 	{
-		ACSGetCEntity('aard_blade_1').PlayEffectSingle('light_trail_fx');
-		ACSGetCEntity('aard_blade_2').PlayEffectSingle('light_trail_fx');
-		ACSGetCEntity('aard_blade_3').PlayEffectSingle('light_trail_fx');
-		ACSGetCEntity('aard_blade_4').PlayEffectSingle('light_trail_fx');
-		ACSGetCEntity('aard_blade_5').PlayEffectSingle('light_trail_fx');
-		ACSGetCEntity('aard_blade_6').PlayEffectSingle('light_trail_fx');
-		ACSGetCEntity('aard_blade_7').PlayEffectSingle('light_trail_fx');
-		ACSGetCEntity('aard_blade_8').PlayEffectSingle('light_trail_fx');
+		ACSGetCEntity('acs_aard_blade_1').PlayEffectSingle('light_trail_fx');
+		ACSGetCEntity('acs_aard_blade_2').PlayEffectSingle('light_trail_fx');
+		ACSGetCEntity('acs_aard_blade_3').PlayEffectSingle('light_trail_fx');
+		ACSGetCEntity('acs_aard_blade_4').PlayEffectSingle('light_trail_fx');
+		ACSGetCEntity('acs_aard_blade_5').PlayEffectSingle('light_trail_fx');
+		ACSGetCEntity('acs_aard_blade_6').PlayEffectSingle('light_trail_fx');
+		ACSGetCEntity('acs_aard_blade_7').PlayEffectSingle('light_trail_fx');
+		ACSGetCEntity('acs_aard_blade_8').PlayEffectSingle('light_trail_fx');
 
-		ACSGetCEntity('aard_blade_1').StopEffect('light_trail_fx');
-		ACSGetCEntity('aard_blade_2').StopEffect('light_trail_fx');
-		ACSGetCEntity('aard_blade_3').StopEffect('light_trail_fx');
-		ACSGetCEntity('aard_blade_4').StopEffect('light_trail_fx');
-		ACSGetCEntity('aard_blade_5').StopEffect('light_trail_fx');
-		ACSGetCEntity('aard_blade_6').StopEffect('light_trail_fx');
-		ACSGetCEntity('aard_blade_7').StopEffect('light_trail_fx');
-		ACSGetCEntity('aard_blade_8').StopEffect('light_trail_fx');
+		ACSGetCEntity('acs_aard_blade_1').StopEffect('light_trail_fx');
+		ACSGetCEntity('acs_aard_blade_2').StopEffect('light_trail_fx');
+		ACSGetCEntity('acs_aard_blade_3').StopEffect('light_trail_fx');
+		ACSGetCEntity('acs_aard_blade_4').StopEffect('light_trail_fx');
+		ACSGetCEntity('acs_aard_blade_5').StopEffect('light_trail_fx');
+		ACSGetCEntity('acs_aard_blade_6').StopEffect('light_trail_fx');
+		ACSGetCEntity('acs_aard_blade_7').StopEffect('light_trail_fx');
+		ACSGetCEntity('acs_aard_blade_8').StopEffect('light_trail_fx');
 	}
 	
 	if (GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped'))
@@ -3442,23 +3442,23 @@ function ACS_Heavy_Attack_Trail()
 	
 	if (GetWitcherPlayer().HasTag('acs_aard_sword_equipped'))
 	{
-		ACSGetCEntity('aard_blade_1').PlayEffectSingle('heavy_trail_fx');
-		ACSGetCEntity('aard_blade_2').PlayEffectSingle('heavy_trail_fx');
-		ACSGetCEntity('aard_blade_3').PlayEffectSingle('heavy_trail_fx');
-		ACSGetCEntity('aard_blade_4').PlayEffectSingle('heavy_trail_fx');
-		ACSGetCEntity('aard_blade_5').PlayEffectSingle('heavy_trail_fx');
-		ACSGetCEntity('aard_blade_6').PlayEffectSingle('heavy_trail_fx');
-		ACSGetCEntity('aard_blade_7').PlayEffectSingle('heavy_trail_fx');
-		ACSGetCEntity('aard_blade_8').PlayEffectSingle('heavy_trail_fx');
+		ACSGetCEntity('acs_aard_blade_1').PlayEffectSingle('heavy_trail_fx');
+		ACSGetCEntity('acs_aard_blade_2').PlayEffectSingle('heavy_trail_fx');
+		ACSGetCEntity('acs_aard_blade_3').PlayEffectSingle('heavy_trail_fx');
+		ACSGetCEntity('acs_aard_blade_4').PlayEffectSingle('heavy_trail_fx');
+		ACSGetCEntity('acs_aard_blade_5').PlayEffectSingle('heavy_trail_fx');
+		ACSGetCEntity('acs_aard_blade_6').PlayEffectSingle('heavy_trail_fx');
+		ACSGetCEntity('acs_aard_blade_7').PlayEffectSingle('heavy_trail_fx');
+		ACSGetCEntity('acs_aard_blade_8').PlayEffectSingle('heavy_trail_fx');
 
-		ACSGetCEntity('aard_blade_1').StopEffect('heavy_trail_fx');
-		ACSGetCEntity('aard_blade_2').StopEffect('heavy_trail_fx');
-		ACSGetCEntity('aard_blade_3').StopEffect('heavy_trail_fx');
-		ACSGetCEntity('aard_blade_4').StopEffect('heavy_trail_fx');
-		ACSGetCEntity('aard_blade_5').StopEffect('heavy_trail_fx');
-		ACSGetCEntity('aard_blade_6').StopEffect('heavy_trail_fx');
-		ACSGetCEntity('aard_blade_7').StopEffect('heavy_trail_fx');
-		ACSGetCEntity('aard_blade_8').StopEffect('heavy_trail_fx');
+		ACSGetCEntity('acs_aard_blade_1').StopEffect('heavy_trail_fx');
+		ACSGetCEntity('acs_aard_blade_2').StopEffect('heavy_trail_fx');
+		ACSGetCEntity('acs_aard_blade_3').StopEffect('heavy_trail_fx');
+		ACSGetCEntity('acs_aard_blade_4').StopEffect('heavy_trail_fx');
+		ACSGetCEntity('acs_aard_blade_5').StopEffect('heavy_trail_fx');
+		ACSGetCEntity('acs_aard_blade_6').StopEffect('heavy_trail_fx');
+		ACSGetCEntity('acs_aard_blade_7').StopEffect('heavy_trail_fx');
+		ACSGetCEntity('acs_aard_blade_8').StopEffect('heavy_trail_fx');
 	}
 	
 	if (GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped'))
@@ -3621,23 +3621,23 @@ function ACS_Wraith_Attack_Trail()
 	
 	if (GetWitcherPlayer().HasTag('acs_aard_sword_equipped'))
 	{
-		ACSGetCEntity('aard_blade_1').PlayEffectSingle('wraith_trail');
-		ACSGetCEntity('aard_blade_2').PlayEffectSingle('wraith_trail');
-		ACSGetCEntity('aard_blade_3').PlayEffectSingle('wraith_trail');
-		ACSGetCEntity('aard_blade_4').PlayEffectSingle('wraith_trail');
-		ACSGetCEntity('aard_blade_5').PlayEffectSingle('wraith_trail');
-		ACSGetCEntity('aard_blade_6').PlayEffectSingle('wraith_trail');
-		ACSGetCEntity('aard_blade_7').PlayEffectSingle('wraith_trail');
-		ACSGetCEntity('aard_blade_8').PlayEffectSingle('wraith_trail');
+		ACSGetCEntity('acs_aard_blade_1').PlayEffectSingle('wraith_trail');
+		ACSGetCEntity('acs_aard_blade_2').PlayEffectSingle('wraith_trail');
+		ACSGetCEntity('acs_aard_blade_3').PlayEffectSingle('wraith_trail');
+		ACSGetCEntity('acs_aard_blade_4').PlayEffectSingle('wraith_trail');
+		ACSGetCEntity('acs_aard_blade_5').PlayEffectSingle('wraith_trail');
+		ACSGetCEntity('acs_aard_blade_6').PlayEffectSingle('wraith_trail');
+		ACSGetCEntity('acs_aard_blade_7').PlayEffectSingle('wraith_trail');
+		ACSGetCEntity('acs_aard_blade_8').PlayEffectSingle('wraith_trail');
 
-		ACSGetCEntity('aard_blade_1').StopEffect('wraith_trail');
-		ACSGetCEntity('aard_blade_2').StopEffect('wraith_trail');
-		ACSGetCEntity('aard_blade_3').StopEffect('wraith_trail');
-		ACSGetCEntity('aard_blade_4').StopEffect('wraith_trail');
-		ACSGetCEntity('aard_blade_5').StopEffect('wraith_trail');
-		ACSGetCEntity('aard_blade_6').StopEffect('wraith_trail');
-		ACSGetCEntity('aard_blade_7').StopEffect('wraith_trail');
-		ACSGetCEntity('aard_blade_8').StopEffect('wraith_trail');
+		ACSGetCEntity('acs_aard_blade_1').StopEffect('wraith_trail');
+		ACSGetCEntity('acs_aard_blade_2').StopEffect('wraith_trail');
+		ACSGetCEntity('acs_aard_blade_3').StopEffect('wraith_trail');
+		ACSGetCEntity('acs_aard_blade_4').StopEffect('wraith_trail');
+		ACSGetCEntity('acs_aard_blade_5').StopEffect('wraith_trail');
+		ACSGetCEntity('acs_aard_blade_6').StopEffect('wraith_trail');
+		ACSGetCEntity('acs_aard_blade_7').StopEffect('wraith_trail');
+		ACSGetCEntity('acs_aard_blade_8').StopEffect('wraith_trail');
 	}
 	
 	if (GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped'))
@@ -3786,23 +3786,23 @@ function ACS_Fast_Attack_Buff()
 	
 	if (GetWitcherPlayer().HasTag('acs_aard_sword_equipped'))
 	{
-		ACSGetCEntity('aard_blade_1').PlayEffectSingle('fast_attack_buff');
-		ACSGetCEntity('aard_blade_2').PlayEffectSingle('fast_attack_buff');
-		ACSGetCEntity('aard_blade_3').PlayEffectSingle('fast_attack_buff');
-		ACSGetCEntity('aard_blade_4').PlayEffectSingle('fast_attack_buff');
-		ACSGetCEntity('aard_blade_5').PlayEffectSingle('fast_attack_buff');
-		ACSGetCEntity('aard_blade_6').PlayEffectSingle('fast_attack_buff');
-		ACSGetCEntity('aard_blade_7').PlayEffectSingle('fast_attack_buff');
-		ACSGetCEntity('aard_blade_8').PlayEffectSingle('fast_attack_buff');
+		ACSGetCEntity('acs_aard_blade_1').PlayEffectSingle('fast_attack_buff');
+		ACSGetCEntity('acs_aard_blade_2').PlayEffectSingle('fast_attack_buff');
+		ACSGetCEntity('acs_aard_blade_3').PlayEffectSingle('fast_attack_buff');
+		ACSGetCEntity('acs_aard_blade_4').PlayEffectSingle('fast_attack_buff');
+		ACSGetCEntity('acs_aard_blade_5').PlayEffectSingle('fast_attack_buff');
+		ACSGetCEntity('acs_aard_blade_6').PlayEffectSingle('fast_attack_buff');
+		ACSGetCEntity('acs_aard_blade_7').PlayEffectSingle('fast_attack_buff');
+		ACSGetCEntity('acs_aard_blade_8').PlayEffectSingle('fast_attack_buff');
 
-		ACSGetCEntity('aard_blade_1').StopEffect('fast_attack_buff');
-		ACSGetCEntity('aard_blade_2').StopEffect('fast_attack_buff');
-		ACSGetCEntity('aard_blade_3').StopEffect('fast_attack_buff');
-		ACSGetCEntity('aard_blade_4').StopEffect('fast_attack_buff');
-		ACSGetCEntity('aard_blade_5').StopEffect('fast_attack_buff');
-		ACSGetCEntity('aard_blade_6').StopEffect('fast_attack_buff');
-		ACSGetCEntity('aard_blade_7').StopEffect('fast_attack_buff');
-		ACSGetCEntity('aard_blade_8').StopEffect('fast_attack_buff');
+		ACSGetCEntity('acs_aard_blade_1').StopEffect('fast_attack_buff');
+		ACSGetCEntity('acs_aard_blade_2').StopEffect('fast_attack_buff');
+		ACSGetCEntity('acs_aard_blade_3').StopEffect('fast_attack_buff');
+		ACSGetCEntity('acs_aard_blade_4').StopEffect('fast_attack_buff');
+		ACSGetCEntity('acs_aard_blade_5').StopEffect('fast_attack_buff');
+		ACSGetCEntity('acs_aard_blade_6').StopEffect('fast_attack_buff');
+		ACSGetCEntity('acs_aard_blade_7').StopEffect('fast_attack_buff');
+		ACSGetCEntity('acs_aard_blade_8').StopEffect('fast_attack_buff');
 	}
 	
 	if (GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped'))
@@ -3951,23 +3951,23 @@ function ACS_Fast_Attack_Buff_Hit()
 	
 	if (GetWitcherPlayer().HasTag('acs_aard_sword_equipped'))
 	{
-		ACSGetCEntity('aard_blade_1').PlayEffectSingle('fast_attack_buff_hit');
-		ACSGetCEntity('aard_blade_2').PlayEffectSingle('fast_attack_buff_hit');
-		ACSGetCEntity('aard_blade_3').PlayEffectSingle('fast_attack_buff_hit');
-		ACSGetCEntity('aard_blade_4').PlayEffectSingle('fast_attack_buff_hit');
-		ACSGetCEntity('aard_blade_5').PlayEffectSingle('fast_attack_buff_hit');
-		ACSGetCEntity('aard_blade_6').PlayEffectSingle('fast_attack_buff_hit');
-		ACSGetCEntity('aard_blade_7').PlayEffectSingle('fast_attack_buff_hit');
-		ACSGetCEntity('aard_blade_8').PlayEffectSingle('fast_attack_buff_hit');
+		ACSGetCEntity('acs_aard_blade_1').PlayEffectSingle('fast_attack_buff_hit');
+		ACSGetCEntity('acs_aard_blade_2').PlayEffectSingle('fast_attack_buff_hit');
+		ACSGetCEntity('acs_aard_blade_3').PlayEffectSingle('fast_attack_buff_hit');
+		ACSGetCEntity('acs_aard_blade_4').PlayEffectSingle('fast_attack_buff_hit');
+		ACSGetCEntity('acs_aard_blade_5').PlayEffectSingle('fast_attack_buff_hit');
+		ACSGetCEntity('acs_aard_blade_6').PlayEffectSingle('fast_attack_buff_hit');
+		ACSGetCEntity('acs_aard_blade_7').PlayEffectSingle('fast_attack_buff_hit');
+		ACSGetCEntity('acs_aard_blade_8').PlayEffectSingle('fast_attack_buff_hit');
 
-		ACSGetCEntity('aard_blade_1').StopEffect('fast_attack_buff_hit');
-		ACSGetCEntity('aard_blade_2').StopEffect('fast_attack_buff_hit');
-		ACSGetCEntity('aard_blade_3').StopEffect('fast_attack_buff_hit');
-		ACSGetCEntity('aard_blade_4').StopEffect('fast_attack_buff_hit');
-		ACSGetCEntity('aard_blade_5').StopEffect('fast_attack_buff_hit');
-		ACSGetCEntity('aard_blade_6').StopEffect('fast_attack_buff_hit');
-		ACSGetCEntity('aard_blade_7').StopEffect('fast_attack_buff_hit');
-		ACSGetCEntity('aard_blade_8').StopEffect('fast_attack_buff_hit');
+		ACSGetCEntity('acs_aard_blade_1').StopEffect('fast_attack_buff_hit');
+		ACSGetCEntity('acs_aard_blade_2').StopEffect('fast_attack_buff_hit');
+		ACSGetCEntity('acs_aard_blade_3').StopEffect('fast_attack_buff_hit');
+		ACSGetCEntity('acs_aard_blade_4').StopEffect('fast_attack_buff_hit');
+		ACSGetCEntity('acs_aard_blade_5').StopEffect('fast_attack_buff_hit');
+		ACSGetCEntity('acs_aard_blade_6').StopEffect('fast_attack_buff_hit');
+		ACSGetCEntity('acs_aard_blade_7').StopEffect('fast_attack_buff_hit');
+		ACSGetCEntity('acs_aard_blade_8').StopEffect('fast_attack_buff_hit');
 	}
 	
 	if (GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped'))
@@ -4138,304 +4138,4 @@ function ACS_Manticore_Special_Attack_Effects()
 	ACSGetCEntity('acs_sword_trail_1').PlayEffectSingle('runeword_quen');
 	ACSGetCEntity('acs_sword_trail_1').PlayEffectSingle('runeword_quen');
 	ACSGetCEntity('acs_sword_trail_1').StopEffect('runeword_quen');
-}
-
-function igni_bow_summon()
-{
-	ACSGetCEntity('acs_igni_bow_1').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('acs_igni_bow_2').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('acs_igni_bow_3').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('acs_igni_bow_4').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('acs_igni_bow_5').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('acs_igni_bow_6').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('acs_igni_bow_7').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('acs_igni_bow_8').PlayEffectSingle('fire_sparks_trail');
-
-	ACSGetCEntity('acs_igni_bow_1').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('acs_igni_bow_2').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('acs_igni_bow_3').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('acs_igni_bow_4').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('acs_igni_bow_5').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('acs_igni_bow_6').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('acs_igni_bow_7').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('acs_igni_bow_8').PlayEffectSingle('runeword1_fire_trail');
-
-	ACSGetCEntity('acs_igni_bow_1').PlayEffectSingle('fast_attack_buff');
-	ACSGetCEntity('acs_igni_bow_2').PlayEffectSingle('fast_attack_buff');
-	ACSGetCEntity('acs_igni_bow_3').PlayEffectSingle('fast_attack_buff');
-	ACSGetCEntity('acs_igni_bow_4').PlayEffectSingle('fast_attack_buff');
-	ACSGetCEntity('acs_igni_bow_5').PlayEffectSingle('fast_attack_buff');
-	ACSGetCEntity('acs_igni_bow_6').PlayEffectSingle('fast_attack_buff');
-	ACSGetCEntity('acs_igni_bow_7').PlayEffectSingle('fast_attack_buff');
-	ACSGetCEntity('acs_igni_bow_8').PlayEffectSingle('fast_attack_buff');
-
-	ACSGetCEntity('acs_igni_bow_1').PlayEffectSingle('fast_attack_buff_hit');
-	ACSGetCEntity('acs_igni_bow_2').PlayEffectSingle('fast_attack_buff_hit');
-	ACSGetCEntity('acs_igni_bow_3').PlayEffectSingle('fast_attack_buff_hit');
-	ACSGetCEntity('acs_igni_bow_4').PlayEffectSingle('fast_attack_buff_hit');
-	ACSGetCEntity('acs_igni_bow_5').PlayEffectSingle('fast_attack_buff_hit');
-	ACSGetCEntity('acs_igni_bow_6').PlayEffectSingle('fast_attack_buff_hit');
-	ACSGetCEntity('acs_igni_bow_7').PlayEffectSingle('fast_attack_buff_hit');
-	ACSGetCEntity('acs_igni_bow_8').PlayEffectSingle('fast_attack_buff_hit');
-}
-
-function axii_bow_summon()
-{
-	ACSGetCEntity('axii_bow_1').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('axii_bow_2').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('axii_bow_3').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('axii_bow_4').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('axii_bow_5').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('axii_bow_6').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('axii_bow_7').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('axii_bow_8').PlayEffectSingle('fire_sparks_trail');
-
-	ACSGetCEntity('axii_bow_1').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('axii_bow_2').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('axii_bow_3').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('axii_bow_4').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('axii_bow_5').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('axii_bow_6').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('axii_bow_7').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('axii_bow_8').PlayEffectSingle('runeword1_fire_trail');
-
-	ACSGetCEntity('axii_bow_1').PlayEffectSingle('fast_attack_buff');
-	ACSGetCEntity('axii_bow_2').PlayEffectSingle('fast_attack_buff');
-	ACSGetCEntity('axii_bow_3').PlayEffectSingle('fast_attack_buff');
-	ACSGetCEntity('axii_bow_4').PlayEffectSingle('fast_attack_buff');
-	ACSGetCEntity('axii_bow_5').PlayEffectSingle('fast_attack_buff');
-	ACSGetCEntity('axii_bow_6').PlayEffectSingle('fast_attack_buff');
-	ACSGetCEntity('axii_bow_7').PlayEffectSingle('fast_attack_buff');
-	ACSGetCEntity('axii_bow_8').PlayEffectSingle('fast_attack_buff');
-
-	ACSGetCEntity('axii_bow_1').PlayEffectSingle('fast_attack_buff_hit');
-	ACSGetCEntity('axii_bow_2').PlayEffectSingle('fast_attack_buff_hit');
-	ACSGetCEntity('axii_bow_3').PlayEffectSingle('fast_attack_buff_hit');
-	ACSGetCEntity('axii_bow_4').PlayEffectSingle('fast_attack_buff_hit');
-	ACSGetCEntity('axii_bow_5').PlayEffectSingle('fast_attack_buff_hit');
-	ACSGetCEntity('axii_bow_6').PlayEffectSingle('fast_attack_buff_hit');
-	ACSGetCEntity('axii_bow_7').PlayEffectSingle('fast_attack_buff_hit');
-	ACSGetCEntity('axii_bow_8').PlayEffectSingle('fast_attack_buff_hit');
-}
-
-function aard_bow_summon()
-{
-	ACSGetCEntity('aard_bow_1').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('aard_bow_2').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('aard_bow_3').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('aard_bow_4').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('aard_bow_5').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('aard_bow_6').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('aard_bow_7').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('aard_bow_8').PlayEffectSingle('fire_sparks_trail');
-
-	ACSGetCEntity('aard_bow_1').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('aard_bow_2').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('aard_bow_3').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('aard_bow_4').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('aard_bow_5').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('aard_bow_6').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('aard_bow_7').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('aard_bow_8').PlayEffectSingle('runeword1_fire_trail');
-
-	ACSGetCEntity('aard_bow_1').PlayEffectSingle('fast_attack_buff');
-	ACSGetCEntity('aard_bow_2').PlayEffectSingle('fast_attack_buff');
-	ACSGetCEntity('aard_bow_3').PlayEffectSingle('fast_attack_buff');
-	ACSGetCEntity('aard_bow_4').PlayEffectSingle('fast_attack_buff');
-	ACSGetCEntity('aard_bow_5').PlayEffectSingle('fast_attack_buff');
-	ACSGetCEntity('aard_bow_6').PlayEffectSingle('fast_attack_buff');
-	ACSGetCEntity('aard_bow_7').PlayEffectSingle('fast_attack_buff');
-	ACSGetCEntity('aard_bow_8').PlayEffectSingle('fast_attack_buff');
-
-	ACSGetCEntity('aard_bow_1').PlayEffectSingle('fast_attack_buff_hit');
-	ACSGetCEntity('aard_bow_2').PlayEffectSingle('fast_attack_buff_hit');
-	ACSGetCEntity('aard_bow_3').PlayEffectSingle('fast_attack_buff_hit');
-	ACSGetCEntity('aard_bow_4').PlayEffectSingle('fast_attack_buff_hit');
-	ACSGetCEntity('aard_bow_5').PlayEffectSingle('fast_attack_buff_hit');
-	ACSGetCEntity('aard_bow_6').PlayEffectSingle('fast_attack_buff_hit');
-	ACSGetCEntity('aard_bow_7').PlayEffectSingle('fast_attack_buff_hit');
-	ACSGetCEntity('aard_bow_8').PlayEffectSingle('fast_attack_buff_hit');
-}
-
-function yrden_bow_summon()
-{
-	ACSGetCEntity('yrden_bow_1').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('yrden_bow_2').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('yrden_bow_3').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('yrden_bow_4').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('yrden_bow_5').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('yrden_bow_6').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('yrden_bow_7').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('yrden_bow_8').PlayEffectSingle('fire_sparks_trail');
-
-	ACSGetCEntity('yrden_bow_1').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('yrden_bow_2').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('yrden_bow_3').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('yrden_bow_4').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('yrden_bow_5').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('yrden_bow_6').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('yrden_bow_7').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('yrden_bow_8').PlayEffectSingle('runeword1_fire_trail');
-
-	ACSGetCEntity('yrden_bow_1').PlayEffectSingle('fast_attack_buff');
-	ACSGetCEntity('yrden_bow_2').PlayEffectSingle('fast_attack_buff');
-	ACSGetCEntity('yrden_bow_3').PlayEffectSingle('fast_attack_buff');
-	ACSGetCEntity('yrden_bow_4').PlayEffectSingle('fast_attack_buff');
-	ACSGetCEntity('yrden_bow_5').PlayEffectSingle('fast_attack_buff');
-	ACSGetCEntity('yrden_bow_6').PlayEffectSingle('fast_attack_buff');
-	ACSGetCEntity('yrden_bow_7').PlayEffectSingle('fast_attack_buff');
-	ACSGetCEntity('yrden_bow_8').PlayEffectSingle('fast_attack_buff');
-
-	ACSGetCEntity('yrden_bow_1').PlayEffectSingle('fast_attack_buff_hit');
-	ACSGetCEntity('yrden_bow_2').PlayEffectSingle('fast_attack_buff_hit');
-	ACSGetCEntity('yrden_bow_3').PlayEffectSingle('fast_attack_buff_hit');
-	ACSGetCEntity('yrden_bow_4').PlayEffectSingle('fast_attack_buff_hit');
-	ACSGetCEntity('yrden_bow_5').PlayEffectSingle('fast_attack_buff_hit');
-	ACSGetCEntity('yrden_bow_6').PlayEffectSingle('fast_attack_buff_hit');
-	ACSGetCEntity('yrden_bow_7').PlayEffectSingle('fast_attack_buff_hit');
-	ACSGetCEntity('yrden_bow_8').PlayEffectSingle('fast_attack_buff_hit');
-}
-
-function quen_bow_summon()
-{
-	ACSGetCEntity('quen_bow_1').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('quen_bow_2').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('quen_bow_3').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('quen_bow_4').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('quen_bow_5').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('quen_bow_6').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('quen_bow_7').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('quen_bow_8').PlayEffectSingle('fire_sparks_trail');
-
-	ACSGetCEntity('quen_bow_1').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('quen_bow_2').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('quen_bow_3').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('quen_bow_4').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('quen_bow_5').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('quen_bow_6').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('quen_bow_7').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('quen_bow_8').PlayEffectSingle('runeword1_fire_trail');
-
-	ACSGetCEntity('quen_bow_1').PlayEffectSingle('fast_attack_buff');
-	ACSGetCEntity('quen_bow_2').PlayEffectSingle('fast_attack_buff');
-	ACSGetCEntity('quen_bow_3').PlayEffectSingle('fast_attack_buff');
-	ACSGetCEntity('quen_bow_4').PlayEffectSingle('fast_attack_buff');
-	ACSGetCEntity('quen_bow_5').PlayEffectSingle('fast_attack_buff');
-	ACSGetCEntity('quen_bow_6').PlayEffectSingle('fast_attack_buff');
-	ACSGetCEntity('quen_bow_7').PlayEffectSingle('fast_attack_buff');
-	ACSGetCEntity('quen_bow_8').PlayEffectSingle('fast_attack_buff');
-
-	ACSGetCEntity('quen_bow_1').PlayEffectSingle('fast_attack_buff_hit');
-	ACSGetCEntity('quen_bow_2').PlayEffectSingle('fast_attack_buff_hit');
-	ACSGetCEntity('quen_bow_3').PlayEffectSingle('fast_attack_buff_hit');
-	ACSGetCEntity('quen_bow_4').PlayEffectSingle('fast_attack_buff_hit');
-	ACSGetCEntity('quen_bow_5').PlayEffectSingle('fast_attack_buff_hit');
-	ACSGetCEntity('quen_bow_6').PlayEffectSingle('fast_attack_buff_hit');
-	ACSGetCEntity('quen_bow_7').PlayEffectSingle('fast_attack_buff_hit');
-	ACSGetCEntity('quen_bow_8').PlayEffectSingle('fast_attack_buff_hit');
-}
-
-function igni_crossbow_summon()
-{
-	ACSGetCEntity('igni_crossbow_1').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('igni_crossbow_2').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('igni_crossbow_3').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('igni_crossbow_4').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('igni_crossbow_5').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('igni_crossbow_6').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('igni_crossbow_7').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('igni_crossbow_8').PlayEffectSingle('fire_sparks_trail');
-
-	ACSGetCEntity('igni_crossbow_1').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('igni_crossbow_2').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('igni_crossbow_3').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('igni_crossbow_4').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('igni_crossbow_5').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('igni_crossbow_6').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('igni_crossbow_7').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('igni_crossbow_8').PlayEffectSingle('runeword1_fire_trail');
-}
-
-function axii_crossbow_summon()
-{
-	ACSGetCEntity('axii_crossbow_1').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('axii_crossbow_2').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('axii_crossbow_3').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('axii_crossbow_4').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('axii_crossbow_5').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('axii_crossbow_6').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('axii_crossbow_7').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('axii_crossbow_8').PlayEffectSingle('fire_sparks_trail');
-
-	ACSGetCEntity('axii_crossbow_1').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('axii_crossbow_2').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('axii_crossbow_3').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('axii_crossbow_4').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('axii_crossbow_5').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('axii_crossbow_6').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('axii_crossbow_7').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('axii_crossbow_8').PlayEffectSingle('runeword1_fire_trail');
-}
-
-function aard_crossbow_summon()
-{
-	ACSGetCEntity('aard_crossbow_1').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('aard_crossbow_2').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('aard_crossbow_3').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('aard_crossbow_4').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('aard_crossbow_5').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('aard_crossbow_6').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('aard_crossbow_7').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('aard_crossbow_8').PlayEffectSingle('fire_sparks_trail');
-
-	ACSGetCEntity('aard_crossbow_1').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('aard_crossbow_2').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('aard_crossbow_3').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('aard_crossbow_4').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('aard_crossbow_5').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('aard_crossbow_6').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('aard_crossbow_7').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('aard_crossbow_8').PlayEffectSingle('runeword1_fire_trail');
-}
-
-function yrden_crossbow_summon()
-{
-	ACSGetCEntity('yrden_crossbow_1').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('yrden_crossbow_2').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('yrden_crossbow_3').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('yrden_crossbow_4').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('yrden_crossbow_5').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('yrden_crossbow_6').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('yrden_crossbow_7').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('yrden_crossbow_8').PlayEffectSingle('fire_sparks_trail');
-
-	ACSGetCEntity('yrden_crossbow_1').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('yrden_crossbow_2').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('yrden_crossbow_3').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('yrden_crossbow_4').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('yrden_crossbow_5').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('yrden_crossbow_6').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('yrden_crossbow_7').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('yrden_crossbow_8').PlayEffectSingle('runeword1_fire_trail');
-}
-
-function quen_crossbow_summon()
-{
-	ACSGetCEntity('quen_crossbow_1').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('quen_crossbow_2').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('quen_crossbow_3').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('quen_crossbow_4').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('quen_crossbow_5').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('quen_crossbow_6').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('quen_crossbow_7').PlayEffectSingle('fire_sparks_trail');
-	ACSGetCEntity('quen_crossbow_8').PlayEffectSingle('fire_sparks_trail');
-
-	ACSGetCEntity('quen_crossbow_1').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('quen_crossbow_2').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('quen_crossbow_3').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('quen_crossbow_4').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('quen_crossbow_5').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('quen_crossbow_6').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('quen_crossbow_7').PlayEffectSingle('runeword1_fire_trail');
-	ACSGetCEntity('quen_crossbow_8').PlayEffectSingle('runeword1_fire_trail');
 }

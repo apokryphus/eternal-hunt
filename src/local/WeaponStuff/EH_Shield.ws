@@ -4,9 +4,9 @@ function ACS_Shield_Destroy()
 {		
 	ACS_Axii_Shield_Destroy();
 	ACS_Axii_Shield_Destroy_DELAY();
-	Quen_Monsters_Despawn();
-	Bruxa_Camo_Decoy_Deactivate();
-	AardPull_Deactivate();
+	ACS_Quen_Monsters_Despawn();
+	ACS_Bruxa_Camo_Decoy_Deactivate();
+	ACS_AardPull_Deactivate();
 
 	//GetWitcherPlayer().RemoveTag('acs_bow_active');
 	//GetWitcherPlayer().RemoveTag('acs_crossbow_active');
@@ -251,13 +251,13 @@ state BruxaCamoDecoy in cACS_Shield_Summon
 		ACSGetCEntity('acs_vampire_claw_anchor').Destroy();
 		*/
 
-		//ACS_Blood_Armor_Destroy();
+		//ACS_Blood_Armor_Destroy(true);
 
 		GetACSWatcher().ACS_Vampire_Back_Claw_Teleport();
 
 		GetWitcherPlayer().AddTag('ACS_Camo_Active');
 
-		GetACSWatcher().Activate_Bruxa_Camo_Env();
+		GetACSWatcher().Custom_Env_Switch('bruxa_camo', true);
 
 		NPC_Fear_Start();
 
@@ -1400,7 +1400,7 @@ function ACS_Revenant() : CNewNPC
 	return revenant;
 }
 
-function Quen_Monsters_Despawn()
+function ACS_Quen_Monsters_Despawn()
 {
 	ACS_Centipede_Destroy();
 	ACS_Wolf_Destroy();
@@ -1411,14 +1411,14 @@ function Quen_Monsters_Despawn()
 	}
 }
 
-function AardPull_Deactivate()
+function ACS_AardPull_Deactivate()
 {
 	GetACSWatcher().RemoveTimer('ACS_bruxa_camo_npc_reaction');
 
 	GetWitcherPlayer().RemoveTag('ACS_AardPull_Active');
 }
 
-function Bruxa_Camo_Decoy_Deactivate()
+function ACS_Bruxa_Camo_Decoy_Deactivate()
 {
 	var vBruxa_Camo_Decoy_DeactivateClawEquip																											: cBruxa_Camo_Decoy_DeactivateClawEquip;
 	
@@ -1456,7 +1456,7 @@ function Bruxa_Camo_Decoy_Deactivate()
 
 		DisableCatViewFx( 0 );
 		
-		GetACSWatcher().Deactivate_Bruxa_Camo_Env();
+		GetACSWatcher().Custom_Env_Switch('bruxa_camo', false);
 
 		GetACSWatcher().RemoveTimer('ACS_npc_fear_reaction');
 
@@ -1531,7 +1531,7 @@ state Bruxa_Camo_Decoy_Deactivate_Claw_Equip_Standalone_Engage in cBruxa_Camo_De
 		ACSGetCEntity('acs_vampire_claw_anchor').Destroy();
 		*/
 
-		ACS_Blood_Armor_Destroy_IMMEDIATE();
+		ACS_Blood_Armor_Destroy(true);
 
 		stupidArray_extra_arms.PushBack( 'Cutscene' );
 

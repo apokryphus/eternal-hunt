@@ -8,7 +8,9 @@ function ACS_SignSwitchArsenalInit()
 	{
 		GetWitcherPlayer().ClearAnimationSpeedMultipliers();
 		
-		ACS_ThingsThatShouldBeRemoved();
+		ACS_ThingsThatShouldBeRemoved(false);
+
+		//thePlayer.RaiseEvent('ACS_GoPloughYourself');
 		
 		if ( ACS_GetWeaponMode() == 0 )
 		{
@@ -36,8 +38,8 @@ function ACS_SignSwitchArsenalInit()
 		{
 			if 
 			(
-				ACS_GetFocusModeSilverWeapon() == 0 && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) 
-				|| ACS_GetFocusModeSteelWeapon() == 0 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' )
+				ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 0 && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) 
+				|| ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 0 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' )
 			)
 			{
 				GetACSWatcher().PrimaryWeaponSwitch();
@@ -46,8 +48,8 @@ function ACS_SignSwitchArsenalInit()
 				
 			else if 
 			(
-				ACS_GetFocusModeSilverWeapon() == 3 && GetWitcherPlayer().IsWeaponHeld( 'silversword' )
-				|| ACS_GetFocusModeSteelWeapon() == 3 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' )
+				ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 3 && GetWitcherPlayer().IsWeaponHeld( 'silversword' )
+				|| ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 3 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' )
 			)
 			{
 				GetACSWatcher().PrimaryWeaponSwitch();
@@ -56,8 +58,8 @@ function ACS_SignSwitchArsenalInit()
 				
 			else if 
 			(
-				ACS_GetFocusModeSilverWeapon() == 7 && GetWitcherPlayer().IsWeaponHeld( 'silversword' )
-				|| ACS_GetFocusModeSteelWeapon() == 7 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' )
+				ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 7 && GetWitcherPlayer().IsWeaponHeld( 'silversword' )
+				|| ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 7 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' )
 			)
 			{
 				GetACSWatcher().PrimaryWeaponSwitch();
@@ -66,8 +68,8 @@ function ACS_SignSwitchArsenalInit()
 				
 			else if 
 			(
-				ACS_GetFocusModeSilverWeapon() == 5 && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) 
-				|| ACS_GetFocusModeSteelWeapon() == 5 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' )
+				ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 5 && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) 
+				|| ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 5 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' )
 			)
 			{
 				GetACSWatcher().PrimaryWeaponSwitch();
@@ -76,8 +78,8 @@ function ACS_SignSwitchArsenalInit()
 				
 			else if 
 			(
-				ACS_GetFocusModeSilverWeapon() == 1 && GetWitcherPlayer().IsWeaponHeld( 'silversword' )
-				|| ACS_GetFocusModeSteelWeapon() == 1 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' )
+				ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 1 && GetWitcherPlayer().IsWeaponHeld( 'silversword' )
+				|| ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 1 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' )
 			)
 			{
 				GetACSWatcher().PrimaryWeaponSwitch();
@@ -86,8 +88,8 @@ function ACS_SignSwitchArsenalInit()
 				
 			else if 
 			(
-				ACS_GetFocusModeSilverWeapon() == 0 && GetWitcherPlayer().IsWeaponHeld( 'silversword' )
-				|| ACS_GetFocusModeSteelWeapon() == 0 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' )
+				ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 0 && GetWitcherPlayer().IsWeaponHeld( 'silversword' )
+				|| ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 0 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' )
 			)
 			{
 				GetACSWatcher().PrimaryWeaponSwitch();
@@ -96,8 +98,8 @@ function ACS_SignSwitchArsenalInit()
 				
 			else if 
 			(
-				ACS_GetFocusModeSilverWeapon() == 4 && GetWitcherPlayer().IsWeaponHeld( 'silversword' )
-				|| ACS_GetFocusModeSteelWeapon() == 4 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' )
+				ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 4 && GetWitcherPlayer().IsWeaponHeld( 'silversword' )
+				|| ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 4 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' )
 			)
 			{
 				GetACSWatcher().PrimaryWeaponSwitch();
@@ -106,8 +108,8 @@ function ACS_SignSwitchArsenalInit()
 				
 			else if 
 			(
-				ACS_GetFocusModeSilverWeapon() == 8 && GetWitcherPlayer().IsWeaponHeld( 'silversword' )
-				|| ACS_GetFocusModeSteelWeapon() == 8 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' )
+				ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 8 && GetWitcherPlayer().IsWeaponHeld( 'silversword' )
+				|| ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 8 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' )
 			)
 			{
 				GetACSWatcher().PrimaryWeaponSwitch();
@@ -116,8 +118,8 @@ function ACS_SignSwitchArsenalInit()
 				
 			else if 
 			(
-				ACS_GetFocusModeSilverWeapon() == 6 && GetWitcherPlayer().IsWeaponHeld( 'silversword' )
-				|| ACS_GetFocusModeSteelWeapon() == 6 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' )
+				ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 6 && GetWitcherPlayer().IsWeaponHeld( 'silversword' )
+				|| ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 6 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' )
 			)
 			{
 				GetACSWatcher().PrimaryWeaponSwitch();
@@ -126,8 +128,8 @@ function ACS_SignSwitchArsenalInit()
 				
 			else if 
 			(
-				ACS_GetFocusModeSilverWeapon() == 2 && GetWitcherPlayer().IsWeaponHeld( 'silversword' )
-				|| ACS_GetFocusModeSteelWeapon() == 2 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' )
+				ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 2 && GetWitcherPlayer().IsWeaponHeld( 'silversword' )
+				|| ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 2 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' )
 			)
 			{
 				GetACSWatcher().PrimaryWeaponSwitch();

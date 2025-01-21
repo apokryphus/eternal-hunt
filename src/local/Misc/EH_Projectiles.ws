@@ -44,7 +44,7 @@ class W3ACSSwordProjectile extends W3AdvancedProjectile
 		
 		if ( actortarget 
 		&& actortarget != GetWitcherPlayer() 
-		&& GetAttitudeBetween( actortarget, GetWitcherPlayer() ) == AIA_Hostile 
+		&& GetAttitudeBetween( GetWitcherPlayer() , actortarget ) == AIA_Hostile 
 		&& actortarget.IsAlive() ) 
 		{
 			attAction = new W3Action_Attack in theGame.damageMgr;
@@ -84,7 +84,7 @@ class W3ACSSwordProjectile extends W3AdvancedProjectile
 			if ( victim 
 			&& !collidedEntities.Contains(victim) 
 			&& victim != GetWitcherPlayer() 
-			&& ( GetAttitudeBetween( victim, GetWitcherPlayer() ) == AIA_Hostile) 
+			&& ( GetAttitudeBetween( GetWitcherPlayer(), victim ) == AIA_Hostile) 
 			&& victim.IsAlive() )
 			{
 				actor = (CActor)victim;
@@ -103,7 +103,7 @@ class W3ACSSwordProjectile extends W3AdvancedProjectile
 						
 						stopped = true;
 						StopProjectile();
-						AddTimer('sword_destroy', 30);
+						AddTimer('sword_destroy', 15);
 					
 						res = this.CreateAttachmentAtBoneWS(actor, bone, arrowHitPos, this.GetWorldRotation());
 						
@@ -292,7 +292,7 @@ class W3ACSSwordProjectile extends W3AdvancedProjectile
 						
 						stopped = true;
 						StopProjectile();
-						AddTimer('sword_destroy', 30);
+						AddTimer('sword_destroy', 15);
 					
 						res = this.CreateAttachmentAtBoneWS(actor, bone, arrowHitPos, this.GetWorldRotation());
 						
@@ -329,7 +329,7 @@ class W3ACSSwordProjectile extends W3AdvancedProjectile
 		&& !stopped )
 		{
 			StopProjectile();
-			AddTimer('sword_destroy', 30);
+			AddTimer('sword_destroy', 15);
 			
 			this.SoundEvent("cmb_arrow_impact_dirt");
 			
@@ -388,7 +388,10 @@ class W3ACSKnifeProjectile extends W3AdvancedProjectile
 		//pos.Y += 0.25;
 		//comp.SetPosition( pos );
 
-		AddTimer('playredtrail', 0.0001, true);
+		//AddTimer('playredtrail', 0.0001, true);
+
+		StopEffect('red_trail');
+		PlayEffectSingle('red_trail');
 	}
 
 	timer function playredtrail( dt : float , optional id : int)
@@ -410,7 +413,7 @@ class W3ACSKnifeProjectile extends W3AdvancedProjectile
 		
 		if ( actortarget 
 		&& actortarget != GetWitcherPlayer() 
-		&& GetAttitudeBetween( actortarget, GetWitcherPlayer() ) == AIA_Hostile 
+		&& GetAttitudeBetween( GetWitcherPlayer(), actortarget ) == AIA_Hostile 
 		&& actortarget.IsAlive() ) 
 		{
 			action = new W3DamageAction in this;
@@ -452,7 +455,7 @@ class W3ACSKnifeProjectile extends W3AdvancedProjectile
 			if ( victim 
 			&& !collidedEntities.Contains(victim) 
 			&& victim != GetWitcherPlayer() 
-			&& ( GetAttitudeBetween( victim, GetWitcherPlayer() ) == AIA_Hostile) 
+			&& ( GetAttitudeBetween( GetWitcherPlayer(), victim ) == AIA_Hostile) 
 			&& victim.IsAlive() )
 			{
 				actor = (CActor)victim;
@@ -470,7 +473,7 @@ class W3ACSKnifeProjectile extends W3AdvancedProjectile
 						
 						stopped = true;
 						StopProjectile();
-						AddTimer('sword_destroy', 30);
+						AddTimer('sword_destroy', 15);
 					
 						res = this.CreateAttachmentAtBoneWS(actor, bone, arrowHitPos, this.GetWorldRotation());
 						
@@ -661,7 +664,7 @@ class W3ACSKnifeProjectile extends W3AdvancedProjectile
 						
 						stopped = true;
 						StopProjectile();
-						AddTimer('sword_destroy', 30);
+						AddTimer('sword_destroy', 15);
 
 						actor.GetInventory().AddAnItem('ACS_Knife', 1);
 					
@@ -1007,11 +1010,11 @@ class W3ACSLeviathanProjectile extends W3AdvancedProjectile
 			{
 				thePlayer.GetInventory().MountItem( thePlayer.inv.GetItemId('Leviathan'), true );  
 
-				thePlayer.GetWeaponHolster().OnWeaponDrawReady();
+				//thePlayer.GetWeaponHolster().OnWeaponDrawReady();
 
-				thePlayer.PushCombatActionOnBuffer( EBAT_Draw_Steel, BS_Pressed );
-					if ( thePlayer.GetBIsCombatActionAllowed() )
-						thePlayer.ProcessCombatActionBuffer();
+				//thePlayer.PushCombatActionOnBuffer( EBAT_Draw_Steel, BS_Pressed );
+					//if ( thePlayer.GetBIsCombatActionAllowed() )
+						//thePlayer.ProcessCombatActionBuffer();
 			}
 
 			GetACSWatcher().ACS_Leviathan_Release_Savelock();
@@ -1027,6 +1030,11 @@ class W3ACSLeviathanProjectile extends W3AdvancedProjectile
 		{
 			if (FactsQuerySum("ACS_Leviathan_Axe_Returning_Anim_Played") <= 0)
 			{
+				RemoveTimer('SwordTauntSwitch'); 
+				RemoveTimer('SwordTauntRunningSwitch'); 
+				RemoveTimer('SwordWalkLongWeaponSwitch'); 
+				RemoveTimer('SwordWalkSwitch'); 
+
 				thePlayer.RaiseEvent('LootHerb');
 
 				FactsAdd("ACS_Leviathan_Axe_Returning_Anim_Played", 1, -1);
@@ -1071,7 +1079,7 @@ class W3ACSLeviathanProjectile extends W3AdvancedProjectile
 		
 		if ( actortarget 
 		&& actortarget != GetWitcherPlayer() 
-		&& GetAttitudeBetween( actortarget, GetWitcherPlayer() ) == AIA_Hostile 
+		&& GetAttitudeBetween( GetWitcherPlayer(), actortarget ) == AIA_Hostile 
 		&& actortarget.IsAlive() ) 
 		{
 			this.SoundEvent('magic_eredin_icespike_tell_sparks');
@@ -1092,7 +1100,7 @@ class W3ACSLeviathanProjectile extends W3AdvancedProjectile
 
 			action = new W3DamageAction in this;
 
-			action.Initialize(GetWitcherPlayer(),victim,this,GetWitcherPlayer(),EHRT_Heavy,CPS_Undefined,false,true,false,false);
+			action.Initialize(GetWitcherPlayer(),victim,this,GetWitcherPlayer(),EHRT_Heavy,CPS_Undefined,false, true, false, false);
 
 			action.AddEffectInfo( EET_SlowdownFrost, 5 );
 
@@ -1189,12 +1197,12 @@ class W3ACSLeviathanProjectile extends W3AdvancedProjectile
 		
 		if ( actortarget 
 		&& actortarget != GetWitcherPlayer() 
-		&& GetAttitudeBetween( actortarget, GetWitcherPlayer() ) == AIA_Hostile 
+		&& GetAttitudeBetween( GetWitcherPlayer(), actortarget ) == AIA_Hostile 
 		&& actortarget.IsAlive() ) 
 		{
 			action = new W3DamageAction in this;
 
-			action.Initialize(GetWitcherPlayer(),victim,this,GetWitcherPlayer(),EHRT_None,CPS_Undefined,false,true,false,false);
+			action.Initialize(GetWitcherPlayer(),victim,this,GetWitcherPlayer(),EHRT_None,CPS_Undefined,false, true, false, false);
 
 			action.AddDamage(theGame.params.DAMAGE_NAME_FROST, actortarget.GetCurrentHealth() * 0.0000001 );
 
@@ -1224,7 +1232,7 @@ class W3ACSLeviathanProjectile extends W3AdvancedProjectile
 				if ( victim 
 				&& !collidedEntities.Contains(victim) 
 				&& victim != GetWitcherPlayer() 
-				&& ( GetAttitudeBetween( victim, GetWitcherPlayer() ) == AIA_Hostile) 
+				&& ( GetAttitudeBetween( GetWitcherPlayer(), victim ) == AIA_Hostile) 
 				&& victim.IsAlive() )
 				{
 					actor = (CActor)victim;
@@ -1263,7 +1271,7 @@ class W3ACSLeviathanProjectile extends W3AdvancedProjectile
 				if ( victim 
 				&& !collidedEntities.Contains(victim) 
 				&& victim != GetWitcherPlayer() 
-				&& ( GetAttitudeBetween( victim, GetWitcherPlayer() ) == AIA_Hostile) 
+				&& ( GetAttitudeBetween( GetWitcherPlayer(), victim ) == AIA_Hostile) 
 				&& victim.IsAlive() )
 				{
 					actor = (CActor)victim;
@@ -1612,6 +1620,11 @@ class W3LeviathanContainer extends W3Container
 			{
 				FactsRemove("ACS_Leviathan_Axe_Returning");
 			}
+
+			RemoveTimer('SwordTauntSwitch'); 
+			RemoveTimer('SwordTauntRunningSwitch'); 
+			RemoveTimer('SwordWalkLongWeaponSwitch'); 
+			RemoveTimer('SwordWalkSwitch'); 
 
 			thePlayer.RaiseEvent('LootHerb');
 
@@ -1990,12 +2003,12 @@ class ACSBladeProjectile extends W3AdvancedProjectile
 		
 		if ( actortarget 
 		&& actortarget != GetWitcherPlayer() 
-		&& GetAttitudeBetween( actortarget, GetWitcherPlayer() ) == AIA_Hostile 
+		&& GetAttitudeBetween( GetWitcherPlayer(), actortarget ) == AIA_Hostile 
 		&& actortarget.IsAlive() ) 
 		{
 			dmg = new W3DamageAction in theGame.damageMgr;
 
-			dmg.Initialize(GetWitcherPlayer(), actortarget, NULL, GetWitcherPlayer().GetName(), EHRT_Heavy, CPS_Undefined, false, false, true, false);
+			dmg.Initialize(GetWitcherPlayer(), actortarget, NULL, GetWitcherPlayer().GetName(), EHRT_Heavy, CPS_Undefined, false, true, false, false);
 			
 			dmg.SetProcessBuffsIfNoDamage(true);
 			
@@ -2034,6 +2047,8 @@ class ACSBladeProjectile extends W3AdvancedProjectile
 
 			GetWitcherPlayer().SoundEvent("cmb_play_hit_light");
 
+			damageMax += damageMax * ACS_SignIntensityPercentage('total') * 0.5;
+
 			dmg.AddDamage( theGame.params.DAMAGE_NAME_FIRE, damageMax );
 
 			dmg.AddEffectInfo( EET_Burning, 0.1 );
@@ -2057,12 +2072,12 @@ class ACSBladeProjectile extends W3AdvancedProjectile
 		
 		if ( actortarget 
 		&& actortarget != GetWitcherPlayer() 
-		&& GetAttitudeBetween( actortarget, GetWitcherPlayer() ) == AIA_Hostile 
+		&& GetAttitudeBetween( GetWitcherPlayer(), actortarget ) == AIA_Hostile 
 		&& actortarget.IsAlive() ) 
 		{
 			dmg = new W3DamageAction in theGame.damageMgr;
 
-			dmg.Initialize(GetWitcherPlayer(), actortarget, NULL, GetWitcherPlayer().GetName(), EHRT_Heavy, CPS_Undefined, false, false, true, false);
+			dmg.Initialize(GetWitcherPlayer(), actortarget, NULL, GetWitcherPlayer().GetName(), EHRT_Heavy, CPS_Undefined, false, true, false, false);
 			
 			dmg.SetProcessBuffsIfNoDamage(true);
 			
@@ -2085,6 +2100,8 @@ class ACSBladeProjectile extends W3AdvancedProjectile
 				
 				damageMax = maxTargetEssence * 0.030625; 
 			} 
+
+			damageMax += damageMax * ACS_SignIntensityPercentage('total') * 0.5;
 
 			dmg.AddDamage( theGame.params.DAMAGE_NAME_DIRECT, damageMax );
 
@@ -2155,7 +2172,7 @@ class ACSBladeProjectile extends W3AdvancedProjectile
 				if ( victim 
 				&& !collidedEntities.Contains(victim) 
 				&& victim != GetWitcherPlayer() 
-				&& ( GetAttitudeBetween( victim, GetWitcherPlayer() ) == AIA_Hostile) 
+				&& ( GetAttitudeBetween( GetWitcherPlayer(), victim ) == AIA_Hostile) 
 				&& victim.IsAlive() )
 				{
 					actor = (CActor)victim;
@@ -2212,7 +2229,7 @@ class ACSBladeProjectile extends W3AdvancedProjectile
 				if ( victim 
 				&& !collidedEntities.Contains(victim) 
 				&& victim != GetWitcherPlayer() 
-				&& ( GetAttitudeBetween( victim, GetWitcherPlayer() ) == AIA_Hostile) 
+				&& ( GetAttitudeBetween( GetWitcherPlayer(), victim ) == AIA_Hostile) 
 				&& victim.IsAlive() )
 				{
 					actor = (CActor)victim;
@@ -2368,6 +2385,7 @@ class ACSBowProjectile extends W3AdvancedProjectile
 	
 	timer function sword_destroy( dt : float , optional id : int)
 	{
+		StopProjectile();
 		RemoveTimers();
 		StopEffect('glow');
 		PlayEffect('disappear');
@@ -2445,7 +2463,7 @@ class ACSBowProjectile extends W3AdvancedProjectile
 		
 		if ( actortarget 
 		&& actortarget != GetWitcherPlayer() 
-		&& GetAttitudeBetween( actortarget, GetWitcherPlayer() ) == AIA_Hostile 
+		&& GetAttitudeBetween( GetWitcherPlayer(), actortarget ) == AIA_Hostile 
 		&& actortarget.IsAlive() ) 
 		{
 			((CActor)victim).AddAbility( 'DisableFinishers', true );
@@ -2487,7 +2505,7 @@ class ACSBowProjectile extends W3AdvancedProjectile
 		
 		if ( actortarget 
 		&& actortarget != GetWitcherPlayer() 
-		&& GetAttitudeBetween( actortarget, GetWitcherPlayer() ) == AIA_Hostile 
+		&& GetAttitudeBetween( GetWitcherPlayer(), actortarget ) == AIA_Hostile 
 		&& actortarget.IsAlive() ) 
 		{
 			attAction = new W3Action_Attack in theGame.damageMgr;
@@ -2618,7 +2636,7 @@ class ACSBowProjectile extends W3AdvancedProjectile
 			if ( victim 
 			&& !collidedEntities.Contains(victim) 
 			&& victim != GetWitcherPlayer() 
-			&& ( GetAttitudeBetween( victim, GetWitcherPlayer() ) == AIA_Hostile) 
+			&& ( GetAttitudeBetween( GetWitcherPlayer(), victim ) == AIA_Hostile) 
 			&& victim.IsAlive() )
 			{
 				actor = (CActor)victim;
@@ -2637,7 +2655,7 @@ class ACSBowProjectile extends W3AdvancedProjectile
 
 							stopped = true;
 							StopProjectile();
-							AddTimer('sword_destroy', 30);
+							AddTimer('sword_destroy', 15);
 						}
 					}
 					else
@@ -2650,7 +2668,7 @@ class ACSBowProjectile extends W3AdvancedProjectile
 
 							stopped = true;
 							StopProjectile();
-							AddTimer('sword_destroy', 30);
+							AddTimer('sword_destroy', 15);
 						}
 					}
 				}
@@ -2666,7 +2684,7 @@ class ACSBowProjectile extends W3AdvancedProjectile
 
 							stopped = true;
 							StopProjectile();
-							AddTimer('sword_destroy', 30);
+							AddTimer('sword_destroy', 15);
 						}
 					}
 					else
@@ -2679,7 +2697,7 @@ class ACSBowProjectile extends W3AdvancedProjectile
 
 							stopped = true;
 							StopProjectile();
-							AddTimer('sword_destroy', 30);
+							AddTimer('sword_destroy', 15);
 						}
 					}
 				}
@@ -2704,7 +2722,7 @@ class ACSBowProjectile extends W3AdvancedProjectile
 			RemoveTimer('tracking');
 
 			StopProjectile();
-			AddTimer('sword_destroy', 30);
+			AddTimer('sword_destroy', 15);
 			
 			this.SoundEvent("cmb_arrow_impact_dirt");
 			
@@ -2726,7 +2744,7 @@ class ACSBowProjectile extends W3AdvancedProjectile
 	}
 }
 
-class ACSBowProjectileMoving extends W3AdvancedProjectile
+class ACSBowProjectileMoving extends W3BoltProjectile
 {
 	private var bone 														: name;
 	private var actor, actortarget											: CActor;
@@ -2745,41 +2763,193 @@ class ACSBowProjectileMoving extends W3AdvancedProjectile
 	private var maxTargetVitality, maxTargetEssence, damageMax, damageMin	: float;
 	private var displaytarget												: CActor;
 	private var targetPositionNPC											: Vector;
+	private var vfxEnt1 		: CEntity;
+	private var attach_rot 		: EulerAngles;
+	private var attach_vec 		: Vector;
+	private var eff_names		: array<CName>;
+
 	var projectileSpeed : float;
+
 	default projectileSpeed = 0;
 
 	event OnSpawned( spawnData : SEntitySpawnData )
 	{
-
+		AddTag('ACS_Azkar_Arrow');
 	}
 	
 	event OnProjectileInit()
 	{	
 		comp = (CMeshComponent)this.GetComponentByClassName('CMeshComponent');
 		rot = comp.GetLocalRotation();
+
 		rot.Yaw -= 90;
+
+		//rot.Roll += 90;
+		//rot.Yaw += 90;
 		comp.SetRotation( rot );
 
 		this.SoundEvent( "cmb_arrow_swoosh" );
 
-		PlayEffect( 'arrow_trail' );
+		PlayEffect( 'ghost_06' );
 
-		PlayEffect( 'arrow_trail_underwater' );
+		if (FactsQuerySum("ACS_Azkar_Aiming") > 0)
+		{
+			AddTag('ACS_Azkar_Aiming_Arrow');
 
-		PlayEffect( 'arrow_trail_red' );
+			AddTimer('tracking_delay', 0.125, false);
+		}
+		else
+		{
+			AddTimer('tracking_delay', 0.25, false);
+		}
 
-		//PlayEffect( 'arrow_trail_fire' );
+		AddTimer('detonate_check', 0.001, true);
 
-		//PlayEffect( 'fire' );
-
-		//PlayEffect( 'lightning_hit' );
-
-		AddTimer('tracking_delay', 0.25, false);
+		AddTimer('sword_destroy', 31, false);
 	}
 
 	timer function tracking_delay( deltaTime : float , id : int)
 	{
-		AddTimer('tracking', 0.001, true);
+		var targetPosition											: Vector;
+
+		if (FactsQuerySum("ACS_Azkar_Aiming") > 0)
+		{
+			PlayEffect( 'appear_flash' );
+
+			PlayEffect( 'hit_flash' );
+
+			PlayEffect( 'appear_flash_hit_1' );
+
+			PlayEffect( 'appear_flash_hit_2' );
+
+			targetPosition = 
+		
+			GetACSWatcher().GetPlayerCamera().GetWorldPosition() + GetACSWatcher().GetPlayerCamera().GetWorldForward() * 50;
+
+			this.ShootProjectileAtPosition( 0, 30, targetPosition, 500  );
+		}
+		else
+		{
+			AddTimer('tracking', 0.001, true);
+		}
+	}
+
+	var vfxent_attach_rot : EulerAngles;
+	var vfxent_attach_vec : Vector;
+
+	var vfxEnt 				: CEntity;
+
+	timer function detonate_check( deltaTime : float , id : int)
+	{
+		var targetRot			: EulerAngles;
+
+		comp = (CMeshComponent)this.GetComponentByClassName('CMeshComponent');
+		rot = comp.GetLocalRotation();
+
+		rot.Roll += 10;
+
+		if (HasTag('ACS_Azkar_Arrow_Detonate'))
+		{
+			if (!HasTag('ACS_Azkar_Arrow_Detonate_Process'))
+			{
+				StopAllEffects();
+				
+				targetRot = thePlayer.GetWorldRotation();
+				targetRot.Yaw = RandRangeF(360,-360);
+				targetRot.Pitch = RandRangeF(45,-45);
+
+				vfxEnt = theGame.CreateEntity( (CEntityTemplate)LoadResource( 
+
+				"dlc\dlc_acs\data\fx\azkar_fx\wraith_explode.w2ent"
+				
+				, true ), this.GetWorldPosition(), targetRot );
+
+				vfxEnt.CreateAttachment(this);
+
+				RemoveTimer('detonate');
+				AddTimer('detonate', 1.75, false);
+
+				AddTag('ACS_Azkar_Arrow_Detonate_Process');
+
+				RemoveTimer('detonate_check');
+			}
+		}
+	}
+
+	timer function detonate( deltaTime : float , id : int)
+	{
+		var actorsAround	 	: array<CActor>;
+		var i					: int;
+		var targetRot			: EulerAngles;
+
+		actorsAround = GetActorsInRange( this, 4, , , true );
+
+		for( i = 0; i < actorsAround.Size(); i += 1 )
+		{
+			DealDamageToTargetExplode( actorsAround[i] );
+		}
+
+		vfxEnt.PlayEffectSingle('explode');
+		vfxEnt.PlayEffectSingle('blast');
+		vfxEnt.PlayEffectSingle('sphere_original');
+		vfxEnt.DestroyAfter(5.5);
+
+		RemoveTimer('sword_destroy');
+		AddTimer('sword_destroy', 5.5, false);
+	}
+
+	timer function lighting_trails( deltaTime : float , id : int)
+	{
+		if (!vfxEnt1)
+		{
+			vfxEnt1 = theGame.CreateEntity( (CEntityTemplate)LoadResource( "gameplay\abilities\sorceresses\sorceress_lightining_bolt.w2ent", true ), GetWitcherPlayer().GetWorldPosition() );
+
+			vfxent_attach_rot.Roll = 0;
+			vfxent_attach_rot.Pitch = 0;
+			vfxent_attach_rot.Yaw = 0;
+			vfxent_attach_vec.X = 0;
+			vfxent_attach_vec.Y = 0;
+			vfxent_attach_vec.Z = 0;
+
+			vfxEnt1.CreateAttachment( this );
+		}
+
+		vfxEnt1.BreakAttachment();
+
+		vfxEnt1.CreateAttachment( this,, vfxent_attach_vec, vfxent_attach_rot );
+
+		vfxent_attach_rot.Roll += 30;
+		
+		//eff_names.Clear();
+
+		//eff_names.PushBack('diagonal_up_left');
+		//eff_names.PushBack('diagonal_down_left');
+		//eff_names.PushBack('down');
+		//eff_names.PushBack('up');
+		//eff_names.PushBack('diagonal_up_right');
+		//eff_names.PushBack('diagonal_down_right');
+		//eff_names.PushBack('right');
+		//eff_names.PushBack('left');
+
+		vfxEnt1.DestroyEffect('diagonal_up_left');
+		vfxEnt1.DestroyEffect('diagonal_down_left');
+		vfxEnt1.DestroyEffect('down');
+		vfxEnt1.DestroyEffect('up');
+		vfxEnt1.DestroyEffect('diagonal_up_right');
+		vfxEnt1.DestroyEffect('diagonal_down_right');
+		vfxEnt1.DestroyEffect('right');
+		vfxEnt1.DestroyEffect('left');
+
+		vfxEnt1.PlayEffect('diagonal_up_left');
+		vfxEnt1.PlayEffect('diagonal_down_left');
+		vfxEnt1.PlayEffect('down');
+		vfxEnt1.PlayEffect('up');
+		vfxEnt1.PlayEffect('diagonal_up_right');
+		vfxEnt1.PlayEffect('diagonal_down_right');
+		vfxEnt1.PlayEffect('right');
+		vfxEnt1.PlayEffect('left');
+		
+		//vfxEnt1.PlayEffectSingle(eff_names[RandRange(eff_names.Size())]);
 	}
 
 	timer function tracking( deltaTime : float , id : int)
@@ -2793,242 +2963,271 @@ class ACSBowProjectileMoving extends W3AdvancedProjectile
 
 		playerMoveTarget = thePlayer.moveTarget;	
 
-		movetargetposition = playerMoveTarget.GetWorldPosition();
+		//movetargetposition = playerMoveTarget.GetWorldPosition();
 
-		movetargetposition.Z += 1.1;
+		//movetargetposition.Z += 1.1;
 
 		targetDistance = VecDistanceSquared2D( this.GetWorldPosition(), displaytarget.GetWorldPosition() ) ;
 
+		projectileSpeed += 1;
 
-		if (displaytarget)
+		if (displaytarget && GetAttitudeBetween( thePlayer, displaytarget ) == AIA_Hostile)
 		{
-			projectileSpeed += 1;
-
-			if( targetDistance <= 3 * 3 ) 
+			if ( displaytarget.GetBoneIndex('head') != -1 )
 			{
-				if ( displaytarget.GetBoneIndex('head') != -1 )
+				targetPositionNPC = displaytarget.GetBoneWorldPosition('head');
+				//targetPositionNPC.Z += RandRangeF(0,-0.1);
+				targetPositionNPC.X += RandRangeF(0.1,-0.1);
+			}
+			else
+			{
+				if ( displaytarget.GetBoneIndex('k_head_g') != -1 )
 				{
-					targetPositionNPC = displaytarget.GetBoneWorldPosition('head');
-					//targetPositionNPC.Z += RandRangeF(0,-0.1);
+					targetPositionNPC = displaytarget.GetBoneWorldPosition('k_head_g');
+					//targetPositionNPC.Z += RandRangeF(0.1,-0.1);
 					targetPositionNPC.X += RandRangeF(0.1,-0.1);
 				}
 				else
 				{
-					if ( displaytarget.GetBoneIndex('k_head_g') != -1 )
-					{
-						targetPositionNPC = displaytarget.GetBoneWorldPosition('k_head_g');
-						//targetPositionNPC.Z += RandRangeF(0.1,-0.1);
-						targetPositionNPC.X += RandRangeF(0.1,-0.1);
-					}
-					else
-					{
-						targetPositionNPC = displaytarget.GetWorldPosition();
-						targetPositionNPC.Z += 1.5;
-						targetPositionNPC.X += RandRangeF(0.1,-0.1);
-					}
-				}
-			}
-			else if( targetDistance > 3 * 3 && targetDistance <= 7.5*7.5 ) 
-			{
-				if ( displaytarget.GetBoneIndex('head') != -1 )
-				{
-					targetPositionNPC = displaytarget.GetBoneWorldPosition('head');
-					targetPositionNPC.Z += RandRangeF(0,-0.25);
-					targetPositionNPC.X += RandRangeF(0.15,-0.15);
-				}
-				else
-				{
-					if ( displaytarget.GetBoneIndex('k_head_g') != -1 )
-					{
-						targetPositionNPC = displaytarget.GetBoneWorldPosition('k_head_g');
-						targetPositionNPC.Z += RandRangeF(0,-0.25);
-						targetPositionNPC.X += RandRangeF(0.15,-0.15);
-					}
-					else
-					{
-						targetPositionNPC = displaytarget.GetWorldPosition();
-						targetPositionNPC.Z += RandRangeF(0,-0.25);
-						targetPositionNPC.X += RandRangeF(0.15,-0.15);
-					}
-				}
-			}
-			else if( targetDistance > 7.5 * 7.5 ) 
-			{
-				if ( displaytarget.GetBoneIndex('head') != -1 )
-				{
-					targetPositionNPC = displaytarget.GetBoneWorldPosition('head');
-					targetPositionNPC.Z += RandRangeF(0,-0.5);
-					targetPositionNPC.X += RandRangeF(0.25,-0.25);
-				}
-				else
-				{
-					if ( displaytarget.GetBoneIndex('k_head_g') != -1 )
-					{
-						targetPositionNPC = displaytarget.GetBoneWorldPosition('k_head_g');
-						targetPositionNPC.Z += RandRangeF(0,-0.5);
-						targetPositionNPC.X += RandRangeF(0.25,-0.25);
-					}
-					else
-					{
-						targetPositionNPC = displaytarget.GetWorldPosition();
-						targetPositionNPC.Z += RandRangeF(0,-0.5);
-						targetPositionNPC.X += RandRangeF(0.25,-0.25);
-					}
+					targetPositionNPC = displaytarget.GetWorldPosition();
+					targetPositionNPC.Z += 1.5;
+					targetPositionNPC.X += RandRangeF(0.1,-0.1);
 				}
 			}
 
-			if ( displaytarget.HasTag('ACS_second_bow_moving_projectile'))
-			{
-				this.ShootProjectileAtPosition( 0, 10+(projectileSpeed*2), targetPositionNPC, 500  );
-
-				if (!this.IsEffectActive('arrow_trail_fire', false))
-				{
-					PlayEffectSingle('arrow_trail_fire');
-				}
-			}
-			else
-			{
-				this.ShootProjectileAtPosition( 0, 10+projectileSpeed, targetPositionNPC, 500  );
-
-				if (this.IsEffectActive('arrow_trail_fire', false))
-				{
-					StopEffect('arrow_trail_fire');
-				}
-			}
+			this.ShootProjectileAtPosition( 0, 10+projectileSpeed, targetPositionNPC, 500  );
 		}
 		else
 		{
-			if (this.IsEffectActive('arrow_trail_fire', false))
-			{
-				StopEffect('arrow_trail_fire');
-			}
-
+			this.ShootProjectileAtPosition( 0, 30, this.GetWorldPosition() + this.GetWorldForward() * 50, 500  );
+			
 			RemoveTimer('tracking');
 		}
 	}
 	
 	timer function sword_destroy( dt : float , optional id : int)
 	{
+		vfxEnt.Destroy();
+		StopProjectile();
 		RemoveTimers();
-		StopEffect('glow');
+		StopAllEffects();
 		PlayEffect('disappear');
 		DestroyAfter(0.4);
 	}
-	
-	function DealDamageToTarget( victim : CGameplayEntity, eff : EEffectType, crit : bool )
+
+	function DealDamageToTargetExplode( victim : CGameplayEntity)
 	{
+		var dmgVal																				: float;
+		var item_steel, item_silver																: SItemUniqueId;
+		var markerNPC_1 																		: CEntity;
+		var markerTemplate 																		: CEntityTemplate;
+
+		actortarget = (CActor)victim;
+
+		if ( actortarget 
+		&& actortarget != GetWitcherPlayer() 
+		&& GetAttitudeBetween( GetWitcherPlayer(), actortarget ) == AIA_Hostile 
+		&& actortarget.IsAlive() ) 
+		{
+			if (thePlayer.IsWeaponHeld('steelsword'))
+			{
+				GetWitcherPlayer().GetInventory().GetItemEquippedOnSlot(EES_SteelSword, item_steel);
+
+				dmgVal = GetWitcherPlayer().GetTotalWeaponDamage(item_steel, theGame.params.DAMAGE_NAME_SLASHING, GetInvalidUniqueId()) 
+				+ GetWitcherPlayer().GetTotalWeaponDamage(item_steel, theGame.params.DAMAGE_NAME_PIERCING, GetInvalidUniqueId())
+				+ GetWitcherPlayer().GetTotalWeaponDamage(item_steel, theGame.params.DAMAGE_NAME_BLUDGEONING, GetInvalidUniqueId());
+			}
+			else if (thePlayer.IsWeaponHeld('silversword'))
+			{
+				GetWitcherPlayer().GetInventory().GetItemEquippedOnSlot(EES_SilverSword, item_silver);
+
+				dmgVal = GetWitcherPlayer().GetTotalWeaponDamage(item_silver, theGame.params.DAMAGE_NAME_SILVER, GetInvalidUniqueId()); 
+			}
+			else
+			{
+				dmgVal = 1;
+			}
+
+			dmg = new W3DamageAction in theGame.damageMgr;
+			
+			dmg.Initialize(GetWitcherPlayer(), victim, GetWitcherPlayer(), GetWitcherPlayer().GetName(), EHRT_Heavy, CPS_Undefined, false, true, false, false);
+			
+			dmg.SetHitReactionType( EHRT_Heavy );
+
+			dmg.SetHitAnimationPlayType(EAHA_ForceYes);
+
+			dmg.SetProcessBuffsIfNoDamage(true);
+
+			dmg.SetForceExplosionDismemberment();
+
+			dmgVal += dmgVal * ACS_SignIntensityPercentage('total') * 0.5;
+
+			if (!actortarget.HasAbility('mon_wraith_base')
+			&& !actortarget.HasAbility('mon_noonwraith_base')
+			&& !actortarget.HasAbility('mon_nightwraith_banshee')
+			&& !actortarget.HasAbility('mon_EP2_wraiths')
+			&& !actortarget.HasAbility('mon_nightwraith_iris')
+			&& !actortarget.HasAbility('q604_shades')
+			&& !actortarget.HasAbility('mon_wraiths_ep1')
+			&& !actortarget.HasAbility('mon_djinn')
+			)
+			{
+				dmg.AddDamage( theGame.params.DAMAGE_NAME_PHYSICAL, dmgVal * 0.1 );
+
+				dmg.AddDamage( theGame.params.DAMAGE_NAME_SILVER, dmgVal * 0.1 );
+			}
+			else
+			{
+				dmg.AddDamage( theGame.params.DAMAGE_NAME_DIRECT, dmgVal * 0.1 );
+			}
+
+			dmg.AddEffectInfo( EET_HeavyKnockdown, 2 );
+
+			dmg.AddEffectInfo( EET_Burning, 3 );
+
+			theGame.damageMgr.ProcessAction( dmg );
+				
+			delete dmg;	
+
+			if ( ( (CNewNPC)victim).IsShielded( NULL ) )
+			{
+				( (CNewNPC)victim).ProcessShieldDestruction();
+			}
+
+			if (!((CNewNPC)victim).HasTag('ACS_Wraith_Finisher_Marked'))
+			{
+				((CNewNPC)victim).AddTag('ACS_Wraith_Finisher_Marked');
+
+				markerTemplate = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\entities\other\wraith_finisher_mark.w2ent", true );
+			
+				markerNPC_1 = (CEntity)theGame.CreateEntity( markerTemplate, ((CNewNPC)victim).GetWorldPosition() );
+
+				markerNPC_1.CreateAttachment( ((CNewNPC)victim), 'blood_point' );
+			}
+		}
+	}
+	
+	function DealDamageToTarget( victim : CGameplayEntity )
+	{
+		var markerNPC_1 																		: CEntity;
+		var markerTemplate 																		: CEntityTemplate;
+		var attach_vec																			: Vector;
+		var attach_rot																			: EulerAngles;	
+		var animcomp 																			: CAnimatedComponent;
+		var dmgVal																				: float;
+		var item_steel, item_silver																: SItemUniqueId;
+	
 		actortarget = (CActor)victim;
 
 		((CActor)victim).AddAbility( 'DisableFinishers', true );
 		
 		if ( actortarget 
 		&& actortarget != GetWitcherPlayer() 
-		&& GetAttitudeBetween( actortarget, GetWitcherPlayer() ) == AIA_Hostile 
+		&& GetAttitudeBetween( GetWitcherPlayer(), actortarget ) == AIA_Hostile 
 		&& actortarget.IsAlive() ) 
 		{
-			
-			if (actortarget.UsesVitality()) 
-			{ 
-				maxTargetVitality = actortarget.GetStatMax( BCS_Vitality );
 
-				damageMax = maxTargetVitality * 0.025; 
-				
-				damageMin = maxTargetVitality * 0.01; 
-			} 
-			else if (actortarget.UsesEssence()) 
-			{ 
-				maxTargetEssence = actortarget.GetStatMax( BCS_Essence );
-				
-				damageMax = maxTargetEssence * 0.05; 
-				
-				damageMin = maxTargetEssence * 0.025; 
-			} 
+			if (thePlayer.IsWeaponHeld('steelsword'))
+			{
+				GetWitcherPlayer().GetInventory().GetItemEquippedOnSlot(EES_SteelSword, item_steel);
+
+				dmgVal = GetWitcherPlayer().GetTotalWeaponDamage(item_steel, theGame.params.DAMAGE_NAME_SLASHING, GetInvalidUniqueId()) 
+				+ GetWitcherPlayer().GetTotalWeaponDamage(item_steel, theGame.params.DAMAGE_NAME_PIERCING, GetInvalidUniqueId())
+				+ GetWitcherPlayer().GetTotalWeaponDamage(item_steel, theGame.params.DAMAGE_NAME_BLUDGEONING, GetInvalidUniqueId());
+			}
+			else if (thePlayer.IsWeaponHeld('silversword'))
+			{
+				GetWitcherPlayer().GetInventory().GetItemEquippedOnSlot(EES_SilverSword, item_silver);
+
+				dmgVal = GetWitcherPlayer().GetTotalWeaponDamage(item_silver, theGame.params.DAMAGE_NAME_SILVER, GetInvalidUniqueId()); 
+			}
+			else
+			{
+				dmgVal = 1;
+			}
+
+			dmgVal += dmgVal * ACS_SignIntensityPercentage('total') * 0.5;
 
 			dmg = new W3DamageAction in theGame.damageMgr;
 			
-			dmg.Initialize(GetWitcherPlayer(), victim, GetWitcherPlayer(), GetWitcherPlayer().GetName(), EHRT_None, CPS_AttackPower, true, false, false, false);
-			
-			dmg.SetHitReactionType( EHRT_Light );
-
-			dmg.SetHitAnimationPlayType(EAHA_ForceYes);
-
-			dmg.SetProcessBuffsIfNoDamage(true);
-
-			//dmg.SetForceExplosionDismemberment();
-			
-			dmg.AddDamage( theGame.params.DAMAGE_NAME_PHYSICAL, RandRangeF(damageMax,damageMin) / 2 );
-
-			dmg.AddDamage( theGame.params.DAMAGE_NAME_SILVER, RandRangeF(damageMax,damageMin) / 2 );
-
-			if( !actortarget.IsImmuneToBuff( EET_Stagger ) && !actortarget.HasBuff( EET_Stagger ) ) 
-			{ 
-				//dmg.AddEffectInfo( EET_Stagger, 0.1 );
-			}
-
-			if (
-			!actortarget.HasTag('ACS_first_bow_moving_projectile')
-			&& !actortarget.HasTag('ACS_second_bow_moving_projectile')
-			)
+			if (HasTag('ACS_Azkar_Aiming_Arrow'))
 			{
-				actortarget.AddTag('ACS_first_bow_moving_projectile'); 
-			}
-			else if (
-			actortarget.HasTag('ACS_first_bow_moving_projectile') 
-			)
-			{
-				actortarget.RemoveTag('ACS_first_bow_moving_projectile'); 
-				actortarget.AddTag('ACS_second_bow_moving_projectile');
-			}
-			else if (
-			actortarget.HasTag('ACS_second_bow_moving_projectile')
-			)
-			{
-				if (GetWitcherPlayer().GetEquippedSign() == ST_Igni)
+				dmg.Initialize(GetWitcherPlayer(), victim, GetWitcherPlayer(), GetWitcherPlayer().GetName(), EHRT_Heavy, CPS_Undefined, false, true, false, false);
+
+				if (!actortarget.HasAbility('mon_wraith_base')
+				&& !actortarget.HasAbility('mon_noonwraith_base')
+				&& !actortarget.HasAbility('mon_nightwraith_banshee')
+				&& !actortarget.HasAbility('mon_EP2_wraiths')
+				&& !actortarget.HasAbility('mon_nightwraith_iris')
+				&& !actortarget.HasAbility('q604_shades')
+				&& !actortarget.HasAbility('mon_wraiths_ep1')
+				&& !actortarget.HasAbility('mon_djinn')
+				)
 				{
-					dmg.AddEffectInfo( EET_Burning, 1 );
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_PHYSICAL, dmgVal );
+
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_SILVER, dmgVal );
 				}
-				else if (GetWitcherPlayer().GetEquippedSign() == ST_Axii)
+				else
 				{
-					dmg.AddEffectInfo( EET_Frozen, 1 );
-				}
-				else if (GetWitcherPlayer().GetEquippedSign() == ST_Aard)
-				{
-					dmg.AddEffectInfo( EET_HeavyKnockdown, 1 );
-				}
-				else if (GetWitcherPlayer().GetEquippedSign() == ST_Yrden)
-				{
-					dmg.AddEffectInfo( EET_Slowdown, 1 );
-				}
-				else if (GetWitcherPlayer().GetEquippedSign() == ST_Quen)
-				{
-					dmg.AddEffectInfo( EET_Paralyzed, 1 );
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_DIRECT, dmgVal );
 				}
 
-				dmg.AddDamage( theGame.params.DAMAGE_NAME_DIRECT, RandRangeF(damageMax,damageMin) * 2.5 );
-
-				dmg.SetHitReactionType( EHRT_Light );
+				dmg.SetHitReactionType( EHRT_Heavy );
 
 				dmg.SetHitAnimationPlayType(EAHA_ForceYes);
 
-				actortarget.RemoveTag('ACS_second_bow_moving_projectile'); 
+				dmg.SetForceExplosionDismemberment();
+
+				if ( ( (CNewNPC)victim).IsShielded( NULL ) )
+				{
+					( (CNewNPC)victim).ProcessShieldDestruction();
+				}
+			}
+			else
+			{
+				dmg.Initialize(GetWitcherPlayer(), victim, GetWitcherPlayer(), GetWitcherPlayer().GetName(), EHRT_None, CPS_Undefined, false, true, false, false);
+
+				if (!actortarget.HasAbility('mon_wraith_base')
+				&& !actortarget.HasAbility('mon_noonwraith_base')
+				&& !actortarget.HasAbility('mon_nightwraith_banshee')
+				&& !actortarget.HasAbility('mon_EP2_wraiths')
+				&& !actortarget.HasAbility('mon_nightwraith_iris')
+				&& !actortarget.HasAbility('q604_shades')
+				&& !actortarget.HasAbility('mon_wraiths_ep1')
+				&& !actortarget.HasAbility('mon_djinn')
+				)
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_PHYSICAL, dmgVal * 0.25 );
+
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_SILVER, dmgVal * 0.25 );
+				}
+				else
+				{
+					dmg.AddDamage( theGame.params.DAMAGE_NAME_DIRECT, dmgVal * 0.25 );
+				}
+
+				animcomp = (CAnimatedComponent)actortarget.GetComponentByClassName('CAnimatedComponent');
+
+				animcomp.FreezePose();
+
+				animcomp.UnfreezePoseFadeOut(0.25f);
 			}
 
-			//dmg.AddEffectInfo( effType, 3 );
-
-			dmg.CanBeParried();
-
-			dmg.CanBeDodged();
+			dmg.SetIgnoreArmor(true);
 				
 			theGame.damageMgr.ProcessAction( dmg );
 				
 			delete dmg;	
-			
-			if ( ( (CNewNPC)victim).IsShielded( NULL ) )
-			{
-				( (CNewNPC)victim).ProcessShieldDestruction();
-			}
 
 			((CActor)victim).RemoveAbility( 'DisableFinishers' );
+
+			/*
+			if (actortarget.GetHealth() <= actortarget.GetMaxHealth() * 0.05) 
+			{
+				GetACSWatcher().ACS_PhantomPerformFinisher(actortarget);
+			}
+			*/
 			
 			collidedEntities.PushBack(victim);
 		}
@@ -3040,51 +3239,81 @@ class ACSBowProjectileMoving extends W3AdvancedProjectile
 		{
 			victim = (CGameplayEntity)collidingComponent.GetEntity();
 		}
-		
-		if( collidingComponent 
-		&& !hitCollisionsGroups.Contains( 'Static' ) 
-		)
-		{		
-			if ( victim 
-			&& !collidedEntities.Contains(victim) 
-			&& victim != GetWitcherPlayer() 
-			&& ( GetAttitudeBetween( victim, GetWitcherPlayer() ) == AIA_Hostile) 
-			&& victim.IsAlive() )
-			{
-				actor = (CActor)victim;
-				
-				collidedEntities.PushBack(victim);
-				
-				if ( hitCollisionsGroups.Contains( 'Ragdoll' ) )
-				{
-					bone = ((CMovingPhysicalAgentComponent)actor.GetMovingAgentComponent()).GetRagdollBoneName(actorIndex);
-					
-					if ((StrContains(StrLower(NameToString(bone)), "head" )))
-					
-					{
-						arrowHitPos = pos;
-						arrowHitPos -= RotForward(  this.GetWorldRotation() ) * 0.5f; 
-						
-						stopped = true;
-						StopProjectile();
-						AddTimer('sword_destroy', 30);
-					
-						res = this.CreateAttachmentAtBoneWS(actor, bone, arrowHitPos, this.GetWorldRotation());
-						
-						if ( !actor.HasBuff( EET_Knockdown ) 
-						&& !actor.HasBuff( EET_HeavyKnockdown ) 
-						&& !actor.GetIsRecoveringFromKnockdown() 
-						&& !actor.HasBuff( EET_Ragdoll ) )
-						{
-							effType = EET_HeavyKnockdown;
-						}
-											
-						crit = true;
 
-						res = true;
-					}
-					else if ( ( 
-						StrContains( StrLower( NameToString( bone ) ), "torso" ) 
+		if (HasTag('ACS_Azkar_Aiming_Arrow'))
+		{
+			if( collidingComponent 
+			&& !hitCollisionsGroups.Contains( 'Static' ) 
+			)
+			{		
+				if ( victim 
+				&& !collidedEntities.Contains(victim) 
+				&& victim != GetWitcherPlayer() 
+				&& ( GetAttitudeBetween( GetWitcherPlayer(), victim ) == AIA_Hostile) 
+				&& victim.IsAlive() )
+				{
+					actor = (CActor)victim;
+					
+					collidedEntities.PushBack(victim);
+					
+					thePlayer.GainStat( BCS_Focus, thePlayer.GetStatMax( BCS_Focus)/24 );
+
+					DealDamageToTarget( victim );
+
+					this.SoundEvent( "cmb_arrow_impact_body" );
+				}
+			}
+			else if ( ( hitCollisionsGroups.Contains( 'Terrain' ) 
+			|| hitCollisionsGroups.Contains( 'Static' ) 
+			|| hitCollisionsGroups.Contains( 'Foliage' ) ) 
+			&& !stopped )
+			{
+				StopProjectile();
+				AddTimer('sword_destroy', 15);
+
+				this.SoundEvent("cmb_arrow_impact_dirt");
+				
+				arrowHitPos = pos;
+				meshComponent = (CMeshComponent)GetComponentByClassName('CMeshComponent');
+				if( meshComponent )
+				{
+					boundingBox = meshComponent.GetBoundingBox();
+					arrowSize = boundingBox.Max - boundingBox.Min;
+				}
+				Teleport( arrowHitPos );
+				
+				res = true;
+			}	
+			else 
+			{
+				return false;
+			}
+		}
+		else
+		{
+			if( collidingComponent 
+			&& !hitCollisionsGroups.Contains( 'Static' ) 
+			)
+			{		
+				if ( victim 
+				&& !collidedEntities.Contains(victim) 
+				&& victim != GetWitcherPlayer() 
+				&& ( GetAttitudeBetween( GetWitcherPlayer(), victim ) == AIA_Hostile) 
+				&& victim.IsAlive() )
+				{
+					actor = (CActor)victim;
+					
+					collidedEntities.PushBack(victim);
+
+					thePlayer.GainStat( BCS_Focus, thePlayer.GetStatMax( BCS_Focus)/24 );
+					
+					if ( hitCollisionsGroups.Contains( 'Ragdoll' ) )
+					{
+						bone = ((CMovingPhysicalAgentComponent)actor.GetMovingAgentComponent()).GetRagdollBoneName(actorIndex);
+						
+						if ( (
+						StrContains( StrLower( NameToString( bone ) ), "head" ) 
+						|| StrContains( StrLower( NameToString( bone ) ), "torso" ) 
 						|| StrContains( StrLower( NameToString( bone ) ), "pelvis" ) 
 						|| StrContains( StrLower( NameToString( bone ) ), "neck" ) 
 						|| StrContains( StrLower( NameToString( bone ) ), "l_foot" )
@@ -3249,153 +3478,109 @@ class ACSBowProjectileMoving extends W3AdvancedProjectile
 						|| StrContains( StrLower( NameToString( bone ) ), "l_middle1" )	
 						|| StrContains( StrLower( NameToString( bone ) ), "l_middle2" )		
 						|| StrContains( StrLower( NameToString( bone ) ), "l_ring1" )	
-						|| StrContains( StrLower( NameToString( bone ) ), "l_hand" )		
+						|| StrContains( StrLower( NameToString( bone ) ), "l_hand" )
+						|| StrContains( StrLower( NameToString( bone ) ), "r_hand" )
 						) )
-					
+						{
+							arrowHitPos = pos;
+							arrowHitPos -= RotForward(  this.GetWorldRotation() ) * 0.125f; 
+							
+							stopped = true;
+							StopProjectile();
+							AddTimer('sword_destroy', 15);
+						
+							res = this.CreateAttachmentAtBoneWS(actor, bone, arrowHitPos, this.GetWorldRotation());
+						}
+						else
+						{
+							arrowHitPos = pos;
+							arrowHitPos -= RotForward(  this.GetWorldRotation() ) * 0.125f; 
+							
+							stopped = true;
+							StopProjectile();
+							AddTimer('sword_destroy', 15);
+
+							if ( actor.GetBoneIndex('torso') != -1 )
+							{
+								res = this.CreateAttachmentAtBoneWS(actor, 'torso', arrowHitPos, this.GetWorldRotation());
+							}
+							else
+							{
+								if ( actor.GetBoneIndex('k_torso_g') != -1 )
+								{
+									res = this.CreateAttachmentAtBoneWS(actor, 'k_torso_g', arrowHitPos, this.GetWorldRotation());
+								}
+								else
+								{
+									res = this.CreateAttachment(actor, , arrowHitPos, this.GetWorldRotation());
+								}
+							}
+						}
+					}
+					else
 					{
 						arrowHitPos = pos;
-						arrowHitPos -= RotForward(  this.GetWorldRotation() ) * 0.5f; 
+						arrowHitPos -= RotForward(  this.GetWorldRotation() ) * 0.125f; 
 						
 						stopped = true;
 						StopProjectile();
-						AddTimer('sword_destroy', 30);
-					
-						res = this.CreateAttachmentAtBoneWS(actor, bone, arrowHitPos, this.GetWorldRotation());
-						
-						effType = EET_LongStagger;
-						
-						crit = false;
+						AddTimer('sword_destroy', 15);
 
-						res = true;
-					}
-					else if ((StrContains(StrLower(NameToString(bone)), "r_hand" )))
-					{
-						actor.DropItemFromSlot( 'r_weapon', true );
-					}
-					else
-					{
-						if ( !actor.HasBuff( EET_Knockdown ) 
-						&& !actor.HasBuff( EET_HeavyKnockdown ) 
-						&& !actor.GetIsRecoveringFromKnockdown() 
-						&& !actor.HasBuff( EET_Ragdoll ) )
+						if ( actor.GetBoneIndex('torso') != -1 )
 						{
-							effType = EET_LongStagger;
-						}
-						crit = false;
-					}
-				}
-				else
-				{	
-					if( RandF() < 0.5 ) 
-					{
-						if( RandF() < 0.5 ) 
-						{
-							if(victim.GetBoneIndex('torso') != -1)
-							{			
-								arrowHitPos = victim.GetBoneWorldPosition('torso');
-								arrowHitPos -= RotForward(  this.GetWorldRotation() ) * 0.5f; 
-								res = this.CreateAttachmentAtBoneWS(actor, 'torso', arrowHitPos, this.GetWorldRotation());
-
-								stopped = true;
-								StopProjectile();
-								AddTimer('sword_destroy', 30);
-							}
+							res = this.CreateAttachmentAtBoneWS(actor, 'torso', arrowHitPos, this.GetWorldRotation());
 						}
 						else
 						{
-							if(victim.GetBoneIndex('torso3') != -1)
-							{			
-								arrowHitPos = victim.GetBoneWorldPosition('torso3');
-								arrowHitPos -= RotForward(  this.GetWorldRotation() ) * 0.5f; 
-								res = this.CreateAttachmentAtBoneWS(actor, 'torso3', arrowHitPos, this.GetWorldRotation());
-
-								stopped = true;
-								StopProjectile();
-								AddTimer('sword_destroy', 30);
+							if ( actor.GetBoneIndex('k_torso_g') != -1 )
+							{
+								res = this.CreateAttachmentAtBoneWS(actor, 'k_torso_g', arrowHitPos, this.GetWorldRotation());
+							}
+							else
+							{
+								res = this.CreateAttachment(actor, , arrowHitPos, this.GetWorldRotation());
 							}
 						}
 					}
-					else
-					{
-						if( RandF() < 0.5 ) 
-						{
-							if(victim.GetBoneIndex('torso2') != -1)
-							{			
-								arrowHitPos = victim.GetBoneWorldPosition('torso2');
-								arrowHitPos -= RotForward(  this.GetWorldRotation() ) * 0.5f; 
-								res = this.CreateAttachmentAtBoneWS(actor, 'torso2', arrowHitPos, this.GetWorldRotation());
 
-								stopped = true;
-								StopProjectile();
-								AddTimer('sword_destroy', 30);
-							}
-						}
-						else
-						{
-							if(victim.GetBoneIndex('pelvis') != -1)
-							{			
-								arrowHitPos = victim.GetBoneWorldPosition('pelvis');
-								arrowHitPos -= RotForward(  this.GetWorldRotation() ) * 0.5f; 
-								res = this.CreateAttachmentAtBoneWS(actor, 'pelvis', arrowHitPos, this.GetWorldRotation());
+					DealDamageToTarget( victim );
 
-								stopped = true;
-								StopProjectile();
-								AddTimer('sword_destroy', 30);
-							}
-						}
-					}
+					this.SoundEvent( "cmb_arrow_impact_body" );
 				}
 
-				thePlayer.GainStat( BCS_Focus, thePlayer.GetStatMax( BCS_Focus) * 0.1 );
-
-				DealDamageToTarget( victim, effType, crit );
-
-				this.SoundEvent( "cmb_arrow_impact_body" );
-
-				StopEffect( 'arrow_trail' );
-
-				StopEffect( 'arrow_trail_underwater' );
-
-				StopEffect( 'arrow_trail_red' );
+				RemoveTimer('tracking_delay');
+				RemoveTimer('tracking');
 			}
-
-			RemoveTimer('tracking_delay');
-			RemoveTimer('tracking');
-		}
-		else
-		if ( ( hitCollisionsGroups.Contains( 'Terrain' ) 
-		|| hitCollisionsGroups.Contains( 'Static' ) 
-		|| hitCollisionsGroups.Contains( 'Foliage' ) ) 
-		&& !stopped )
-		{
-			RemoveTimer('tracking_delay');
-			RemoveTimer('tracking');
-
-			StopEffect( 'arrow_trail' );
-
-			StopEffect( 'arrow_trail_underwater' );
-
-			StopEffect( 'arrow_trail_red' );
-
-			StopProjectile();
-			AddTimer('sword_destroy', 30);
-			
-			this.SoundEvent("cmb_arrow_impact_dirt");
-			
-			arrowHitPos = pos;
-			meshComponent = (CMeshComponent)GetComponentByClassName('CMeshComponent');
-			if( meshComponent )
+			else
+			if ( ( hitCollisionsGroups.Contains( 'Terrain' ) 
+			|| hitCollisionsGroups.Contains( 'Static' ) 
+			|| hitCollisionsGroups.Contains( 'Foliage' ) ) 
+			&& !stopped )
 			{
-				boundingBox = meshComponent.GetBoundingBox();
-				arrowSize = boundingBox.Max - boundingBox.Min;
+				RemoveTimer('tracking_delay');
+				RemoveTimer('tracking');
+				StopProjectile();
+				AddTimer('sword_destroy', 15);
+				
+				this.SoundEvent("cmb_arrow_impact_dirt");
+				
+				arrowHitPos = pos;
+				meshComponent = (CMeshComponent)GetComponentByClassName('CMeshComponent');
+
+				if( meshComponent )
+				{
+					boundingBox = meshComponent.GetBoundingBox();
+					arrowSize = boundingBox.Max - boundingBox.Min;
+				}
+
+				Teleport( arrowHitPos );
+				
+				res = true;
+			}	
+			else 
+			{
+				return false;
 			}
-			Teleport( arrowHitPos );
-			
-			res = true;
-		}	
-		else 
-		{
-			return false;
 		}
 	}
 }
@@ -3534,7 +3719,7 @@ class ACSCrossbowProjectile extends W3AdvancedProjectile
 		
 		if ( actortarget 
 		&& actortarget != GetWitcherPlayer() 
-		&& GetAttitudeBetween( actortarget, GetWitcherPlayer() ) == AIA_Hostile 
+		&& GetAttitudeBetween( GetWitcherPlayer(), actortarget ) == AIA_Hostile 
 		&& actortarget.IsAlive() ) 
 		{
 			
@@ -3557,7 +3742,7 @@ class ACSCrossbowProjectile extends W3AdvancedProjectile
 
 			dmg = new W3DamageAction in theGame.damageMgr;
 			
-			dmg.Initialize(GetWitcherPlayer(), victim, GetWitcherPlayer(), GetWitcherPlayer().GetName(), EHRT_None, CPS_Undefined, true, false, false, false);
+			dmg.Initialize(GetWitcherPlayer(), victim, GetWitcherPlayer(), GetWitcherPlayer().GetName(), EHRT_None, CPS_Undefined, false, true, false, false);
 			
 			dmg.SetHitReactionType( EHRT_Light );
 
@@ -3566,6 +3751,10 @@ class ACSCrossbowProjectile extends W3AdvancedProjectile
 			dmg.SetProcessBuffsIfNoDamage(true);
 
 			//dmg.SetForceExplosionDismemberment();
+
+			damageMax += damageMax * ACS_SignIntensityPercentage('total') * 0.5;
+
+			damageMin += damageMin * ACS_SignIntensityPercentage('total') * 0.5;
 			
 			dmg.AddDamage( theGame.params.DAMAGE_NAME_PHYSICAL, RandRangeF(damageMax,damageMin) / 8 );
 
@@ -3606,7 +3795,7 @@ class ACSCrossbowProjectile extends W3AdvancedProjectile
 			if ( victim 
 			&& !collidedEntities.Contains(victim) 
 			&& victim != GetWitcherPlayer() 
-			&& ( GetAttitudeBetween( victim, GetWitcherPlayer() ) == AIA_Hostile) 
+			&& ( GetAttitudeBetween( GetWitcherPlayer(), victim ) == AIA_Hostile) 
 			&& victim.IsAlive() )
 			{
 				actor = (CActor)victim;
@@ -3625,7 +3814,7 @@ class ACSCrossbowProjectile extends W3AdvancedProjectile
 						
 						stopped = true;
 						StopProjectile();
-						AddTimer('sword_destroy', 30);
+						AddTimer('sword_destroy', 15);
 					
 						res = this.CreateAttachmentAtBoneWS(actor, bone, arrowHitPos, this.GetWorldRotation());
 						
@@ -3816,7 +4005,7 @@ class ACSCrossbowProjectile extends W3AdvancedProjectile
 						
 						stopped = true;
 						StopProjectile();
-						AddTimer('sword_destroy', 30);
+						AddTimer('sword_destroy', 15);
 					
 						res = this.CreateAttachmentAtBoneWS(actor, bone, arrowHitPos, this.GetWorldRotation());
 						
@@ -3856,7 +4045,7 @@ class ACSCrossbowProjectile extends W3AdvancedProjectile
 
 								stopped = true;
 								StopProjectile();
-								AddTimer('sword_destroy', 30);
+								AddTimer('sword_destroy', 15);
 							}
 						}
 						else
@@ -3869,7 +4058,7 @@ class ACSCrossbowProjectile extends W3AdvancedProjectile
 
 								stopped = true;
 								StopProjectile();
-								AddTimer('sword_destroy', 30);
+								AddTimer('sword_destroy', 15);
 							}
 						}
 					}
@@ -3885,7 +4074,7 @@ class ACSCrossbowProjectile extends W3AdvancedProjectile
 
 								stopped = true;
 								StopProjectile();
-								AddTimer('sword_destroy', 30);
+								AddTimer('sword_destroy', 15);
 							}
 						}
 						else
@@ -3898,13 +4087,13 @@ class ACSCrossbowProjectile extends W3AdvancedProjectile
 
 								stopped = true;
 								StopProjectile();
-								AddTimer('sword_destroy', 30);
+								AddTimer('sword_destroy', 15);
 							}
 						}
 					}
 				}
 
-				thePlayer.GainStat( BCS_Focus, thePlayer.GetStatMax( BCS_Focus) * 0.1 );
+				thePlayer.GainStat( BCS_Focus, thePlayer.GetStatMax( BCS_Focus)/48 );
 
 				DealDamageToTarget( victim, effType, crit );
 
@@ -3936,7 +4125,7 @@ class ACSCrossbowProjectile extends W3AdvancedProjectile
 			StopEffect( 'arrow_trail_red' );
 
 			StopProjectile();
-			AddTimer('sword_destroy', 30);
+			AddTimer('sword_destroy', 15);
 			
 			this.SoundEvent("cmb_arrow_impact_dirt");
 			
@@ -3957,6 +4146,7 @@ class ACSCrossbowProjectile extends W3AdvancedProjectile
 		}
 	}
 }
+
 /*
 {
 	private var bone 									: name;
@@ -4001,7 +4191,7 @@ class ACSCrossbowProjectile extends W3AdvancedProjectile
 		
 		if ( actortarget 
 		&& actortarget != GetWitcherPlayer() 
-		&& GetAttitudeBetween( actortarget, GetWitcherPlayer() ) == AIA_Hostile 
+		&& GetAttitudeBetween( GetWitcherPlayer(), actortarget ) == AIA_Hostile 
 		&& actortarget.IsAlive() ) 
 		{
 			attAction = new W3Action_Attack in theGame.damageMgr;
@@ -4041,7 +4231,7 @@ class ACSCrossbowProjectile extends W3AdvancedProjectile
 			if ( victim 
 			&& !collidedEntities.Contains(victim) 
 			&& victim != GetWitcherPlayer() 
-			&& ( GetAttitudeBetween( victim, GetWitcherPlayer() ) == AIA_Hostile) 
+			&& ( GetAttitudeBetween( GetWitcherPlayer(), victim ) == AIA_Hostile) 
 			&& victim.IsAlive() )
 			{
 				actor = (CActor)victim;
@@ -4060,7 +4250,7 @@ class ACSCrossbowProjectile extends W3AdvancedProjectile
 						
 						stopped = true;
 						StopProjectile();
-						AddTimer('sword_destroy', 30);
+						AddTimer('sword_destroy', 15);
 					
 						res = this.CreateAttachmentAtBoneWS(actor, bone, arrowHitPos, this.GetWorldRotation());
 						
@@ -4249,7 +4439,7 @@ class ACSCrossbowProjectile extends W3AdvancedProjectile
 						
 						stopped = true;
 						StopProjectile();
-						AddTimer('sword_destroy', 30);
+						AddTimer('sword_destroy', 15);
 					
 						res = this.CreateAttachmentAtBoneWS(actor, bone, arrowHitPos, this.GetWorldRotation());
 						
@@ -4284,7 +4474,7 @@ class ACSCrossbowProjectile extends W3AdvancedProjectile
 		&& !stopped )
 		{
 			StopProjectile();
-			AddTimer('sword_destroy', 30);
+			AddTimer('sword_destroy', 15);
 			
 			this.SoundEvent("cmb_arrow_impact_dirt");
 			
@@ -4307,7 +4497,7 @@ class ACSCrossbowProjectile extends W3AdvancedProjectile
 }
 */
 
-class ACSCrossbowProjectileMoving extends W3AdvancedProjectile
+class ACSCrossbowProjectileMoving extends W3BoltProjectile
 {
 	private var bone 									: name;
 	private var actor, actortarget						: CActor;
@@ -4351,7 +4541,7 @@ class ACSCrossbowProjectileMoving extends W3AdvancedProjectile
 		
 		if ( actortarget 
 		&& actortarget != GetWitcherPlayer() 
-		&& GetAttitudeBetween( actortarget, GetWitcherPlayer() ) == AIA_Hostile 
+		&& GetAttitudeBetween( GetWitcherPlayer(), actortarget ) == AIA_Hostile 
 		&& actortarget.IsAlive() ) 
 		{
 			attAction = new W3Action_Attack in theGame.damageMgr;
@@ -4391,7 +4581,7 @@ class ACSCrossbowProjectileMoving extends W3AdvancedProjectile
 			if ( victim 
 			&& !collidedEntities.Contains(victim) 
 			&& victim != GetWitcherPlayer() 
-			&& ( GetAttitudeBetween( victim, GetWitcherPlayer() ) == AIA_Hostile) 
+			&& ( GetAttitudeBetween( GetWitcherPlayer(), victim ) == AIA_Hostile) 
 			&& victim.IsAlive() )
 			{
 				actor = (CActor)victim;
@@ -4410,7 +4600,7 @@ class ACSCrossbowProjectileMoving extends W3AdvancedProjectile
 						
 						stopped = true;
 						StopProjectile();
-						AddTimer('sword_destroy', 30);
+						AddTimer('sword_destroy', 15);
 					
 						res = this.CreateAttachmentAtBoneWS(actor, bone, arrowHitPos, this.GetWorldRotation());
 						
@@ -4599,7 +4789,7 @@ class ACSCrossbowProjectileMoving extends W3AdvancedProjectile
 						
 						stopped = true;
 						StopProjectile();
-						AddTimer('sword_destroy', 30);
+						AddTimer('sword_destroy', 15);
 					
 						res = this.CreateAttachmentAtBoneWS(actor, bone, arrowHitPos, this.GetWorldRotation());
 						
@@ -4634,7 +4824,7 @@ class ACSCrossbowProjectileMoving extends W3AdvancedProjectile
 		&& !stopped )
 		{
 			StopProjectile();
-			AddTimer('sword_destroy', 30);
+			AddTimer('sword_destroy', 15);
 			
 			this.SoundEvent("cmb_arrow_impact_dirt");
 			
@@ -4717,7 +4907,7 @@ class W3ACSSwordProjectileGiant extends W3AdvancedProjectile
 		
 		if ( actortarget 
 		&& actortarget != GetWitcherPlayer() 
-		&& GetAttitudeBetween( actortarget, GetWitcherPlayer() ) == AIA_Hostile 
+		&& GetAttitudeBetween( GetWitcherPlayer(), actortarget ) == AIA_Hostile 
 		&& actortarget.IsAlive() ) 
 		{
 			attAction = new W3Action_Attack in theGame.damageMgr;
@@ -4846,7 +5036,7 @@ class ACSBowProjectileSplit extends W3AdvancedProjectile
 		
 		if ( actortarget 
 		&& actortarget != GetWitcherPlayer() 
-		&& GetAttitudeBetween( actortarget, GetWitcherPlayer() ) == AIA_Hostile 
+		&& GetAttitudeBetween( GetWitcherPlayer(), actortarget ) == AIA_Hostile 
 		&& actortarget.IsAlive() ) 
 		{
 			if (actortarget.UsesVitality()) 
@@ -4868,7 +5058,7 @@ class ACSBowProjectileSplit extends W3AdvancedProjectile
 
 			dmg = new W3DamageAction in theGame.damageMgr;
 			
-			dmg.Initialize(GetWitcherPlayer(), victim, GetWitcherPlayer(), GetWitcherPlayer().GetName(), EHRT_None, CPS_AttackPower, true, false, false, false);
+			dmg.Initialize(GetWitcherPlayer(), victim, GetWitcherPlayer(), GetWitcherPlayer().GetName(), EHRT_None, CPS_AttackPower, false, true, false, false);
 			
 			//dmg.SetHitReactionType( EHRT_Light );
 
@@ -4877,6 +5067,10 @@ class ACSBowProjectileSplit extends W3AdvancedProjectile
 			//dmg.SetProcessBuffsIfNoDamage(true);
 
 			//dmg.SetForceExplosionDismemberment();
+
+			damageMax += damageMax * ACS_SignIntensityPercentage('total') * 0.5;
+
+			damageMin += damageMin * ACS_SignIntensityPercentage('total') * 0.5;
 			
 			dmg.AddDamage( theGame.params.DAMAGE_NAME_PHYSICAL, RandRangeF(damageMax,damageMin) / 2 );
 
@@ -4915,7 +5109,7 @@ class ACSBowProjectileSplit extends W3AdvancedProjectile
 			if ( victim 
 			&& !collidedEntities.Contains(victim) 
 			&& victim != GetWitcherPlayer() 
-			&& ( GetAttitudeBetween( victim, GetWitcherPlayer() ) == AIA_Hostile) 
+			&& ( GetAttitudeBetween( GetWitcherPlayer(), victim ) == AIA_Hostile) 
 			&& victim.IsAlive() )
 			{
 				actor = (CActor)victim;
@@ -4934,7 +5128,7 @@ class ACSBowProjectileSplit extends W3AdvancedProjectile
 						
 						stopped = true;
 						StopProjectile();
-						AddTimer('sword_destroy', 30);
+						AddTimer('sword_destroy', 15);
 					
 						res = this.CreateAttachmentAtBoneWS(actor, bone, arrowHitPos, this.GetWorldRotation());
 						
@@ -5125,7 +5319,7 @@ class ACSBowProjectileSplit extends W3AdvancedProjectile
 						
 						stopped = true;
 						StopProjectile();
-						AddTimer('sword_destroy', 30);
+						AddTimer('sword_destroy', 15);
 					
 						res = this.CreateAttachmentAtBoneWS(actor, bone, arrowHitPos, this.GetWorldRotation());
 						
@@ -5165,7 +5359,7 @@ class ACSBowProjectileSplit extends W3AdvancedProjectile
 
 								stopped = true;
 								StopProjectile();
-								AddTimer('sword_destroy', 30);
+								AddTimer('sword_destroy', 15);
 							}
 						}
 						else
@@ -5178,7 +5372,7 @@ class ACSBowProjectileSplit extends W3AdvancedProjectile
 
 								stopped = true;
 								StopProjectile();
-								AddTimer('sword_destroy', 30);
+								AddTimer('sword_destroy', 15);
 							}
 						}
 					}
@@ -5194,7 +5388,7 @@ class ACSBowProjectileSplit extends W3AdvancedProjectile
 
 								stopped = true;
 								StopProjectile();
-								AddTimer('sword_destroy', 30);
+								AddTimer('sword_destroy', 15);
 							}
 						}
 						else
@@ -5207,7 +5401,7 @@ class ACSBowProjectileSplit extends W3AdvancedProjectile
 
 								stopped = true;
 								StopProjectile();
-								AddTimer('sword_destroy', 30);
+								AddTimer('sword_destroy', 15);
 							}
 						}
 					}
@@ -5237,7 +5431,7 @@ class ACSBowProjectileSplit extends W3AdvancedProjectile
 			StopEffect( 'arrow_trail_red' );
 
 			StopProjectile();
-			AddTimer('sword_destroy', 30);
+			AddTimer('sword_destroy', 15);
 			
 			this.SoundEvent("cmb_arrow_impact_dirt");
 			
@@ -5318,7 +5512,7 @@ class ACSBowProjectileRain extends W3AdvancedProjectile
 		
 		if ( actortarget 
 		&& actortarget != GetWitcherPlayer() 
-		&& GetAttitudeBetween( actortarget, GetWitcherPlayer() ) == AIA_Hostile 
+		&& GetAttitudeBetween( GetWitcherPlayer(), actortarget ) == AIA_Hostile 
 		&& actortarget.IsAlive() ) 
 		{
 			((CActor)victim).AddAbility( 'DisableFinishers', true );
@@ -5342,7 +5536,7 @@ class ACSBowProjectileRain extends W3AdvancedProjectile
 
 			dmg = new W3DamageAction in theGame.damageMgr;
 			
-			dmg.Initialize(GetWitcherPlayer(), victim, GetWitcherPlayer(), GetWitcherPlayer().GetName(), EHRT_None, CPS_Undefined, true, false, false, false);
+			dmg.Initialize(GetWitcherPlayer(), victim, GetWitcherPlayer(), GetWitcherPlayer().GetName(), EHRT_None, CPS_Undefined, false, true, false, false);
 			
 			dmg.SetHitReactionType( EHRT_Light );
 
@@ -5351,6 +5545,10 @@ class ACSBowProjectileRain extends W3AdvancedProjectile
 			//dmg.SetProcessBuffsIfNoDamage(true);
 
 			//dmg.SetForceExplosionDismemberment();
+
+			damageMax += damageMax * ACS_SignIntensityPercentage('total') * 0.5;
+
+			damageMin += damageMin * ACS_SignIntensityPercentage('total') * 0.5;
 			
 			dmg.AddDamage( theGame.params.DAMAGE_NAME_PHYSICAL, RandRangeF(damageMax,damageMin) / 4 );
 
@@ -5386,7 +5584,7 @@ class ACSBowProjectileRain extends W3AdvancedProjectile
 			if ( victim 
 			&& !collidedEntities.Contains(victim) 
 			&& victim != GetWitcherPlayer() 
-			&& ( GetAttitudeBetween( victim, GetWitcherPlayer() ) == AIA_Hostile) 
+			&& ( GetAttitudeBetween( GetWitcherPlayer(), victim ) == AIA_Hostile) 
 			&& victim.IsAlive() )
 			{
 				actor = (CActor)victim;
@@ -5813,7 +6011,7 @@ class W3BatSwarmGather extends W3AdvancedProjectile
 		
 		templatename = "dlc\magicspellsrev\data\entities\assassin_dodge.w2ent";
 		
-		if ( victimtarget && victimtarget != GetWitcherPlayer() && GetAttitudeBetween( victimtarget, GetWitcherPlayer() ) == AIA_Hostile && victimtarget.IsAlive() ) 
+		if ( victimtarget && victimtarget != GetWitcherPlayer() && GetAttitudeBetween( GetWitcherPlayer(), victimtarget ) == AIA_Hostile && victimtarget.IsAlive() ) 
 		{
 			
 		}
@@ -6341,7 +6539,7 @@ class W3ACSRootAttack extends CGameplayEntity
 			}
 			
 			action = new W3DamageAction in theGame.damageMgr;
-			action.Initialize(GetWitcherPlayer(),victimtarget,this,GetWitcherPlayer().GetName(),EHRT_Heavy,CPS_Undefined,false, false, true, false );
+			action.Initialize(GetWitcherPlayer(),victimtarget,this,GetWitcherPlayer().GetName(),EHRT_Heavy,CPS_Undefined,false, true, false, false);
 			action.SetProcessBuffsIfNoDamage(true);
 			action.SetCanPlayHitParticle( true );
 			
@@ -6450,7 +6648,7 @@ class W3ACSBloodTentacles extends CGameplayEntity
 				}
 				
 				action = new W3DamageAction in theGame.damageMgr;
-				action.Initialize(thePlayer, victimtarget, NULL, thePlayer.GetName(), EHRT_Heavy, CPS_Undefined, false, false, true, false);
+				action.Initialize(thePlayer, victimtarget, NULL, thePlayer.GetName(), EHRT_Heavy, CPS_Undefined, false, true, false, false);
 				action.SetProcessBuffsIfNoDamage(true);
 				action.SetCanPlayHitParticle( true );
 				
@@ -6490,7 +6688,7 @@ class W3ACSBloodTentacles extends CGameplayEntity
 				
 				action = new W3DamageAction in theGame.damageMgr;
 
-				action.Initialize(thePlayer, victimtarget, NULL, thePlayer.GetName(), EHRT_Heavy, CPS_Undefined, false, false, true, false);
+				action.Initialize(thePlayer, victimtarget, NULL, thePlayer.GetName(), EHRT_Heavy, CPS_Undefined, false, true, false, false);
 				
 				action.SetProcessBuffsIfNoDamage(true);
 				action.SetCanPlayHitParticle( true );
@@ -6544,7 +6742,7 @@ class W3ACSBloodTentacles extends CGameplayEntity
 				}
 				
 				action = new W3DamageAction in theGame.damageMgr;
-				action.Initialize(ACSGetCGameplayEntity('ACS_Heart_Of_Darknness'),victimtarget,this,ACSGetCGameplayEntity('ACS_Heart_Of_Darknness').GetName(),EHRT_Heavy,CPS_Undefined,false, false, true, false );
+				action.Initialize(ACSGetCGameplayEntity('ACS_Heart_Of_Darknness'),victimtarget,this,ACSGetCGameplayEntity('ACS_Heart_Of_Darknness').GetName(),EHRT_Heavy,CPS_Undefined,false, true, false, false);
 				action.SetProcessBuffsIfNoDamage(true);
 				action.SetCanPlayHitParticle( true );
 				
@@ -6637,7 +6835,10 @@ class W3ACSEnemyKnifeProjectile extends W3AdvancedProjectile
 		pos.Y += 0.25;
 		comp.SetPosition( pos );
 
-		AddTimer('playredtrail', 0.0001, true);
+		//AddTimer('playredtrail', 0.0001, true);
+
+		StopEffect('red_trail');
+		PlayEffectSingle('red_trail');
 	}
 
 	timer function playredtrail( dt : float , optional id : int)
@@ -9040,11 +9241,7 @@ class W3ACSPoisonProjectile extends W3AdvancedProjectile
 		
 		super.OnProjectileCollision(pos, normal, collidingComponent, hitCollisionsGroups, actorIndex, shapeIndex);
 				
-		if ( victim && !projectileHitGround && !collidedEntities.Contains(victim) )
-		{
-			VictimCollision(victim);
-		}
-		else if ( hitCollisionsGroups.Contains( 'Terrain' ) || hitCollisionsGroups.Contains( 'Static' ) )
+		if ( hitCollisionsGroups.Contains( 'Terrain' ) || hitCollisionsGroups.Contains( 'Static' ) )
 		{
 			ProjectileHitGround();
 		}
@@ -9053,9 +9250,70 @@ class W3ACSPoisonProjectile extends W3AdvancedProjectile
 			ProjectileHitGround();
 		}
 	}
-	
-	protected function VictimCollision( victim : CGameplayEntity )
+
+	protected function PlayCollisionEffect( optional victim : CGameplayEntity)
 	{
+		if ( victim == thePlayer && thePlayer.GetCurrentlyCastSign() == ST_Quen && ((W3PlayerWitcher)thePlayer).IsCurrentSignChanneled() )
+		{}
+		else
+			this.PlayEffect(onCollisionFxName);
+	}
+	
+	protected function DeactivateProjectile()
+	{
+		isActive = false;
+		if( !persistFxAfterCollision )
+		{
+			this.StopEffect(initFxName);	
+		}
+		this.DestroyAfter(1.f);
+	}
+	
+	protected function ProjectileHitGround()
+	{
+		DealDamageProj();
+	}
+	
+	function SpawnEntity( onGround : bool )
+	{
+		var ent : CEntity;
+		var damageAreaEntity : CDamageAreaEntity;
+		var entPos, normal : Vector;
+		
+		if ( spawnEntityTemplate )
+		{
+			entPos = this.GetWorldPosition();
+			if ( onGround )
+				theGame.GetWorld().StaticTrace( entPos + Vector(0,0,3), entPos - Vector(0,0,3), entPos, normal );
+			ent = theGame.CreateEntity( spawnEntityTemplate, entPos, this.GetWorldRotation() );
+			damageAreaEntity = (CDamageAreaEntity)ent;
+			if ( damageAreaEntity )
+			{
+				damageAreaEntity.owner = (CActor)caster;
+				this.StopEffect(initFxName);
+				projectileHitGround = true;
+			}
+		}
+	}
+	
+	function DealDamageProj()
+	{
+		var ent 				: CEntity;
+		var damageAreaEntity 	: CDamageAreaEntity;
+		var entities	 		: array<CGameplayEntity>;
+		var i					: int;
+		var surface				: CGameplayFXSurfacePost;
+
+		this.PlayEffect(onCollisionFxName);
+
+		entities.Clear();
+
+		FindGameplayEntitiesInSphere( entities, GetWorldPosition(), 3, 100 );
+		for( i = 0; i < entities.Size(); i += 1 )
+		{
+			DealDamageToVictim( entities[i] );
+		}
+
 		DealDamageToVictim(victim);
 		PlayCollisionEffect(victim);
 		SpawnEntity( spawnEntityOnGround );
@@ -9095,54 +9353,7 @@ class W3ACSPoisonProjectile extends W3AdvancedProjectile
 		
 		collidedEntities.PushBack(victim);
 	}
-	
-	protected function PlayCollisionEffect( optional victim : CGameplayEntity)
-	{
-		if ( victim == thePlayer && thePlayer.GetCurrentlyCastSign() == ST_Quen && ((W3PlayerWitcher)thePlayer).IsCurrentSignChanneled() )
-		{}
-		else
-			this.PlayEffect(onCollisionFxName);
-	}
-	
-	protected function DeactivateProjectile()
-	{
-		isActive = false;
-		if( !persistFxAfterCollision )
-		{
-			this.StopEffect(initFxName);	
-		}
-		this.DestroyAfter(1.f);
-	}
-	
-	protected function ProjectileHitGround()
-	{
-		SpawnEntity( spawnEntityOnGround );
-		this.PlayEffect(onCollisionFxName);
-		DeactivateProjectile();
-	}
-	
-	function SpawnEntity( onGround : bool )
-	{
-		var ent : CEntity;
-		var damageAreaEntity : CDamageAreaEntity;
-		var entPos, normal : Vector;
-		
-		if ( spawnEntityTemplate )
-		{
-			entPos = this.GetWorldPosition();
-			if ( onGround )
-				theGame.GetWorld().StaticTrace( entPos + Vector(0,0,3), entPos - Vector(0,0,3), entPos, normal );
-			ent = theGame.CreateEntity( spawnEntityTemplate, entPos, this.GetWorldRotation() );
-			damageAreaEntity = (CDamageAreaEntity)ent;
-			if ( damageAreaEntity )
-			{
-				damageAreaEntity.owner = (CActor)caster;
-				this.StopEffect(initFxName);
-				projectileHitGround = true;
-			}
-		}
-	}
-	
+
 	event OnRangeReached()
 	{
 		
@@ -10252,7 +10463,7 @@ statemachine class W3ACSChaosTornado extends CGameplayEntity
 
 						damage_action =  new W3DamageAction in this;
 
-						damage_action.Initialize(GetWitcherPlayer(), victim, GetWitcherPlayer(), GetWitcherPlayer().GetName(), EHRT_None, CPS_Undefined, false, false, true, false);
+						damage_action.Initialize(GetWitcherPlayer(), victim, GetWitcherPlayer(), GetWitcherPlayer().GetName(), EHRT_None, CPS_Undefined, false, true, false, false);
 
 						if (((CActor)victim).UsesVitality()) 
 						{ 
@@ -10359,7 +10570,7 @@ statemachine class W3ACSChaosTornado extends CGameplayEntity
 
 						damage_action =  new W3DamageAction in this;
 
-						damage_action.Initialize(GetWitcherPlayer(), victim, GetWitcherPlayer(), GetWitcherPlayer().GetName(), EHRT_None, CPS_Undefined, false, false, true, false);
+						damage_action.Initialize(GetWitcherPlayer(), victim, GetWitcherPlayer(), GetWitcherPlayer().GetName(), EHRT_None, CPS_Undefined, false, true, false, false);
 
 						if (((CActor)victim).UsesVitality()) 
 						{ 
@@ -10689,7 +10900,7 @@ class W3ChaosIceExplosion extends CGameplayEntity
 			}
 			
 			action = new W3DamageAction in theGame.damageMgr;
-			action.Initialize(GetWitcherPlayer(),victimtarget,this,GetWitcherPlayer().GetName(),EHRT_Heavy,CPS_Undefined,false, false, true, false );
+			action.Initialize(GetWitcherPlayer(),victimtarget,this,GetWitcherPlayer().GetName(),EHRT_Heavy,CPS_Undefined,false, true, false, false);
 			action.SetProcessBuffsIfNoDamage(true);
 			action.SetCanPlayHitParticle( true );
 			
@@ -10913,7 +11124,7 @@ class W3ACSChasoVacuumOrb extends W3DurationObstacle
 
 						damage_action =  new W3DamageAction in this;
 
-						damage_action.Initialize(GetWitcherPlayer(), victim, GetWitcherPlayer(), GetWitcherPlayer().GetName(), EHRT_Heavy, CPS_Undefined, false, false, true, false);
+						damage_action.Initialize(GetWitcherPlayer(), victim, GetWitcherPlayer(), GetWitcherPlayer().GetName(), EHRT_Heavy, CPS_Undefined, false, true, false, false);
 
 						if (((CActor)victim).UsesVitality()) 
 						{ 
@@ -11324,7 +11535,7 @@ class W3ACSChaosOrbSmall extends W3AdvancedProjectile
 
 						damage_action =  new W3DamageAction in this;
 
-						damage_action.Initialize(GetWitcherPlayer(), victim, GetWitcherPlayer(), GetWitcherPlayer().GetName(), EHRT_Heavy, CPS_Undefined, false, false, true, false);
+						damage_action.Initialize(GetWitcherPlayer(), victim, GetWitcherPlayer(), GetWitcherPlayer().GetName(), EHRT_Heavy, CPS_Undefined, false, true, false, false);
 
 						if (((CActor)victim).UsesVitality()) 
 						{ 
@@ -11588,7 +11799,7 @@ statemachine class W3ACSChaosArena extends CGameplayEntity
 
 					damage_action =  new W3DamageAction in this;
 
-					damage_action.Initialize(GetWitcherPlayer(), victim, GetWitcherPlayer(), GetWitcherPlayer().GetName(), EHRT_None, CPS_Undefined, false, false, true, false);
+					damage_action.Initialize(GetWitcherPlayer(), victim, GetWitcherPlayer(), GetWitcherPlayer().GetName(), EHRT_None, CPS_Undefined, false, true, false, false);
 
 					if (((CActor)victim).UsesVitality()) 
 					{ 
@@ -12425,11 +12636,11 @@ class W3ACSIceStaffIceLineSpikesProjectile extends W3TraceGroundProjectile
 
 			if (((CActor)victim).UsesEssence())
 			{
-				damage = ((CActor)victim).GetStat( BCS_Essence ) * 0.00625;
+				damage = ((CActor)victim).GetStat( BCS_Essence ) * 0.05;
 			}
 			else if (((CActor)victim).UsesVitality())
 			{
-				damage = ((CActor)victim).GetStat( BCS_Vitality ) * 0.00625;
+				damage = ((CActor)victim).GetStat( BCS_Vitality ) * 0.05;
 			}
 
 			action.AddDamage(theGame.params.DAMAGE_NAME_FROST, damage );	
@@ -12479,11 +12690,11 @@ class W3ACSIceStaffFrostLine extends W3TraceGroundProjectile
 		{
 			if (((CActor)victim).UsesEssence())
 			{
-				damage = ((CActor)victim).GetStat( BCS_Essence ) * 0.0125;
+				damage = ((CActor)victim).GetStat( BCS_Essence ) * 0.025;
 			}
 			else if (((CActor)victim).UsesVitality())
 			{
-				damage = ((CActor)victim).GetStat( BCS_Vitality ) * 0.0125;
+				damage = ((CActor)victim).GetStat( BCS_Vitality ) * 0.025;
 			}
 
 			action = new W3DamageAction in this;
@@ -12843,11 +13054,11 @@ class W3ACSIceStaffIceMeteorProjectile extends W3MeteorProjectile
 			{ 
 				if ( ((CActor)victim).GetStat( BCS_Vitality ) >= ((CActor)victim).GetStatMax( BCS_Vitality ) * 0.5 )
 				{
-					projDMG = ((CActor)victim).GetStat( BCS_Vitality ) * 0.25; 
+					projDMG = ((CActor)victim).GetStat( BCS_Vitality ) * 0.5; 
 				}
 				else if ( ((CActor)victim).GetStat( BCS_Vitality ) < ((CActor)victim).GetStatMax( BCS_Vitality ) * 0.5 )
 				{
-					projDMG = ( ((CActor)victim).GetStatMax( BCS_Vitality ) - ((CActor)victim).GetStat( BCS_Vitality ) ) * 0.25; 
+					projDMG = ( ((CActor)victim).GetStatMax( BCS_Vitality ) - ((CActor)victim).GetStat( BCS_Vitality ) ) * 0.5; 
 				}
 			} 
 			else if (((CActor)victim).UsesEssence()) 
@@ -12871,11 +13082,11 @@ class W3ACSIceStaffIceMeteorProjectile extends W3MeteorProjectile
 				{
 					if ( ((CActor)victim).GetStat( BCS_Essence ) >= ((CActor)victim).GetStatMax( BCS_Essence ) * 0.5 )
 					{
-						projDMG = ((CActor)victim).GetStat( BCS_Essence ) * 0.25; 
+						projDMG = ((CActor)victim).GetStat( BCS_Essence ) * 0.5; 
 					}
 					else if ( ((CActor)victim).GetStat( BCS_Essence ) < ((CActor)victim).GetStatMax( BCS_Essence ) * 0.5 )
 					{
-						projDMG = ( ((CActor)victim).GetStatMax( BCS_Essence ) - ((CActor)victim).GetStat( BCS_Essence ) ) * 0.25; 
+						projDMG = ( ((CActor)victim).GetStatMax( BCS_Essence ) - ((CActor)victim).GetStat( BCS_Essence ) ) * 0.5; 
 					}
 				}
 			}
@@ -13357,7 +13568,7 @@ statemachine class W3ACSMageAttacks extends CGameplayEntity
 
 						damage_action =  new W3DamageAction in this;
 
-						damage_action.Initialize(GetWitcherPlayer(), victim, GetWitcherPlayer(), GetWitcherPlayer().GetName(), EHRT_None, CPS_Undefined, false, false, true, false);
+						damage_action.Initialize(GetWitcherPlayer(), victim, GetWitcherPlayer(), GetWitcherPlayer().GetName(), EHRT_None, CPS_Undefined, false, true, false, false);
 
 						damage_action.SetHitAnimationPlayType(EAHA_ForceNo);
 
@@ -13474,19 +13685,21 @@ state ACS_Mage_Attack_Cone in W3ACSMageAttacks
 				continue;
 
 				dmg = new W3DamageAction in theGame.damageMgr;
-				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Mage_Cone_Damage', EHRT_Heavy, CPS_Undefined, false, false, true, false);
+				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Mage_Cone_Damage', EHRT_Heavy, CPS_Undefined, false, true, false, false);
 
 				dmg.SetProcessBuffsIfNoDamage(true);
 				dmg.SetCanPlayHitParticle(true);
 
 				if (actortarget.UsesVitality()) 
 				{ 
-					damageMax = actortarget.GetStat( BCS_Vitality ) * 0.025; 
+					damageMax = actortarget.GetStat( BCS_Vitality ) * 0.05; 
 				} 
 				else if (actortarget.UsesEssence()) 
 				{ 
-					damageMax = actortarget.GetStat( BCS_Essence ) * 0.025; 
-				} 
+					damageMax = actortarget.GetStat( BCS_Essence ) * 0.05; 
+				}
+
+				damageMax += damageMax * ACS_SignIntensityPercentage('total') * 0.5;
 
 				dmg.SetForceExplosionDismemberment();
 
@@ -13706,19 +13919,21 @@ state ACS_Mage_Attack_Coil in W3ACSMageAttacks
 				continue;
 
 				dmg = new W3DamageAction in theGame.damageMgr;
-				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Mage_Coil_Damage', EHRT_Heavy, CPS_Undefined, false, false, true, false);
+				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Mage_Coil_Damage', EHRT_Heavy, CPS_Undefined, false, true, false, false);
 
 				dmg.SetProcessBuffsIfNoDamage(true);
 				dmg.SetCanPlayHitParticle(true);
 
 				if (actortarget.UsesVitality()) 
 				{ 
-					damageMax = actortarget.GetStat( BCS_Vitality ) * 0.05; 
+					damageMax = actortarget.GetStat( BCS_Vitality ) * 0.1; 
 				} 
 				else if (actortarget.UsesEssence()) 
 				{ 
-					damageMax = actortarget.GetStat( BCS_Essence ) * 0.05; 
+					damageMax = actortarget.GetStat( BCS_Essence ) * 0.1; 
 				} 
+
+				damageMax += damageMax * ACS_SignIntensityPercentage('total') * 0.5;
 
 				dmg.SetForceExplosionDismemberment();
 
@@ -13919,19 +14134,21 @@ state ACS_Mage_Attack_Coil_With_Cone in W3ACSMageAttacks
 				continue;
 
 				dmg = new W3DamageAction in theGame.damageMgr;
-				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Mage_Coil_With_Cone_Damage', EHRT_Heavy, CPS_Undefined, false, false, true, false);
+				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Mage_Coil_With_Cone_Damage', EHRT_Heavy, CPS_Undefined, false, true, false, false);
 
 				dmg.SetProcessBuffsIfNoDamage(true);
 				dmg.SetCanPlayHitParticle(true);
 
 				if (actortarget.UsesVitality()) 
 				{ 
-					damageMax = actortarget.GetStat( BCS_Vitality ) * 0.055; 
+					damageMax = actortarget.GetStat( BCS_Vitality ) * 0.15; 
 				} 
 				else if (actortarget.UsesEssence()) 
 				{ 
-					damageMax = actortarget.GetStat( BCS_Essence ) * 0.055; 
+					damageMax = actortarget.GetStat( BCS_Essence ) * 0.15; 
 				} 
+
+				damageMax += damageMax * ACS_SignIntensityPercentage('total') * 0.5;
 
 				dmg.SetForceExplosionDismemberment();
 
@@ -14231,19 +14448,21 @@ state ACS_Mage_Attack_Blast_1 in W3ACSMageAttacks
 				continue;
 
 				dmg = new W3DamageAction in theGame.damageMgr;
-				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Mage_Blast_1_Damage', EHRT_Heavy, CPS_Undefined, false, false, true, false);
+				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Mage_Blast_1_Damage', EHRT_Heavy, CPS_Undefined, false, true, false, false);
 
 				dmg.SetProcessBuffsIfNoDamage(true);
 				dmg.SetCanPlayHitParticle(true);
 
 				if (actortarget.UsesVitality()) 
 				{ 
-					damageMax = (actortarget.GetStatMax( BCS_Vitality ) - actortarget.GetStat( BCS_Vitality )) * 0.05; 
+					damageMax = (actortarget.GetStatMax( BCS_Vitality ) - actortarget.GetStat( BCS_Vitality )) * 0.25; 
 				} 
 				else if (actortarget.UsesEssence()) 
 				{ 
-					damageMax = (actortarget.GetStatMax( BCS_Essence ) - actortarget.GetStat( BCS_Essence )) * 0.05; 
+					damageMax = (actortarget.GetStatMax( BCS_Essence ) - actortarget.GetStat( BCS_Essence )) * 0.25; 
 				} 
+
+				damageMax += damageMax * ACS_SignIntensityPercentage('total') * 0.5;
 
 				dmg.SetForceExplosionDismemberment();
 
@@ -14577,19 +14796,21 @@ state ACS_Mage_Attack_Blast_2 in W3ACSMageAttacks
 				continue;
 
 				dmg = new W3DamageAction in theGame.damageMgr;
-				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Mage_Blast_2_Damage', EHRT_Heavy, CPS_Undefined, false, false, true, false);
+				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Mage_Blast_2_Damage', EHRT_Heavy, CPS_Undefined, false, true, false, false);
 
 				dmg.SetProcessBuffsIfNoDamage(true);
 				dmg.SetCanPlayHitParticle(true);
 
 				if (actortarget.UsesVitality()) 
 				{ 
-					damageMax = (actortarget.GetStatMax( BCS_Vitality ) - actortarget.GetStat( BCS_Vitality )) * 0.07; 
+					damageMax = (actortarget.GetStatMax( BCS_Vitality ) - actortarget.GetStat( BCS_Vitality )) * 0.33; 
 				} 
 				else if (actortarget.UsesEssence()) 
 				{ 
-					damageMax = (actortarget.GetStatMax( BCS_Essence ) - actortarget.GetStat( BCS_Essence )) * 0.07; 
+					damageMax = (actortarget.GetStatMax( BCS_Essence ) - actortarget.GetStat( BCS_Essence )) * 0.33; 
 				} 
+
+				damageMax += damageMax * ACS_SignIntensityPercentage('total') * 0.5;
 
 				dmg.SetForceExplosionDismemberment();
 
@@ -14904,19 +15125,21 @@ state ACS_Mage_Attack_Blast_3 in W3ACSMageAttacks
 				continue;
 
 				dmg = new W3DamageAction in theGame.damageMgr;
-				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Mage_Blast_3_Damage', EHRT_Heavy, CPS_Undefined, false, false, true, false);
+				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Mage_Blast_3_Damage', EHRT_Heavy, CPS_Undefined, false, true, false, false);
 
 				dmg.SetProcessBuffsIfNoDamage(true);
 				dmg.SetCanPlayHitParticle(true);
 
 				if (actortarget.UsesVitality()) 
 				{ 
-					damageMax = (actortarget.GetStatMax( BCS_Vitality ) - actortarget.GetStat( BCS_Vitality )) * 0.1; 
+					damageMax = (actortarget.GetStatMax( BCS_Vitality ) - actortarget.GetStat( BCS_Vitality )) * 0.45; 
 				} 
 				else if (actortarget.UsesEssence()) 
 				{ 
-					damageMax = (actortarget.GetStatMax( BCS_Essence ) - actortarget.GetStat( BCS_Essence )) * 0.1; 
+					damageMax = (actortarget.GetStatMax( BCS_Essence ) - actortarget.GetStat( BCS_Essence )) * 0.45; 
 				} 
+
+				damageMax += damageMax * ACS_SignIntensityPercentage('total') * 0.5;
 
 				dmg.SetForceExplosionDismemberment();
 
@@ -15084,19 +15307,21 @@ state ACS_Mage_Attack_Blast_3 in W3ACSMageAttacks
 				continue;
 
 				dmg = new W3DamageAction in theGame.damageMgr;
-				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Mage_Blast_3_Damage', EHRT_Heavy, CPS_Undefined, false, false, true, false);
+				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Mage_Blast_3_Damage', EHRT_Heavy, CPS_Undefined, false, true, false, false);
 
 				dmg.SetProcessBuffsIfNoDamage(true);
 				dmg.SetCanPlayHitParticle(true);
 
 				if (actortarget.UsesVitality()) 
 				{ 
-					damageMax = (actortarget.GetStatMax( BCS_Vitality ) - actortarget.GetStat( BCS_Vitality )) * 0.1; 
+					damageMax = (actortarget.GetStatMax( BCS_Vitality ) - actortarget.GetStat( BCS_Vitality )) * 0.45; 
 				} 
 				else if (actortarget.UsesEssence()) 
 				{ 
-					damageMax = (actortarget.GetStatMax( BCS_Essence ) - actortarget.GetStat( BCS_Essence )) * 0.1; 
+					damageMax = (actortarget.GetStatMax( BCS_Essence ) - actortarget.GetStat( BCS_Essence )) * 0.45; 
 				} 
+
+				damageMax += damageMax * ACS_SignIntensityPercentage('total') * 0.5;
 
 				dmg.SetForceExplosionDismemberment();
 
@@ -15333,19 +15558,21 @@ state ACS_Mage_Attack_Gust_Left in W3ACSMageAttacks
 				continue;
 
 				dmg = new W3DamageAction in theGame.damageMgr;
-				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Mage_Gust_Left_Damage', EHRT_Heavy, CPS_Undefined, false, false, true, false);
+				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Mage_Gust_Left_Damage', EHRT_Heavy, CPS_Undefined, false, true, false, false);
 
 				dmg.SetProcessBuffsIfNoDamage(true);
 				dmg.SetCanPlayHitParticle(true);
 
 				if (actortarget.UsesVitality()) 
 				{ 
-					damageMax = actortarget.GetStat( BCS_Vitality ) * 0.07; 
+					damageMax = actortarget.GetStat( BCS_Vitality ) * 0.125; 
 				} 
 				else if (actortarget.UsesEssence()) 
 				{ 
-					damageMax = actortarget.GetStat( BCS_Essence ) * 0.07; 
+					damageMax = actortarget.GetStat( BCS_Essence ) * 0.125; 
 				} 
+
+				damageMax += damageMax * ACS_SignIntensityPercentage('total') * 0.5;
 
 				dmg.SetForceExplosionDismemberment();
 
@@ -15594,19 +15821,21 @@ state ACS_Mage_Attack_Gust_Right in W3ACSMageAttacks
 				continue;
 
 				dmg = new W3DamageAction in theGame.damageMgr;
-				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Mage_Gust_Right_Damage', EHRT_Heavy, CPS_Undefined, false, false, true, false);
+				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Mage_Gust_Right_Damage', EHRT_Heavy, CPS_Undefined, false, true, false, false);
 
 				dmg.SetProcessBuffsIfNoDamage(true);
 				dmg.SetCanPlayHitParticle(true);
 
 				if (actortarget.UsesVitality()) 
 				{ 
-					damageMax = actortarget.GetStat( BCS_Vitality ) * 0.07; 
+					damageMax = actortarget.GetStat( BCS_Vitality ) * 0.125; 
 				} 
 				else if (actortarget.UsesEssence()) 
 				{ 
-					damageMax = actortarget.GetStat( BCS_Essence ) * 0.07; 
+					damageMax = actortarget.GetStat( BCS_Essence ) * 0.125; 
 				} 
+
+				damageMax += damageMax * ACS_SignIntensityPercentage('total') * 0.5;
 
 				dmg.SetForceExplosionDismemberment();
 
@@ -15959,19 +16188,21 @@ state ACS_Mage_Attack_Gust_Up in W3ACSMageAttacks
 				continue;
 
 				dmg = new W3DamageAction in theGame.damageMgr;
-				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Mage_Gust_Up_Damage', EHRT_Heavy, CPS_Undefined, false, false, true, false);
+				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Mage_Gust_Up_Damage', EHRT_Heavy, CPS_Undefined, false, true, false, false);
 
 				dmg.SetProcessBuffsIfNoDamage(true);
 				dmg.SetCanPlayHitParticle(true);
 
 				if (actortarget.UsesVitality()) 
 				{ 
-					damageMax = actortarget.GetStat( BCS_Vitality ) * 0.1; 
+					damageMax = actortarget.GetStat( BCS_Vitality ) * 0.25; 
 				} 
 				else if (actortarget.UsesEssence()) 
 				{ 
-					damageMax = actortarget.GetStat( BCS_Essence ) * 0.1; 
+					damageMax = actortarget.GetStat( BCS_Essence ) * 0.25; 
 				} 
+
+				damageMax += damageMax * ACS_SignIntensityPercentage('total') * 0.5;
 
 				dmg.SetForceExplosionDismemberment();
 
@@ -16357,19 +16588,21 @@ state ACS_Mage_Attack_Mega_Gust in W3ACSMageAttacks
 				continue;
 
 				dmg = new W3DamageAction in theGame.damageMgr;
-				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Mage_Mega_Gust_Damage', EHRT_Heavy, CPS_Undefined, false, false, true, false);
+				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Mage_Mega_Gust_Damage', EHRT_Heavy, CPS_Undefined, false, true, false, false);
 
 				dmg.SetProcessBuffsIfNoDamage(true);
 				dmg.SetCanPlayHitParticle(true);
 
 				if (actortarget.UsesVitality()) 
 				{ 
-					damageMax = (actortarget.GetStatMax( BCS_Vitality ) - actortarget.GetStat( BCS_Vitality )) * 0.1; 
+					damageMax = (actortarget.GetStatMax( BCS_Vitality ) - actortarget.GetStat( BCS_Vitality )) * 0.33; 
 				} 
 				else if (actortarget.UsesEssence()) 
 				{ 
-					damageMax = (actortarget.GetStatMax( BCS_Essence ) - actortarget.GetStat( BCS_Essence )) * 0.1; 
+					damageMax = (actortarget.GetStatMax( BCS_Essence ) - actortarget.GetStat( BCS_Essence )) * 0.33; 
 				} 
+
+				damageMax += damageMax * ACS_SignIntensityPercentage('total') * 0.5;
 
 				dmg.SetForceExplosionDismemberment();
 
@@ -16842,19 +17075,21 @@ state ACS_Mage_Attack_Quicksand in W3ACSMageAttacks
 				animcomp.UnfreezePoseFadeOut(30.f);
 
 				dmg = new W3DamageAction in theGame.damageMgr;
-				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Mage_Quicksand_Damage', EHRT_Heavy, CPS_Undefined, false, false, true, false);
+				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Mage_Quicksand_Damage', EHRT_Heavy, CPS_Undefined, false, true, false, false);
 
 				dmg.SetProcessBuffsIfNoDamage(true);
 				dmg.SetCanPlayHitParticle(true);
 
 				if (actortarget.UsesVitality()) 
 				{ 
-					damageMax = (actortarget.GetStatMax( BCS_Vitality ) - actortarget.GetStat( BCS_Vitality )) * 0.05; 
+					damageMax = (actortarget.GetStatMax( BCS_Vitality ) - actortarget.GetStat( BCS_Vitality )) * 0.5; 
 				} 
 				else if (actortarget.UsesEssence()) 
 				{ 
-					damageMax = (actortarget.GetStatMax( BCS_Essence ) - actortarget.GetStat( BCS_Essence )) * 0.05; 
+					damageMax = (actortarget.GetStatMax( BCS_Essence ) - actortarget.GetStat( BCS_Essence )) * 0.5; 
 				} 
+
+				damageMax += damageMax * ACS_SignIntensityPercentage('total') * 0.5;
 
 				dmg.SetForceExplosionDismemberment();
 
@@ -17209,19 +17444,21 @@ state ACS_Mage_Attack_SandCage in W3ACSMageAttacks
 				animcomp.UnfreezePoseFadeOut(30.f);
 
 				dmg = new W3DamageAction in theGame.damageMgr;
-				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Mage_Ice_Meteor_Damage', EHRT_Heavy, CPS_Undefined, false, false, true, false);
+				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Mage_Ice_Meteor_Damage', EHRT_Heavy, CPS_Undefined, false, true, false, false);
 
 				dmg.SetProcessBuffsIfNoDamage(true);
 				dmg.SetCanPlayHitParticle(true);
 
 				if (actortarget.UsesVitality()) 
 				{ 
-					damageMax = (actortarget.GetStatMax( BCS_Vitality ) - actortarget.GetStat( BCS_Vitality )) * 0.05; 
+					damageMax = (actortarget.GetStatMax( BCS_Vitality ) - actortarget.GetStat( BCS_Vitality )) * 0.66; 
 				} 
 				else if (actortarget.UsesEssence()) 
 				{ 
-					damageMax = (actortarget.GetStatMax( BCS_Essence ) - actortarget.GetStat( BCS_Essence )) * 0.05; 
+					damageMax = (actortarget.GetStatMax( BCS_Essence ) - actortarget.GetStat( BCS_Essence )) * 0.66; 
 				} 
+
+				damageMax += damageMax * ACS_SignIntensityPercentage('total') * 0.5;
 
 				dmg.SetForceExplosionDismemberment();
 
@@ -17365,19 +17602,21 @@ state ACS_Mage_Attack_SandCage in W3ACSMageAttacks
 				continue;
 
 				dmg = new W3DamageAction in theGame.damageMgr;
-				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Mage_Sand_Cage_Damage', EHRT_Heavy, CPS_Undefined, false, false, true, false);
+				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Mage_Sand_Cage_Damage', EHRT_Heavy, CPS_Undefined, false, true, false, false);
 
 				dmg.SetProcessBuffsIfNoDamage(true);
 				dmg.SetCanPlayHitParticle(true);
 
 				if (actortarget.UsesVitality()) 
 				{ 
-					damageMax = (actortarget.GetStatMax( BCS_Vitality ) - actortarget.GetStat( BCS_Vitality )) * 0.25; 
+					damageMax = (actortarget.GetStatMax( BCS_Vitality ) - actortarget.GetStat( BCS_Vitality )) * 0.66; 
 				} 
 				else if (actortarget.UsesEssence()) 
 				{ 
-					damageMax = (actortarget.GetStatMax( BCS_Essence ) - actortarget.GetStat( BCS_Essence )) * 0.25; 
+					damageMax = (actortarget.GetStatMax( BCS_Essence ) - actortarget.GetStat( BCS_Essence )) * 0.66; 
 				} 
+
+				damageMax += damageMax * ACS_SignIntensityPercentage('total') * 0.5;
 
 				dmg.SetForceExplosionDismemberment();
 
@@ -17741,19 +17980,21 @@ state ACS_Mage_Attack_Tornado in W3ACSMageAttacks
 				continue;
 
 				dmg = new W3DamageAction in theGame.damageMgr;
-				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Mage_Tornado_Damage', EHRT_Heavy, CPS_Undefined, false, false, true, false);
+				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Mage_Tornado_Damage', EHRT_Heavy, CPS_Undefined, false, true, false, false);
 
 				dmg.SetProcessBuffsIfNoDamage(true);
 				dmg.SetCanPlayHitParticle(true);
 
 				if (actortarget.UsesVitality()) 
 				{ 
-					damageMax = (actortarget.GetStatMax( BCS_Vitality ) - actortarget.GetStat( BCS_Vitality )) * 0.25; 
+					damageMax = (actortarget.GetStatMax( BCS_Vitality ) - actortarget.GetStat( BCS_Vitality )) * 0.75; 
 				} 
 				else if (actortarget.UsesEssence()) 
 				{ 
-					damageMax = (actortarget.GetStatMax( BCS_Essence ) - actortarget.GetStat( BCS_Essence )) * 0.25; 
+					damageMax = (actortarget.GetStatMax( BCS_Essence ) - actortarget.GetStat( BCS_Essence )) * 0.75; 
 				} 
+
+				damageMax += damageMax * ACS_SignIntensityPercentage('total') * 0.5;
 
 				dmg.SetForceExplosionDismemberment();
 
@@ -18069,19 +18310,21 @@ state ACS_Sorc_Slash_Left in CACSSorcFistAttacks
 				continue;
 
 				dmg = new W3DamageAction in theGame.damageMgr;
-				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Sorc_Slash_Left_Damage', EHRT_Heavy, CPS_Undefined, false, false, true, false);
+				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Sorc_Slash_Left_Damage', EHRT_Heavy, CPS_Undefined, false, true, false, false);
 
 				dmg.SetProcessBuffsIfNoDamage(true);
 				dmg.SetCanPlayHitParticle(true);
 
 				if (actortarget.UsesVitality()) 
 				{ 
-					damageMax = (actortarget.GetStatMax( BCS_Vitality ) - actortarget.GetStat( BCS_Vitality )) * 0.05; 
+					damageMax = (actortarget.GetStatMax( BCS_Vitality ) - actortarget.GetStat( BCS_Vitality )) * 0.25; 
 				} 
 				else if (actortarget.UsesEssence()) 
 				{ 
-					damageMax = (actortarget.GetStatMax( BCS_Essence ) - actortarget.GetStat( BCS_Essence )) * 0.05; 
+					damageMax = (actortarget.GetStatMax( BCS_Essence ) - actortarget.GetStat( BCS_Essence )) * 0.25; 
 				} 
+
+				damageMax += damageMax * ACS_SignIntensityPercentage('total') * 0.5;
 
 				dmg.SetForceExplosionDismemberment();
 
@@ -18186,19 +18429,21 @@ state ACS_Sorc_Slash_Right in CACSSorcFistAttacks
 				continue;
 
 				dmg = new W3DamageAction in theGame.damageMgr;
-				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Sorc_Slash_Right_Damage', EHRT_Heavy, CPS_Undefined, false, false, true, false);
+				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Sorc_Slash_Right_Damage', EHRT_Heavy, CPS_Undefined, false, true, false, false);
 
 				dmg.SetProcessBuffsIfNoDamage(true);
 				dmg.SetCanPlayHitParticle(true);
 
 				if (actortarget.UsesVitality()) 
 				{ 
-					damageMax = (actortarget.GetStatMax( BCS_Vitality ) - actortarget.GetStat( BCS_Vitality )) * 0.05; 
+					damageMax = (actortarget.GetStatMax( BCS_Vitality ) - actortarget.GetStat( BCS_Vitality )) * 0.25; 
 				} 
 				else if (actortarget.UsesEssence()) 
 				{ 
-					damageMax = (actortarget.GetStatMax( BCS_Essence ) - actortarget.GetStat( BCS_Essence )) * 0.05; 
+					damageMax = (actortarget.GetStatMax( BCS_Essence ) - actortarget.GetStat( BCS_Essence )) * 0.25; 
 				} 
+
+				damageMax += damageMax * ACS_SignIntensityPercentage('total') * 0.5;
 
 				dmg.SetForceExplosionDismemberment();
 
@@ -18316,19 +18561,21 @@ state ACS_Sorc_Lightning in CACSSorcFistAttacks
 				continue;
 
 				dmg = new W3DamageAction in theGame.damageMgr;
-				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Sorc_Slash_Right_Damage', EHRT_Heavy, CPS_Undefined, false, false, true, false);
+				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Sorc_Slash_Right_Damage', EHRT_Heavy, CPS_Undefined, false, true, false, false);
 
 				dmg.SetProcessBuffsIfNoDamage(true);
 				dmg.SetCanPlayHitParticle(true);
 
 				if (actortarget.UsesVitality()) 
 				{ 
-					damageMax = (actortarget.GetStatMax( BCS_Vitality ) - actortarget.GetStat( BCS_Vitality )) * 0.05; 
+					damageMax = (actortarget.GetStatMax( BCS_Vitality ) - actortarget.GetStat( BCS_Vitality )) * 0.5; 
 				} 
 				else if (actortarget.UsesEssence()) 
 				{ 
-					damageMax = (actortarget.GetStatMax( BCS_Essence ) - actortarget.GetStat( BCS_Essence )) * 0.05; 
+					damageMax = (actortarget.GetStatMax( BCS_Essence ) - actortarget.GetStat( BCS_Essence )) * 0.5; 
 				} 
+
+				damageMax += damageMax * ACS_SignIntensityPercentage('total') * 0.5;
 
 				dmg.SetForceExplosionDismemberment();
 
@@ -18459,19 +18706,21 @@ state ACS_Sorc_Lightning_Chain in CACSSorcFistAttacks
 				continue;
 
 				dmg = new W3DamageAction in theGame.damageMgr;
-				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Sorc_Slash_Right_Damage', EHRT_Heavy, CPS_Undefined, false, false, true, false);
+				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Sorc_Slash_Right_Damage', EHRT_Heavy, CPS_Undefined, false, true, false, false);
 
 				dmg.SetProcessBuffsIfNoDamage(true);
 				dmg.SetCanPlayHitParticle(true);
 
 				if (actortarget.UsesVitality()) 
 				{ 
-					damageMax = (actortarget.GetStatMax( BCS_Vitality ) - actortarget.GetStat( BCS_Vitality )) * 0.05; 
+					damageMax = (actortarget.GetStatMax( BCS_Vitality ) - actortarget.GetStat( BCS_Vitality )) * 0.15; 
 				} 
 				else if (actortarget.UsesEssence()) 
 				{ 
-					damageMax = (actortarget.GetStatMax( BCS_Essence ) - actortarget.GetStat( BCS_Essence )) * 0.05; 
+					damageMax = (actortarget.GetStatMax( BCS_Essence ) - actortarget.GetStat( BCS_Essence )) * 0.15; 
 				} 
+
+				damageMax += damageMax * ACS_SignIntensityPercentage('total') * 0.5;
 
 				dmg.SetForceExplosionDismemberment();
 
@@ -19094,19 +19343,21 @@ state ACS_Sorc_Lightning_Strike in CACSSorcFistAttacks
 				continue;
 
 				dmg = new W3DamageAction in theGame.damageMgr;
-				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Sorc_Slash_Left_Damage', EHRT_Heavy, CPS_Undefined, false, false, true, false);
+				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Sorc_Slash_Left_Damage', EHRT_Heavy, CPS_Undefined, false, true, false, false);
 
 				dmg.SetProcessBuffsIfNoDamage(true);
 				dmg.SetCanPlayHitParticle(true);
 
 				if (actortarget.UsesVitality()) 
 				{ 
-					damageMax = (actortarget.GetStatMax( BCS_Vitality ) - actortarget.GetStat( BCS_Vitality )) * 0.25; 
+					damageMax = (actortarget.GetStatMax( BCS_Vitality ) - actortarget.GetStat( BCS_Vitality )) * 0.5; 
 				} 
 				else if (actortarget.UsesEssence()) 
 				{ 
-					damageMax = (actortarget.GetStatMax( BCS_Essence ) - actortarget.GetStat( BCS_Essence )) * 0.25; 
+					damageMax = (actortarget.GetStatMax( BCS_Essence ) - actortarget.GetStat( BCS_Essence )) * 0.5; 
 				} 
+
+				damageMax += damageMax * ACS_SignIntensityPercentage('total') * 0.5;
 
 				dmg.SetForceExplosionDismemberment();
 
@@ -19260,19 +19511,21 @@ state ACS_Sorc_Lightning_Strike_Mult in CACSSorcFistAttacks
 				continue;
 
 				dmg = new W3DamageAction in theGame.damageMgr;
-				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Sorc_Slash_Left_Damage', EHRT_Heavy, CPS_Undefined, false, false, true, false);
+				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Sorc_Slash_Left_Damage', EHRT_Heavy, CPS_Undefined, false, true, false, false);
 
 				dmg.SetProcessBuffsIfNoDamage(true);
 				dmg.SetCanPlayHitParticle(true);
 
 				if (actortarget.UsesVitality()) 
 				{ 
-					damageMax = (actortarget.GetStatMax( BCS_Vitality ) - actortarget.GetStat( BCS_Vitality )) * 0.125; 
+					damageMax = (actortarget.GetStatMax( BCS_Vitality ) - actortarget.GetStat( BCS_Vitality )) * 0.25; 
 				} 
 				else if (actortarget.UsesEssence()) 
 				{ 
-					damageMax = (actortarget.GetStatMax( BCS_Essence ) - actortarget.GetStat( BCS_Essence )) * 0.125; 
+					damageMax = (actortarget.GetStatMax( BCS_Essence ) - actortarget.GetStat( BCS_Essence )) * 0.25; 
 				} 
+
+				damageMax += damageMax * ACS_SignIntensityPercentage('total') * 0.5;
 
 				dmg.SetForceExplosionDismemberment();
 
@@ -19563,19 +19816,21 @@ state ACS_Sorc_Lightning_Storm in CACSSorcFistAttacks
 				continue;
 
 				dmg = new W3DamageAction in theGame.damageMgr;
-				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Sorc_Slash_Left_Damage', EHRT_Heavy, CPS_Undefined, false, false, true, false);
+				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Sorc_Slash_Left_Damage', EHRT_Heavy, CPS_Undefined, false, true, false, false);
 
 				dmg.SetProcessBuffsIfNoDamage(true);
 				dmg.SetCanPlayHitParticle(true);
 
 				if (actortarget.UsesVitality()) 
 				{ 
-					damageMax = (actortarget.GetStatMax( BCS_Vitality ) - actortarget.GetStat( BCS_Vitality )) * 0.25; 
+					damageMax = (actortarget.GetStatMax( BCS_Vitality ) - actortarget.GetStat( BCS_Vitality )) * 0.5; 
 				} 
 				else if (actortarget.UsesEssence()) 
 				{ 
-					damageMax = (actortarget.GetStatMax( BCS_Essence ) - actortarget.GetStat( BCS_Essence )) * 0.25; 
+					damageMax = (actortarget.GetStatMax( BCS_Essence ) - actortarget.GetStat( BCS_Essence )) * 0.5; 
 				} 
+
+				damageMax += damageMax * ACS_SignIntensityPercentage('total') * 0.5;
 
 				dmg.SetForceExplosionDismemberment();
 
@@ -19720,19 +19975,21 @@ state ACS_Sorc_Fire_Repel in CACSSorcFistAttacks
 				continue;
 
 				dmg = new W3DamageAction in theGame.damageMgr;
-				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Sorc_Slash_Left_Damage', EHRT_Heavy, CPS_Undefined, false, false, true, false);
+				dmg.Initialize(GetWitcherPlayer(), actortarget, theGame, 'ACS_Sorc_Slash_Left_Damage', EHRT_Heavy, CPS_Undefined, false, true, false, false);
 
 				dmg.SetProcessBuffsIfNoDamage(true);
 				dmg.SetCanPlayHitParticle(true);
 
 				if (actortarget.UsesVitality()) 
 				{ 
-					damageMax = (actortarget.GetStatMax( BCS_Vitality ) - actortarget.GetStat( BCS_Vitality )) * 0.05; 
+					damageMax = (actortarget.GetStatMax( BCS_Vitality ) - actortarget.GetStat( BCS_Vitality )) * 0.1; 
 				} 
 				else if (actortarget.UsesEssence()) 
 				{ 
-					damageMax = (actortarget.GetStatMax( BCS_Essence ) - actortarget.GetStat( BCS_Essence )) * 0.05; 
+					damageMax = (actortarget.GetStatMax( BCS_Essence ) - actortarget.GetStat( BCS_Essence )) * 0.1; 
 				} 
+
+				damageMax += damageMax * ACS_SignIntensityPercentage('total') * 0.5;
 
 				dmg.SetForceExplosionDismemberment();
 
@@ -20564,5 +20821,360 @@ class W3ACSAssassinBolt extends W3BoltProjectile
 		thePlayer.BlockAllActions( 'ACS_Finisher_Bolt_Action_Block', false );
 
 		GetACSWatcher().ACS_PerformFinisher(boltVictim);
+	}
+}
+
+class W3ACSTransformationGiantElectricSpear extends CProjectileTrajectory
+{
+	var damage 						: Float; 
+	var effect						: CEntity;
+	var spellpower 					: SAbilityAttributeValue;
+	var ghpois						: SCustomEffectParams;
+	var victims						: array<CGameplayEntity>;
+	var spellpower_final			: float;
+	var comp						: CMeshComponent;
+	var range						: float;
+	
+	event OnSpawned( spawnData : SEntitySpawnData )
+	{
+		SoundEvent("magic_sorceress_vfx_fireball_fire_fx_loop_start");
+		comp = (CMeshComponent)this.GetComponentByClassName('CMeshComponent');
+		comp.SetScale( Vector ( 0.f, 0.f, 0.f ) );
+	}
+	
+	event OnProjectileInit()
+	{
+		range = 3;
+		
+		AddTimer('repeatEffect', 0.025, true );
+	}
+	timer function repeatEffect( dt : float, optional id : int)
+	{
+		PlayEffect('appear_blink_hit');
+	}
+	
+	event OnProjectileCollision( pos, normal : Vector, collidingComponent : CComponent, hitCollisionsGroups : array< name >, actorIndex : int, shapeIndex : int )
+	{
+		if ( IsStopped() )
+		{
+			return true;
+		}
+		
+		if(collidingComponent)
+			victim = (CGameplayEntity)collidingComponent.GetEntity();
+		else
+			victim = NULL;
+
+		
+		if ( hitCollisionsGroups.Contains( 'Terrain' ) 
+		|| hitCollisionsGroups.Contains( 'Static' ) 
+		|| hitCollisionsGroups.Contains( 'Water' ) 
+		|| hitCollisionsGroups.Contains( 'Foliage' ) )
+		{
+			DealDamageProj();
+		}
+	}
+	
+	function DealDamageProj()
+	{
+		var ent 				: CEntity;
+		var damageAreaEntity 	: CDamageAreaEntity;
+		var entities	 		: array<CGameplayEntity>;
+		var i					: int;
+		var surface				: CGameplayFXSurfacePost;
+
+		ACSGetCActor('ACS_Transformation_Giant').PlayEffect('lightning_l', this);
+
+		entities.Clear();
+
+		FindGameplayEntitiesInSphere( entities, GetWorldPosition(), 5, 100 );
+		for( i = 0; i < entities.Size(); i += 1 )
+		{
+			DealDamageToVictim( entities[i] );
+		}
+
+		StopProjectile();
+		StopAllEffects();
+		PlayEffect('explode');
+		PlayEffect('explode2');
+		PlayEffect('explode3');
+		SoundEvent("fx_other_lightning_pre_2s");
+		SoundEvent('magic_sorceress_vfx_arcane_explode');
+		SoundEvent("magic_sorceress_vfx_fireball_fire_fx_loop_stop");
+		
+		RemoveTimer('repeatEffect');
+	}
+	
+	protected function DealDamageToVictim(victim : CGameplayEntity)
+	{
+		var targetSlowdown 	: CActor;		
+		var action : W3DamageAction;
+		var damage : float;
+		
+		action = new W3DamageAction in this;
+
+		action.Initialize( ( CGameplayEntity)caster, victim, this, caster.GetName(), EHRT_Heavy, CPS_Undefined, false, true, false, false );
+
+		if ( ((CActor)victim) == thePlayer
+		|| ((CActor)victim) == ACSGetCActor('ACS_Transformation_Giant')
+		)
+		{
+			return;
+		}
+
+		if (((CActor)victim).UsesVitality()) 
+		{ 
+			if ( ((CActor)victim).GetStat( BCS_Vitality ) >= ((CActor)victim).GetStatMax( BCS_Vitality ) * 0.25 )
+			{
+				damage = ((CActor)victim).GetStat( BCS_Vitality ) * 0.125; 
+			}
+			else if ( ((CActor)victim).GetStat( BCS_Vitality ) < ((CActor)victim).GetStatMax( BCS_Vitality ) * 0.25 )
+			{
+				damage = ( ((CActor)victim).GetStatMax( BCS_Vitality ) - ((CActor)victim).GetStat( BCS_Vitality ) ) * 0.125; 
+			}
+		} 
+		else if (((CActor)victim).UsesEssence()) 
+		{ 
+			if (((CMovingPhysicalAgentComponent)(((CActor)victim).GetMovingAgentComponent())).GetCapsuleHeight() >= 2
+			|| ((CActor)victim).GetRadius() >= 0.7
+			|| ((CActor)victim).HasAbility('Boss')
+			|| ((CActor)victim).HasTag('IsBoss')
+			)
+			{
+				if ( ((CActor)victim).GetStat( BCS_Essence ) >= ((CActor)victim).GetStatMax( BCS_Essence ) * 0.25 )
+				{
+					damage = ((CActor)victim).GetStat( BCS_Essence ) * 0.06125; 
+				}
+				else if ( ((CActor)victim).GetStat( BCS_Essence ) < ((CActor)victim).GetStatMax( BCS_Essence ) * 0.25 )
+				{
+					damage = ( ((CActor)victim).GetStatMax( BCS_Essence ) - ((CActor)victim).GetStat( BCS_Essence ) ) * 0.06125; 
+				}
+			}
+			else
+			{
+				if ( ((CActor)victim).GetStat( BCS_Essence ) >= ((CActor)victim).GetStatMax( BCS_Essence ) * 0.25 )
+				{
+					damage = ((CActor)victim).GetStat( BCS_Essence ) * 0.125; 
+				}
+				else if ( ((CActor)victim).GetStat( BCS_Essence ) < ((CActor)victim).GetStatMax( BCS_Essence ) * 0.25 )
+				{
+					damage = ( ((CActor)victim).GetStatMax( BCS_Essence ) - ((CActor)victim).GetStat( BCS_Essence ) ) * 0.125; 
+				}
+			}
+		}
+
+		action.AddDamage( theGame.params.DAMAGE_NAME_ELEMENTAL , damage * 0.125 );
+		
+		if (!ACSGetCActor('ACS_Transformation_Giant').HasTag('ACS_Transformation_Giant_Weapon_Mode'))
+		{
+			action.AddEffectInfo( EET_Paralyzed, 1 );
+		}
+		else
+		{
+			action.AddEffectInfo( EET_Burning, 1 );
+		}
+
+		action.SetCanPlayHitParticle(false);
+		theGame.damageMgr.ProcessAction( action );
+		delete action;	
+	}
+}
+
+class W3ACSNPCExplosiveBolt extends W3BoltProjectile
+{
+	editable var explosionRange : float;
+	private var insideToxicClouds : array<W3ToxicCloud>;
+	
+	event OnProjectileCollision( pos, normal : Vector, collidingComponent : CComponent, hitCollisionsGroups : array< name >, actorIndex : int, shapeIndex : int )
+	{
+		var ents : array<CGameplayEntity>;
+		var i : int;
+		var waterZ : float;
+		var victim, actor : CActor;
+		var shouldPierce : bool;
+		var drawableComponent : CDrawableComponent;
+		
+		
+		if(wasShotUnderWater && hitCollisionsGroups.Contains( 'Water' ) )
+			return true;
+		
+		victim = (CActor)collidingComponent.GetEntity();
+		
+		SetVictim( victim );
+		
+		if ( !CanCollideWithVictim( victim ) )
+			return true;
+			
+		if ( !ProcessProjectileRepulsion( pos, normal ) && !victim.IsCurrentlyDodging() )
+		{			
+			
+			if(wasShotUnderWater)
+			{
+				waterZ = theGame.GetWorld().GetWaterLevel(pos, true);
+				if(waterZ >= pos.Z)
+				{
+					
+					if(victim)
+					{
+						super.OnProjectileCollision(pos, normal, collidingComponent, hitCollisionsGroups, actorIndex, shapeIndex);
+					}
+					else
+					{
+						StopProjectile();
+						isActive = false;
+						DestroyAfter(20);
+					}
+					
+					return true;				
+				}
+			}
+			
+			shouldPierce = ShouldPierceVictim( victim );
+			
+			if( shouldPierce )
+			{
+				Mutation9HitFX( victim );
+			}
+			else
+			{
+				StopProjectile();
+				isActive = false;
+			}
+			
+			
+			if ( hitCollisionsGroups.Contains( 'Water' ) && ! hitCollisionsGroups.Contains( 'Terrain' ) )
+				PlayEffect('explode_water');
+			else
+				PlayEffect('explosion');
+				
+			
+			pos.Z += 0.1f;
+			FindGameplayEntitiesInSphere(ents, pos, explosionRange, 100000, , FLAG_TestLineOfSight);
+			
+			
+			if(ents.Size() == 0)
+			{
+				pos.Z -= 0.2f;
+				FindGameplayEntitiesInSphere(ents, pos, explosionRange, 100000, , FLAG_TestLineOfSight);
+			}
+			
+			
+			for( i = ents.Size() - 1 ; i>=0 ; i-=1)
+			{
+				if(ents[i] == this)
+					continue;
+				
+				actor = (CActor)ents[i];
+				
+				if(actor && !actor.IsAlive())
+				{
+					continue;
+				}
+
+				if(actor && actor.HasTag('ACS_Dwarf'))
+				{
+					continue;
+				}
+				
+				DealDamageToVictim(ents[i]);
+			}
+			
+			
+			theGame.GetBehTreeReactionManager().CreateReactionEventIfPossible( this, 'BombExplosionAction', 10.0, 50.0f, -1, -1, true); 
+			
+			
+			for(i=0; i<insideToxicClouds.Size(); i+=1)
+			{
+				if(insideToxicClouds[i] && insideToxicClouds[i].GetCurrentStateName() == 'Armed')
+				{
+					((W3ToxicCloudStateArmed)(insideToxicClouds[i].GetCurrentState())).Explode(this);
+				}
+			}
+			
+			if( !shouldPierce )
+			{
+				drawableComponent = (CDrawableComponent)GetComponentByClassName('CDrawableComponent');
+				if( drawableComponent )
+				{
+					drawableComponent.SetVisible(false);
+				}
+				
+				DestroyAfter(5);	
+			}
+		}
+	}
+
+	protected function DealDamageToVictim(victim : CGameplayEntity)
+	{
+		var targetSlowdown 	: CActor;		
+		var action : W3DamageAction;
+		var damage : float;
+		
+		action = new W3DamageAction in this;
+
+		action.Initialize( ( CGameplayEntity)caster, victim, this, caster.GetName(), EHRT_Heavy, CPS_Undefined, false, true, false, false );
+
+		if (((CActor)victim).UsesVitality()) 
+		{ 
+			if ( ((CActor)victim).GetStat( BCS_Vitality ) >= ((CActor)victim).GetStatMax( BCS_Vitality ) * 0.25 )
+			{
+				damage = ((CActor)victim).GetStat( BCS_Vitality ) * 0.125; 
+			}
+			else if ( ((CActor)victim).GetStat( BCS_Vitality ) < ((CActor)victim).GetStatMax( BCS_Vitality ) * 0.25 )
+			{
+				damage = ( ((CActor)victim).GetStatMax( BCS_Vitality ) - ((CActor)victim).GetStat( BCS_Vitality ) ) * 0.125; 
+			}
+		} 
+		else if (((CActor)victim).UsesEssence()) 
+		{ 
+			if (((CMovingPhysicalAgentComponent)(((CActor)victim).GetMovingAgentComponent())).GetCapsuleHeight() >= 2
+			|| ((CActor)victim).GetRadius() >= 0.7
+			|| ((CActor)victim).HasAbility('Boss')
+			|| ((CActor)victim).HasTag('IsBoss')
+			)
+			{
+				if ( ((CActor)victim).GetStat( BCS_Essence ) >= ((CActor)victim).GetStatMax( BCS_Essence ) * 0.25 )
+				{
+					damage = ((CActor)victim).GetStat( BCS_Essence ) * 0.06125; 
+				}
+				else if ( ((CActor)victim).GetStat( BCS_Essence ) < ((CActor)victim).GetStatMax( BCS_Essence ) * 0.25 )
+				{
+					damage = ( ((CActor)victim).GetStatMax( BCS_Essence ) - ((CActor)victim).GetStat( BCS_Essence ) ) * 0.06125; 
+				}
+			}
+			else
+			{
+				if ( ((CActor)victim).GetStat( BCS_Essence ) >= ((CActor)victim).GetStatMax( BCS_Essence ) * 0.25 )
+				{
+					damage = ((CActor)victim).GetStat( BCS_Essence ) * 0.125; 
+				}
+				else if ( ((CActor)victim).GetStat( BCS_Essence ) < ((CActor)victim).GetStatMax( BCS_Essence ) * 0.25 )
+				{
+					damage = ( ((CActor)victim).GetStatMax( BCS_Essence ) - ((CActor)victim).GetStat( BCS_Essence ) ) * 0.125; 
+				}
+			}
+		}
+
+		action.AddDamage( theGame.params.DAMAGE_NAME_FIRE , damage * 1.5 );
+		
+		action.AddEffectInfo( EET_Burning, 1 );
+
+		theGame.damageMgr.ProcessAction( action );
+		delete action;	
+	}
+	
+	public final function AddToxicCloud(gas : W3ToxicCloud)
+	{
+		if(gas)
+		{
+			insideToxicClouds.PushBack(gas);
+		}
+	}
+	public final function RemoveToxicCloud(gas : W3ToxicCloud)
+	{
+		if(gas)
+		{
+			insideToxicClouds.Remove(gas);
+		}
 	}
 }

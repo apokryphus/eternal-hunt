@@ -34,13 +34,6 @@ function ACS_WeaponHolsterInit()
 		GetWitcherPlayer().RemoveAbility('ForceDismemberment');
 	}
 
-	if (GetWitcherPlayer().HasTag('ACS_Size_Adjusted')) //ACS
-	{
-		GetACSWatcher().Grow_Geralt_Immediate_Fast(); //ACS
-
-		GetWitcherPlayer().RemoveTag('ACS_Size_Adjusted'); //ACS
-	}
-
 	GetWitcherPlayer().StopEffect('fury_ciri');
 
 	GetWitcherPlayer().StopEffect('fury_403_ciri');
@@ -49,18 +42,38 @@ function ACS_WeaponHolsterInit()
 
 	GetWitcherPlayer().StopEffect('teleport_glow_ciri');
 
+	if (thePlayer.IsEffectActive('acs_armor_effect_1', false))
+	{
+		thePlayer.StopEffect('acs_armor_effect_1');
+	}
+	
+	if (thePlayer.IsEffectActive('acs_armor_effect_2', false))
+	{
+		thePlayer.StopEffect('acs_armor_effect_2');
+	}
+
+	if (thePlayer.IsEffectActive('demon_cs', false))
+	{
+		thePlayer.StopEffect('demon_cs');
+	}
+
+	if (thePlayer.IsEffectActive('him_smoke_red', false))
+	{
+		thePlayer.StopEffect('him_smoke_red');
+	}
+
 	if (GetWitcherPlayer().HasTag('acs_igni_sword_equipped')
 	|| GetWitcherPlayer().HasTag('acs_igni_secondary_sword_equipped')
 	|| GetWitcherPlayer().HasTag('acs_igni_sword_equipped_TAG')
 	|| GetWitcherPlayer().HasTag('acs_igni_secondary_sword_equipped_TAG'))
 	{
-		ACS_WeaponDestroyInit_WITHOUT_HIDESWORD_IMMEDIATE();
+		ACS_WeaponDestroyInit(false);
 
 		if ( ACS_GetWeaponMode() == 0 
 		|| ACS_GetWeaponMode() == 1
 		|| ACS_GetWeaponMode() == 2 )
 		{
-			if (ACS_CloakEquippedCheck() || ACS_HideSwordsheathes_Enabled())
+			if (ACS_CloakEquippedCheck() || ACS_Settings_Main_Bool('EHmodVisualSettings','EHmodHideSwordsheathes', false))
 			{
 				GetWitcherPlayer().PlayEffectSingle('embers_particles_test');
 				GetWitcherPlayer().StopEffect('embers_particles_test');
@@ -141,7 +154,7 @@ function ACS_WeaponHolsterInit()
 
 		ACS_Shield_Destroy();
 	
-		ACS_WeaponDestroyIMMEDIATEInit();
+		ACS_WeaponDestroyInit(true);
 		
 		/*
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SilverSword, silverID);
@@ -223,9 +236,6 @@ function ACS_WeaponHolsterInit()
 		if (GetWitcherPlayer().HasTag ('acs_vampire_claws_equipped'))
 		{
 			GetACSWatcher().ClawDestroy();
-
-			GetWitcherPlayer().PlayEffectSingle('claws_effect');
-			GetWitcherPlayer().StopEffect('claws_effect');
 		}
 
 		if (GetWitcherPlayer().HasTag ('acs_sorc_fists_equipped'))
@@ -255,7 +265,7 @@ function ACS_WeaponHolsterInit()
 		ACS_Axii_Shield_Destroy_IMMEDIATE();
 	}
 
-	ACS_ThingsThatShouldBeRemoved();
+	ACS_ThingsThatShouldBeRemoved(true);
 
 	//GetACSWatcher().UpdateBehGraph();
 
@@ -279,7 +289,7 @@ state WeaponHolster_Engage in cWeaponHolster
 	event OnEnterState(prevStateName : name)
 	{
 		WeaponHolster();
-		ACS_ThingsThatShouldBeRemoved();
+		ACS_ThingsThatShouldBeRemoved(true);
 	}
 	
 	entry function WeaponHolster()
@@ -299,7 +309,7 @@ state WeaponHolster_Engage in cWeaponHolster
 		|| GetWitcherPlayer().HasTag('acs_igni_sword_equipped_TAG')
 		|| GetWitcherPlayer().HasTag('acs_igni_secondary_sword_equipped_TAG'))
 		{
-			ACS_WeaponDestroyInit_WITHOUT_HIDESWORD_IMMEDIATE();
+			ACS_WeaponDestroyInit(false);
 		}
 		else
 		{
@@ -312,7 +322,7 @@ state WeaponHolster_Engage in cWeaponHolster
 
 			ACS_Shield_Destroy();
 		
-			ACS_WeaponDestroyIMMEDIATEInit();
+			ACS_WeaponDestroyInit(true);
 			
 			Sword();
 		}

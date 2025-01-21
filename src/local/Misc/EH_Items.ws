@@ -1399,9 +1399,6 @@ class W3ACSWisp extends W3QuestUsableItem
 
 				if (
 				theGame.IsDialogOrCutscenePlaying() 
-				|| thePlayer.IsInNonGameplayCutscene() 
-				|| thePlayer.IsInGameplayScene()
-				|| theGame.IsCurrentlyPlayingNonGameplayScene()
 				|| theGame.IsFading()
 				|| theGame.IsBlackscreen()
 				)

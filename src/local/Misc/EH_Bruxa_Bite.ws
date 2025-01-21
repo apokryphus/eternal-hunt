@@ -18,7 +18,7 @@ function ACS_BruxaBiteInit()
 			if (!GetWitcherPlayer().HasTag('acs_in_wraith'))
 			{
 				if (!GetWitcherPlayer().HasTag('acs_blood_sucking') 
-				//&& (ACS_BruxaDash_Enabled() || ACS_BruxaLeapAttack_Enabled())
+				//&& (ACS_Settings_Main_Bool('EHmodBruxaDashSettings','EHmodBruxaDash', false) || ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodBruxaLeapAttack', false))
 				//&& GetWitcherPlayer().GetStat( BCS_Stamina ) == GetWitcherPlayer().GetStatMax( BCS_Stamina ) 
 				)
 				{
@@ -37,7 +37,7 @@ function ACS_BruxaBiteInit()
 				{
 					if (GetWitcherPlayer().IsInCombat())
 					{
-						if (ACS_BruxaLeapAttack_Enabled())
+						if (ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodBruxaLeapAttack', false))
 						{
 							GetACSWatcher().JumpAttackCombat();
 						}
@@ -218,7 +218,7 @@ state BruxaBite_Engage in cBruxaBite
 			GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails' );
 			GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 			
-			if (!ACS_HideVampireClaws_Enabled())
+			if (!ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodHideVampireClaws', false))
 			{
 				GetWitcherPlayer().DestroyEffect('shadowdash_short');
 				GetWitcherPlayer().PlayEffectSingle( 'shadowdash_short' );
@@ -226,7 +226,7 @@ state BruxaBite_Engage in cBruxaBite
 			}	
 		}
 
-		ACS_ThingsThatShouldBeRemoved();
+		ACS_ThingsThatShouldBeRemoved(true);
 								
 		bruxa_bite_init();	
 	}

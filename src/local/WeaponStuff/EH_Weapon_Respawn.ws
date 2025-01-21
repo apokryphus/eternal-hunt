@@ -42,12 +42,6 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 	{
 		if (!GetWitcherPlayer().HasTag('acs_vampire_claws_equipped'))
 		{
-			if (GetWitcherPlayer().IsAnyWeaponHeld())
-			{
-				//GetWitcherPlayer().PlayEffectSingle('claws_effect');
-				//GetWitcherPlayer().StopEffect('claws_effect');
-			}
-
 			ClawDestroy_Latent_OnDodge();
 		}
 
@@ -279,28 +273,117 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 	latent function ClawDestroy_Latent_OnDodge()
 	{
-		p_actor = GetWitcherPlayer();
-		p_comp = p_actor.GetComponentByClassName( 'CAppearanceComponent' );
+		var morphManager 							: CMorphedMeshManagerComponent;
 
 		head_temp = (CEntityTemplate)LoadResource("dlc\bob\data\items\cutscenes\cs704_dettlaff_transformation\cs704_dettlaff_transformation_extra_arms.w2ent", true);	
 
 		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(head_temp);
 			
-		if (ACS_Armor_Equipped_Check())
+		if (ACS_Armor_Equipped_Check() || ACS_GetItem_VampClaw_ACS_Armor())
 		{
-			claw_temp = (CEntityTemplate)LoadResource(	"dlc\dlc_acs\data\models\nightmare_to_remember\nightmare_body.w2ent", true);	
-
-			((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(claw_temp);
+			
 		}
 		else
 		{
-			claw_temp = (CEntityTemplate)LoadResource(	"dlc\dlc_acs\data\entities\swords\vamp_claws.w2ent", true);	
+			morphManager = (CMorphedMeshManagerComponent) ACSGetCEntity('ACS_Vamp_Claws_R1').GetComponentByClassName('CMorphedMeshManagerComponent');
+			morphManager.SetMorphBlend( 0, 1 );
 
-			((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(claw_temp);
+			morphManager = (CMorphedMeshManagerComponent) ACSGetCEntity('ACS_Vamp_Claws_R2').GetComponentByClassName('CMorphedMeshManagerComponent');
+			morphManager.SetMorphBlend( 0, 1 );
 
-			claw_temp = (CEntityTemplate)LoadResource(	"dlc\dlc_acs\data\entities\swords\vamp_claws_blood.w2ent", true);	
+			morphManager = (CMorphedMeshManagerComponent) ACSGetCEntity('ACS_Vamp_Claws_R3').GetComponentByClassName('CMorphedMeshManagerComponent');
+			morphManager.SetMorphBlend( 0, 1 );
 
-			((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(claw_temp);
+			morphManager = (CMorphedMeshManagerComponent) ACSGetCEntity('ACS_Vamp_Claws_R4').GetComponentByClassName('CMorphedMeshManagerComponent');
+			morphManager.SetMorphBlend( 0, 1 );
+
+			morphManager = (CMorphedMeshManagerComponent) ACSGetCEntity('ACS_Vamp_Claws_R5').GetComponentByClassName('CMorphedMeshManagerComponent');
+			morphManager.SetMorphBlend( 0, 1 );
+
+			morphManager = (CMorphedMeshManagerComponent) ACSGetCEntity('ACS_Vamp_Claws_L1').GetComponentByClassName('CMorphedMeshManagerComponent');
+			morphManager.SetMorphBlend( 0, 1 );
+
+			morphManager = (CMorphedMeshManagerComponent) ACSGetCEntity('ACS_Vamp_Claws_L2').GetComponentByClassName('CMorphedMeshManagerComponent');
+			morphManager.SetMorphBlend( 0, 1 );
+
+			morphManager = (CMorphedMeshManagerComponent) ACSGetCEntity('ACS_Vamp_Claws_L3').GetComponentByClassName('CMorphedMeshManagerComponent');
+			morphManager.SetMorphBlend( 0, 1 );
+
+			morphManager = (CMorphedMeshManagerComponent) ACSGetCEntity('ACS_Vamp_Claws_L4').GetComponentByClassName('CMorphedMeshManagerComponent');
+			morphManager.SetMorphBlend( 0, 1 );
+
+			morphManager = (CMorphedMeshManagerComponent) ACSGetCEntity('ACS_Vamp_Claws_L5').GetComponentByClassName('CMorphedMeshManagerComponent');
+			morphManager.SetMorphBlend( 0, 1 );
+
+			ACSGetCEntity('ACS_Vamp_Claws_R1_Anchor').DestroyAfter(1);
+			ACSGetCEntity('ACS_Vamp_Claws_R1_Anchor').RemoveTag('ACS_Vamp_Claws_R1_Anchor');
+
+			ACSGetCEntity('ACS_Vamp_Claws_R2_Anchor').DestroyAfter(1);
+			ACSGetCEntity('ACS_Vamp_Claws_R2_Anchor').RemoveTag('ACS_Vamp_Claws_R2_Anchor');
+
+			ACSGetCEntity('ACS_Vamp_Claws_R3_Anchor').DestroyAfter(1);
+			ACSGetCEntity('ACS_Vamp_Claws_R3_Anchor').RemoveTag('ACS_Vamp_Claws_R3_Anchor');
+
+			ACSGetCEntity('ACS_Vamp_Claws_R4_Anchor').DestroyAfter(1);
+			ACSGetCEntity('ACS_Vamp_Claws_R4_Anchor').RemoveTag('ACS_Vamp_Claws_R4_Anchor');
+
+			ACSGetCEntity('ACS_Vamp_Claws_R5_Anchor').DestroyAfter(1);
+			ACSGetCEntity('ACS_Vamp_Claws_R5_Anchor').RemoveTag('ACS_Vamp_Claws_R5_Anchor');
+
+			ACSGetCEntity('ACS_Vamp_Claws_L1_Anchor').DestroyAfter(1);
+			ACSGetCEntity('ACS_Vamp_Claws_L1_Anchor').RemoveTag('ACS_Vamp_Claws_L1_Anchor');
+
+			ACSGetCEntity('ACS_Vamp_Claws_L2_Anchor').DestroyAfter(1);
+			ACSGetCEntity('ACS_Vamp_Claws_L2_Anchor').RemoveTag('ACS_Vamp_Claws_L2_Anchor');
+
+			ACSGetCEntity('ACS_Vamp_Claws_L3_Anchor').DestroyAfter(1);
+			ACSGetCEntity('ACS_Vamp_Claws_L3_Anchor').RemoveTag('ACS_Vamp_Claws_L3_Anchor');
+
+			ACSGetCEntity('ACS_Vamp_Claws_L4_Anchor').DestroyAfter(1);
+			ACSGetCEntity('ACS_Vamp_Claws_L4_Anchor').RemoveTag('ACS_Vamp_Claws_L4_Anchor');
+
+			ACSGetCEntity('ACS_Vamp_Claws_L5_Anchor').DestroyAfter(1);
+			ACSGetCEntity('ACS_Vamp_Claws_L5_Anchor').RemoveTag('ACS_Vamp_Claws_L5_Anchor');
+
+			
+			ACSGetCEntity('ACS_Vamp_Claws_R1').DestroyAfter(1);
+			ACSGetCEntity('ACS_Vamp_Claws_R1').RemoveTag('ACS_Vamp_Claws_R1');
+
+			
+			ACSGetCEntity('ACS_Vamp_Claws_R2').DestroyAfter(1);
+			ACSGetCEntity('ACS_Vamp_Claws_R2').RemoveTag('ACS_Vamp_Claws_R2');
+
+			
+			ACSGetCEntity('ACS_Vamp_Claws_R3').DestroyAfter(1);
+			ACSGetCEntity('ACS_Vamp_Claws_R3').RemoveTag('ACS_Vamp_Claws_R3');
+
+			
+			ACSGetCEntity('ACS_Vamp_Claws_R4').DestroyAfter(1);
+			ACSGetCEntity('ACS_Vamp_Claws_R4').RemoveTag('ACS_Vamp_Claws_R4');
+
+			
+			ACSGetCEntity('ACS_Vamp_Claws_R5').DestroyAfter(1);
+			ACSGetCEntity('ACS_Vamp_Claws_R5').RemoveTag('ACS_Vamp_Claws_R5');
+
+			
+			ACSGetCEntity('ACS_Vamp_Claws_L1').DestroyAfter(1);
+			ACSGetCEntity('ACS_Vamp_Claws_L1').RemoveTag('ACS_Vamp_Claws_L1');
+
+			
+			ACSGetCEntity('ACS_Vamp_Claws_L2').DestroyAfter(1);
+			ACSGetCEntity('ACS_Vamp_Claws_L2').RemoveTag('ACS_Vamp_Claws_L2');
+
+			
+			ACSGetCEntity('ACS_Vamp_Claws_L3').DestroyAfter(1);
+			ACSGetCEntity('ACS_Vamp_Claws_L3').RemoveTag('ACS_Vamp_Claws_L3');
+
+			
+			ACSGetCEntity('ACS_Vamp_Claws_L4').DestroyAfter(1);
+			ACSGetCEntity('ACS_Vamp_Claws_L4').RemoveTag('ACS_Vamp_Claws_L4');
+
+			
+			ACSGetCEntity('ACS_Vamp_Claws_L5').DestroyAfter(1);
+			ACSGetCEntity('ACS_Vamp_Claws_L5').RemoveTag('ACS_Vamp_Claws_L5');
 		}
 	}
 
@@ -429,7 +512,7 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 				steelswordentity.SetHideInGame(false); 
 			}
 
-			if (!ACS_HideSwordsheathes_Enabled())
+			if (!ACS_Settings_Main_Bool('EHmodVisualSettings','EHmodHideSwordsheathes', false))
 			{
 				scabbards_steel.Clear();
 
@@ -452,7 +535,7 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 				silverswordentity.SetHideInGame(false); 
 			}
 
-			if (!ACS_HideSwordsheathes_Enabled())
+			if (!ACS_Settings_Main_Bool('EHmodVisualSettings','EHmodHideSwordsheathes', false))
 			{
 				scabbards_silver.Clear();
 
@@ -480,11 +563,11 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 	latent function ArmigerModeAxiiSword()
 	{
-		if ( ACS_GetArmigerModeWeaponType() == 0 )
+		if ( ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerModeWeaponType', 0) == 0 )
 		{
 			AxiiSwordEvolving();
 		}
-		else if ( ACS_GetArmigerModeWeaponType() == 1 )
+		else if ( ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerModeWeaponType', 0) == 1 )
 		{
 			AxiiSwordStatic();
 		}
@@ -492,11 +575,11 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 	latent function FocusModeAxiiSword()
 	{
-		if ( ACS_GetFocusModeWeaponType() == 0 )
+		if ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeWeaponType', 0) == 0 )
 		{
 			AxiiSwordEvolving();
 		}
-		else if ( ACS_GetFocusModeWeaponType() == 1 )
+		else if ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeWeaponType', 0) == 1 )
 		{
 			AxiiSwordStatic();
 		}
@@ -504,11 +587,11 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 	latent function HybridModeAxiiSword()
 	{
-		if ( ACS_GetHybridModeWeaponType() == 0)
+		if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeWeaponType', 0) == 0)
 		{
 			AxiiSwordEvolving();
 		}
-		else if ( ACS_GetHybridModeWeaponType() == 1)
+		else if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeWeaponType', 0) == 1)
 		{
 			AxiiSwordStatic();
 		}
@@ -521,7 +604,7 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 		
 
-		if ( ACS_SOI_Installed()  )
+		if ( ACS_Is_DLC_Installed('dlc_050_51')  )
 		{
 			if ( GetWitcherPlayer().IsWeaponHeld( 'silversword' ) )
 			{
@@ -1460,11 +1543,11 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 	latent function ArmigerModeAardSword()
 	{
-		if ( ACS_GetArmigerModeWeaponType() == 0 )
+		if ( ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerModeWeaponType', 0) == 0 )
 		{
 			AardSwordEvolving();
 		}
-		else if ( ACS_GetArmigerModeWeaponType() == 1 )
+		else if ( ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerModeWeaponType', 0) == 1 )
 		{
 			AardSwordStatic();
 		}
@@ -1472,11 +1555,11 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 	latent function FocusModeAardSword()
 	{
-		if ( ACS_GetFocusModeWeaponType() == 0 )
+		if ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeWeaponType', 0) == 0 )
 		{
 			AardSwordEvolving();
 		}
-		else if ( ACS_GetFocusModeWeaponType() == 1 )
+		else if ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeWeaponType', 0) == 1 )
 		{
 			AardSwordStatic();
 		}
@@ -1484,11 +1567,11 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 	latent function HybridModeAardSword()
 	{	
-		if ( ACS_GetHybridModeWeaponType() == 0 )
+		if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeWeaponType', 0) == 0 )
 		{
 			AardSwordEvolving();
 		}
-		else if ( ACS_GetHybridModeWeaponType() == 1 )
+		else if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeWeaponType', 0) == 1 )
 		{
 			AardSwordStatic();
 		}
@@ -1629,27 +1712,27 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 					
 		r_blade4.CreateAttachment( r_anchor, , attach_vec, attach_rot );
 
-		r_blade1.AddTag('aard_blade_1');
-		l_blade1.AddTag('aard_blade_2');
-		r_blade2.AddTag('aard_blade_3');
-		l_blade2.AddTag('aard_blade_4');
-		r_blade3.AddTag('aard_blade_5');
-		l_blade3.AddTag('aard_blade_6');
-		r_blade4.AddTag('aard_blade_7');
-		l_blade4.AddTag('aard_blade_8');
-		r_anchor.AddTag('r_hand_anchor_1');
-		l_anchor.AddTag('l_hand_anchor_1');
+		r_blade1.AddTag('acs_aard_blade_1');
+		l_blade1.AddTag('acs_aard_blade_2');
+		r_blade2.AddTag('acs_aard_blade_3');
+		l_blade2.AddTag('acs_aard_blade_4');
+		r_blade3.AddTag('acs_aard_blade_5');
+		l_blade3.AddTag('acs_aard_blade_6');
+		r_blade4.AddTag('acs_aard_blade_7');
+		l_blade4.AddTag('acs_aard_blade_8');
+		r_anchor.AddTag('acs_r_hand_anchor_1');
+		l_anchor.AddTag('acs_l_hand_anchor_1');
 	}
 
 	latent function AardSwordEvolving()
 	{
 		
 
-		if ( ACS_SOI_Installed() && ACS_Warglaives_Installed() )
+		if ( ACS_Is_DLC_Installed('dlc_050_51') && ACS_Is_DLC_Installed('dlc_glaives_9897') )
 		{
 			Warglaives_AardSword();
 		}
-		else if ( ACS_SOI_Installed()  )
+		else if ( ACS_Is_DLC_Installed('dlc_050_51')  )
 		{
 			SOI_AardSword();
 		}
@@ -2189,16 +2272,16 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 			}
 		}
 
-		r_blade1.AddTag('aard_blade_1');
-		l_blade1.AddTag('aard_blade_2');
-		r_blade2.AddTag('aard_blade_3');
-		l_blade2.AddTag('aard_blade_4');
-		r_blade3.AddTag('aard_blade_5');
-		l_blade3.AddTag('aard_blade_6');
-		r_blade4.AddTag('aard_blade_7');
-		l_blade4.AddTag('aard_blade_8');
-		r_anchor.AddTag('r_hand_anchor_1');
-		l_anchor.AddTag('l_hand_anchor_1');
+		r_blade1.AddTag('acs_aard_blade_1');
+		l_blade1.AddTag('acs_aard_blade_2');
+		r_blade2.AddTag('acs_aard_blade_3');
+		l_blade2.AddTag('acs_aard_blade_4');
+		r_blade3.AddTag('acs_aard_blade_5');
+		l_blade3.AddTag('acs_aard_blade_6');
+		r_blade4.AddTag('acs_aard_blade_7');
+		l_blade4.AddTag('acs_aard_blade_8');
+		r_anchor.AddTag('acs_r_hand_anchor_1');
+		l_anchor.AddTag('acs_l_hand_anchor_1');
 	}
 
 	latent function SOI_AardSword()
@@ -2728,16 +2811,16 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 			}
 		}
 
-		r_blade1.AddTag('aard_blade_1');
-		l_blade1.AddTag('aard_blade_2');
-		r_blade2.AddTag('aard_blade_3');
-		l_blade2.AddTag('aard_blade_4');
-		r_blade3.AddTag('aard_blade_5');
-		l_blade3.AddTag('aard_blade_6');
-		r_blade4.AddTag('aard_blade_7');
-		l_blade4.AddTag('aard_blade_8');
-		r_anchor.AddTag('r_hand_anchor_1');
-		l_anchor.AddTag('l_hand_anchor_1');
+		r_blade1.AddTag('acs_aard_blade_1');
+		l_blade1.AddTag('acs_aard_blade_2');
+		r_blade2.AddTag('acs_aard_blade_3');
+		l_blade2.AddTag('acs_aard_blade_4');
+		r_blade3.AddTag('acs_aard_blade_5');
+		l_blade3.AddTag('acs_aard_blade_6');
+		r_blade4.AddTag('acs_aard_blade_7');
+		l_blade4.AddTag('acs_aard_blade_8');
+		r_anchor.AddTag('acs_r_hand_anchor_1');
+		l_anchor.AddTag('acs_l_hand_anchor_1');
 	}
 
 	latent function Normal_AardSword()
@@ -3293,16 +3376,16 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 			}
 		}
 
-		r_blade1.AddTag('aard_blade_1');
-		l_blade1.AddTag('aard_blade_2');
-		r_blade2.AddTag('aard_blade_3');
-		l_blade2.AddTag('aard_blade_4');
-		r_blade3.AddTag('aard_blade_5');
-		l_blade3.AddTag('aard_blade_6');
-		r_blade4.AddTag('aard_blade_7');
-		l_blade4.AddTag('aard_blade_8');
-		r_anchor.AddTag('r_hand_anchor_1');
-		l_anchor.AddTag('l_hand_anchor_1');
+		r_blade1.AddTag('acs_aard_blade_1');
+		l_blade1.AddTag('acs_aard_blade_2');
+		r_blade2.AddTag('acs_aard_blade_3');
+		l_blade2.AddTag('acs_aard_blade_4');
+		r_blade3.AddTag('acs_aard_blade_5');
+		l_blade3.AddTag('acs_aard_blade_6');
+		r_blade4.AddTag('acs_aard_blade_7');
+		l_blade4.AddTag('acs_aard_blade_8');
+		r_anchor.AddTag('acs_r_hand_anchor_1');
+		l_anchor.AddTag('acs_l_hand_anchor_1');
 	}
 
 	latent function AardSwordStatic()
@@ -3331,7 +3414,7 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 		r_anchor.PlayEffect('mist_regis_q702');
 		l_anchor.PlayEffect('mist_regis_q702');
 
-		if ( ACS_SOI_Installed()  )
+		if ( ACS_Is_DLC_Installed('dlc_050_51')  )
 		{
 			if (GetWitcherPlayer().IsWeaponHeld( 'silversword' ))
 			{
@@ -3723,25 +3806,25 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 			}
 		}
 
-		r_blade1.AddTag('aard_blade_1');
-		l_blade1.AddTag('aard_blade_2');
-		r_blade2.AddTag('aard_blade_3');
-		l_blade2.AddTag('aard_blade_4');
-		r_blade3.AddTag('aard_blade_5');
-		l_blade3.AddTag('aard_blade_6');
-		r_blade4.AddTag('aard_blade_7');
-		l_blade4.AddTag('aard_blade_8');
-		r_anchor.AddTag('r_hand_anchor_1');
-		l_anchor.AddTag('l_hand_anchor_1');
+		r_blade1.AddTag('acs_aard_blade_1');
+		l_blade1.AddTag('acs_aard_blade_2');
+		r_blade2.AddTag('acs_aard_blade_3');
+		l_blade2.AddTag('acs_aard_blade_4');
+		r_blade3.AddTag('acs_aard_blade_5');
+		l_blade3.AddTag('acs_aard_blade_6');
+		r_blade4.AddTag('acs_aard_blade_7');
+		l_blade4.AddTag('acs_aard_blade_8');
+		r_anchor.AddTag('acs_r_hand_anchor_1');
+		l_anchor.AddTag('acs_l_hand_anchor_1');
 	}
 	
 	latent function ArmigerModeYrdenSword()
 	{
-		if ( ACS_GetArmigerModeWeaponType() == 0 )
+		if ( ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerModeWeaponType', 0) == 0 )
 		{
 			YrdenSwordEvolving();
 		}
-		else if ( ACS_GetArmigerModeWeaponType() == 1 )
+		else if ( ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerModeWeaponType', 0) == 1 )
 		{
 			YrdenSwordStatic();
 		}
@@ -3749,11 +3832,11 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 	latent function FocusModeYrdenSword()
 	{
-		if ( ACS_GetFocusModeWeaponType() == 0 )
+		if ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeWeaponType', 0) == 0 )
 		{
 			YrdenSwordEvolving();
 		}
-		else if ( ACS_GetFocusModeWeaponType() == 1 )
+		else if ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeWeaponType', 0) == 1 )
 		{
 			YrdenSwordStatic();
 		}
@@ -3761,11 +3844,11 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 	latent function HybridModeYrdenSword()
 	{
-		if ( ACS_GetHybridModeWeaponType() == 0 )
+		if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeWeaponType', 0) == 0 )
 		{
 			YrdenSwordEvolving();
 		}
-		else if ( ACS_GetHybridModeWeaponType() == 1 )
+		else if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeWeaponType', 0) == 1 )
 		{
 			YrdenSwordStatic();
 		}
@@ -3778,7 +3861,7 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 		
 
-		if ( ACS_SOI_Installed()  )
+		if ( ACS_Is_DLC_Installed('dlc_050_51')  )
 		{
 			if ( GetWitcherPlayer().IsWeaponHeld( 'silversword' ) )
 			{
@@ -5317,11 +5400,11 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 	latent function ArmigerModeQuenSword()
 	{
-		if ( ACS_GetArmigerModeWeaponType() == 0 )
+		if ( ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerModeWeaponType', 0) == 0 )
 		{
 			QuenSwordEvolving();
 		}
-		else if ( ACS_GetArmigerModeWeaponType() == 1 )
+		else if ( ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerModeWeaponType', 0) == 1 )
 		{
 			QuenSwordStatic();
 		}
@@ -5329,11 +5412,11 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 	latent function FocusModeQuenSword()
 	{
-		if ( ACS_GetFocusModeWeaponType() == 0 )
+		if ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeWeaponType', 0) == 0 )
 		{
 			QuenSwordEvolving();
 		}
-		else if ( ACS_GetFocusModeWeaponType() == 1 )
+		else if ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeWeaponType', 0) == 1 )
 		{
 			QuenSwordStatic();
 		}
@@ -5341,11 +5424,11 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 	latent function HybridModeQuenSword()
 	{
-		if ( ACS_GetHybridModeWeaponType() == 0 )
+		if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeWeaponType', 0) == 0 )
 		{
 			QuenSwordEvolving();
 		}
-		else if ( ACS_GetHybridModeWeaponType() == 1 )
+		else if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeWeaponType', 0) == 1 )
 		{
 			QuenSwordStatic();
 		}
@@ -5587,11 +5670,11 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 	latent function ArmigerModeAxiiSecondarySword()
 	{
-		if ( ACS_GetArmigerModeWeaponType() == 0 )
+		if ( ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerModeWeaponType', 0) == 0 )
 		{
 			AxiiSecondarySwordEvolving();
 		}
-		else if ( ACS_GetArmigerModeWeaponType() == 1 )
+		else if ( ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerModeWeaponType', 0) == 1 )
 		{
 			AxiiSecondarySwordStatic();
 		}
@@ -5599,11 +5682,11 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 	latent function FocusModeAxiiSecondarySword()
 	{
-		if ( ACS_GetFocusModeWeaponType() == 0 )
+		if ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeWeaponType', 0) == 0 )
 		{
 			AxiiSecondarySwordEvolving();
 		}
-		else if ( ACS_GetFocusModeWeaponType() == 1 )
+		else if ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeWeaponType', 0) == 1 )
 		{
 			AxiiSecondarySwordStatic();
 		}
@@ -5611,11 +5694,11 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 	latent function HybridModeAxiiSecondarySword()
 	{
-		if ( ACS_GetHybridModeWeaponType() == 0)
+		if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeWeaponType', 0) == 0)
 		{
 			AxiiSecondarySwordEvolving();
 		}
-		else if ( ACS_GetHybridModeWeaponType() == 1)
+		else if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeWeaponType', 0) == 1)
 		{
 			AxiiSecondarySwordStatic();
 		}
@@ -5630,7 +5713,7 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 		
 		
 
-		if ( ACS_SOI_Installed()  )
+		if ( ACS_Is_DLC_Installed('dlc_050_51')  )
 		{
 			if ( GetWitcherPlayer().IsWeaponHeld( 'silversword' ) )
 			{
@@ -6243,11 +6326,11 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 	latent function ArmigerModeAardSecondarySword()
 	{
-		if ( ACS_GetArmigerModeWeaponType() == 0 )
+		if ( ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerModeWeaponType', 0) == 0 )
 		{
 			AardSecondarySwordEvolving();
 		}
-		else if ( ACS_GetArmigerModeWeaponType() == 1 )
+		else if ( ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerModeWeaponType', 0) == 1 )
 		{
 			AardSecondarySwordStatic();
 		}
@@ -6255,11 +6338,11 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 	latent function FocusModeAardSecondarySword()
 	{
-		if ( ACS_GetFocusModeWeaponType() == 0  )
+		if ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeWeaponType', 0) == 0  )
 		{
 			AardSecondarySwordEvolving();
 		}
-		else if ( ACS_GetFocusModeWeaponType() == 1 )
+		else if ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeWeaponType', 0) == 1 )
 		{
 			AardSecondarySwordStatic();
 		}
@@ -6267,11 +6350,11 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 	latent function HybridModeAardSecondarySword()
 	{
-		if ( ACS_GetHybridModeWeaponType() == 0 )
+		if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeWeaponType', 0) == 0 )
 		{
 			AardSecondarySwordEvolving();
 		}
-		else if ( ACS_GetHybridModeWeaponType() == 1 )
+		else if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeWeaponType', 0) == 1 )
 		{
 			AardSecondarySwordStatic();
 		}
@@ -6286,7 +6369,7 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 		
 		
 
-		if ( ACS_SOI_Installed()  )
+		if ( ACS_Is_DLC_Installed('dlc_050_51')  )
 		{
 			if ( GetWitcherPlayer().IsWeaponHeld( 'silversword' ) )
 			{
@@ -7476,11 +7559,11 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 	latent function ArmigerModeYrdenSecondarySword()
 	{
-		if ( ACS_GetArmigerModeWeaponType() == 0 )
+		if ( ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerModeWeaponType', 0) == 0 )
 		{
 			YrdenSecondarySwordEvolving();
 		}
-		else if ( ACS_GetArmigerModeWeaponType() == 1 )
+		else if ( ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerModeWeaponType', 0) == 1 )
 		{
 			YrdenSecondarySwordStatic();
 		}
@@ -7488,11 +7571,11 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 	latent function FocusModeYrdenSecondarySword()
 	{
-		if ( ACS_GetFocusModeWeaponType() == 0 )
+		if ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeWeaponType', 0) == 0 )
 		{
 			YrdenSecondarySwordEvolving();
 		}
-		else if ( ACS_GetFocusModeWeaponType() == 1 )
+		else if ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeWeaponType', 0) == 1 )
 		{
 			YrdenSecondarySwordStatic();
 		}
@@ -7500,11 +7583,11 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 	latent function HybridModeYrdenSecondarySword()
 	{
-		if ( ACS_GetHybridModeWeaponType() == 0 )
+		if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeWeaponType', 0) == 0 )
 		{
 			YrdenSecondarySwordEvolving();
 		}
-		else if ( ACS_GetHybridModeWeaponType() == 1 )
+		else if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeWeaponType', 0) == 1 )
 		{
 			YrdenSecondarySwordStatic();
 		}
@@ -7519,7 +7602,7 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 		
 		
 
-		if ( ACS_SOI_Installed()  )
+		if ( ACS_Is_DLC_Installed('dlc_050_51')  )
 		{
 			if ( GetWitcherPlayer().IsWeaponHeld( 'silversword' ) )
 			{
@@ -8329,11 +8412,11 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 	
 	latent function ArmigerModeQuenSecondarySword()
 	{
-		if ( ACS_GetArmigerModeWeaponType() == 0 )
+		if ( ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerModeWeaponType', 0) == 0 )
 		{
 			QuenSecondarySwordEvolving();
 		}
-		else if ( ACS_GetArmigerModeWeaponType() == 1 )
+		else if ( ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerModeWeaponType', 0) == 1 )
 		{
 			QuenSecondarySwordStatic();
 		}
@@ -8341,11 +8424,11 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 	latent function FocusModeQuenSecondarySword()
 	{
-		if ( ACS_GetFocusModeWeaponType() == 0 )
+		if ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeWeaponType', 0) == 0 )
 		{
 			QuenSecondarySwordEvolving();
 		}
-		else if ( ACS_GetFocusModeWeaponType() == 1 )
+		else if ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeWeaponType', 0) == 1 )
 		{
 			QuenSecondarySwordStatic();
 		}
@@ -8353,11 +8436,11 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 	latent function HybridModeQuenSecondarySword()
 	{
-		if ( ACS_GetHybridModeWeaponType() == 0 )
+		if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeWeaponType', 0) == 0 )
 		{
 			QuenSecondarySwordEvolving();
 		}
-		else if ( ACS_GetHybridModeWeaponType() == 1 )
+		else if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeWeaponType', 0) == 1 )
 		{
 			QuenSecondarySwordStatic();
 		}
@@ -8370,7 +8453,7 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 		
 
-		if ( ACS_SOI_Installed()  )
+		if ( ACS_Is_DLC_Installed('dlc_050_51')  )
 		{
 			if ( GetWitcherPlayer().IsWeaponHeld( 'silversword' ) )
 			{

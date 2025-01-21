@@ -46,7 +46,7 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 
 		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
 
-		ACS_ThingsThatShouldBeRemoved();
+		ACS_ThingsThatShouldBeRemoved(true);
 
 		ACS_ExplorationDelayHack();
 
@@ -85,21 +85,22 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 			theSound.SoundLoadBank( "monster_dettlaff_monster.bnk", false );
 		}
 		
-		if ( ACS_StaminaBlockAction_Enabled() 
+		if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 		&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 		)
 		{
+			if (thePlayer.HasTag('ACS_IsSwordWalking')){thePlayer.RemoveTag('ACS_IsSwordWalking');}
 			GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
 			GetWitcherPlayer().SoundEvent("gui_no_stamina");
 		}
 		else
 		{
 			if (
-			GetWitcherPlayer().HasTag('acs_bow_active')
-			|| GetWitcherPlayer().HasTag('acs_crossbow_active')
+			GetWitcherPlayer().HasTag('acs_crossbow_active')
+			|| FactsQuerySum("ACS_Azkar_Active") > 0
 			)
 			{
-				forgotten_wolf_school_dodges();
+				wolf_school_dodges();
 			}
 			else
 			{
@@ -168,7 +169,16 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 				else
 				{
 					if (theInput.GetActionValue('GI_AxisLeftY') < -0.1 && theInput.GetActionValue('GI_AxisLeftX') == 0  
-					&& ACS_BruxaDodgeSlideBack_Enabled()
+					&& ( ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodWildHuntBlink', false) 
+							|| ACS_GetItem_MageStaff() 
+							|| ACS_Armor_Equipped_Check()
+							|| ACS_WH_Armor_Equipped_Check()
+							|| ACS_Eredin_Armor_Equipped_Check()
+							|| ACS_Imlerith_Armor_Equipped_Check()
+							|| ACS_Caranthir_Armor_Equipped_Check()
+							|| ACS_VGX_Eredin_Armor_Equipped_Check()
+							|| thePlayer.HasTag('acs_vampire_claws_equipped')
+							)
 					&& ACS_can_special_dodge())
 					{
 						ACS_refresh_special_dodge_cooldown();
@@ -183,11 +193,11 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 					}
 					else
 					{
-						if ( ACS_StaminaBlockAction_Enabled() 
+						if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 						&& GetACSWatcher().StaminaCheck()
 						)
 						{							 
-							if(thePlayer.IsInCombat()){thePlayer.RaiseEvent( 'CombatTaunt' );} thePlayer.SoundEvent("gui_no_stamina");
+							if (thePlayer.HasTag('ACS_IsSwordWalking')){thePlayer.RemoveTag('ACS_IsSwordWalking');} if(thePlayer.IsInCombat()){thePlayer.RaiseEvent( 'CombatTaunt' );} thePlayer.SoundEvent("gui_no_stamina");
 						}
 						else
 						{
@@ -232,7 +242,7 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 
 	latent function DodgeEffects()
 	{
-		if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled())
+		if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false))
 		{
 			GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 			GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -365,7 +375,7 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 				
 				DodgeEffects();
 
-				if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+				if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 				{
 					GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 					GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -393,7 +403,7 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 					
 				DodgeEffects();
 
-				if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+				if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 				{
 					GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 					GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -429,7 +439,7 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 					
 				DodgeEffects();
 
-				if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+				if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 				{
 					GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 					GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -459,7 +469,7 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 					
 				DodgeEffects();
 
-				if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+				if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 				{
 					GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 					GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -504,7 +514,17 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 		if (theInput.GetActionValue('GI_AxisLeftY') < -0.1 && theInput.GetActionValue('GI_AxisLeftX') == 0  )
 		{
 			if (ACS_can_special_dodge()
-			&& ACS_BruxaDodgeSlideBack_Enabled())
+			&& ( ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodWildHuntBlink', false) 
+							|| ACS_GetItem_MageStaff() 
+							|| ACS_Armor_Equipped_Check()
+							|| ACS_WH_Armor_Equipped_Check()
+							|| ACS_Eredin_Armor_Equipped_Check()
+							|| ACS_Imlerith_Armor_Equipped_Check()
+							|| ACS_Caranthir_Armor_Equipped_Check()
+							|| ACS_VGX_Eredin_Armor_Equipped_Check()
+							|| thePlayer.HasTag('acs_vampire_claws_equipped')
+							)
+			)
 			{
 				ACS_refresh_special_dodge_cooldown();
 		
@@ -645,7 +665,16 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 
 		if (theInput.GetActionValue('GI_AxisLeftY') < -0.1 && theInput.GetActionValue('GI_AxisLeftX') == 0  )
 		{
-			if (ACS_BruxaDodgeSlideBack_Enabled()
+			if (( ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodWildHuntBlink', false) 
+							|| ACS_GetItem_MageStaff() 
+							|| ACS_Armor_Equipped_Check()
+							|| ACS_WH_Armor_Equipped_Check()
+							|| ACS_Eredin_Armor_Equipped_Check()
+							|| ACS_Imlerith_Armor_Equipped_Check()
+							|| ACS_Caranthir_Armor_Equipped_Check()
+							|| ACS_VGX_Eredin_Armor_Equipped_Check()
+							|| thePlayer.HasTag('acs_vampire_claws_equipped')
+							)
 			&& ACS_can_special_dodge())
 			{
 				ACS_refresh_special_dodge_cooldown();
@@ -813,7 +842,16 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 
 		if (theInput.GetActionValue('GI_AxisLeftY') < -0.1 && theInput.GetActionValue('GI_AxisLeftX') == 0  )
 		{
-			if (ACS_BruxaDodgeSlideBack_Enabled()
+			if (( ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodWildHuntBlink', false) 
+							|| ACS_GetItem_MageStaff() 
+							|| ACS_Armor_Equipped_Check()
+							|| ACS_WH_Armor_Equipped_Check()
+							|| ACS_Eredin_Armor_Equipped_Check()
+							|| ACS_Imlerith_Armor_Equipped_Check()
+							|| ACS_Caranthir_Armor_Equipped_Check()
+							|| ACS_VGX_Eredin_Armor_Equipped_Check()
+							|| thePlayer.HasTag('acs_vampire_claws_equipped')
+							)
 			&& ACS_can_special_dodge())
 			{
 				ACS_refresh_special_dodge_cooldown();
@@ -831,7 +869,7 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 			}
 			else if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -970,7 +1008,16 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 
 		if (theInput.GetActionValue('GI_AxisLeftY') < -0.1 && theInput.GetActionValue('GI_AxisLeftX') == 0  )
 		{
-			if (ACS_BruxaDodgeSlideBack_Enabled()
+			if (( ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodWildHuntBlink', false) 
+							|| ACS_GetItem_MageStaff() 
+							|| ACS_Armor_Equipped_Check()
+							|| ACS_WH_Armor_Equipped_Check()
+							|| ACS_Eredin_Armor_Equipped_Check()
+							|| ACS_Imlerith_Armor_Equipped_Check()
+							|| ACS_Caranthir_Armor_Equipped_Check()
+							|| ACS_VGX_Eredin_Armor_Equipped_Check()
+							|| thePlayer.HasTag('acs_vampire_claws_equipped')
+							)
 			&& ACS_can_special_dodge())
 			{
 				ACS_refresh_special_dodge_cooldown();
@@ -988,7 +1035,7 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 			}
 			else if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -1134,7 +1181,16 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 
 		if (theInput.GetActionValue('GI_AxisLeftY') < -0.1 && theInput.GetActionValue('GI_AxisLeftX') == 0  )
 		{
-			if (ACS_BruxaDodgeSlideBack_Enabled()
+			if (( ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodWildHuntBlink', false) 
+							|| ACS_GetItem_MageStaff() 
+							|| ACS_Armor_Equipped_Check()
+							|| ACS_WH_Armor_Equipped_Check()
+							|| ACS_Eredin_Armor_Equipped_Check()
+							|| ACS_Imlerith_Armor_Equipped_Check()
+							|| ACS_Caranthir_Armor_Equipped_Check()
+							|| ACS_VGX_Eredin_Armor_Equipped_Check()
+							|| thePlayer.HasTag('acs_vampire_claws_equipped')
+							)
 			&& ACS_can_special_dodge())
 			{
 				ACS_refresh_special_dodge_cooldown();
@@ -1152,7 +1208,7 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 			}
 			else if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -1298,7 +1354,16 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 
 		if (theInput.GetActionValue('GI_AxisLeftY') < -0.1 && theInput.GetActionValue('GI_AxisLeftX') == 0  )
 		{
-			if (ACS_BruxaDodgeSlideBack_Enabled()
+			if (( ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodWildHuntBlink', false) 
+							|| ACS_GetItem_MageStaff() 
+							|| ACS_Armor_Equipped_Check()
+							|| ACS_WH_Armor_Equipped_Check()
+							|| ACS_Eredin_Armor_Equipped_Check()
+							|| ACS_Imlerith_Armor_Equipped_Check()
+							|| ACS_Caranthir_Armor_Equipped_Check()
+							|| ACS_VGX_Eredin_Armor_Equipped_Check()
+							|| thePlayer.HasTag('acs_vampire_claws_equipped')
+							)
 			&& ACS_can_special_dodge())
 			{
 				ACS_refresh_special_dodge_cooldown();
@@ -1316,7 +1381,7 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 			}
 			else if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -1462,7 +1527,16 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 
 		if (theInput.GetActionValue('GI_AxisLeftY') < -0.1 && theInput.GetActionValue('GI_AxisLeftX') == 0  )
 		{
-			if (ACS_BruxaDodgeSlideBack_Enabled()
+			if (( ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodWildHuntBlink', false) 
+							|| ACS_GetItem_MageStaff() 
+							|| ACS_Armor_Equipped_Check()
+							|| ACS_WH_Armor_Equipped_Check()
+							|| ACS_Eredin_Armor_Equipped_Check()
+							|| ACS_Imlerith_Armor_Equipped_Check()
+							|| ACS_Caranthir_Armor_Equipped_Check()
+							|| ACS_VGX_Eredin_Armor_Equipped_Check()
+							|| thePlayer.HasTag('acs_vampire_claws_equipped')
+							)
 			&& ACS_can_special_dodge())
 			{
 				ACS_refresh_special_dodge_cooldown();
@@ -1480,7 +1554,7 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 			}
 			else if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -1617,7 +1691,16 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 	{
 		if ( theInput.GetActionValue('GI_AxisLeftY') < -0.1 && theInput.GetActionValue('GI_AxisLeftX') == 0  )
 		{
-			if (ACS_BruxaDodgeSlideBack_Enabled()
+			if (( ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodWildHuntBlink', false) 
+							|| ACS_GetItem_MageStaff() 
+							|| ACS_Armor_Equipped_Check()
+							|| ACS_WH_Armor_Equipped_Check()
+							|| ACS_Eredin_Armor_Equipped_Check()
+							|| ACS_Imlerith_Armor_Equipped_Check()
+							|| ACS_Caranthir_Armor_Equipped_Check()
+							|| ACS_VGX_Eredin_Armor_Equipped_Check()
+							|| thePlayer.HasTag('acs_vampire_claws_equipped')
+							)
 			&& ACS_can_special_dodge())
 			{
 				ACS_refresh_special_dodge_cooldown();
@@ -1799,7 +1882,16 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 			else
 			{
 				if (theInput.GetActionValue('GI_AxisLeftY') < -0.1 && theInput.GetActionValue('GI_AxisLeftX') == 0  
-				&& ACS_BruxaDodgeSlideBack_Enabled()
+				&& ( ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodWildHuntBlink', false) 
+							|| ACS_GetItem_MageStaff() 
+							|| ACS_Armor_Equipped_Check()
+							|| ACS_WH_Armor_Equipped_Check()
+							|| ACS_Eredin_Armor_Equipped_Check()
+							|| ACS_Imlerith_Armor_Equipped_Check()
+							|| ACS_Caranthir_Armor_Equipped_Check()
+							|| ACS_VGX_Eredin_Armor_Equipped_Check()
+							|| thePlayer.HasTag('acs_vampire_claws_equipped')
+							)
 				&& ACS_can_special_dodge())
 				{
 					ACS_refresh_special_dodge_cooldown();
@@ -1848,7 +1940,16 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 	{
 		if (theInput.GetActionValue('GI_AxisLeftY') < -0.1 && theInput.GetActionValue('GI_AxisLeftX') == 0  )
 		{
-			if (ACS_BruxaDodgeSlideBack_Enabled()
+			if (( ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodWildHuntBlink', false) 
+							|| ACS_GetItem_MageStaff() 
+							|| ACS_Armor_Equipped_Check()
+							|| ACS_WH_Armor_Equipped_Check()
+							|| ACS_Eredin_Armor_Equipped_Check()
+							|| ACS_Imlerith_Armor_Equipped_Check()
+							|| ACS_Caranthir_Armor_Equipped_Check()
+							|| ACS_VGX_Eredin_Armor_Equipped_Check()
+							|| thePlayer.HasTag('acs_vampire_claws_equipped')
+							)
 			&& ACS_can_special_dodge())
 			{
 				ACS_refresh_special_dodge_cooldown();
@@ -1866,7 +1967,7 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 			}
 			else if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -1879,39 +1980,39 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 
 					DodgeEffects();
 
-					if (ACS_DefaultGeraltMovesetOverrideModeBackwardDodgeOptions() == 0)
+					if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeBackwardDodgeOptions', 0) == 0)
 					{
 						override_mode_back_dodge_1();
 					}
-					else if (ACS_DefaultGeraltMovesetOverrideModeBackwardDodgeOptions() == 1)
+					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeBackwardDodgeOptions', 0) == 1)
 					{
 						override_mode_back_dodge_2();
 					}
-					else if (ACS_DefaultGeraltMovesetOverrideModeBackwardDodgeOptions() == 2)
+					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeBackwardDodgeOptions', 0) == 2)
 					{
 						override_mode_back_dodge_3();
 					}
-					else if (ACS_DefaultGeraltMovesetOverrideModeBackwardDodgeOptions() == 3)
+					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeBackwardDodgeOptions', 0) == 3)
 					{
 						override_mode_back_dodge_4();
 					}
-					else if (ACS_DefaultGeraltMovesetOverrideModeBackwardDodgeOptions() == 4)
+					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeBackwardDodgeOptions', 0) == 4)
 					{
 						override_mode_back_dodge_5();
 					}
-					else if (ACS_DefaultGeraltMovesetOverrideModeBackwardDodgeOptions() == 5)
+					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeBackwardDodgeOptions', 0) == 5)
 					{
 						override_mode_back_dodge_6();
 					}
-					else if (ACS_DefaultGeraltMovesetOverrideModeBackwardDodgeOptions() == 6)
+					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeBackwardDodgeOptions', 0) == 6)
 					{
 						override_mode_back_dodge_7();
 					}
-					else if (ACS_DefaultGeraltMovesetOverrideModeBackwardDodgeOptions() == 7)
+					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeBackwardDodgeOptions', 0) == 7)
 					{
 						override_mode_back_dodge_8();
 					}
-					else if (ACS_DefaultGeraltMovesetOverrideModeBackwardDodgeOptions() == 8)
+					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeBackwardDodgeOptions', 0) == 8)
 					{
 						override_mode_back_dodge_9();
 					}
@@ -1928,27 +2029,27 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 
 				DodgeEffects();
 
-				if (ACS_DefaultGeraltMovesetOverrideModeForwardDodgeOptions() == 0)
+				if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardDodgeOptions', 2) == 0)
 				{
 					override_mode_front_dodge_1();
 				}
-				else if (ACS_DefaultGeraltMovesetOverrideModeForwardDodgeOptions() == 1)
+				else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardDodgeOptions', 2) == 1)
 				{
 					override_mode_front_dodge_2();
 				}
-				else if (ACS_DefaultGeraltMovesetOverrideModeForwardDodgeOptions() == 2)
+				else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardDodgeOptions', 2) == 2)
 				{
 					override_mode_front_dodge_3();
 				}
-				else if (ACS_DefaultGeraltMovesetOverrideModeForwardDodgeOptions() == 3)
+				else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardDodgeOptions', 2) == 3)
 				{
 					override_mode_front_dodge_4();
 				}
-				else if (ACS_DefaultGeraltMovesetOverrideModeForwardDodgeOptions() == 4)
+				else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardDodgeOptions', 2) == 4)
 				{
 					override_mode_front_dodge_5();
 				}
-				else if (ACS_DefaultGeraltMovesetOverrideModeForwardDodgeOptions() == 5)
+				else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardDodgeOptions', 2) == 5)
 				{
 					override_mode_front_dodge_6();
 				}
@@ -1964,19 +2065,19 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 
 				DodgeEffects();
 
-				if (ACS_DefaultGeraltMovesetOverrideModeRightDodgeOptions() == 0)
+				if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeRightDodgeOptions', 0) == 0)
 				{
 					override_mode_right_dodge_1();
 				}
-				else if (ACS_DefaultGeraltMovesetOverrideModeRightDodgeOptions() == 1)
+				else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeRightDodgeOptions', 0) == 1)
 				{
 					override_mode_right_dodge_2();
 				}
-				else if (ACS_DefaultGeraltMovesetOverrideModeRightDodgeOptions() == 2)
+				else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeRightDodgeOptions', 0) == 2)
 				{
 					override_mode_right_dodge_3();
 				}
-				else if (ACS_DefaultGeraltMovesetOverrideModeRightDodgeOptions() == 3)
+				else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeRightDodgeOptions', 0) == 3)
 				{
 					override_mode_right_dodge_4();
 				}
@@ -1992,19 +2093,19 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 
 				DodgeEffects();
 
-				if (ACS_DefaultGeraltMovesetOverrideModeLeftDodgeOptions() == 0)
+				if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeLeftDodgeOptions', 0) == 0)
 				{
 					override_mode_left_dodge_1();
 				}
-				else if (ACS_DefaultGeraltMovesetOverrideModeLeftDodgeOptions() == 1)
+				else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeLeftDodgeOptions', 0) == 1)
 				{
 					override_mode_left_dodge_2();
 				}
-				else if (ACS_DefaultGeraltMovesetOverrideModeLeftDodgeOptions() == 2)
+				else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeLeftDodgeOptions', 0) == 2)
 				{
 					override_mode_left_dodge_3();
 				}
-				else if (ACS_DefaultGeraltMovesetOverrideModeLeftDodgeOptions() == 3)
+				else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeLeftDodgeOptions', 0) == 3)
 				{
 					override_mode_left_dodge_4();
 				}
@@ -2020,47 +2121,47 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 
 				DodgeEffects();
 
-				if (ACS_DefaultGeraltMovesetOverrideModeRightDodgeOptions() == 0)
+				if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeRightDodgeOptions', 0) == 0)
 				{
 					override_mode_right_dodge_1();
 
 					ACSDodgeMovementAdjust('forwardright');
 				}
-				else if (ACS_DefaultGeraltMovesetOverrideModeRightDodgeOptions() == 1)
+				else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeRightDodgeOptions', 0) == 1)
 				{
 					override_mode_right_dodge_2();
 
 					ACSDodgeMovementAdjust('forwardright');
 				}
-				else if (ACS_DefaultGeraltMovesetOverrideModeRightDodgeOptions() == 2)
+				else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeRightDodgeOptions', 0) == 2)
 				{
 					override_mode_right_dodge_3();
 
 					ACSDodgeMovementAdjust('forwardright');
 				}
-				else if (ACS_DefaultGeraltMovesetOverrideModeRightDodgeOptions() == 3)
+				else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeRightDodgeOptions', 0) == 3)
 				{
-					if (ACS_DefaultGeraltMovesetOverrideModeForwardDodgeOptions() == 0)
+					if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardDodgeOptions', 2) == 0)
 					{
 						override_mode_front_dodge_1();
 					}
-					else if (ACS_DefaultGeraltMovesetOverrideModeForwardDodgeOptions() == 1)
+					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardDodgeOptions', 2) == 1)
 					{
 						override_mode_front_dodge_2();
 					}
-					else if (ACS_DefaultGeraltMovesetOverrideModeForwardDodgeOptions() == 2)
+					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardDodgeOptions', 2) == 2)
 					{
 						override_mode_front_dodge_3();
 					}
-					else if (ACS_DefaultGeraltMovesetOverrideModeForwardDodgeOptions() == 3)
+					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardDodgeOptions', 2) == 3)
 					{
 						override_mode_front_dodge_4();
 					}
-					else if (ACS_DefaultGeraltMovesetOverrideModeForwardDodgeOptions() == 4)
+					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardDodgeOptions', 2) == 4)
 					{
 						override_mode_front_dodge_5();
 					}
-					else if (ACS_DefaultGeraltMovesetOverrideModeForwardDodgeOptions() == 5)
+					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardDodgeOptions', 2) == 5)
 					{
 						override_mode_front_dodge_6();
 					}
@@ -2079,47 +2180,47 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 
 				DodgeEffects();
 
-				if (ACS_DefaultGeraltMovesetOverrideModeLeftDodgeOptions() == 0)
+				if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeLeftDodgeOptions', 0) == 0)
 				{
 					override_mode_left_dodge_1();
 
 					ACSDodgeMovementAdjust('forwardleft');
 				}
-				else if (ACS_DefaultGeraltMovesetOverrideModeLeftDodgeOptions() == 1)
+				else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeLeftDodgeOptions', 0) == 1)
 				{
 					override_mode_left_dodge_2();
 
 					ACSDodgeMovementAdjust('forwardleft');
 				}
-				else if (ACS_DefaultGeraltMovesetOverrideModeLeftDodgeOptions() == 2)
+				else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeLeftDodgeOptions', 0) == 2)
 				{
 					override_mode_left_dodge_3();
 
 					ACSDodgeMovementAdjust('forwardleft');
 				}
-				else if (ACS_DefaultGeraltMovesetOverrideModeLeftDodgeOptions() == 3)
+				else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeLeftDodgeOptions', 0) == 3)
 				{
-					if (ACS_DefaultGeraltMovesetOverrideModeForwardDodgeOptions() == 0)
+					if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardDodgeOptions', 2) == 0)
 					{
 						override_mode_front_dodge_1();
 					}
-					else if (ACS_DefaultGeraltMovesetOverrideModeForwardDodgeOptions() == 1)
+					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardDodgeOptions', 2) == 1)
 					{
 						override_mode_front_dodge_2();
 					}
-					else if (ACS_DefaultGeraltMovesetOverrideModeForwardDodgeOptions() == 2)
+					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardDodgeOptions', 2) == 2)
 					{
 						override_mode_front_dodge_3();
 					}
-					else if (ACS_DefaultGeraltMovesetOverrideModeForwardDodgeOptions() == 3)
+					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardDodgeOptions', 2) == 3)
 					{
 						override_mode_front_dodge_4();
 					}
-					else if (ACS_DefaultGeraltMovesetOverrideModeForwardDodgeOptions() == 4)
+					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardDodgeOptions', 2) == 4)
 					{
 						override_mode_front_dodge_5();
 					}
-					else if (ACS_DefaultGeraltMovesetOverrideModeForwardDodgeOptions() == 5)
+					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardDodgeOptions', 2) == 5)
 					{
 						override_mode_front_dodge_6();
 					}
@@ -2138,25 +2239,25 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 
 				DodgeEffects();
 
-				if (ACS_DefaultGeraltMovesetOverrideModeRightDodgeOptions() == 0)
+				if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeRightDodgeOptions', 0) == 0)
 				{
 					override_mode_right_dodge_1();
 
 					ACSDodgeMovementAdjust('backright');
 				}
-				else if (ACS_DefaultGeraltMovesetOverrideModeRightDodgeOptions() == 1)
+				else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeRightDodgeOptions', 0) == 1)
 				{
 					override_mode_right_dodge_2();
 
 					ACSDodgeMovementAdjust('backright');
 				}
-				else if (ACS_DefaultGeraltMovesetOverrideModeRightDodgeOptions() == 2)
+				else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeRightDodgeOptions', 0) == 2)
 				{
 					override_mode_right_dodge_3();
 
 					ACSDodgeMovementAdjust('backright');
 				}
-				else if (ACS_DefaultGeraltMovesetOverrideModeRightDodgeOptions() == 3)
+				else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeRightDodgeOptions', 0) == 3)
 				{
 					override_mode_right_dodge_4();
 
@@ -2174,25 +2275,25 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 
 				DodgeEffects();
 
-				if (ACS_DefaultGeraltMovesetOverrideModeLeftDodgeOptions() == 0)
+				if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeLeftDodgeOptions', 0) == 0)
 				{
 					override_mode_left_dodge_1();
 
 					ACSDodgeMovementAdjust('backleft');
 				}
-				else if (ACS_DefaultGeraltMovesetOverrideModeLeftDodgeOptions() == 1)
+				else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeLeftDodgeOptions', 0) == 1)
 				{
 					override_mode_left_dodge_2();
 
 					ACSDodgeMovementAdjust('backleft');
 				}
-				else if (ACS_DefaultGeraltMovesetOverrideModeLeftDodgeOptions() == 2)
+				else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeLeftDodgeOptions', 0) == 2)
 				{
 					override_mode_left_dodge_3();
 
 					ACSDodgeMovementAdjust('backleft');
 				}
-				else if (ACS_DefaultGeraltMovesetOverrideModeLeftDodgeOptions() == 3)
+				else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeLeftDodgeOptions', 0) == 3)
 				{
 					override_mode_left_dodge_4();
 
@@ -2210,39 +2311,39 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 
 				DodgeEffects();
 
-				if (ACS_DefaultGeraltMovesetOverrideModeNeutralDodgeOptions() == 0)
+				if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeNeutralDodgeOptions', 0) == 0)
 				{
 					override_mode_back_dodge_1();
 				}
-				else if (ACS_DefaultGeraltMovesetOverrideModeNeutralDodgeOptions() == 1)
+				else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeNeutralDodgeOptions', 0) == 1)
 				{
 					override_mode_back_dodge_2();
 				}
-				else if (ACS_DefaultGeraltMovesetOverrideModeNeutralDodgeOptions() == 2)
+				else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeNeutralDodgeOptions', 0) == 2)
 				{
 					override_mode_back_dodge_3();
 				}
-				else if (ACS_DefaultGeraltMovesetOverrideModeNeutralDodgeOptions() == 3)
+				else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeNeutralDodgeOptions', 0) == 3)
 				{
 					override_mode_back_dodge_4();
 				}
-				else if (ACS_DefaultGeraltMovesetOverrideModeNeutralDodgeOptions() == 4)
+				else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeNeutralDodgeOptions', 0) == 4)
 				{
 					override_mode_back_dodge_5();
 				}
-				else if (ACS_DefaultGeraltMovesetOverrideModeNeutralDodgeOptions() == 5)
+				else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeNeutralDodgeOptions', 0) == 5)
 				{
 					override_mode_back_dodge_6();
 				}
-				else if (ACS_DefaultGeraltMovesetOverrideModeNeutralDodgeOptions() == 6)
+				else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeNeutralDodgeOptions', 0) == 6)
 				{
 					override_mode_back_dodge_7();
 				}
-				else if (ACS_DefaultGeraltMovesetOverrideModeNeutralDodgeOptions() == 7)
+				else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeNeutralDodgeOptions', 0) == 7)
 				{
 					override_mode_back_dodge_8();
 				}
-				else if (ACS_DefaultGeraltMovesetOverrideModeNeutralDodgeOptions() == 8)
+				else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeNeutralDodgeOptions', 0) == 8)
 				{
 					override_mode_back_dodge_9();
 				}
@@ -3307,7 +3408,16 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 	{
 		if (theInput.GetActionValue('GI_AxisLeftY') < -0.1 && theInput.GetActionValue('GI_AxisLeftX') == 0  )
 		{
-			if (ACS_BruxaDodgeSlideBack_Enabled()
+			if (( ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodWildHuntBlink', false) 
+							|| ACS_GetItem_MageStaff() 
+							|| ACS_Armor_Equipped_Check()
+							|| ACS_WH_Armor_Equipped_Check()
+							|| ACS_Eredin_Armor_Equipped_Check()
+							|| ACS_Imlerith_Armor_Equipped_Check()
+							|| ACS_Caranthir_Armor_Equipped_Check()
+							|| ACS_VGX_Eredin_Armor_Equipped_Check()
+							|| thePlayer.HasTag('acs_vampire_claws_equipped')
+							)
 			&& ACS_can_special_dodge())
 			{
 				ACS_refresh_special_dodge_cooldown();
@@ -3325,7 +3435,7 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 			}
 			else if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -3469,7 +3579,16 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 	{
 		if (theInput.GetActionValue('GI_AxisLeftY') < -0.1 && theInput.GetActionValue('GI_AxisLeftX') == 0  )
 		{
-			if (ACS_BruxaDodgeSlideBack_Enabled()
+			if (( ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodWildHuntBlink', false) 
+							|| ACS_GetItem_MageStaff() 
+							|| ACS_Armor_Equipped_Check()
+							|| ACS_WH_Armor_Equipped_Check()
+							|| ACS_Eredin_Armor_Equipped_Check()
+							|| ACS_Imlerith_Armor_Equipped_Check()
+							|| ACS_Caranthir_Armor_Equipped_Check()
+							|| ACS_VGX_Eredin_Armor_Equipped_Check()
+							|| thePlayer.HasTag('acs_vampire_claws_equipped')
+							)
 			&& ACS_can_special_dodge())
 			{
 				ACS_refresh_special_dodge_cooldown();
@@ -3487,7 +3606,7 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 			}
 			else if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -3631,7 +3750,16 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 	{
 		if ( theInput.GetActionValue('GI_AxisLeftY') < -0.1 && theInput.GetActionValue('GI_AxisLeftX') == 0  )
 		{
-			if (ACS_BruxaDodgeSlideBack_Enabled()
+			if (( ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodWildHuntBlink', false) 
+							|| ACS_GetItem_MageStaff() 
+							|| ACS_Armor_Equipped_Check()
+							|| ACS_WH_Armor_Equipped_Check()
+							|| ACS_Eredin_Armor_Equipped_Check()
+							|| ACS_Imlerith_Armor_Equipped_Check()
+							|| ACS_Caranthir_Armor_Equipped_Check()
+							|| ACS_VGX_Eredin_Armor_Equipped_Check()
+							|| thePlayer.HasTag('acs_vampire_claws_equipped')
+							)
 			&& ACS_can_special_dodge())
 			{
 				ACS_refresh_special_dodge_cooldown();
@@ -3776,7 +3904,16 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 	{
 		if (theInput.GetActionValue('GI_AxisLeftY') < -0.1 && theInput.GetActionValue('GI_AxisLeftX') == 0  )
 		{
-			if (ACS_BruxaDodgeSlideBack_Enabled()
+			if (( ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodWildHuntBlink', false) 
+							|| ACS_GetItem_MageStaff() 
+							|| ACS_Armor_Equipped_Check()
+							|| ACS_WH_Armor_Equipped_Check()
+							|| ACS_Eredin_Armor_Equipped_Check()
+							|| ACS_Imlerith_Armor_Equipped_Check()
+							|| ACS_Caranthir_Armor_Equipped_Check()
+							|| ACS_VGX_Eredin_Armor_Equipped_Check()
+							|| thePlayer.HasTag('acs_vampire_claws_equipped')
+							)
 			&& ACS_can_special_dodge())
 			{
 				ACS_refresh_special_dodge_cooldown();
@@ -3794,7 +3931,7 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 			}
 			else if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -3938,7 +4075,16 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 	{
 		if (theInput.GetActionValue('GI_AxisLeftY') < -0.1 && theInput.GetActionValue('GI_AxisLeftX') == 0  )
 		{
-			if (ACS_BruxaDodgeSlideBack_Enabled()
+			if (( ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodWildHuntBlink', false) 
+							|| ACS_GetItem_MageStaff() 
+							|| ACS_Armor_Equipped_Check()
+							|| ACS_WH_Armor_Equipped_Check()
+							|| ACS_Eredin_Armor_Equipped_Check()
+							|| ACS_Imlerith_Armor_Equipped_Check()
+							|| ACS_Caranthir_Armor_Equipped_Check()
+							|| ACS_VGX_Eredin_Armor_Equipped_Check()
+							|| thePlayer.HasTag('acs_vampire_claws_equipped')
+							)
 			&& ACS_can_special_dodge())
 			{
 				ACS_refresh_special_dodge_cooldown();
@@ -3956,7 +4102,7 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 			}
 			else if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -4100,7 +4246,16 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 	{
 		if (theInput.GetActionValue('GI_AxisLeftY') < -0.1 && theInput.GetActionValue('GI_AxisLeftX') == 0  )
 		{
-			if (ACS_BruxaDodgeSlideBack_Enabled()
+			if (( ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodWildHuntBlink', false) 
+							|| ACS_GetItem_MageStaff() 
+							|| ACS_Armor_Equipped_Check()
+							|| ACS_WH_Armor_Equipped_Check()
+							|| ACS_Eredin_Armor_Equipped_Check()
+							|| ACS_Imlerith_Armor_Equipped_Check()
+							|| ACS_Caranthir_Armor_Equipped_Check()
+							|| ACS_VGX_Eredin_Armor_Equipped_Check()
+							|| thePlayer.HasTag('acs_vampire_claws_equipped')
+							)
 			&& ACS_can_special_dodge())
 			{
 				ACS_refresh_special_dodge_cooldown();
@@ -4118,7 +4273,7 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 			}
 			else if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -4262,7 +4417,16 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 	{
 		if (theInput.GetActionValue('GI_AxisLeftY') < -0.1 && theInput.GetActionValue('GI_AxisLeftX') == 0  )
 		{
-			if (ACS_BruxaDodgeSlideBack_Enabled()
+			if (( ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodWildHuntBlink', false) 
+							|| ACS_GetItem_MageStaff() 
+							|| ACS_Armor_Equipped_Check()
+							|| ACS_WH_Armor_Equipped_Check()
+							|| ACS_Eredin_Armor_Equipped_Check()
+							|| ACS_Imlerith_Armor_Equipped_Check()
+							|| ACS_Caranthir_Armor_Equipped_Check()
+							|| ACS_VGX_Eredin_Armor_Equipped_Check()
+							|| thePlayer.HasTag('acs_vampire_claws_equipped')
+							)
 			&& ACS_can_special_dodge())
 			{
 				ACS_refresh_special_dodge_cooldown();
@@ -4280,7 +4444,7 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 			}
 			else if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -4439,7 +4603,16 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 
 		if (theInput.GetActionValue('GI_AxisLeftY') < -0.1 && theInput.GetActionValue('GI_AxisLeftX') == 0  )
 		{
-			if (ACS_BruxaDodgeSlideBack_Enabled()
+			if (( ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodWildHuntBlink', false) 
+							|| ACS_GetItem_MageStaff() 
+							|| ACS_Armor_Equipped_Check()
+							|| ACS_WH_Armor_Equipped_Check()
+							|| ACS_Eredin_Armor_Equipped_Check()
+							|| ACS_Imlerith_Armor_Equipped_Check()
+							|| ACS_Caranthir_Armor_Equipped_Check()
+							|| ACS_VGX_Eredin_Armor_Equipped_Check()
+							|| thePlayer.HasTag('acs_vampire_claws_equipped')
+							)
 			&& ACS_can_special_dodge())
 			{
 				ACS_refresh_special_dodge_cooldown();
@@ -4462,7 +4635,7 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 			}
 			else if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -4679,7 +4852,7 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 			else
 			{
 				if (!GetWitcherPlayer().HasTag('ACS_Camo_Active')
-				&& ACS_DodgeEffects_Enabled())
+				&& ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false))
 				{
 					GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 					GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -4712,7 +4885,7 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 		else
 		{
 			if (!GetWitcherPlayer().HasTag('ACS_Camo_Active')
-			&& ACS_DodgeEffects_Enabled())
+			&& ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false))
 			{
 				GetWitcherPlayer().PlayEffectSingle( 'special_attack_only_black_fx' );
 				GetWitcherPlayer().StopEffect( 'special_attack_only_black_fx' );
@@ -4801,7 +4974,7 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 				GetACSWatcher().dodge_timer_attack_actual();
 
 				if (!GetWitcherPlayer().HasTag('ACS_Camo_Active')
-				&& ACS_DodgeEffects_Enabled())
+				&& ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false))
 				{
 					GetWitcherPlayer().PlayEffectSingle('special_attack_fx');
 					GetWitcherPlayer().StopEffect('special_attack_fx');
@@ -4823,7 +4996,7 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 			else
 			{
 				if (!GetWitcherPlayer().HasTag('ACS_Camo_Active')
-				&& ACS_DodgeEffects_Enabled())
+				&& ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false))
 				{
 					GetWitcherPlayer().PlayEffectSingle('special_attack_fx');
 					GetWitcherPlayer().StopEffect('special_attack_fx');
@@ -4850,7 +5023,7 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 		else
 		{
 			if (!GetWitcherPlayer().HasTag('ACS_Camo_Active')
-			&& ACS_DodgeEffects_Enabled())
+			&& ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false))
 			{
 				GetWitcherPlayer().PlayEffectSingle('special_attack_fx');
 				GetWitcherPlayer().StopEffect('special_attack_fx');
@@ -4904,7 +5077,7 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 			movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) );
 			
 			if (!GetWitcherPlayer().HasTag('ACS_Camo_Active')
-			&& ACS_DodgeEffects_Enabled())
+			&& ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false))
 			{
 				GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails' );
 				GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
@@ -4925,7 +5098,7 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 		else
 		{
 			if (!GetWitcherPlayer().HasTag('ACS_Camo_Active')
-			&& ACS_DodgeEffects_Enabled())
+			&& ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false))
 			{
 				GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails' );
 				GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
@@ -4956,7 +5129,7 @@ state BruxaDodgeSlideBack_Engage in cBruxaDodgeSlideBack
 		movementAdjustor.CancelAll();
 
 		if (!GetWitcherPlayer().HasTag('ACS_Camo_Active')
-		&& ACS_DodgeEffects_Enabled())
+		&& ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false))
 		{
 			GetWitcherPlayer().PlayEffectSingle( 'shadowdash_short' );
 			GetWitcherPlayer().StopEffect( 'shadowdash_short' );
@@ -7007,7 +7180,7 @@ state BruxaDodgeSlideBackInitForWeaponSwitching_Engage in cBruxaDodgeSlideBackIn
 		if (GetWitcherPlayer().HasTag('acs_aard_sword_equipped'))
 		{
 			if (!GetWitcherPlayer().HasTag('ACS_Camo_Active')
-			&& ACS_DodgeEffects_Enabled())
+			&& ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false))
 			{
 				GetWitcherPlayer().PlayEffectSingle( 'shadowdash_short' );
 				GetWitcherPlayer().StopEffect( 'shadowdash_short' );
@@ -8646,7 +8819,7 @@ function ACS_BruxaDodgeBackCenterInit()
 			{
 				if (ACS_can_dodge())
 				{
-					if ( ACS_StaminaBlockAction_Enabled() 
+					if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 					&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 					)
 					{
@@ -8656,7 +8829,7 @@ function ACS_BruxaDodgeBackCenterInit()
 					{
 						ACS_refresh_dodge_cooldown();
 
-						ACS_ThingsThatShouldBeRemoved();
+						ACS_ThingsThatShouldBeRemoved(true);
 
 						GetWitcherPlayer().ClearAnimationSpeedMultipliers();
 
@@ -8670,7 +8843,7 @@ function ACS_BruxaDodgeBackCenterInit()
 				/*
 				else
 				{
-					if ( ACS_StaminaBlockAction_Enabled() 
+					if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 					&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 					)
 					{
@@ -8678,7 +8851,7 @@ function ACS_BruxaDodgeBackCenterInit()
 					}
 					else
 					{
-						ACS_ThingsThatShouldBeRemoved();
+						ACS_ThingsThatShouldBeRemoved(true);
 
 						GetWitcherPlayer().ClearAnimationSpeedMultipliers();
 
@@ -8980,7 +9153,7 @@ state BruxaDodgeBackCenter_Engage in cBruxaDodgeBackCenter
 	entry function BruxaDodgeBack()
 	{
 		if (!GetWitcherPlayer().HasTag('ACS_Camo_Active')
-		&& ACS_DodgeEffects_Enabled())
+		&& ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false))
 		{
 			GetWitcherPlayer().PlayEffectSingle( 'shadowdash_short' );
 			GetWitcherPlayer().StopEffect( 'shadowdash_short' );
@@ -9086,7 +9259,7 @@ function ACS_BruxaDodgeBackLeftInit()
 			{
 				if (ACS_can_dodge())
 				{
-					if ( ACS_StaminaBlockAction_Enabled() 
+					if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 					&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 					)
 					{
@@ -9096,7 +9269,7 @@ function ACS_BruxaDodgeBackLeftInit()
 					{
 						ACS_refresh_dodge_cooldown();	
 
-						ACS_ThingsThatShouldBeRemoved();
+						ACS_ThingsThatShouldBeRemoved(true);
 
 						GetWitcherPlayer().ClearAnimationSpeedMultipliers();
 
@@ -9110,7 +9283,7 @@ function ACS_BruxaDodgeBackLeftInit()
 				/*
 				else
 				{
-					if ( ACS_StaminaBlockAction_Enabled() 
+					if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 					&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 					)
 					{
@@ -9120,7 +9293,7 @@ function ACS_BruxaDodgeBackLeftInit()
 					{
 						ACS_refresh_dodge_cooldown();	
 
-						ACS_ThingsThatShouldBeRemoved();
+						ACS_ThingsThatShouldBeRemoved(true);
 
 						GetWitcherPlayer().ClearAnimationSpeedMultipliers();
 
@@ -9518,7 +9691,7 @@ state BruxaDodgeBackLeft_Engage in cBruxaDodgeBackLeft
 	entry function BruxaDodgeBackLeft()
 	{
 		if (!GetWitcherPlayer().HasTag('ACS_Camo_Active')
-		&& ACS_DodgeEffects_Enabled())
+		&& ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false))
 		{
 			GetWitcherPlayer().PlayEffectSingle( 'shadowdash_short' );
 			GetWitcherPlayer().StopEffect( 'shadowdash_short' );
@@ -9625,7 +9798,7 @@ function ACS_BruxaDodgeBackRightInit()
 			{
 				if (ACS_can_dodge())
 				{
-					if ( ACS_StaminaBlockAction_Enabled() 
+					if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 					&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 					)
 					{
@@ -9635,7 +9808,7 @@ function ACS_BruxaDodgeBackRightInit()
 					{
 						ACS_refresh_dodge_cooldown();
 
-						ACS_ThingsThatShouldBeRemoved();
+						ACS_ThingsThatShouldBeRemoved(true);
 
 						GetWitcherPlayer().ClearAnimationSpeedMultipliers();
 
@@ -9649,7 +9822,7 @@ function ACS_BruxaDodgeBackRightInit()
 				/*
 				else
 				{
-					if ( ACS_StaminaBlockAction_Enabled() 
+					if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 					&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 					)
 					{
@@ -9659,7 +9832,7 @@ function ACS_BruxaDodgeBackRightInit()
 					{
 						ACS_refresh_dodge_cooldown();
 
-						ACS_ThingsThatShouldBeRemoved();
+						ACS_ThingsThatShouldBeRemoved(true);
 
 						GetWitcherPlayer().ClearAnimationSpeedMultipliers();
 
@@ -10057,7 +10230,7 @@ state BruxaDodgeBackRight_Engage in cBruxaDodgeBackRight
 	entry function BruxaDodgeBackRight()
 	{
 		if (!GetWitcherPlayer().HasTag('ACS_Camo_Active')
-		&& ACS_DodgeEffects_Enabled())
+		&& ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false))
 		{
 			GetWitcherPlayer().PlayEffectSingle( 'shadowdash_short' );
 			GetWitcherPlayer().StopEffect( 'shadowdash_short' );

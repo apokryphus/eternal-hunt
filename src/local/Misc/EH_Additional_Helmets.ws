@@ -45,7 +45,18 @@ state ACS_Hood_Enable_Engage in cACS_Hood
 
 			GetACSWatcher().Facegear_Include_No_Anim();
 
-			temp_1 = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\models\wh_armors\acs_eredin_armor\acs_eredin_helmet.w2ent", true);	
+			temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\models\wh_armors\acs_eredin_armor\acs_eredin_helmet.w2ent", true);	
+		}
+		else if (ACS_WH_Armor_Equipped_Check() )
+		{
+			if ( FactsQuerySum("ACS_Wild_Hunt_Hood_Equipped") <= 0 )
+			{
+				FactsAdd("ACS_Wild_Hunt_Hood_Equipped", 1, -1);
+			}
+
+			GetACSWatcher().Facegear_Include_No_Anim();
+
+			temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\armor\old_stuff\revenant_hood.w2ent", true);	
 		}
 		else if (ACS_Imlerith_Armor_Equipped_Check())
 		{
@@ -56,7 +67,7 @@ state ACS_Hood_Enable_Engage in cACS_Hood
 
 			GetACSWatcher().Facegear_Exclude_No_Anim();
 
-			temp_1 = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\models\wh_armors\acs_imlerith_armor\acs_imlerith_helmet.w2ent", true);		
+			temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\models\wh_armors\acs_imlerith_armor\acs_imlerith_helmet.w2ent", true);		
 		}
 		else if (ACS_Caranthir_Armor_Equipped_Check())
 		{
@@ -67,7 +78,7 @@ state ACS_Hood_Enable_Engage in cACS_Hood
 
 			GetACSWatcher().Facegear_Exclude_No_Anim();
 
-			temp_1 = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\models\wh_armors\acs_caranthir_armor\acs_caranthir_helmet.w2ent", true);		
+			temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\models\wh_armors\acs_caranthir_armor\acs_caranthir_helmet.w2ent", true);		
 		}
 		else if (ACS_VGX_Eredin_Armor_Equipped_Check())
 		{
@@ -78,7 +89,7 @@ state ACS_Hood_Enable_Engage in cACS_Hood
 
 			GetACSWatcher().Facegear_Include_No_Anim();
 
-			temp_1 = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\models\wh_armors\acs_vgx_eredin_arrmor\acs_vgx_eredin_helmet.w2ent", true);	
+			temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\models\wh_armors\acs_vgx_eredin_arrmor\acs_vgx_eredin_helmet.w2ent", true);	
 		}
 		else if (ACS_Legion_Armor_Equipped_Check())
 		{
@@ -89,7 +100,7 @@ state ACS_Hood_Enable_Engage in cACS_Hood
 
 			GetACSWatcher().Facegear_Exclude_No_Anim();
 
-			temp_1 = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\models\knight_armors\entities\alien\acs_alien_helm.w2ent", true);	
+			temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\models\knight_armors\entities\alien\acs_alien_helm.w2ent", true);	
 		}
 		else if (ACS_Cavalier_Armor_Equipped_Check())
 		{
@@ -100,7 +111,7 @@ state ACS_Hood_Enable_Engage in cACS_Hood
 
 			GetACSWatcher().Facegear_Exclude_No_Anim();
 
-			temp_1 = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\models\knight_armors\entities\cava\acs_cava_helm.w2ent", true);	
+			temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\models\knight_armors\entities\cava\acs_cava_helm.w2ent", true);	
 		}
 		else if (ACS_Leonidas_Armor_Equipped_Check())
 		{
@@ -111,7 +122,7 @@ state ACS_Hood_Enable_Engage in cACS_Hood
 
 			GetACSWatcher().Facegear_Exclude_No_Anim();
 
-			temp_1 = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\models\knight_armors\entities\leo\acs_leo_helm.w2ent", true);	
+			temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\models\knight_armors\entities\leo\acs_leo_helm.w2ent", true);	
 		}
 		else if (ACS_Centurion_Armor_Equipped_Check())
 		{
@@ -122,7 +133,7 @@ state ACS_Hood_Enable_Engage in cACS_Hood
 
 			GetACSWatcher().Facegear_Include_No_Anim();
 
-			temp_1 = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\models\knight_armors\entities\rome\acs_rome_helm.w2ent", true);	
+			temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\models\knight_armors\entities\rome\acs_rome_helm.w2ent", true);	
 		}
 		else if (ACS_Templar_Armor_Equipped_Check())
 		{
@@ -133,7 +144,7 @@ state ACS_Hood_Enable_Engage in cACS_Hood
 
 			GetACSWatcher().Facegear_Exclude_No_Anim();
 
-			temp_1 = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\models\knight_armors\entities\templar\acs_templar_helm.w2ent", true);	
+			temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\models\knight_armors\entities\templar\acs_templar_helm.w2ent", true);	
 		}
 		else if (ACS_Knight_Armor_Check())
 		{
@@ -144,7 +155,7 @@ state ACS_Hood_Enable_Engage in cACS_Hood
 
 			GetACSWatcher().Facegear_Exclude_No_Anim();
 
-			temp_1 = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\models\knight_armors_errant\entities\helms\acs_knight_helmet_05.w2ent", true);	
+			temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\models\knight_armors_errant\entities\helms\acs_knight_helmet_05.w2ent", true);	
 		}
 		else if (ACS_Knight_Armor_Gold_Check())
 		{
@@ -155,7 +166,7 @@ state ACS_Hood_Enable_Engage in cACS_Hood
 
 			GetACSWatcher().Facegear_Exclude_No_Anim();
 
-			temp_1 = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\models\knight_armors_errant\entities\helms\gold\gold_acs_knight_helmet_05.w2ent", true);	
+			temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\models\knight_armors_errant\entities\helms\gold\gold_acs_knight_helmet_05.w2ent", true);	
 		}
 		else if (ACS_Vampire_Armor_Black_Check())
 		{
@@ -166,7 +177,7 @@ state ACS_Hood_Enable_Engage in cACS_Hood
 
 			GetACSWatcher().Facegear_Exclude_No_Anim();
 
-			temp_1 = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\models\knight_armors_errant\entities\helms\black\black_acs_knight_helmet_05.w2ent", true);	
+			temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\models\knight_armors_errant\entities\helms\black\black_acs_knight_helmet_05.w2ent", true);	
 		}
 		else if (ACS_Vampire_Armor_Red_Check())
 		{
@@ -177,14 +188,14 @@ state ACS_Hood_Enable_Engage in cACS_Hood
 
 			GetACSWatcher().Facegear_Exclude_No_Anim();
 
-			temp_1 = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\models\knight_armors_errant\entities\helms\red\red_acs_knight_helmet_05.w2ent", true);	
+			temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\models\knight_armors_errant\entities\helms\red\red_acs_knight_helmet_05.w2ent", true);	
 		}
 		/*
 		else if (ACS_Artorias_Armor_Equipped_Check())
 		{
 			GetACSWatcher().Facegear_Include_No_Anim();
 
-			temp_1 = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\models\artorias_armor\acs_artorias_helmet.w2ent", true);	
+			temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\models\artorias_armor\acs_artorias_helmet.w2ent", true);	
 		}
 		*/
 		else
@@ -194,7 +205,7 @@ state ACS_Hood_Enable_Engage in cACS_Hood
 				FactsAdd("ACS_Hood_Normal_Equipped", 1, -1);
 			}
 
-			temp_1 = (CEntityTemplate)LoadResource(
+			temp_1 = (CEntityTemplate)LoadResourceAsync(
 
 			//"dlc\ep1\data\characters\models\main_npc\ewald_borsody\ewald_borsody_hood_01.w2ent"
 
@@ -283,7 +294,7 @@ state ACS_Hood_Disable_Engage in cACS_Hood
 		{
 			FactsRemove("ACS_Hood_Normal_Equipped");
 
-			temp_1 = (CEntityTemplate)LoadResource(
+			temp_1 = (CEntityTemplate)LoadResourceAsync(
 
 			//"dlc\ep1\data\characters\models\main_npc\ewald_borsody\ewald_borsody_hood_01.w2ent"
 
@@ -302,7 +313,7 @@ state ACS_Hood_Disable_Engage in cACS_Hood
 
 		if ( FactsQuerySum("ACS_Eredin_Helm_Equipped") > 0 )
 		{
-			temp_1 = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\models\wh_armors\acs_eredin_armor\acs_eredin_helmet.w2ent", true);	
+			temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\models\wh_armors\acs_eredin_armor\acs_eredin_helmet.w2ent", true);	
 
 			((CAppearanceComponent)l_comp).ExcludeAppearanceTemplate(temp_1);
 
@@ -311,9 +322,20 @@ state ACS_Hood_Disable_Engage in cACS_Hood
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+		if ( FactsQuerySum("ACS_Wild_Hunt_Hood_Equipped") > 0 )
+		{
+			temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\armor\old_stuff\revenant_hood.w2ent", true);	
+
+			((CAppearanceComponent)l_comp).ExcludeAppearanceTemplate(temp_1);
+
+			FactsRemove("ACS_Wild_Hunt_Hood_Equipped");
+		}
+
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 		if ( FactsQuerySum("ACS_Imlerith_Helm_Equipped") > 0 )
 		{
-			temp_1 = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\models\wh_armors\acs_imlerith_armor\acs_imlerith_helmet.w2ent", true);		
+			temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\models\wh_armors\acs_imlerith_armor\acs_imlerith_helmet.w2ent", true);		
 
 			((CAppearanceComponent)l_comp).ExcludeAppearanceTemplate(temp_1);
 
@@ -324,7 +346,7 @@ state ACS_Hood_Disable_Engage in cACS_Hood
 
 		if ( FactsQuerySum("ACS_Caranthir_Helm_Equipped") > 0 )
 		{
-			temp_1 = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\models\wh_armors\acs_caranthir_armor\acs_caranthir_helmet.w2ent", true);		
+			temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\models\wh_armors\acs_caranthir_armor\acs_caranthir_helmet.w2ent", true);		
 
 			((CAppearanceComponent)l_comp).ExcludeAppearanceTemplate(temp_1);
 
@@ -335,7 +357,7 @@ state ACS_Hood_Disable_Engage in cACS_Hood
 
 		if ( FactsQuerySum("ACS_VGX_Eredin_Helm_Equipped") > 0 )
 		{
-			temp_1 = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\models\wh_armors\acs_vgx_eredin_arrmor\acs_vgx_eredin_helmet.w2ent", true);	
+			temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\models\wh_armors\acs_vgx_eredin_arrmor\acs_vgx_eredin_helmet.w2ent", true);	
 
 			((CAppearanceComponent)l_comp).ExcludeAppearanceTemplate(temp_1);
 
@@ -346,7 +368,7 @@ state ACS_Hood_Disable_Engage in cACS_Hood
 
 		if ( FactsQuerySum("ACS_Legion_Helm_Equipped") > 0 )
 		{
-			temp_1 = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\models\knight_armors\entities\alien\acs_alien_helm.w2ent", true);	
+			temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\models\knight_armors\entities\alien\acs_alien_helm.w2ent", true);	
 
 			((CAppearanceComponent)l_comp).ExcludeAppearanceTemplate(temp_1);
 
@@ -357,7 +379,7 @@ state ACS_Hood_Disable_Engage in cACS_Hood
 
 		if ( FactsQuerySum("ACS_Cavalier_Helm_Equipped") > 0 )
 		{
-			temp_1 = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\models\knight_armors\entities\cava\acs_cava_helm.w2ent", true);	
+			temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\models\knight_armors\entities\cava\acs_cava_helm.w2ent", true);	
 
 			((CAppearanceComponent)l_comp).ExcludeAppearanceTemplate(temp_1);
 
@@ -368,7 +390,7 @@ state ACS_Hood_Disable_Engage in cACS_Hood
 
 		if ( FactsQuerySum("ACS_Leonidas_Helm_Equipped") > 0 )
 		{
-			temp_1 = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\models\knight_armors\entities\leo\acs_leo_helm.w2ent", true);	
+			temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\models\knight_armors\entities\leo\acs_leo_helm.w2ent", true);	
 
 			((CAppearanceComponent)l_comp).ExcludeAppearanceTemplate(temp_1);
 
@@ -379,7 +401,7 @@ state ACS_Hood_Disable_Engage in cACS_Hood
 
 		if ( FactsQuerySum("ACS_Centurion_Helm_Equipped") > 0 )
 		{
-			temp_1 = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\models\knight_armors\entities\rome\acs_rome_helm.w2ent", true);	
+			temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\models\knight_armors\entities\rome\acs_rome_helm.w2ent", true);	
 
 			((CAppearanceComponent)l_comp).ExcludeAppearanceTemplate(temp_1);
 
@@ -390,7 +412,7 @@ state ACS_Hood_Disable_Engage in cACS_Hood
 
 		if ( FactsQuerySum("ACS_Templar_Helm_Equipped") > 0 )
 		{
-			temp_1 = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\models\knight_armors\entities\templar\acs_templar_helm.w2ent", true);	
+			temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\models\knight_armors\entities\templar\acs_templar_helm.w2ent", true);	
 
 			((CAppearanceComponent)l_comp).ExcludeAppearanceTemplate(temp_1);
 
@@ -401,7 +423,7 @@ state ACS_Hood_Disable_Engage in cACS_Hood
 
 		if ( FactsQuerySum("ACS_Knight_Helm_Equipped") > 0 )
 		{
-			temp_1 = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\models\knight_armors_errant\entities\helms\acs_knight_helmet_05.w2ent", true);	
+			temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\models\knight_armors_errant\entities\helms\acs_knight_helmet_05.w2ent", true);	
 
 			((CAppearanceComponent)l_comp).ExcludeAppearanceTemplate(temp_1);
 
@@ -412,7 +434,7 @@ state ACS_Hood_Disable_Engage in cACS_Hood
 
 		if ( FactsQuerySum("ACS_Knight_Helm_Gold_Equipped") > 0 )
 		{
-			temp_1 = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\models\knight_armors_errant\entities\helms\gold\gold_acs_knight_helmet_05.w2ent", true);	
+			temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\models\knight_armors_errant\entities\helms\gold\gold_acs_knight_helmet_05.w2ent", true);	
 
 			((CAppearanceComponent)l_comp).ExcludeAppearanceTemplate(temp_1);
 
@@ -423,7 +445,7 @@ state ACS_Hood_Disable_Engage in cACS_Hood
 
 		if ( FactsQuerySum("ACS_Vampire_Helm_Black_Equipped") > 0 )
 		{
-			temp_1 = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\models\knight_armors_errant\entities\helms\black\black_acs_knight_helmet_05.w2ent", true);	
+			temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\models\knight_armors_errant\entities\helms\black\black_acs_knight_helmet_05.w2ent", true);	
 
 			((CAppearanceComponent)l_comp).ExcludeAppearanceTemplate(temp_1);
 
@@ -434,7 +456,7 @@ state ACS_Hood_Disable_Engage in cACS_Hood
 
 		if ( FactsQuerySum("ACS_Vampire_Helm_Red_Equipped") > 0 )
 		{
-			temp_1 = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\models\knight_armors_errant\entities\helms\red\red_acs_knight_helmet_05.w2ent", true);	
+			temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\models\knight_armors_errant\entities\helms\red\red_acs_knight_helmet_05.w2ent", true);	
 
 			((CAppearanceComponent)l_comp).ExcludeAppearanceTemplate(temp_1);
 
@@ -444,7 +466,7 @@ state ACS_Hood_Disable_Engage in cACS_Hood
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-		//temp_1 = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\models\artorias_armor\acs_artorias_helmet.w2ent", true);	
+		//temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\models\artorias_armor\acs_artorias_helmet.w2ent", true);	
 
 		//((CAppearanceComponent)l_comp).ExcludeAppearanceTemplate(temp_1);
 
@@ -463,13 +485,13 @@ state ACS_Hood_Disable_Engage in cACS_Hood
 
 statemachine class cACS_Facegear_Include
 {
-    function Engage()
+    function cACS_Facegear_Include_Engage()
 	{
-		this.PushState('Engage');
+		this.PushState('cACS_Facegear_Include_Engage');
 	}
 }
 
-state Engage in cACS_Facegear_Include
+state cACS_Facegear_Include_Engage in cACS_Facegear_Include
 {
 	private var temp_1																											: CEntityTemplate;
 	private var l_actor 																										: CActor;
@@ -486,7 +508,7 @@ state Engage in cACS_Facegear_Include
 		l_actor = thePlayer;
 		l_comp = l_actor.GetComponentByClassName( 'CAppearanceComponent' );
 
-		temp_1 = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\armor\old_stuff\face_mask.w2ent", true);		
+		temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\armor\old_stuff\face_mask.w2ent", true);		
 		((CAppearanceComponent)l_comp).IncludeAppearanceTemplate(temp_1);
 	}
 	
@@ -502,11 +524,11 @@ statemachine class cACS_Facegear_Exclude
 {
     function Engage()
 	{
-		this.PushState('Engage');
+		this.PushState('Facegear_Exclude_Engage');
 	}
 }
 
-state Engage in cACS_Facegear_Exclude
+state Facegear_Exclude_Engage in cACS_Facegear_Exclude
 {
 	private var temp_1																											: CEntityTemplate;
 	private var l_actor 																										: CActor;
@@ -523,7 +545,7 @@ state Engage in cACS_Facegear_Exclude
 		l_actor = thePlayer;
 		l_comp = l_actor.GetComponentByClassName( 'CAppearanceComponent' );
 
-		temp_1 = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\armor\old_stuff\face_mask.w2ent", true);		
+		temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\armor\old_stuff\face_mask.w2ent", true);		
 		((CAppearanceComponent)l_comp).ExcludeAppearanceTemplate(temp_1);
 	}
 	
@@ -577,7 +599,7 @@ state AttachEredinSkirt in cACS_Wildhunt_Additional_Pieces
 		ACSGetCEntity('ACS_Eredin_Skirt').Destroy();
 		ACSGetCEntity('ACS_Eredin_Skirt_Anchor').Destroy();
 
-		anchor_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\entities\other\fx_ent.w2ent", true );
+		anchor_temp = (CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\other\fx_ent.w2ent", true );
 
 
 		thePlayer.GetBoneWorldPositionAndRotationByIndex( thePlayer.GetBoneIndex( 'pelvis' ), bone_vec, bone_rot );
@@ -595,7 +617,7 @@ state AttachEredinSkirt in cACS_Wildhunt_Additional_Pieces
 
 
 
-		ent = theGame.CreateEntity( (CEntityTemplate)LoadResource( 
+		ent = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( 
 
 		"dlc\dlc_acs\data\models\wh_armors\acs_eredin_armor\acs_eredin_skirt.w2ent"
 
@@ -641,7 +663,7 @@ state AttachEredinCloak in cACS_Wildhunt_Additional_Pieces
 
 
 
-		anchor_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\entities\other\fx_ent.w2ent", true );
+		anchor_temp = (CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\other\fx_ent.w2ent", true );
 
 
 		thePlayer.GetBoneWorldPositionAndRotationByIndex( thePlayer.GetBoneIndex( 'r_shoulder' ), bone_vec, bone_rot );
@@ -659,7 +681,7 @@ state AttachEredinCloak in cACS_Wildhunt_Additional_Pieces
 
 
 
-		ent = theGame.CreateEntity( (CEntityTemplate)LoadResource( 
+		ent = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( 
 
 		"dlc\dlc_acs\data\models\wh_armors\acs_eredin_armor\acs_eredin_cloak.w2ent"
 
@@ -713,7 +735,7 @@ state AttachVGXEredinCloak in cACS_Wildhunt_Additional_Pieces
 
 
 
-		anchor_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\entities\other\fx_ent.w2ent", true );
+		anchor_temp = (CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\other\fx_ent.w2ent", true );
 
 
 		thePlayer.GetBoneWorldPositionAndRotationByIndex( thePlayer.GetBoneIndex( 'r_shoulder' ), bone_vec, bone_rot );
@@ -731,7 +753,7 @@ state AttachVGXEredinCloak in cACS_Wildhunt_Additional_Pieces
 
 
 
-		ent = theGame.CreateEntity( (CEntityTemplate)LoadResource( 
+		ent = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( 
 
 		"dlc\dlc_acs\data\models\wh_armors\acs_eredin_armor\acs_eredin_cloak.w2ent"
 
@@ -785,7 +807,7 @@ state AttachImlerithSkirt in cACS_Wildhunt_Additional_Pieces
 
 
 
-		anchor_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\entities\other\fx_ent.w2ent", true );
+		anchor_temp = (CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\other\fx_ent.w2ent", true );
 
 
 		thePlayer.GetBoneWorldPositionAndRotationByIndex( thePlayer.GetBoneIndex( 'pelvis' ), bone_vec, bone_rot );
@@ -803,7 +825,7 @@ state AttachImlerithSkirt in cACS_Wildhunt_Additional_Pieces
 
 
 
-		ent = theGame.CreateEntity( (CEntityTemplate)LoadResource( 
+		ent = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( 
 
 		"dlc\dlc_acs\data\models\wh_armors\acs_imlerith_armor\acs_imlerith_skirt.w2ent"
 
@@ -962,7 +984,7 @@ state ACS_Witcher_Bear_Armor_Fur_Include in cACS_Knight_Additional_Pieces
 		p_comp = thePlayer.GetComponentByClassName( 'CAppearanceComponent' );
 
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\wh_armors\acs_caranthir_armor\i_01_mw__wild_hunt.w2ent"
 		
@@ -971,7 +993,7 @@ state ACS_Witcher_Bear_Armor_Fur_Include in cACS_Knight_Additional_Pieces
 		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
 
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_15.w2ent"
 		
@@ -1003,7 +1025,7 @@ state ACS_Witcher_Bear_Armor_Fur_Exclude in cACS_Knight_Additional_Pieces
 		p_comp = thePlayer.GetComponentByClassName( 'CAppearanceComponent' );
 
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\wh_armors\acs_caranthir_armor\i_01_mw__wild_hunt.w2ent"
 		
@@ -1012,7 +1034,7 @@ state ACS_Witcher_Bear_Armor_Fur_Exclude in cACS_Knight_Additional_Pieces
 		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
 
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_15.w2ent"
 		
@@ -1046,7 +1068,7 @@ state ACS_Knight_Armor_V1_Pieces_Include in cACS_Knight_Additional_Pieces
 
 		p_comp = thePlayer.GetComponentByClassName( 'CAppearanceComponent' );
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_18.w2ent"
 		
@@ -1054,17 +1076,17 @@ state ACS_Knight_Armor_V1_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
 
-
-		temp = (CEntityTemplate)LoadResource(
+		/*
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_17.w2ent"
 		
 		, true);
 		
 		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
-		
+		*/
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_01.w2ent"
 		
@@ -1073,7 +1095,7 @@ state ACS_Knight_Armor_V1_Pieces_Include in cACS_Knight_Additional_Pieces
 		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
 
 		
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_04.w2ent"
 		
@@ -1082,7 +1104,7 @@ state ACS_Knight_Armor_V1_Pieces_Include in cACS_Knight_Additional_Pieces
 		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
 		
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_06.w2ent"
 		
@@ -1092,7 +1114,7 @@ state ACS_Knight_Armor_V1_Pieces_Include in cACS_Knight_Additional_Pieces
 
 		
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_13.w2ent"
 		
@@ -1122,7 +1144,7 @@ state ACS_Knight_Armor_V1_Pieces_Exclude in cACS_Knight_Additional_Pieces
 
 		p_comp = thePlayer.GetComponentByClassName( 'CAppearanceComponent' );
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_18.w2ent"
 		
@@ -1130,16 +1152,17 @@ state ACS_Knight_Armor_V1_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
 
-
-		temp = (CEntityTemplate)LoadResource(
+		/*
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_17.w2ent"
 		
 		, true);
 		
 		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		*/
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_01.w2ent"
 		
@@ -1148,7 +1171,7 @@ state ACS_Knight_Armor_V1_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
 
 		
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_04.w2ent"
 		
@@ -1158,7 +1181,7 @@ state ACS_Knight_Armor_V1_Pieces_Exclude in cACS_Knight_Additional_Pieces
 
 		
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_06.w2ent"
 		
@@ -1168,7 +1191,7 @@ state ACS_Knight_Armor_V1_Pieces_Exclude in cACS_Knight_Additional_Pieces
 
 		
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_13.w2ent"
 		
@@ -1202,7 +1225,7 @@ state ACS_Knight_Armor_V2_Pieces_Include in cACS_Knight_Additional_Pieces
 
 		p_comp = thePlayer.GetComponentByClassName( 'CAppearanceComponent' );
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_18.w2ent"
 		
@@ -1210,17 +1233,17 @@ state ACS_Knight_Armor_V2_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
 
-
-		temp = (CEntityTemplate)LoadResource(
+		/*
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_17.w2ent"
 		
 		, true);
 		
 		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		*/
 
-
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_03.w2ent"
 		
@@ -1229,7 +1252,7 @@ state ACS_Knight_Armor_V2_Pieces_Include in cACS_Knight_Additional_Pieces
 		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
 
 		
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_04.w2ent"
 		
@@ -1239,7 +1262,7 @@ state ACS_Knight_Armor_V2_Pieces_Include in cACS_Knight_Additional_Pieces
 
 		
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_08.w2ent"
 		
@@ -1249,7 +1272,7 @@ state ACS_Knight_Armor_V2_Pieces_Include in cACS_Knight_Additional_Pieces
 
 		
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_14.w2ent"
 		
@@ -1279,7 +1302,7 @@ state ACS_Knight_Armor_V2_Pieces_Exclude in cACS_Knight_Additional_Pieces
 
 		p_comp = thePlayer.GetComponentByClassName( 'CAppearanceComponent' );
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_18.w2ent"
 		
@@ -1287,16 +1310,17 @@ state ACS_Knight_Armor_V2_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
 
-		temp = (CEntityTemplate)LoadResource(
+		/*
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_17.w2ent"
 		
 		, true);
 		
 		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		*/
 
-
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_03.w2ent"
 		
@@ -1305,7 +1329,7 @@ state ACS_Knight_Armor_V2_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
 
 		
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_04.w2ent"
 		
@@ -1315,7 +1339,7 @@ state ACS_Knight_Armor_V2_Pieces_Exclude in cACS_Knight_Additional_Pieces
 
 		
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_08.w2ent"
 		
@@ -1325,7 +1349,7 @@ state ACS_Knight_Armor_V2_Pieces_Exclude in cACS_Knight_Additional_Pieces
 
 		
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_14.w2ent"
 		
@@ -1357,7 +1381,7 @@ state ACS_Knight_Armor_V3_Pieces_Include in cACS_Knight_Additional_Pieces
 
 		p_comp = thePlayer.GetComponentByClassName( 'CAppearanceComponent' );
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_18.w2ent"
 		
@@ -1365,17 +1389,17 @@ state ACS_Knight_Armor_V3_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
 
-
-		temp = (CEntityTemplate)LoadResource(
+		/*
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_17.w2ent"
 		
 		, true);
 		
 		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		*/
 
-
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_03.w2ent"
 		
@@ -1384,7 +1408,7 @@ state ACS_Knight_Armor_V3_Pieces_Include in cACS_Knight_Additional_Pieces
 		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
 
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_05.w2ent"
 		
@@ -1393,7 +1417,7 @@ state ACS_Knight_Armor_V3_Pieces_Include in cACS_Knight_Additional_Pieces
 		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
 
 		
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_04.w2ent"
 		
@@ -1402,7 +1426,7 @@ state ACS_Knight_Armor_V3_Pieces_Include in cACS_Knight_Additional_Pieces
 		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
 
 		
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_09.w2ent"
 		
@@ -1412,7 +1436,7 @@ state ACS_Knight_Armor_V3_Pieces_Include in cACS_Knight_Additional_Pieces
 
 
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_15.w2ent"
 		
@@ -1442,7 +1466,7 @@ state ACS_Knight_Armor_V3_Pieces_Exclude in cACS_Knight_Additional_Pieces
 
 		p_comp = thePlayer.GetComponentByClassName( 'CAppearanceComponent' );
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_18.w2ent"
 		
@@ -1450,17 +1474,17 @@ state ACS_Knight_Armor_V3_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
 
-
-		temp = (CEntityTemplate)LoadResource(
+		/*
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_17.w2ent"
 		
 		, true);
 		
 		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		*/
 
-
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_03.w2ent"
 		
@@ -1469,7 +1493,7 @@ state ACS_Knight_Armor_V3_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
 
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_05.w2ent"
 		
@@ -1478,7 +1502,7 @@ state ACS_Knight_Armor_V3_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
 
 		
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_04.w2ent"
 		
@@ -1487,7 +1511,7 @@ state ACS_Knight_Armor_V3_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
 
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_09.w2ent"
 		
@@ -1497,7 +1521,7 @@ state ACS_Knight_Armor_V3_Pieces_Exclude in cACS_Knight_Additional_Pieces
 
 		
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_15.w2ent"
 		
@@ -1529,7 +1553,7 @@ state ACS_Witcher_Knight_Armor_V1_Pieces_Include in cACS_Knight_Additional_Piece
 
 		p_comp = thePlayer.GetComponentByClassName( 'CAppearanceComponent' );
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_18.w2ent"
 		
@@ -1537,17 +1561,17 @@ state ACS_Witcher_Knight_Armor_V1_Pieces_Include in cACS_Knight_Additional_Piece
 		
 		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
 
-
-		temp = (CEntityTemplate)LoadResource(
+		/*
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_17.w2ent"
 		
 		, true);
 		
 		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
-		
+		*/
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_01.w2ent"
 		
@@ -1556,7 +1580,7 @@ state ACS_Witcher_Knight_Armor_V1_Pieces_Include in cACS_Knight_Additional_Piece
 		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
 		
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_06.w2ent"
 		
@@ -1586,7 +1610,7 @@ state ACS_Witcher_Knight_Armor_V1_Pieces_Exclude in cACS_Knight_Additional_Piece
 
 		p_comp = thePlayer.GetComponentByClassName( 'CAppearanceComponent' );
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_18.w2ent"
 		
@@ -1594,16 +1618,17 @@ state ACS_Witcher_Knight_Armor_V1_Pieces_Exclude in cACS_Knight_Additional_Piece
 		
 		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
 
-
-		temp = (CEntityTemplate)LoadResource(
+		/*
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_17.w2ent"
 		
 		, true);
 		
 		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		*/
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_01.w2ent"
 		
@@ -1613,7 +1638,7 @@ state ACS_Witcher_Knight_Armor_V1_Pieces_Exclude in cACS_Knight_Additional_Piece
 
 
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_06.w2ent"
 		
@@ -1647,7 +1672,7 @@ state ACS_Witcher_Knight_Armor_V2_Pieces_Include in cACS_Knight_Additional_Piece
 
 		p_comp = thePlayer.GetComponentByClassName( 'CAppearanceComponent' );
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_18.w2ent"
 		
@@ -1655,17 +1680,17 @@ state ACS_Witcher_Knight_Armor_V2_Pieces_Include in cACS_Knight_Additional_Piece
 		
 		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
 
-
-		temp = (CEntityTemplate)LoadResource(
+		/*
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_17.w2ent"
 		
 		, true);
 		
 		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		*/
 
-
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_03.w2ent"
 		
@@ -1674,7 +1699,7 @@ state ACS_Witcher_Knight_Armor_V2_Pieces_Include in cACS_Knight_Additional_Piece
 		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
 		
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_08.w2ent"
 		
@@ -1706,7 +1731,7 @@ state ACS_Witcher_Knight_Armor_V2_Pieces_Exclude in cACS_Knight_Additional_Piece
 
 		p_comp = thePlayer.GetComponentByClassName( 'CAppearanceComponent' );
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_18.w2ent"
 		
@@ -1714,17 +1739,17 @@ state ACS_Witcher_Knight_Armor_V2_Pieces_Exclude in cACS_Knight_Additional_Piece
 		
 		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
 
-
-		temp = (CEntityTemplate)LoadResource(
+		/*
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_17.w2ent"
 		
 		, true);
 		
 		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		*/
 
-
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_03.w2ent"
 		
@@ -1733,7 +1758,7 @@ state ACS_Witcher_Knight_Armor_V2_Pieces_Exclude in cACS_Knight_Additional_Piece
 		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
 
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_08.w2ent"
 		
@@ -1766,8 +1791,8 @@ state ACS_Witcher_Knight_Armor_V3_Pieces_Include in cACS_Knight_Additional_Piece
 		var temp				: CEntityTemplate;
 
 		p_comp = thePlayer.GetComponentByClassName( 'CAppearanceComponent' );
-
-		temp = (CEntityTemplate)LoadResource(
+		
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_18.w2ent"
 		
@@ -1775,17 +1800,17 @@ state ACS_Witcher_Knight_Armor_V3_Pieces_Include in cACS_Knight_Additional_Piece
 		
 		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
 
-
-		temp = (CEntityTemplate)LoadResource(
+		/*
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_17.w2ent"
 		
 		, true);
 		
 		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
-
-
-		temp = (CEntityTemplate)LoadResource(
+		*/
+		
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_03.w2ent"
 		
@@ -1793,8 +1818,8 @@ state ACS_Witcher_Knight_Armor_V3_Pieces_Include in cACS_Knight_Additional_Piece
 		
 		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
 
-
-		temp = (CEntityTemplate)LoadResource(
+		
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_05.w2ent"
 		
@@ -1802,8 +1827,8 @@ state ACS_Witcher_Knight_Armor_V3_Pieces_Include in cACS_Knight_Additional_Piece
 		
 		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
 
-
-		temp = (CEntityTemplate)LoadResource(
+		
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_09.w2ent"
 		
@@ -1834,7 +1859,7 @@ state ACS_Witcher_Knight_Armor_V3_Pieces_Exclude in cACS_Knight_Additional_Piece
 
 		p_comp = thePlayer.GetComponentByClassName( 'CAppearanceComponent' );
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_18.w2ent"
 		
@@ -1842,17 +1867,17 @@ state ACS_Witcher_Knight_Armor_V3_Pieces_Exclude in cACS_Knight_Additional_Piece
 		
 		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
 
-
-		temp = (CEntityTemplate)LoadResource(
+		/*
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_17.w2ent"
 		
 		, true);
 		
 		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		*/
 
-
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_03.w2ent"
 		
@@ -1861,7 +1886,7 @@ state ACS_Witcher_Knight_Armor_V3_Pieces_Exclude in cACS_Knight_Additional_Piece
 		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
 
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_05.w2ent"
 		
@@ -1870,7 +1895,7 @@ state ACS_Witcher_Knight_Armor_V3_Pieces_Exclude in cACS_Knight_Additional_Piece
 		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
 
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\acs_knight_item_09.w2ent"
 		
@@ -1903,7 +1928,7 @@ state ACS_Knight_Armor_Gold_V1_Pieces_Include in cACS_Knight_Additional_Pieces
 
 		p_comp = thePlayer.GetComponentByClassName( 'CAppearanceComponent' );
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\gold\gold_acs_knight_item_18.w2ent"
 		
@@ -1912,7 +1937,7 @@ state ACS_Knight_Armor_Gold_V1_Pieces_Include in cACS_Knight_Additional_Pieces
 		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
 
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\gold\gold_acs_knight_item_17.w2ent"
 		
@@ -1921,7 +1946,7 @@ state ACS_Knight_Armor_Gold_V1_Pieces_Include in cACS_Knight_Additional_Pieces
 		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
 
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\gold\gold_acs_knight_item_03.w2ent"
 		
@@ -1930,7 +1955,7 @@ state ACS_Knight_Armor_Gold_V1_Pieces_Include in cACS_Knight_Additional_Pieces
 		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
 
 		
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\gold\gold_acs_knight_item_04.w2ent"
 		
@@ -1940,7 +1965,7 @@ state ACS_Knight_Armor_Gold_V1_Pieces_Include in cACS_Knight_Additional_Pieces
 
 		
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\gold\gold_acs_knight_item_08.w2ent"
 		
@@ -1950,7 +1975,7 @@ state ACS_Knight_Armor_Gold_V1_Pieces_Include in cACS_Knight_Additional_Pieces
 
 		
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\gold\gold_acs_knight_item_14.w2ent"
 		
@@ -1980,7 +2005,7 @@ state ACS_Knight_Armor_Gold_V1_Pieces_Exclude in cACS_Knight_Additional_Pieces
 
 		p_comp = thePlayer.GetComponentByClassName( 'CAppearanceComponent' );
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\gold\gold_acs_knight_item_18.w2ent"
 		
@@ -1989,7 +2014,7 @@ state ACS_Knight_Armor_Gold_V1_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
 
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\gold\gold_acs_knight_item_17.w2ent"
 		
@@ -1998,7 +2023,7 @@ state ACS_Knight_Armor_Gold_V1_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
 
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\gold\gold_acs_knight_item_03.w2ent"
 		
@@ -2008,7 +2033,7 @@ state ACS_Knight_Armor_Gold_V1_Pieces_Exclude in cACS_Knight_Additional_Pieces
 
 		
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\gold\gold_acs_knight_item_04.w2ent"
 		
@@ -2018,7 +2043,7 @@ state ACS_Knight_Armor_Gold_V1_Pieces_Exclude in cACS_Knight_Additional_Pieces
 
 		
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\gold\gold_acs_knight_item_08.w2ent"
 		
@@ -2028,7 +2053,7 @@ state ACS_Knight_Armor_Gold_V1_Pieces_Exclude in cACS_Knight_Additional_Pieces
 
 		
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\gold\gold_acs_knight_item_14.w2ent"
 		
@@ -2058,7 +2083,7 @@ state ACS_Knight_Armor_Gold_V2_Pieces_Include in cACS_Knight_Additional_Pieces
 
 		p_comp = thePlayer.GetComponentByClassName( 'CAppearanceComponent' );
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\gold\gold_acs_knight_item_18.w2ent"
 		
@@ -2066,7 +2091,7 @@ state ACS_Knight_Armor_Gold_V2_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\gold\gold_acs_knight_item_17.w2ent"
 		
@@ -2075,7 +2100,7 @@ state ACS_Knight_Armor_Gold_V2_Pieces_Include in cACS_Knight_Additional_Pieces
 		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
 
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\gold\gold_acs_knight_item_03.w2ent"
 		
@@ -2084,7 +2109,7 @@ state ACS_Knight_Armor_Gold_V2_Pieces_Include in cACS_Knight_Additional_Pieces
 		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
 
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\gold\gold_acs_knight_item_05.w2ent"
 		
@@ -2093,7 +2118,7 @@ state ACS_Knight_Armor_Gold_V2_Pieces_Include in cACS_Knight_Additional_Pieces
 		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
 
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\gold\gold_acs_knight_item_04.w2ent"
 		
@@ -2102,7 +2127,7 @@ state ACS_Knight_Armor_Gold_V2_Pieces_Include in cACS_Knight_Additional_Pieces
 		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
 
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\gold\gold_acs_knight_item_09.w2ent"
 		
@@ -2111,7 +2136,7 @@ state ACS_Knight_Armor_Gold_V2_Pieces_Include in cACS_Knight_Additional_Pieces
 		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
 
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\gold\gold_acs_knight_item_15.w2ent"
 		
@@ -2141,7 +2166,7 @@ state ACS_Knight_Armor_Gold_V2_Pieces_Exclude in cACS_Knight_Additional_Pieces
 
 		p_comp = thePlayer.GetComponentByClassName( 'CAppearanceComponent' );
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\gold\gold_acs_knight_item_18.w2ent"
 		
@@ -2149,7 +2174,7 @@ state ACS_Knight_Armor_Gold_V2_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\gold\gold_acs_knight_item_17.w2ent"
 		
@@ -2158,7 +2183,7 @@ state ACS_Knight_Armor_Gold_V2_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
 
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\gold\gold_acs_knight_item_03.w2ent"
 		
@@ -2167,7 +2192,7 @@ state ACS_Knight_Armor_Gold_V2_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
 
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\gold\gold_acs_knight_item_05.w2ent"
 		
@@ -2177,7 +2202,7 @@ state ACS_Knight_Armor_Gold_V2_Pieces_Exclude in cACS_Knight_Additional_Pieces
 
 		
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\gold\gold_acs_knight_item_04.w2ent"
 		
@@ -2186,7 +2211,7 @@ state ACS_Knight_Armor_Gold_V2_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
 
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\gold\gold_acs_knight_item_09.w2ent"
 		
@@ -2195,7 +2220,7 @@ state ACS_Knight_Armor_Gold_V2_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
 
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\gold\gold_acs_knight_item_15.w2ent"
 		
@@ -2227,7 +2252,7 @@ state ACS_Vampire_Armor_Black_Pieces_Include in cACS_Knight_Additional_Pieces
 
 		p_comp = thePlayer.GetComponentByClassName( 'CAppearanceComponent' );
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\black\black_acs_knight_item_18.w2ent"
 		
@@ -2236,7 +2261,7 @@ state ACS_Vampire_Armor_Black_Pieces_Include in cACS_Knight_Additional_Pieces
 		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
 
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\black\black_acs_knight_item_17.w2ent"
 		
@@ -2245,7 +2270,7 @@ state ACS_Vampire_Armor_Black_Pieces_Include in cACS_Knight_Additional_Pieces
 		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
 
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\black\black_acs_knight_item_03.w2ent"
 		
@@ -2255,7 +2280,7 @@ state ACS_Vampire_Armor_Black_Pieces_Include in cACS_Knight_Additional_Pieces
 
 		
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\black\black_acs_knight_item_04.w2ent"
 		
@@ -2265,7 +2290,7 @@ state ACS_Vampire_Armor_Black_Pieces_Include in cACS_Knight_Additional_Pieces
 
 		
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\black\black_acs_knight_item_08.w2ent"
 		
@@ -2275,7 +2300,7 @@ state ACS_Vampire_Armor_Black_Pieces_Include in cACS_Knight_Additional_Pieces
 
 		
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\black\black_acs_knight_item_14.w2ent"
 		
@@ -2305,7 +2330,7 @@ state ACS_Vampire_Armor_Black_Pieces_Exclude in cACS_Knight_Additional_Pieces
 
 		p_comp = thePlayer.GetComponentByClassName( 'CAppearanceComponent' );
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\black\black_acs_knight_item_18.w2ent"
 		
@@ -2313,7 +2338,7 @@ state ACS_Vampire_Armor_Black_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\black\black_acs_knight_item_17.w2ent"
 		
@@ -2322,7 +2347,7 @@ state ACS_Vampire_Armor_Black_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
 
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\black\black_acs_knight_item_03.w2ent"
 		
@@ -2332,7 +2357,7 @@ state ACS_Vampire_Armor_Black_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\black\black_acs_knight_item_04.w2ent"
 		
@@ -2342,7 +2367,7 @@ state ACS_Vampire_Armor_Black_Pieces_Exclude in cACS_Knight_Additional_Pieces
 
 		
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\black\black_acs_knight_item_08.w2ent"
 		
@@ -2352,7 +2377,7 @@ state ACS_Vampire_Armor_Black_Pieces_Exclude in cACS_Knight_Additional_Pieces
 
 		
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\black\black_acs_knight_item_14.w2ent"
 		
@@ -2384,7 +2409,7 @@ state ACS_Vampire_Armor_Red_Pieces_Include in cACS_Knight_Additional_Pieces
 
 		p_comp = thePlayer.GetComponentByClassName( 'CAppearanceComponent' );
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\red\red_acs_knight_item_18.w2ent"
 		
@@ -2392,7 +2417,7 @@ state ACS_Vampire_Armor_Red_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\red\red_acs_knight_item_17.w2ent"
 		
@@ -2401,7 +2426,7 @@ state ACS_Vampire_Armor_Red_Pieces_Include in cACS_Knight_Additional_Pieces
 		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
 
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\red\red_acs_knight_item_03.w2ent"
 		
@@ -2411,7 +2436,7 @@ state ACS_Vampire_Armor_Red_Pieces_Include in cACS_Knight_Additional_Pieces
 
 		
 	
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\red\red_acs_knight_item_04.w2ent"
 		
@@ -2421,7 +2446,7 @@ state ACS_Vampire_Armor_Red_Pieces_Include in cACS_Knight_Additional_Pieces
 
 		
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\red\red_acs_knight_item_08.w2ent"
 		
@@ -2431,7 +2456,7 @@ state ACS_Vampire_Armor_Red_Pieces_Include in cACS_Knight_Additional_Pieces
 
 		
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\red\red_acs_knight_item_14.w2ent"
 		
@@ -2461,7 +2486,7 @@ state ACS_Vampire_Armor_Red_Pieces_Exclude in cACS_Knight_Additional_Pieces
 
 		p_comp = thePlayer.GetComponentByClassName( 'CAppearanceComponent' );
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\red\red_acs_knight_item_03.w2ent"
 		
@@ -2471,7 +2496,7 @@ state ACS_Vampire_Armor_Red_Pieces_Exclude in cACS_Knight_Additional_Pieces
 
 		
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\red\red_acs_knight_item_04.w2ent"
 		
@@ -2481,7 +2506,7 @@ state ACS_Vampire_Armor_Red_Pieces_Exclude in cACS_Knight_Additional_Pieces
 
 		
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\red\red_acs_knight_item_08.w2ent"
 		
@@ -2491,7 +2516,7 @@ state ACS_Vampire_Armor_Red_Pieces_Exclude in cACS_Knight_Additional_Pieces
 
 		
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\red\red_acs_knight_item_14.w2ent"
 		
@@ -2500,7 +2525,7 @@ state ACS_Vampire_Armor_Red_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
 
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\red\red_acs_knight_item_17.w2ent"
 		
@@ -2508,7 +2533,7 @@ state ACS_Vampire_Armor_Red_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
 
-		temp = (CEntityTemplate)LoadResource(
+		temp = (CEntityTemplate)LoadResourceAsync(
 
 		"dlc\dlc_acs\data\models\knight_armors_errant\items\red\red_acs_knight_item_18.w2ent"
 		
@@ -2529,11 +2554,11 @@ statemachine class cACS_Crach_Cape_Include
 {
     function Engage()
 	{
-		this.PushState('Engage');
+		this.PushState('ACS_Crach_Cape_Include_Engage');
 	}
 }
 
-state Engage in cACS_Crach_Cape_Include
+state ACS_Crach_Cape_Include_Engage in cACS_Crach_Cape_Include
 {
 	private var temp_1																											: CEntityTemplate;
 	private var l_actor 																										: CActor;
@@ -2550,7 +2575,7 @@ state Engage in cACS_Crach_Cape_Include
 		l_actor = thePlayer;
 		l_comp = l_actor.GetComponentByClassName( 'CAppearanceComponent' );
 
-		temp_1 = (CEntityTemplate)LoadResource("characters\models\crowd_npc\skellige_villager\items\i_06_mb__skellige_villager_px.w2ent", true);		
+		temp_1 = (CEntityTemplate)LoadResourceAsync("characters\models\crowd_npc\skellige_villager\items\i_06_mb__skellige_villager_px.w2ent", true);		
 		((CAppearanceComponent)l_comp).IncludeAppearanceTemplate(temp_1);
 	}
 	
@@ -2566,11 +2591,11 @@ statemachine class cACS_Crach_Cape_Exclude
 {
     function Engage()
 	{
-		this.PushState('Engage');
+		this.PushState('ACS_Crach_Cape_Exclude_Engage');
 	}
 }
 
-state Engage in cACS_Crach_Cape_Exclude
+state ACS_Crach_Cape_Exclude_Engage in cACS_Crach_Cape_Exclude
 {
 	private var temp_1																											: CEntityTemplate;
 	private var l_actor 																										: CActor;
@@ -2587,7 +2612,7 @@ state Engage in cACS_Crach_Cape_Exclude
 		l_actor = thePlayer;
 		l_comp = l_actor.GetComponentByClassName( 'CAppearanceComponent' );
 
-		temp_1 = (CEntityTemplate)LoadResource("characters\models\crowd_npc\skellige_villager\items\i_06_mb__skellige_villager_px.w2ent", true);		
+		temp_1 = (CEntityTemplate)LoadResourceAsync("characters\models\crowd_npc\skellige_villager\items\i_06_mb__skellige_villager_px.w2ent", true);		
 		((CAppearanceComponent)l_comp).ExcludeAppearanceTemplate(temp_1);
 	}
 	
@@ -2603,11 +2628,11 @@ statemachine class cACS_Warden_Tail_Include
 {
     function Engage()
 	{
-		this.PushState('Engage');
+		this.PushState('ACS_Warden_Tail_Include_Engage');
 	}
 }
 
-state Engage in cACS_Warden_Tail_Include
+state ACS_Warden_Tail_Include_Engage in cACS_Warden_Tail_Include
 {
 	private var temp_1, temp_2, temp_3																							: CEntityTemplate;
 	private var l_actor 																										: CActor;
@@ -2624,8 +2649,8 @@ state Engage in cACS_Warden_Tail_Include
 		l_actor = thePlayer;
 		l_comp = l_actor.GetComponentByClassName( 'CAppearanceComponent' );
 
-		temp_1 = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\armor\old_stuff\warden_alt.w2ent", true);		
-		temp_2 = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\armor\old_stuff\warden.w2ent", true);	
+		temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\armor\old_stuff\warden_alt.w2ent", true);		
+		temp_2 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\armor\old_stuff\warden.w2ent", true);	
 
 		((CAppearanceComponent)l_comp).ExcludeAppearanceTemplate(temp_1);
 
@@ -2644,11 +2669,11 @@ statemachine class cACS_Warden_Tail_Exclude
 {
     function Engage()
 	{
-		this.PushState('Engage');
+		this.PushState('ACS_Warden_Tail_Exclude_Engage');
 	}
 }
 
-state Engage in cACS_Warden_Tail_Exclude
+state ACS_Warden_Tail_Exclude_Engage in cACS_Warden_Tail_Exclude
 {
 	private var temp_1, temp_2																									: CEntityTemplate;
 	private var l_actor 																										: CActor;
@@ -2665,8 +2690,8 @@ state Engage in cACS_Warden_Tail_Exclude
 		l_actor = thePlayer;
 		l_comp = l_actor.GetComponentByClassName( 'CAppearanceComponent' );
 
-		temp_1 = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\armor\old_stuff\warden_alt.w2ent", true);		
-		temp_2 = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\armor\old_stuff\warden.w2ent", true);	
+		temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\armor\old_stuff\warden_alt.w2ent", true);		
+		temp_2 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\armor\old_stuff\warden.w2ent", true);	
 
 		((CAppearanceComponent)l_comp).ExcludeAppearanceTemplate(temp_2);
 
@@ -2685,11 +2710,11 @@ statemachine class cACS_Additional_Helmets
 {
     function Engage()
 	{
-		this.PushState('Engage');
+		this.PushState('ACS_Additional_Helmets_Include_Engage');
 	}
 }
 
-state Engage in cACS_Additional_Helmets
+state ACS_Additional_Helmets_Include_Engage in cACS_Additional_Helmets
 {
 	private var anchor_temp, helm_temp_1, helm_temp_2, helm_temp_3, helm_temp_4, helm_temp_5, helm_temp_6, helm_temp_7						: CEntityTemplate;
 	private var bonePosition, attach_vec																									: Vector;
@@ -2710,14 +2735,7 @@ state Engage in cACS_Additional_Helmets
 
 		GetACSWatcher().Additional_Helmets_Destroy();
 
-		if ( ACS_SOI_Installed() )
-		{
-			Helmets_Attach_Shades();
-		}
-		else
-		{
-			Helmets_Attach();
-		}
+		Helmets_Attach_Shades();
 	}
 	
 	entry function Helmets_Attach_Shades()
@@ -2725,26 +2743,26 @@ state Engage in cACS_Additional_Helmets
 		l_actor = thePlayer;
 		l_comp = l_actor.GetComponentByClassName( 'CAppearanceComponent' );
 		
-		anchor_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\entities\other\fx_ent.w2ent", true );
+		anchor_temp = (CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\other\fx_ent.w2ent", true );
 
-		helm_temp_1 = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\armor\old_stuff\omen_helm.w2ent", true );
+		helm_temp_1 = (CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\armor\old_stuff\omen_helm_test.w2ent", true );
 
-		helm_temp_2 = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\armor\old_stuff\hellbride.w2ent", true );
+		helm_temp_2 = (CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\armor\old_stuff\hellbride_test.w2ent", true );
 
-		//helm_temp_3 = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\armor\old_stuff\warden_no_hair.w2ent", true );
+		//helm_temp_3 = (CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\armor\old_stuff\warden_no_hair.w2ent", true );
 
-		helm_temp_4 = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\armor\old_stuff\c_01_mw__eredin.w2ent", true );
+		helm_temp_4 = (CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\armor\old_stuff\c_01_mw__eredin.w2ent", true );
 
 		if (ACS_Armor_Alpha_Equipped_Check())
 		{
-			helm_temp_5 = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\armor\old_stuff\warden_alt.w2ent", true);	
+			helm_temp_5 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\armor\old_stuff\warden_alt.w2ent", true);	
 		}
 		else if (ACS_Armor_Omega_Equipped_Check())
 		{
-			helm_temp_5 = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\armor\old_stuff\warden.w2ent", true);	
+			helm_temp_5 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\armor\old_stuff\warden.w2ent", true);	
 		}
 
-		helm_temp_6 = (CEntityTemplate)LoadResource("dlc\bob\data\characters\models\crowd_npc\bob_knight\caps\c_03_mb__bob_knights_f4.w2ent", true);	
+		helm_temp_6 = (CEntityTemplate)LoadResourceAsync("dlc\bob\data\characters\models\crowd_npc\bob_knight\caps\c_03_mb__bob_knights_f4.w2ent", true);	
 
 		((CAppearanceComponent)l_comp).IncludeAppearanceTemplate(helm_temp_5);
 
@@ -2756,7 +2774,7 @@ state Engage in cACS_Additional_Helmets
 		anchor.AddTag('acs_helm_anchor');
 
 		/*
-		helm_temp_1 = (CEntityTemplate)LoadResource( "dlc\dlc_shadesofiron\data\items\armour\berserker\h_01_berserker.w2ent", true );
+		helm_temp_1 = (CEntityTemplate)LoadResourceAsync( "dlc\dlc_shadesofiron\data\items\armour\berserker\h_01_berserker.w2ent", true );
 				
 		helm_1 = (CEntity)theGame.CreateEntity( helm_temp_1, thePlayer.GetWorldPosition() + Vector( 0, 0, -10 ) );
 		meshcomp1 = helm_1.GetComponentByClassName('CMeshComponent');
@@ -2842,119 +2860,6 @@ state Engage in cACS_Additional_Helmets
 		helm_4.CreateAttachment( anchor, , attach_vec, attach_rot );
 		helm_4.AddTag('acs_helm_4');
 	}
-
-	entry function Helmets_Attach()
-	{	
-		l_actor = thePlayer;
-		l_comp = l_actor.GetComponentByClassName( 'CAppearanceComponent' );
-		
-		anchor_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\entities\other\fx_ent.w2ent", true );
-
-		helm_temp_1 = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\armor\old_stuff\omen_helm_test.w2ent", true );
-
-		helm_temp_2 = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\armor\old_stuff\hellbride_test.w2ent", true );
-
-		//helm_temp_3 = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\armor\old_stuff\warden_no_hair_test.w2ent", true);		
-
-		helm_temp_4 = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\armor\old_stuff\c_01_mw__eredin.w2ent", true );
-
-		helm_temp_5 = (CEntityTemplate)LoadResource("dlc\bob\data\characters\models\crowd_npc\bob_knight\caps\c_03_mb__bob_knights_f4.w2ent", true);		
-
-		((CAppearanceComponent)l_comp).IncludeAppearanceTemplate(helm_temp_5);
-		
-		thePlayer.GetBoneWorldPositionAndRotationByIndex( thePlayer.GetBoneIndex( 'head' ), bonePosition, boneRotation );
-		anchor = (CEntity)theGame.CreateEntity( anchor_temp, thePlayer.GetWorldPosition() + Vector( 0, 0, -10 ) );
-		anchor.CreateAttachmentAtBoneWS( thePlayer, 'head', bonePosition, boneRotation );
-		anchor.PlayEffectSingle('eye_glow');
-		anchor.AddTag('acs_helm_anchor');
-
-		/*
-		helm_temp_1 = (CEntityTemplate)LoadResource( "dlc\dlc_shadesofiron\data\items\armour\berserker\h_01_berserker.w2ent", true );
-				
-		helm_1 = (CEntity)theGame.CreateEntity( helm_temp_1, thePlayer.GetWorldPosition() + Vector( 0, 0, -10 ) );
-		meshcomp1 = helm_1.GetComponentByClassName('CMeshComponent');
-		h = 5;
-		meshcomp1.SetScale(Vector(h,h,h,1));	
-
-		attach_rot.Roll = 90;
-		attach_rot.Pitch = 0;
-		attach_rot.Yaw = 0;
-		//attach_vec.X = -2.07;
-		attach_vec.X = -8.0775;
-		attach_vec.Y = 0.0375;
-		//attach_vec.Y = 0.08;
-		attach_vec.Z = 0;
-				
-		helm_1.CreateAttachment( anchor, , attach_vec, attach_rot );
-		helm_1.AddTag('helm_1');
-		*/
-				
-		helm_1 = (CEntity)theGame.CreateEntity( helm_temp_1, thePlayer.GetWorldPosition() + Vector( 0, 0, -10 ) );
-		meshcomp1 = helm_1.GetComponentByClassName('CMeshComponent');
-		h = 1;
-		meshcomp1.SetScale(Vector(h,h,h,1));	
-
-		attach_rot.Roll = 90;
-		attach_rot.Pitch = 0;
-		attach_rot.Yaw = 0;
-		//attach_vec.X = -2.07;
-		//attach_vec.X = -2.0775;
-		attach_vec.X = -1.725;
-		//attach_vec.Y = 0.0375;
-		attach_vec.Y = 0.065;
-		attach_vec.Z = 0;
-				
-		helm_1.CreateAttachment( anchor, , attach_vec, attach_rot );
-		helm_1.AddTag('acs_helm_1');
-				
-		helm_2 = (CEntity)theGame.CreateEntity( helm_temp_2, thePlayer.GetWorldPosition() + Vector( 0, 0, -10 ) );
-		meshcomp2 = helm_2.GetComponentByClassName('CMeshComponent');
-		h = 0.875;
-		meshcomp2.SetScale(Vector(h,h,h,1));	
-
-		attach_rot.Roll = 90;
-		attach_rot.Pitch = 0;
-		attach_rot.Yaw = 16.875;
-		//attach_vec.X = -1.53;
-		attach_vec.X = -1.33;
-		//attach_vec.Y = -0.4625;
-		//attach_vec.Y = -0.365;
-		//attach_vec.Y = -0.362;
-		attach_vec.Y = -0.375;
-		attach_vec.Z = 0;	
-		
-		helm_2.CreateAttachment( anchor, , attach_vec, attach_rot );
-		helm_2.AddTag('acs_helm_2');
-
-		//helm_3 = (CEntity)theGame.CreateEntity( helm_temp_3, thePlayer.GetWorldPosition() + Vector( 0, 0, -10 ) );
-				
-		//attach_rot.Roll = 90;
-		//attach_rot.Pitch = 0;
-		//attach_rot.Yaw = 0;
-		//attach_vec.X = -1.625;
-		//attach_vec.Y = -0.025;
-		//attach_vec.Z = 0;
-		
-		//helm_3.CreateAttachment( anchor, , attach_vec, attach_rot );
-		//helm_3.AddTag('helm_3');
-				
-		helm_4 = (CEntity)theGame.CreateEntity( helm_temp_4, thePlayer.GetWorldPosition() + Vector( 0, 0, -10 ) );
-		meshcomp3 = helm_4.GetComponentByClassName('CMeshComponent');
-		h = 0.75;
-		meshcomp3.SetScale(Vector(h,h,h,1));	
-				
-		attach_rot.Roll = 90;
-		attach_rot.Pitch = 0;
-		attach_rot.Yaw = 0;
-		//attach_vec.X = -1.624;
-		//attach_vec.X = -2.025;
-		attach_vec.X = -1.5125;
-		attach_vec.Y = 0.04;
-		attach_vec.Z = 0;
-		
-		helm_4.CreateAttachment( anchor, , attach_vec, attach_rot );
-		helm_4.AddTag('acs_helm_4');
-	}
 	
 	event OnLeaveState( nextStateName : name ) 
 	{
@@ -2968,11 +2873,11 @@ statemachine class cACS_Additional_Helmet_Appearance_Destroy
 {
     function Engage()
 	{
-		this.PushState('Engage');
+		this.PushState('ACS_Additional_Helmet_Appearance_Destroy_Engage');
 	}
 }
 
-state Engage in cACS_Additional_Helmet_Appearance_Destroy
+state ACS_Additional_Helmet_Appearance_Destroy_Engage in cACS_Additional_Helmet_Appearance_Destroy
 {
 	private var helm_temp_1, helm_temp_2, helm_temp_3, helm_temp_4																: CEntityTemplate;
 	private var l_actor 																										: CActor;
@@ -2987,14 +2892,7 @@ state Engage in cACS_Additional_Helmet_Appearance_Destroy
 	{
 		super.OnEnterState(prevStateName);
 
-		if ( ACS_SOI_Installed() )
-		{
-			Helmet_Appearance_Exclude_Shades();
-		}
-		else
-		{
-			Helmet_Appearance_Exclude();
-		}
+		Helmet_Appearance_Exclude_Shades();
 	}
 	
 	entry function Helmet_Appearance_Exclude_Shades()
@@ -3002,45 +2900,17 @@ state Engage in cACS_Additional_Helmet_Appearance_Destroy
 		l_actor = thePlayer;
 		l_comp = l_actor.GetComponentByClassName( 'CAppearanceComponent' );
 
-		helm_temp_1 = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\armor\old_stuff\warden_alt.w2ent", true);	
+		helm_temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\armor\old_stuff\warden_alt.w2ent", true);	
 
 		((CAppearanceComponent)l_comp).ExcludeAppearanceTemplate(helm_temp_1);
 
-		helm_temp_2 = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\armor\old_stuff\warden.w2ent", true);	
+		helm_temp_2 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\armor\old_stuff\warden.w2ent", true);	
 
 		((CAppearanceComponent)l_comp).ExcludeAppearanceTemplate(helm_temp_2);
 		
-		helm_temp_3 = (CEntityTemplate)LoadResource("dlc\bob\data\characters\models\crowd_npc\bob_knight\caps\c_03_mb__bob_knights_f4.w2ent", true);		
+		helm_temp_3 = (CEntityTemplate)LoadResourceAsync("dlc\bob\data\characters\models\crowd_npc\bob_knight\caps\c_03_mb__bob_knights_f4.w2ent", true);		
 
 		((CAppearanceComponent)l_comp).ExcludeAppearanceTemplate(helm_temp_3);
-
-		inv = thePlayer.GetInventory();
-    
-		ids = inv.GetItemsByCategory( 'hair' );
-		size = ids.Size();
-		
-		if( size > 0 )
-		{					
-			for( i = 0; i < size; i+=1 )
-			{
-				if(inv.IsItemMounted( ids[i] ) )
-				{
-					inv.MountItem(ids[i],,true);
-				}
-			}	
-		}			
-		ids.Clear();
-	}
-
-	entry function Helmet_Appearance_Exclude()
-	{	
-		l_actor = thePlayer;
-		l_comp = l_actor.GetComponentByClassName( 'CAppearanceComponent' );
-
-		//helm_temp_1 = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\armor\old_stuff\warden_alt.w2ent", true);		
-		//helm_temp_1 = (CEntityTemplate)LoadResource("dlc\ep1\data\characters\models\main_npc\ewald_borsody\ewald_borsody_hood_01.w2ent", true);	
-		helm_temp_1 = (CEntityTemplate)LoadResource("dlc\bob\data\characters\models\crowd_npc\bob_knight\caps\c_03_mb__bob_knights_f4.w2ent", true);			
-		((CAppearanceComponent)l_comp).ExcludeAppearanceTemplate(helm_temp_1);
 
 		inv = thePlayer.GetInventory();
     
@@ -3080,11 +2950,11 @@ statemachine class cACS_Shoulder_Armor_Toggle_On
 {
     function Engage()
 	{
-		this.PushState('Engage');
+		this.PushState('ACS_Shoulder_Armor_Toggle_On_Engage');
 	}
 }
 
-state Engage in cACS_Shoulder_Armor_Toggle_On
+state ACS_Shoulder_Armor_Toggle_On_Engage in cACS_Shoulder_Armor_Toggle_On
 {
 	private var temp_1, temp_2, temp_3, temp_4, temp_5																			: CEntityTemplate;
 	private var l_actor 																										: CActor;
@@ -3101,13 +2971,13 @@ state Engage in cACS_Shoulder_Armor_Toggle_On
 		l_actor = thePlayer;
 		l_comp = l_actor.GetComponentByClassName( 'CAppearanceComponent' );
 
-		temp_1 = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\armor\old_stuff\berserkercape.w2ent", true);		
+		temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\armor\old_stuff\berserkercape.w2ent", true);		
 		((CAppearanceComponent)l_comp).IncludeAppearanceTemplate(temp_1);
 
-		temp_3 = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\armor\old_stuff\imlerith_arms.w2ent", true);		
+		temp_3 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\armor\old_stuff\imlerith_arms.w2ent", true);		
 		((CAppearanceComponent)l_comp).IncludeAppearanceTemplate(temp_3);
 
-		temp_5 = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\armor\old_stuff\wild_hunt_arm_cloth.w2ent", true);		
+		temp_5 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\armor\old_stuff\wild_hunt_arm_cloth.w2ent", true);		
 		((CAppearanceComponent)l_comp).IncludeAppearanceTemplate(temp_5);
 	}
 	
@@ -3131,11 +3001,11 @@ statemachine class cACS_Shoulder_Armor_Toggle_Off
 {
     function Engage()
 	{
-		this.PushState('Engage');
+		this.PushState('ACS_Shoulder_Armor_Toggle_Off_Engage');
 	}
 }
 
-state Engage in cACS_Shoulder_Armor_Toggle_Off
+state ACS_Shoulder_Armor_Toggle_Off_Engage in cACS_Shoulder_Armor_Toggle_Off
 {
 	private var temp_1, temp_2, temp_3, temp_4, temp_5																			: CEntityTemplate;
 	private var l_actor 																										: CActor;
@@ -3152,13 +3022,13 @@ state Engage in cACS_Shoulder_Armor_Toggle_Off
 		l_actor = thePlayer;
 		l_comp = l_actor.GetComponentByClassName( 'CAppearanceComponent' );
 
-		temp_1 = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\armor\old_stuff\berserkercape.w2ent", true);
+		temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\armor\old_stuff\berserkercape.w2ent", true);
 		((CAppearanceComponent)l_comp).ExcludeAppearanceTemplate(temp_1);
 
-		temp_3 = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\armor\old_stuff\imlerith_arms.w2ent", true);	
+		temp_3 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\armor\old_stuff\imlerith_arms.w2ent", true);	
 		((CAppearanceComponent)l_comp).ExcludeAppearanceTemplate(temp_3);
 
-		temp_5 = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\armor\old_stuff\wild_hunt_arm_cloth.w2ent", true);		
+		temp_5 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\armor\old_stuff\wild_hunt_arm_cloth.w2ent", true);		
 		((CAppearanceComponent)l_comp).ExcludeAppearanceTemplate(temp_5);
 	}
 	
@@ -3182,11 +3052,11 @@ statemachine class cACS_Fur_Toggle_On
 {
     function Engage()
 	{
-		this.PushState('Engage');
+		this.PushState('ACS_Fur_Toggle_On_Engage');
 	}
 }
 
-state Engage in cACS_Fur_Toggle_On
+state ACS_Fur_Toggle_On_Engage in cACS_Fur_Toggle_On
 {
 	private var temp_1, temp_2																									: CEntityTemplate;
 	private var l_actor 																										: CActor;
@@ -3203,10 +3073,10 @@ state Engage in cACS_Fur_Toggle_On
 		l_actor = thePlayer;
 		l_comp = l_actor.GetComponentByClassName( 'CAppearanceComponent' );
 
-		temp_1 = (CEntityTemplate)LoadResource("dlc\modtemplates\batman\data\caranthir_fur.w2ent", true);		
+		temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\modtemplates\batman\data\caranthir_fur.w2ent", true);		
 		((CAppearanceComponent)l_comp).IncludeAppearanceTemplate(temp_1);
 
-		temp_2 = (CEntityTemplate)LoadResource("dlc\modtemplates\batman\data\fur\red_fur_black.w2ent", true);		
+		temp_2 = (CEntityTemplate)LoadResourceAsync("dlc\modtemplates\batman\data\fur\red_fur_black.w2ent", true);		
 		((CAppearanceComponent)l_comp).IncludeAppearanceTemplate(temp_2);
 	}
 	
@@ -3230,11 +3100,11 @@ statemachine class cACS_Fur_Toggle_Off
 {
     function Engage()
 	{
-		this.PushState('Engage');
+		this.PushState('ACS_Fur_Toggle_Off_Engage');
 	}
 }
 
-state Engage in cACS_Fur_Toggle_Off
+state ACS_Fur_Toggle_Off_Engage in cACS_Fur_Toggle_Off
 {
 	private var temp_1, temp_2																									: CEntityTemplate;
 	private var l_actor 																										: CActor;
@@ -3251,10 +3121,10 @@ state Engage in cACS_Fur_Toggle_Off
 		l_actor = thePlayer;
 		l_comp = l_actor.GetComponentByClassName( 'CAppearanceComponent' );
 
-		temp_1 = (CEntityTemplate)LoadResource("dlc\modtemplates\batman\data\caranthir_fur.w2ent", true);		
+		temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\modtemplates\batman\data\caranthir_fur.w2ent", true);		
 		((CAppearanceComponent)l_comp).ExcludeAppearanceTemplate(temp_1);
 
-		temp_2 = (CEntityTemplate)LoadResource("dlc\modtemplates\batman\data\fur\red_fur_black.w2ent", true);		
+		temp_2 = (CEntityTemplate)LoadResourceAsync("dlc\modtemplates\batman\data\fur\red_fur_black.w2ent", true);		
 		((CAppearanceComponent)l_comp).ExcludeAppearanceTemplate(temp_2);
 	}
 	
@@ -3278,11 +3148,11 @@ statemachine class cACS_Cape_Toggle_On
 {
     function Engage()
 	{
-		this.PushState('Engage');
+		this.PushState('ACS_Cape_Toggle_On_Engage');
 	}
 }
 
-state Engage in cACS_Cape_Toggle_On
+state ACS_Cape_Toggle_On_Engage in cACS_Cape_Toggle_On
 {
 	private var temp_1																											: CEntityTemplate;
 	private var l_actor 																										: CActor;
@@ -3299,7 +3169,7 @@ state Engage in cACS_Cape_Toggle_On
 		l_actor = thePlayer;
 		l_comp = l_actor.GetComponentByClassName( 'CAppearanceComponent' );
 
-		temp_1 = (CEntityTemplate)LoadResource("dlc\modtemplates\batman\data\berserkercape.w2ent", true);		
+		temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\modtemplates\batman\data\berserkercape.w2ent", true);		
 		((CAppearanceComponent)l_comp).IncludeAppearanceTemplate(temp_1);
 	}
 	
@@ -3323,11 +3193,11 @@ statemachine class cACS_Cape_Toggle_Off
 {
     function Engage()
 	{
-		this.PushState('Engage');
+		this.PushState('ACS_Cape_Toggle_Off_Engage');
 	}
 }
 
-state Engage in cACS_Cape_Toggle_Off
+state ACS_Cape_Toggle_Off_Engage in cACS_Cape_Toggle_Off
 {
 	private var temp_1																											: CEntityTemplate;
 	private var l_actor 																										: CActor;
@@ -3344,7 +3214,7 @@ state Engage in cACS_Cape_Toggle_Off
 		l_actor = thePlayer;
 		l_comp = l_actor.GetComponentByClassName( 'CAppearanceComponent' );
 
-		temp_1 = (CEntityTemplate)LoadResource("dlc\modtemplates\batman\data\berserkercape.w2ent", true);		
+		temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\modtemplates\batman\data\berserkercape.w2ent", true);		
 		((CAppearanceComponent)l_comp).ExcludeAppearanceTemplate(temp_1);
 	}
 	
@@ -3447,16 +3317,16 @@ statemachine class cACS_Swordsanoo extends CGameplayEntity
 {
     function Normal()
 	{
-		this.PushState('Normal');
+		this.PushState('ACS_Swordsanoo_Normal');
 	}
 
 	function Energy()
 	{
-		this.PushState('Energy');
+		this.PushState('ACS_Swordsanoo_Energy');
 	}
 }
 
-state Normal in cACS_Swordsanoo
+state ACS_Swordsanoo_Normal in cACS_Swordsanoo
 {	
 	private var anchor_temp, sword_temp																																										: CEntityTemplate;
 	private var bonePosition, attach_vec																																										: Vector;
@@ -3780,7 +3650,7 @@ state Normal in cACS_Swordsanoo
 	}
 }
 
-state Energy in cACS_Swordsanoo
+state ACS_Swordsanoo_Energy in cACS_Swordsanoo
 {	
 	private var anchor_temp, sword_temp																																										: CEntityTemplate;
 	private var bonePosition, attach_vec																																										: Vector;
@@ -3801,11 +3671,11 @@ state Energy in cACS_Swordsanoo
 		
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
-		anchor_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\entities\other\fx_ent.w2ent", true );
+		anchor_temp = (CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\other\fx_ent.w2ent", true );
 		
-		//sword_temp = (CEntityTemplate)LoadResource( "items\weapons\unique\eredin_sword.w2ent", true );
-		//sword_temp = (CEntityTemplate)LoadResource( "dlc\dlc_shadesofiron\data\items\weapons\silverknife\zerri.w2ent", true );
-		sword_temp = (CEntityTemplate)LoadResource( 
+		//sword_temp = (CEntityTemplate)LoadResourceAsync( "items\weapons\unique\eredin_sword.w2ent", true );
+		//sword_temp = (CEntityTemplate)LoadResourceAsync( "dlc\dlc_shadesofiron\data\items\weapons\silverknife\zerri.w2ent", true );
+		sword_temp = (CEntityTemplate)LoadResourceAsync( 
 		//"dlc\bob\data\items\cutscenes\cs704_dettlaff_transformation\cs704_dettlaff_transformation_extra_arms.w2ent"
 		"dlc\dlc_acs\data\fx\acs_enemy_sword_trail.w2ent"
 		//"dlc\dlc_shadesofiron\data\items\weapons\pridefall\pridefall.w2ent"

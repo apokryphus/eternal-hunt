@@ -410,9 +410,6 @@ class W3ACSPetard extends CThrowable
 		)
 		)
 		{
-			bounceOfVelocityPreserve = 0.5;
-			BounceOff( normal, pos );
-			this.Init( npc );
 			return true;
 		}
 
@@ -1228,6 +1225,7 @@ class W3ACSPetard extends CThrowable
 
 					GetWitcherPlayer().GetMovingAgentComponent().GetMovementAdjustor().CancelAll();
 
+					if (thePlayer.HasTag('ACS_IsSwordWalking')){thePlayer.RemoveTag('ACS_IsSwordWalking');}
 					GetWitcherPlayer().RaiseEvent( 'AttackInterrupt' );
 
 					if (actorTarget.UsesVitality()) 
@@ -1552,7 +1550,7 @@ class W3ACSEnemyDimeritium extends W3ACSPetard
 				witcher.FinishQuen(false);
 			}
 
-			Bruxa_Camo_Decoy_Deactivate();
+			ACS_Bruxa_Camo_Decoy_Deactivate();
 
 			//GetWitcherPlayer().StopAllEffects();
 

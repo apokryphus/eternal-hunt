@@ -447,7 +447,7 @@ statemachine abstract class W3ACSStorage extends CPeristentEntity
 	{
 		var should_initialize_and_render: bool;
 
-		should_initialize_and_render = this.GetCurrentStateName() != 'OnelinerRender';
+		should_initialize_and_render = this.GetCurrentStateName() != 'ACSStorageOnelinerRender';
 
 		if (should_initialize_and_render) 
 		{
@@ -462,7 +462,7 @@ statemachine abstract class W3ACSStorage extends CPeristentEntity
 
 		if (should_initialize_and_render) 
 		{
-			this.GotoState('OnelinerRender');
+			this.GotoState('ACSStorageOnelinerRender');
 		}
 	}
 
@@ -496,6 +496,49 @@ statemachine abstract class W3ACSStorage extends CPeristentEntity
 		}
 
 		return output;
+	}
+
+	public function acs_setPositionForOnelinerByTag(tag: string, x, y, z : float)
+	{
+		var output: array<ACS_Oneliner>;
+		var i: int;
+
+		output = acs_findOnelinerByTag(tag);
+
+		for (i = 0; i < output.Size(); i += 1) 
+		{
+			module_flash.GetChildFlashSprite( "mcOneliner" + output[i].id ).SetX(x);
+			module_flash.GetChildFlashSprite( "mcOneliner" + output[i].id ).SetY(y);
+			module_flash.GetChildFlashSprite( "mcOneliner" + output[i].id ).SetZ(z);
+		}
+	}
+
+	public function acs_setAlphaForOnelinerByTag(tag: string, alpha : float)
+	{
+		var output: array<ACS_Oneliner>;
+		var i: int;
+
+		output = acs_findOnelinerByTag(tag);
+
+		for (i = 0; i < output.Size(); i += 1) 
+		{
+			module_flash.GetChildFlashSprite( "mcOneliner" + output[i].id ).SetAlpha(alpha);
+		}
+	}
+
+	public function acs_setScaleForOnelinerByTag(tag: string, scaleX, scaleY, scaleZ : float)
+	{
+		var output: array<ACS_Oneliner>;
+		var i: int;
+
+		output = acs_findOnelinerByTag(tag);
+
+		for (i = 0; i < output.Size(); i += 1) 
+		{
+			module_flash.GetChildFlashSprite( "mcOneliner" + output[i].id ).SetXScale(scaleX);
+			module_flash.GetChildFlashSprite( "mcOneliner" + output[i].id ).SetYScale(scaleY);
+			module_flash.GetChildFlashSprite( "mcOneliner" + output[i].id ).SetZScale(scaleZ);
+		}
 	}
 
 	public function acs_findOnelinerByTagPrefix(tag: string): array<ACS_Oneliner> 
@@ -589,7 +632,7 @@ statemachine abstract class W3ACSStorage extends CPeristentEntity
 	
 }
 
-state Idle in W3ACSStorage 
+state acsStorageIdle in W3ACSStorage 
 {
   	event OnEnterState(previous_state_name: name) 
 	{

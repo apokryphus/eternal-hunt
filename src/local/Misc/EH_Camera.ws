@@ -438,6 +438,43 @@ statemachine class ACSTransformationCamera extends CStaticCamera
 
 			vampPos.Z += 1.625;
 		}
+		else if (
+		FactsQuerySum("acs_giant_curse_activated") > 0
+		)
+		{
+			vampPos = ACSGetCActor('ACS_Transformation_Giant').GetWorldPosition();
+
+			vampPos.Z += 3;
+
+			if (thePlayer.GetStat(BCS_Focus) >= thePlayer.GetStatMax( BCS_Focus ) * 0.9875)
+			{
+				if (cameraHeight < 1.5)
+				{
+					cameraHeight += 0.03125;
+				}
+
+				if (cameraHeight > 1.5)
+				{
+					cameraHeight -= 0.03125;
+				}
+
+				vampPos.Z += cameraHeight;
+			}
+			else
+			{
+				if (cameraHeight < 0)
+				{
+					cameraHeight += 0.03125;
+				}
+
+				if (cameraHeight > 0)
+				{
+					cameraHeight -= 0.03125;
+				}
+
+				vampPos.Z += cameraHeight;
+			}
+		}
 
 		if ( theInput.LastUsedPCInput() )
 		{
@@ -572,6 +609,65 @@ statemachine class ACSTransformationCamera extends CStaticCamera
 
 			cameraPos = cameraPos + VecConeRand(currentHeading, 0, LerpF( AbsF(currentPitch)  , 0 , 3.0)/75, LerpF(AbsF(currentPitch)  , 0 , 3.0)/75);
 			cameraPos.Z = vampPos.Z + LerpF(currentPitch  , 1.0 , -1.0)/60;
+		}
+		else if (
+		FactsQuerySum("acs_giant_curse_activated") > 0
+		)
+		{
+			if (ACSGetCActor('ACS_Transformation_Giant').HasTag('ACS_Transformation_Giant_Weapon_Mode'))
+			{
+				if (cameraDistance < -12)
+				{
+					cameraDistance += 0.125;
+				}
+				else if (cameraDistance > -12)
+				{
+					cameraDistance -= 0.125;
+				}
+				else
+				{
+					cameraDistance = -12;
+				}
+			}
+			else
+			{
+				if (thePlayer.GetStat(BCS_Focus) >= thePlayer.GetStatMax( BCS_Focus ) * 0.9875)
+				{
+					if (cameraDistance < -10)
+					{
+						cameraDistance += 0.125;
+					}
+					else if (cameraDistance > -9)
+					{
+						cameraDistance -= 0.125;
+					}
+					else
+					{
+						cameraDistance = -10;
+					}
+				}
+				else
+				{
+					if (cameraDistance < -8)
+					{
+						cameraDistance += 0.125;
+					}
+					else if (cameraDistance > -8)
+					{
+						cameraDistance -= 0.125;
+					}
+					else
+					{
+						cameraDistance = -8;
+					}
+				}
+			}
+			
+
+			cameraPos = vampPos + VecConeRand(currentHeading, 0, cameraDistance, cameraDistance);
+
+			cameraPos = cameraPos + VecConeRand(currentHeading, 0, LerpF( AbsF(currentPitch)  , 0 , 3.0)/75, LerpF(AbsF(currentPitch)  , 0 , 3.0)/75);
+			cameraPos.Z = vampPos.Z + LerpF(currentPitch  , 1.0 , -1.0)/30;
 		}
 
 		cameraRot.Yaw = currentHeading;
@@ -1026,6 +1122,8 @@ statemachine class ACSPlayerCamera extends CStaticCamera
 	var cameraPos, vampPos : Vector;
 	var cameraRot : EulerAngles;
 
+	var cameraHeight, cameraDistance : float;
+
 	timer function Tick( deltaTime : float , id : int)	{	
 		
 		vampPos = thePlayer.GetWorldPosition();
@@ -1035,6 +1133,11 @@ statemachine class ACSPlayerCamera extends CStaticCamera
 		{
 			vampPos.Z += 4.75;
 		}
+		else if ( thePlayer.HasTag('ACS_GrappleMovingPlayer') 
+		)
+		{
+			vampPos.Z += 1.25;
+		}
 		else if ( thePlayer.HasTag('ACS_In_Dance_Of_Wrath') 
 		|| thePlayer.HasTag('ACS_In_Ciri_Special_Attack')  
 		)
@@ -1042,6 +1145,49 @@ statemachine class ACSPlayerCamera extends CStaticCamera
 			vampPos.Z += 2;
 		}
 		else if (thePlayer.HasTag('ACS_Ghost_Stance_Active')
+		|| thePlayer.HasTag('ACS_Aiming_Bow')
+		)
+		{
+			vampPos.Z += 1.5;
+		}
+		else if (FactsQuerySum("ACS_Azkar_Active") > 0
+		)
+		{
+			if (FactsQuerySum("ACS_Azkar_Aiming") > 0)
+			{
+				if (cameraHeight < 1.5)
+				{
+					cameraHeight += 0.0625;
+				}
+
+				if (cameraHeight > 1.5)
+				{
+					cameraHeight -= 0.0625;
+				}
+
+				vampPos.Z += cameraHeight;
+			}
+			else 
+			{
+				if (cameraHeight < 1.5)
+				{
+					cameraHeight += 0.0625;
+				}
+
+				if (cameraHeight > 1.5)
+				{
+					cameraHeight -= 0.0625;
+				}
+
+				vampPos.Z += cameraHeight;
+			}
+		}
+		else if (ACSGetCEntity('ACS_Wings_Entity')
+		)
+		{
+			vampPos.Z += 2;
+		}
+		else if (thePlayer.HasTag('acs_vampire_claws_equipped')
 		)
 		{
 			vampPos.Z += 1.5;
@@ -1092,21 +1238,132 @@ statemachine class ACSPlayerCamera extends CStaticCamera
 		)
 		{
 			cameraPos = vampPos + VecConeRand(currentHeading, 0, -12.5, -12.5);
+
+			cameraPos = cameraPos + VecConeRand(currentHeading, 0, LerpF( AbsF(currentPitch)  , 0 , 3.0)/100, LerpF(AbsF(currentPitch)  , 0 , 3.0)/100);
+			cameraPos.Z = vampPos.Z + LerpF(currentPitch  , 1.0 , -1.0)/80;
 		}
 		else if (thePlayer.HasTag('ACS_Ghost_Stance_Active')
 		)
 		{
 			cameraPos = vampPos + thePlayer.GetWorldRight() * 0.5 + VecConeRand(currentHeading, 0, -1.5, -1.5);
+
+			cameraPos = cameraPos + VecConeRand(currentHeading, 0, LerpF( AbsF(currentPitch)  , 0 , 3.0)/100, LerpF(AbsF(currentPitch)  , 0 , 3.0)/100);
+			cameraPos.Z = vampPos.Z + LerpF(currentPitch  , 1.0 , -1.0)/80;
+		}
+		else if (FactsQuerySum("ACS_Azkar_Active") > 0
+		)
+		{
+			if (FactsQuerySum("ACS_Azkar_Aiming") > 0)
+			{
+				if (cameraDistance < -1)
+				{
+					cameraDistance += 0.0625;
+				}
+				else if (cameraDistance > -1)
+				{
+					cameraDistance -= 0.0625;
+				}
+				else
+				{
+					cameraDistance = -1;
+				}
+
+				cameraPos = vampPos + thePlayer.GetWorldRight() * 1 + VecConeRand(currentHeading, 0, cameraDistance, cameraDistance);
+
+				cameraPos = cameraPos + VecConeRand(currentHeading, 0, LerpF( AbsF(currentPitch)  , 0 , 3.0)/100, LerpF(AbsF(currentPitch)  , 0 , 3.0)/100);
+				cameraPos.Z = vampPos.Z + LerpF(currentPitch  , 1.0 , -1.0)/80;
+			}
+			else
+			{
+				if (cameraDistance < -2.5)
+				{
+					cameraDistance += 0.0625;
+				}
+				else if (cameraDistance > -2.5)
+				{
+					cameraDistance -= 0.0625;
+				}
+				else
+				{
+					cameraDistance = -2.5;
+				}
+
+				cameraPos = vampPos + thePlayer.GetWorldRight() * 0.5 + VecConeRand(currentHeading, 0, cameraDistance, cameraDistance);
+
+				cameraPos = cameraPos + VecConeRand(currentHeading, 0, LerpF( AbsF(currentPitch)  , 0 , 3.0)/100, LerpF(AbsF(currentPitch)  , 0 , 3.0)/100);
+				cameraPos.Z = vampPos.Z + LerpF(currentPitch  , 1.0 , -1.0)/80;
+			}
+		}
+		else if ( thePlayer.HasTag('ACS_GrappleMovingPlayer') 
+		)
+		{
+			cameraPos = vampPos + VecConeRand(currentHeading, 0, -3.5, -3.5);
+
+			cameraPos = cameraPos + VecConeRand(currentHeading, 0, LerpF( AbsF(currentPitch)  , 0 , 3.0)/100, LerpF(AbsF(currentPitch)  , 0 , 3.0)/100);
+			cameraPos.Z = vampPos.Z + LerpF(currentPitch  , 1.0 , -1.0)/80;
+		}
+		else if (ACSGetCEntity('ACS_Wings_Entity')
+		)
+		{
+			cameraPos = vampPos + VecConeRand(currentHeading, 0, -6.5, -6.5);
+
+			cameraPos = cameraPos + VecConeRand(currentHeading, 0, LerpF( AbsF(currentPitch)  , 0 , 3.0)/25, LerpF(AbsF(currentPitch)  , 0 , 3.0)/25);
+			cameraPos.Z = vampPos.Z + LerpF(currentPitch  , 1.0 , -1.0)/20;
+		}
+		else if (thePlayer.HasTag('acs_vampire_claws_equipped')
+		)
+		{
+			if (thePlayer.HasTag('ACS_IsPerformingFinisher'))
+			{
+				if (cameraDistance < -3)
+				{
+					cameraDistance += 0.0625;
+				}
+				else if (cameraDistance > -3)
+				{
+					cameraDistance -= 0.0625;
+				}
+				else
+				{
+					cameraDistance = -3;
+				}
+
+				cameraPos = vampPos + thePlayer.GetWorldRight() * 1 + VecConeRand(currentHeading, 0, cameraDistance, cameraDistance);
+
+				cameraPos = cameraPos + VecConeRand(currentHeading, 0, LerpF( AbsF(currentPitch)  , 0 , 3.0)/50, LerpF(AbsF(currentPitch)  , 0 , 3.0)/50);
+				cameraPos.Z = vampPos.Z + LerpF(currentPitch  , 1.0 , -1.0)/40;
+			}
+			else
+			{
+				if (cameraDistance < -7.5)
+				{
+					cameraDistance += 0.0625;
+				}
+				else if (cameraDistance > -7.5)
+				{
+					cameraDistance -= 0.0625;
+				}
+				else
+				{
+					cameraDistance = -7.5;
+				}
+
+				cameraPos = vampPos + thePlayer.GetWorldRight() * 0.5 + VecConeRand(currentHeading, 0, cameraDistance, cameraDistance);
+
+				cameraPos = cameraPos + VecConeRand(currentHeading, 0, LerpF( AbsF(currentPitch)  , 0 , 3.0)/50, LerpF(AbsF(currentPitch)  , 0 , 3.0)/50);
+				cameraPos.Z = vampPos.Z + LerpF(currentPitch  , 1.0 , -1.0)/40;
+			}
 		}
 		else
 		{
-			cameraPos = vampPos + VecConeRand(currentHeading, 0, -2.5, -2.5);
+			cameraPos = vampPos + VecConeRand(currentHeading, 0, -8.5, -8.5);
+
+			cameraPos = cameraPos + VecConeRand(currentHeading, 0, LerpF( AbsF(currentPitch)  , 0 , 3.0)/50, LerpF(AbsF(currentPitch)  , 0 , 3.0)/50);
+			cameraPos.Z = vampPos.Z + LerpF(currentPitch  , 1.0 , -1.0)/40;
 		}
 
-		cameraPos = cameraPos + VecConeRand(currentHeading, 0, LerpF( AbsF(currentPitch)  , 0 , 3.0)/100, LerpF(AbsF(currentPitch)  , 0 , 3.0)/100);
-		cameraPos.Z = vampPos.Z + LerpF(currentPitch  , 1.0 , -1.0)/80;
-
 		cameraRot.Yaw = currentHeading;
+
 		cameraRot.Pitch = currentPitch;
 		
 		this.TeleportWithRotation(cameraPos, cameraRot);

@@ -5,7 +5,7 @@ function ACS_Jump_Extend_Init( type : EJumpType )
 	
 	if ( 
 	ACS_Enabled() 
-	&& ACS_JumpExtend_Enabled() 
+	&& (ACS_Settings_Main_Bool('EHmodJumpSettings','EHmodJumpExtend', false) || ACS_Armor_Equipped_Check())
 	&& !GetWitcherPlayer().HasTag('acs_in_wraith') 
 	&& !ACS_Transformation_Activated_Check()
 	&& GetWitcherPlayer().IsAlive()
@@ -20,7 +20,7 @@ function ACS_Jump_Extend_Init( type : EJumpType )
 	)
 	)
 	{	
-		ACS_ThingsThatShouldBeRemoved();
+		ACS_ThingsThatShouldBeRemoved(true);
 		vACS_JumpExtend.ACS_JumpExtend();
 	}
 }
@@ -79,7 +79,7 @@ state ACS_JumpExtendState in cACS_JumpExtend
 		momentum = mass * velocity;
 		
 		if (!GetWitcherPlayer().HasTag('acs_in_wraith')
-		&& ACS_JumpExtend_Effect_Enabled())
+		&& ACS_Settings_Main_Bool('EHmodJumpSettings','EHmodJumpExtendEffect', false))
 		{
 			GetWitcherPlayer().PlayEffect( 'bruxa_dash_trails_backup' );
 			GetWitcherPlayer().StopEffect( 'bruxa_dash_trails_backup' );
@@ -98,7 +98,6 @@ state ACS_JumpExtendState in cACS_JumpExtend
 		!GetWitcherPlayer().GetIsSprinting() 
 		&& !GetWitcherPlayer().HasTag('acs_in_wraith') 
 		&& !GetWitcherPlayer().HasTag('acs_igni_sword_equipped')
-		&& !ACS_SwordWalk_Enabled()
 		)
 		{
 			GetACSWatcher().dodge_timer_slideback_actual();
@@ -123,17 +122,17 @@ state ACS_JumpExtendState in cACS_JumpExtend
 		
 		if (GetWitcherPlayer().GetIsSprinting())
 		{
-			dest = GetWitcherPlayer().PredictWorldPosition(1.0) + (GetWitcherPlayer().GetHeadingVector() * (ACS_Sprinting_JumpExtend_GetDistance()  ));
+			dest = GetWitcherPlayer().PredictWorldPosition(1.0) + (GetWitcherPlayer().GetHeadingVector() * (ACS_Settings_Main_Int('EHmodJumpSettings','EHmodJumpExtendSprintingDistance', 12)  ));
 			
-			dest.Z += ACS_Sprinting_JumpExtend_GetHeight();
+			dest.Z += ACS_Settings_Main_Int('EHmodJumpSettings','EHmodJumpExtendSprintingHeight', 7);
 			
-			movementAdjustor.MaxLocationAdjustmentDistance(ticket, true, ACS_Sprinting_JumpExtend_GetDistance() + 5, ACS_Sprinting_JumpExtend_GetHeight() + 5);
+			movementAdjustor.MaxLocationAdjustmentDistance(ticket, true, ACS_Settings_Main_Int('EHmodJumpSettings','EHmodJumpExtendSprintingDistance', 12) + 5, ACS_Settings_Main_Int('EHmodJumpSettings','EHmodJumpExtendSprintingHeight', 7) + 5);
 
 			if (
-			(ACS_Sprinting_JumpExtend_GetDistance() >= 15 
-			|| ACS_Sprinting_JumpExtend_GetHeight() >= 15)
+			(ACS_Settings_Main_Int('EHmodJumpSettings','EHmodJumpExtendSprintingDistance', 12) >= 15 
+			|| ACS_Settings_Main_Int('EHmodJumpSettings','EHmodJumpExtendSprintingHeight', 7) >= 15)
 			&& !GetWitcherPlayer().HasTag('acs_in_wraith')
-			&& ACS_JumpExtend_Effect_Enabled()
+			&& ACS_Settings_Main_Bool('EHmodJumpSettings','EHmodJumpExtendEffect', false)
 			)
 			{
 				GetWitcherPlayer().StopEffect('smoke_explosion');
@@ -145,17 +144,17 @@ state ACS_JumpExtendState in cACS_JumpExtend
 		}
 		else
 		{
-			dest = GetWitcherPlayer().PredictWorldPosition(1.0) + (GetWitcherPlayer().GetHeadingVector() * (ACS_Normal_JumpExtend_GetDistance() ));
+			dest = GetWitcherPlayer().PredictWorldPosition(1.0) + (GetWitcherPlayer().GetHeadingVector() * (ACS_Settings_Main_Int('EHmodJumpSettings','EHmodJumpExtendNormalDistance', 10) ));
 			
-			dest.Z += ACS_Normal_JumpExtend_GetHeight() ;
+			dest.Z += ACS_Settings_Main_Int('EHmodJumpSettings','EHmodJumpExtendNormalHeight', 5) ;
 			
-			movementAdjustor.MaxLocationAdjustmentDistance(ticket, true, ACS_Normal_JumpExtend_GetDistance() + 5, ACS_Normal_JumpExtend_GetHeight() + 5);
+			movementAdjustor.MaxLocationAdjustmentDistance(ticket, true, ACS_Settings_Main_Int('EHmodJumpSettings','EHmodJumpExtendNormalDistance', 10) + 5, ACS_Settings_Main_Int('EHmodJumpSettings','EHmodJumpExtendNormalHeight', 5) + 5);
 
 			if (
-			(ACS_Normal_JumpExtend_GetDistance() >= 15 
-			|| ACS_Normal_JumpExtend_GetHeight() >= 15)
+			(ACS_Settings_Main_Int('EHmodJumpSettings','EHmodJumpExtendNormalDistance', 10) >= 15 
+			|| ACS_Settings_Main_Int('EHmodJumpSettings','EHmodJumpExtendNormalHeight', 5) >= 15)
 			&& !GetWitcherPlayer().HasTag('acs_in_wraith')
-			&& ACS_JumpExtend_Effect_Enabled()
+			&& ACS_Settings_Main_Bool('EHmodJumpSettings','EHmodJumpExtendEffect', false)
 			)
 			{
 				GetWitcherPlayer().StopEffect('smoke_explosion');

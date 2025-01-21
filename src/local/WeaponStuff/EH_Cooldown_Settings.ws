@@ -164,6 +164,8 @@ struct ACS_Cooldown_Manager
 
 	var last_sign_combo_system_activation_time			: float;
 
+	var last_apply_oil_activation_time					: float;
+
 	// Change the values below to adjust the cooldowns of specific attacks or skills.
 
 	default beam_attack_cooldown = 0.25;	
@@ -273,28 +275,23 @@ function ACS_can_perform_light_attack(): bool
 	var property: ACS_Cooldown_Manager;
 	var cooldown : float;
 
-	if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus )/3
-	&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus ) * 2/3) 
-	{	
+	if( thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus )/3) 
+	{
 		cooldown = 0.6;
 	}
-	else if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus ) * 2/3
-	&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus )) 
+	else if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus )/3
+	&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus ) * 2/3) 
 	{	
 		cooldown = 0.5;
 	}
-	else if( thePlayer.GetStat( BCS_Focus ) == thePlayer.GetStatMax(BCS_Focus) ) 
-	{
+	else if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus ) * 2/3)
+	{	
 		cooldown = 0.4;
-	}
-	else
-	{
-		cooldown = 0.7;
 	}
 
 	property = GetACSWatcher().vACS_Cooldown_Manager;
 
-	return (theGame.GetEngineTimeAsSeconds() - property.last_light_attack_time > cooldown) && ACS_BuffCheck();
+	return (theGame.GetEngineTimeAsSeconds() - property.last_light_attack_time > cooldown) ;
 }
 
 function ACS_refresh_light_attack_cooldown() 
@@ -306,7 +303,10 @@ function ACS_refresh_light_attack_cooldown()
 
 	watcher.vACS_Cooldown_Manager.last_light_attack_time = theGame.GetEngineTimeAsSeconds();
 
-	ACS_Size_Revert_And_Enable_Interrupt();
+	if (GetWitcherPlayer().HasTag('ACS_Special_Dodge'))
+	{
+		GetWitcherPlayer().RemoveTag('ACS_Special_Dodge');
+	}
 
 	animatedComponentA = (CAnimatedComponent)thePlayer.GetComponentByClassName( 'CAnimatedComponent' );
 
@@ -318,28 +318,23 @@ function ACS_can_perform_heavy_attack(): bool
 	var property: ACS_Cooldown_Manager;
 	var cooldown : float;
 
-	if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus )/3
-	&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus ) * 2/3) 
-	{	
+	if( thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus )/3) 
+	{
 		cooldown = 0.6;
 	}
-	else if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus ) * 2/3
-	&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus )) 
+	else if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus )/3
+	&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus ) * 2/3) 
 	{	
 		cooldown = 0.5;
 	}
-	else if( thePlayer.GetStat( BCS_Focus ) == thePlayer.GetStatMax(BCS_Focus) ) 
-	{
+	else if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus ) * 2/3)
+	{	
 		cooldown = 0.4;
-	}
-	else
-	{
-		cooldown = 0.7;
 	}
 
 	property = GetACSWatcher().vACS_Cooldown_Manager;
 
-	return (theGame.GetEngineTimeAsSeconds() - property.last_heavy_attack_time > cooldown) && ACS_BuffCheck();
+	return (theGame.GetEngineTimeAsSeconds() - property.last_heavy_attack_time > cooldown) ;
 }
 
 function ACS_refresh_heavy_attack_cooldown() 
@@ -351,7 +346,10 @@ function ACS_refresh_heavy_attack_cooldown()
 
 	watcher.vACS_Cooldown_Manager.last_heavy_attack_time = theGame.GetEngineTimeAsSeconds();
 
-	ACS_Size_Revert_And_Enable_Interrupt();
+	if (GetWitcherPlayer().HasTag('ACS_Special_Dodge'))
+	{
+		GetWitcherPlayer().RemoveTag('ACS_Special_Dodge');
+	}
 
 	animatedComponentA = (CAnimatedComponent)thePlayer.GetComponentByClassName( 'CAnimatedComponent' );
 
@@ -363,28 +361,23 @@ function ACS_can_perform_parry_skill(): bool
 	var property: ACS_Cooldown_Manager;
 	var cooldown : float;
 
-	if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus )/3
-	&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus ) * 2/3) 
-	{	
+	if( thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus )/3) 
+	{
 		cooldown = 0.6;
 	}
-	else if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus ) * 2/3
-	&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus )) 
+	else if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus )/3
+	&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus ) * 2/3) 
 	{	
 		cooldown = 0.5;
 	}
-	else if( thePlayer.GetStat( BCS_Focus ) == thePlayer.GetStatMax(BCS_Focus) ) 
-	{
+	else if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus ) * 2/3)
+	{	
 		cooldown = 0.4;
-	}
-	else
-	{
-		cooldown = 0.7;
 	}
 
 	property = GetACSWatcher().vACS_Cooldown_Manager;
 
-	return (theGame.GetEngineTimeAsSeconds() - property.last_parry_skill_time > cooldown) && ACS_BuffCheck();
+	return (theGame.GetEngineTimeAsSeconds() - property.last_parry_skill_time > cooldown) ;
 }
 
 function ACS_refresh_parry_skill_cooldown() 
@@ -396,7 +389,10 @@ function ACS_refresh_parry_skill_cooldown()
 
 	watcher.vACS_Cooldown_Manager.last_parry_skill_time = theGame.GetEngineTimeAsSeconds();
 
-	ACS_Size_Revert_And_Enable_Interrupt();
+	if (GetWitcherPlayer().HasTag('ACS_Special_Dodge'))
+	{
+		GetWitcherPlayer().RemoveTag('ACS_Special_Dodge');
+	}
 
 	animatedComponentA = (CAnimatedComponent)thePlayer.GetComponentByClassName( 'CAnimatedComponent' );
 
@@ -408,28 +404,23 @@ function ACS_can_perform_parry_skill_doubletap(): bool
 	var property: ACS_Cooldown_Manager;
 	var cooldown : float;
 
-	if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus )/3
-	&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus ) * 2/3) 
-	{	
+	if( thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus )/3) 
+	{
 		cooldown = 0.6;
 	}
-	else if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus ) * 2/3
-	&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus )) 
+	else if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus )/3
+	&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus ) * 2/3) 
 	{	
 		cooldown = 0.5;
 	}
-	else if( thePlayer.GetStat( BCS_Focus ) == thePlayer.GetStatMax(BCS_Focus) ) 
-	{
+	else if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus ) * 2/3)
+	{	
 		cooldown = 0.4;
-	}
-	else
-	{
-		cooldown = 0.7;
 	}
 
 	property = GetACSWatcher().vACS_Cooldown_Manager;
 
-	return (theGame.GetEngineTimeAsSeconds() - property.last_parry_skill_doubletap_time > cooldown) && ACS_BuffCheck();
+	return (theGame.GetEngineTimeAsSeconds() - property.last_parry_skill_doubletap_time > cooldown) ;
 }
 
 function ACS_refresh_parry_skill_doubletap_cooldown() 
@@ -441,7 +432,10 @@ function ACS_refresh_parry_skill_doubletap_cooldown()
 
 	watcher.vACS_Cooldown_Manager.last_parry_skill_doubletap_time = theGame.GetEngineTimeAsSeconds();
 
-	ACS_Size_Revert_And_Enable_Interrupt();
+	if (GetWitcherPlayer().HasTag('ACS_Special_Dodge'))
+	{
+		GetWitcherPlayer().RemoveTag('ACS_Special_Dodge');
+	}
 
 	animatedComponentA = (CAnimatedComponent)thePlayer.GetComponentByClassName( 'CAnimatedComponent' );
 
@@ -453,28 +447,23 @@ function ACS_can_perform_guard_attack(): bool
 	var property: ACS_Cooldown_Manager;
 	var cooldown : float;
 
-	if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus )/3
-	&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus ) * 2/3) 
-	{	
+	if( thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus )/3) 
+	{
 		cooldown = 0.6;
 	}
-	else if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus ) * 2/3
-	&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus )) 
+	else if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus )/3
+	&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus ) * 2/3) 
 	{	
 		cooldown = 0.5;
 	}
-	else if( thePlayer.GetStat( BCS_Focus ) == thePlayer.GetStatMax(BCS_Focus) ) 
-	{
+	else if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus ) * 2/3)
+	{	
 		cooldown = 0.4;
-	}
-	else
-	{
-		cooldown = 0.7;
 	}
 
 	property = GetACSWatcher().vACS_Cooldown_Manager;
 
-	return (theGame.GetEngineTimeAsSeconds() - property.last_guard_attack_time > cooldown) && ACS_BuffCheck();
+	return (theGame.GetEngineTimeAsSeconds() - property.last_guard_attack_time > cooldown) ;
 }
 
 function ACS_refresh_guard_attack_cooldown() 
@@ -486,7 +475,10 @@ function ACS_refresh_guard_attack_cooldown()
 
 	watcher.vACS_Cooldown_Manager.last_guard_attack_time = theGame.GetEngineTimeAsSeconds();
 
-	ACS_Size_Revert_And_Enable_Interrupt();
+	if (GetWitcherPlayer().HasTag('ACS_Special_Dodge'))
+	{
+		GetWitcherPlayer().RemoveTag('ACS_Special_Dodge');
+	}
 
 	animatedComponentA = (CAnimatedComponent)thePlayer.GetComponentByClassName( 'CAnimatedComponent' );
 
@@ -498,28 +490,23 @@ function ACS_can_perform_guard_doubletap_attack(): bool
 	var property: ACS_Cooldown_Manager;
 	var cooldown : float;
 
-	if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus )/3
-	&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus ) * 2/3) 
-	{	
+	if( thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus )/3) 
+	{
 		cooldown = 0.6;
 	}
-	else if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus ) * 2/3
-	&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus )) 
+	else if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus )/3
+	&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus ) * 2/3) 
 	{	
 		cooldown = 0.5;
 	}
-	else if( thePlayer.GetStat( BCS_Focus ) == thePlayer.GetStatMax(BCS_Focus) ) 
-	{
+	else if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus ) * 2/3)
+	{	
 		cooldown = 0.4;
-	}
-	else
-	{
-		cooldown = 0.7;
 	}
 
 	property = GetACSWatcher().vACS_Cooldown_Manager;
 
-	return (theGame.GetEngineTimeAsSeconds() - property.last_guard_doubletap_attack_time > cooldown) && ACS_BuffCheck();
+	return (theGame.GetEngineTimeAsSeconds() - property.last_guard_doubletap_attack_time > cooldown) ;
 }
 
 function ACS_refresh_guard_doubletap_attack_cooldown() 
@@ -531,7 +518,10 @@ function ACS_refresh_guard_doubletap_attack_cooldown()
 
 	watcher.vACS_Cooldown_Manager.last_guard_doubletap_attack_time = theGame.GetEngineTimeAsSeconds();
 
-	ACS_Size_Revert_And_Enable_Interrupt();
+	if (GetWitcherPlayer().HasTag('ACS_Special_Dodge'))
+	{
+		GetWitcherPlayer().RemoveTag('ACS_Special_Dodge');
+	}
 
 	animatedComponentA = (CAnimatedComponent)thePlayer.GetComponentByClassName( 'CAnimatedComponent' );
 
@@ -543,28 +533,23 @@ function ACS_can_perform_special_attack(): bool
 	var property: ACS_Cooldown_Manager;
 	var cooldown : float;
 
-	if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus )/3
-	&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus ) * 2/3) 
-	{	
-		cooldown = 1.0;
+	if( thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus )/3) 
+	{
+		cooldown = 1;
 	}
-	else if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus ) * 2/3
-	&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus )) 
+	else if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus )/3
+	&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus ) * 2/3) 
 	{	
 		cooldown = 0.9;
 	}
-	else if( thePlayer.GetStat( BCS_Focus ) == thePlayer.GetStatMax(BCS_Focus) ) 
-	{
+	else if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus ) * 2/3)
+	{	
 		cooldown = 0.8;
-	}
-	else
-	{
-		cooldown = 1.1;
 	}
 
 	property = GetACSWatcher().vACS_Cooldown_Manager;
 
-	return (theGame.GetEngineTimeAsSeconds() - property.last_special_attack_time > cooldown) && ACS_BuffCheck();
+	return (theGame.GetEngineTimeAsSeconds() - property.last_special_attack_time > cooldown) ;
 }
 
 function ACS_refresh_special_attack_cooldown() 
@@ -576,7 +561,10 @@ function ACS_refresh_special_attack_cooldown()
 
 	watcher.vACS_Cooldown_Manager.last_special_attack_time = theGame.GetEngineTimeAsSeconds();
 
-	ACS_Size_Revert_And_Enable_Interrupt();
+	if (GetWitcherPlayer().HasTag('ACS_Special_Dodge'))
+	{
+		GetWitcherPlayer().RemoveTag('ACS_Special_Dodge');
+	}
 
 	animatedComponentA = (CAnimatedComponent)thePlayer.GetComponentByClassName( 'CAnimatedComponent' );
 
@@ -595,29 +583,24 @@ function ACS_can_bruxa_dash(): bool
 	}
 	else
 	{
-		if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus )/3
-		&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus ) * 2/3) 
-		{	
+		if( thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus )/3) 
+		{
 			cooldown = 0.575;
 		}
-		else if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus ) * 2/3
-		&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus )) 
+		else if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus )/3
+		&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus ) * 2/3) 
 		{	
 			cooldown = 0.475;
 		}
-		else if( thePlayer.GetStat( BCS_Focus ) == thePlayer.GetStatMax(BCS_Focus) ) 
-		{
+		else if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus ) * 2/3)
+		{	
 			cooldown = 0.375;
-		}
-		else
-		{
-			cooldown = 0.675;
 		}
 	}
 	
 	property = GetACSWatcher().vACS_Cooldown_Manager;
 
-	return (theGame.GetEngineTimeAsSeconds() - property.last_bruxa_dash_time > cooldown) && ACS_BuffCheck();
+	return (theGame.GetEngineTimeAsSeconds() - property.last_bruxa_dash_time > cooldown) ;
 }
 
 function ACS_refresh_bruxa_dash_cooldown() 
@@ -628,7 +611,10 @@ function ACS_refresh_bruxa_dash_cooldown()
 
 	watcher.vACS_Cooldown_Manager.last_bruxa_dash_time = theGame.GetEngineTimeAsSeconds();
 
-	ACS_Size_Revert_And_Enable_Interrupt();
+	if (GetWitcherPlayer().HasTag('ACS_Special_Dodge'))
+	{
+		GetWitcherPlayer().RemoveTag('ACS_Special_Dodge');
+	}
 }
 
 function ACS_can_dodge(): bool 
@@ -636,28 +622,23 @@ function ACS_can_dodge(): bool
 	var property: ACS_Cooldown_Manager;
 	var cooldown : float;
 
-	if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus )/3
-	&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus ) * 2/3) 
-	{	
+	if( thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus )/3) 
+	{
 		cooldown = 0.575;
 	}
-	else if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus ) * 2/3
-	&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus )) 
+	else if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus )/3
+	&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus ) * 2/3) 
 	{	
 		cooldown = 0.475;
 	}
-	else if( thePlayer.GetStat( BCS_Focus ) == thePlayer.GetStatMax(BCS_Focus) ) 
-	{
+	else if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus ) * 2/3)
+	{	
 		cooldown = 0.375;
-	}
-	else
-	{
-		cooldown = 0.675;
 	}
 
 	property = GetACSWatcher().vACS_Cooldown_Manager;
 
-	return (theGame.GetEngineTimeAsSeconds() - property.last_dodge_time > cooldown) && ACS_BuffCheck();
+	return (theGame.GetEngineTimeAsSeconds() - property.last_dodge_time > cooldown) ;
 }
 
 function ACS_refresh_dodge_cooldown() 
@@ -669,7 +650,10 @@ function ACS_refresh_dodge_cooldown()
 
 	watcher.vACS_Cooldown_Manager.last_dodge_time = theGame.GetEngineTimeAsSeconds();
 
-	ACS_Size_Revert_And_Enable_Interrupt();
+	if (GetWitcherPlayer().HasTag('ACS_Special_Dodge'))
+	{
+		GetWitcherPlayer().RemoveTag('ACS_Special_Dodge');
+	}
 
 	animatedComponentA = (CAnimatedComponent)thePlayer.GetComponentByClassName( 'CAnimatedComponent' );
 
@@ -681,28 +665,23 @@ function ACS_can_special_dodge(): bool
 	var property: ACS_Cooldown_Manager;
 	var cooldown : float;
 
-	if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus )/3
-	&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus ) * 2/3) 
-	{	
+	if( thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus )/3) 
+	{
 		cooldown = 2;
 	}
-	else if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus ) * 2/3
-	&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus )) 
+	else if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus )/3
+	&& thePlayer.GetStat( BCS_Focus ) < thePlayer.GetStatMax( BCS_Focus ) * 2/3) 
 	{	
 		cooldown = 1.5;
 	}
-	else if( thePlayer.GetStat( BCS_Focus ) == thePlayer.GetStatMax(BCS_Focus) ) 
-	{
+	else if( thePlayer.GetStat( BCS_Focus ) >= thePlayer.GetStatMax( BCS_Focus ) * 2/3)
+	{	
 		cooldown = 1;
-	}
-	else
-	{
-		cooldown = 2.5;
 	}
 
 	property = GetACSWatcher().vACS_Cooldown_Manager;
 
-	return (theGame.GetEngineTimeAsSeconds() - property.last_special_dodge_time > cooldown) && ACS_BuffCheck();
+	return (theGame.GetEngineTimeAsSeconds() - property.last_special_dodge_time > cooldown) ;
 }
 
 function ACS_refresh_special_dodge_cooldown() 
@@ -714,7 +693,10 @@ function ACS_refresh_special_dodge_cooldown()
 
 	watcher.vACS_Cooldown_Manager.last_special_dodge_time = theGame.GetEngineTimeAsSeconds();
 
-	ACS_Size_Revert_And_Enable_Interrupt();
+	if (GetWitcherPlayer().HasTag('ACS_Special_Dodge'))
+	{
+		GetWitcherPlayer().RemoveTag('ACS_Special_Dodge');
+	}
 
 	animatedComponentA = (CAnimatedComponent)thePlayer.GetComponentByClassName( 'CAnimatedComponent' );
 
@@ -738,7 +720,10 @@ function ACS_refresh_beam_attack_cooldown()
 
 	watcher.vACS_Cooldown_Manager.last_beam_attack_time = theGame.GetEngineTimeAsSeconds();
 
-	ACS_Size_Revert_And_Enable_Interrupt();
+	if (GetWitcherPlayer().HasTag('ACS_Special_Dodge'))
+	{
+		GetWitcherPlayer().RemoveTag('ACS_Special_Dodge');
+	}
 
 	
 }
@@ -760,7 +745,10 @@ function ACS_refresh_bow_stationary_cooldown()
 
 	watcher.vACS_Cooldown_Manager.last_shoot_bow_stationary_time = theGame.GetEngineTimeAsSeconds();
 
-	ACS_Size_Revert_And_Enable_Interrupt();
+	if (GetWitcherPlayer().HasTag('ACS_Special_Dodge'))
+	{
+		GetWitcherPlayer().RemoveTag('ACS_Special_Dodge');
+	}
 
 	
 }
@@ -782,7 +770,10 @@ function ACS_refresh_bow_moving_cooldown()
 
 	watcher.vACS_Cooldown_Manager.last_shoot_bow_moving_time = theGame.GetEngineTimeAsSeconds();
 
-	ACS_Size_Revert_And_Enable_Interrupt();
+	if (GetWitcherPlayer().HasTag('ACS_Special_Dodge'))
+	{
+		GetWitcherPlayer().RemoveTag('ACS_Special_Dodge');
+	}
 
 	
 }
@@ -792,7 +783,7 @@ function ACS_can_shoot_crossbow(): bool
 	var property: ACS_Cooldown_Manager;
 	var cooldown: float;
 
-	if ( thePlayer.GetStat(BCS_Focus) == thePlayer.GetStatMax(BCS_Focus) )
+	if ( thePlayer.GetStat(BCS_Focus) >= thePlayer.GetStatMax( BCS_Focus ) * 0.9 )
 	{
 		cooldown = 0.2;
 	}
@@ -814,24 +805,12 @@ function ACS_refresh_crossbow_cooldown()
 
 	watcher.vACS_Cooldown_Manager.last_shoot_crossbow_time = theGame.GetEngineTimeAsSeconds();
 
-	ACS_Size_Revert_And_Enable_Interrupt();
-
-	
-}
-
-function ACS_Size_Revert_And_Enable_Interrupt()
-{
-	if (GetWitcherPlayer().HasTag('ACS_Size_Adjusted'))
-	{
-		GetACSWatcher().Grow_Geralt_Immediate_Fast();
-
-		GetWitcherPlayer().RemoveTag('ACS_Size_Adjusted');
-	}
-
 	if (GetWitcherPlayer().HasTag('ACS_Special_Dodge'))
 	{
 		GetWitcherPlayer().RemoveTag('ACS_Special_Dodge');
 	}
+
+	
 }
 
 function ACS_can_spawn_forest_god_shadows(): bool 
@@ -840,7 +819,7 @@ function ACS_can_spawn_forest_god_shadows(): bool
 
 	property = GetACSWatcher().vACS_Cooldown_Manager;
 
-	return theGame.GetEngineTimeAsSeconds() - property.last_forest_god_shadow_spawn_time > ACS_ShadowsSpawnDelayTimeInSeconds();
+	return theGame.GetEngineTimeAsSeconds() - property.last_forest_god_shadow_spawn_time > ACS_Settings_Main_Float('EHmodEventsSettings','EHmodShadowsSpawnDelayInSeconds', 420);
 }
 
 function ACS_refresh_forest_god_shadows_cooldown() 
@@ -1121,7 +1100,10 @@ function ACS_refresh_transformation_light_attack_cooldown()
 
 	watcher.vACS_Cooldown_Manager.last_transformation_light_attack_time = theGame.GetEngineTimeAsSeconds();
 
-	ACS_Size_Revert_And_Enable_Interrupt();
+	if (GetWitcherPlayer().HasTag('ACS_Special_Dodge'))
+	{
+		GetWitcherPlayer().RemoveTag('ACS_Special_Dodge');
+	}
 
 	
 }
@@ -1143,7 +1125,10 @@ function ACS_refresh_transformation_heavy_attack_cooldown()
 
 	watcher.vACS_Cooldown_Manager.last_transformation_heavy_attack_time = theGame.GetEngineTimeAsSeconds();
 
-	ACS_Size_Revert_And_Enable_Interrupt();
+	if (GetWitcherPlayer().HasTag('ACS_Special_Dodge'))
+	{
+		GetWitcherPlayer().RemoveTag('ACS_Special_Dodge');
+	}
 
 	
 }
@@ -1165,7 +1150,10 @@ function ACS_refresh_transformation_special_attack_cooldown()
 
 	watcher.vACS_Cooldown_Manager.last_transformation_special_attack_time = theGame.GetEngineTimeAsSeconds();
 
-	ACS_Size_Revert_And_Enable_Interrupt();
+	if (GetWitcherPlayer().HasTag('ACS_Special_Dodge'))
+	{
+		GetWitcherPlayer().RemoveTag('ACS_Special_Dodge');
+	}
 
 	
 }
@@ -1187,7 +1175,10 @@ function ACS_refresh_transformation_dodge_cooldown()
 
 	watcher.vACS_Cooldown_Manager.last_transformation_dodge_time = theGame.GetEngineTimeAsSeconds();
 
-	ACS_Size_Revert_And_Enable_Interrupt();
+	if (GetWitcherPlayer().HasTag('ACS_Special_Dodge'))
+	{
+		GetWitcherPlayer().RemoveTag('ACS_Special_Dodge');
+	}
 
 	
 }
@@ -1216,7 +1207,7 @@ function ACS_can_spawn_wild_hunt_warriors(): bool
 
 	property = GetACSWatcher().vACS_Cooldown_Manager;
 
-	return theGame.GetEngineTimeAsSeconds() - property.last_wild_hunt_warriors_spawn_time > ACS_WildhuntSpawnDelayTimeInSeconds();
+	return theGame.GetEngineTimeAsSeconds() - property.last_wild_hunt_warriors_spawn_time > ACS_Settings_Main_Float('EHmodEventsSettings','EHmodWildhuntSpawnDelayInSeconds', 840);
 }
 
 function ACS_refresh_wild_hunt_warriors_spawn_cooldown() 
@@ -1288,7 +1279,7 @@ function ACS_can_spawn_nightstalker(): bool
 
 	property = GetACSWatcher().vACS_Cooldown_Manager;
 
-	return theGame.GetEngineTimeAsSeconds() - property.last_nightstalker_spawn_time > ACS_NightStalkerSpawnDelayTimeInSeconds();
+	return theGame.GetEngineTimeAsSeconds() - property.last_nightstalker_spawn_time > ACS_Settings_Main_Float('EHmodEventsSettings','EHmodNightStalkerSpawnDelayInSeconds',840);
 }
 
 function ACS_refresh_nightstalker_spawn_cooldown() 
@@ -1672,7 +1663,7 @@ function ACS_can_use_aard(): bool
 
 	property = GetACSWatcher().vACS_Cooldown_Manager;
 
-	if (ACS_GM_Installed())
+	if (ACS_Is_DLC_Installed('dlc_spectre'))
 	{
 		configValueString = ACSSettingsGetConfigValue('spectreGameplayOptions','spectreSignCooldown');
 		configValue =(float) configValueString;
@@ -1705,7 +1696,7 @@ function ACS_can_use_axii(): bool
 
 	property = GetACSWatcher().vACS_Cooldown_Manager;
 
-	if (ACS_GM_Installed())
+	if (ACS_Is_DLC_Installed('dlc_spectre'))
 	{
 		configValueString = ACSSettingsGetConfigValue('spectreGameplayOptions','spectreSignCooldown');
 		configValue =(float) configValueString;
@@ -1738,7 +1729,7 @@ function ACS_can_use_igni(): bool
 
 	property = GetACSWatcher().vACS_Cooldown_Manager;
 
-	if (ACS_GM_Installed())
+	if (ACS_Is_DLC_Installed('dlc_spectre'))
 	{
 		configValueString = ACSSettingsGetConfigValue('spectreGameplayOptions','spectreSignCooldown');
 		configValue =(float) configValueString;
@@ -1771,7 +1762,7 @@ function ACS_can_use_quen(): bool
 
 	property = GetACSWatcher().vACS_Cooldown_Manager;
 
-	if (ACS_GM_Installed())
+	if (ACS_Is_DLC_Installed('dlc_spectre'))
 	{
 		configValueString = ACSSettingsGetConfigValue('spectreGameplayOptions','spectreSignCooldown');
 		configValue =(float) configValueString;
@@ -1804,7 +1795,7 @@ function ACS_can_use_yrden(): bool
 
 	property = GetACSWatcher().vACS_Cooldown_Manager;
 
-	if (ACS_GM_Installed())
+	if (ACS_Is_DLC_Installed('dlc_spectre'))
 	{
 		configValueString = ACSSettingsGetConfigValue('spectreGameplayOptions','spectreSignCooldown');
 		configValue =(float) configValueString;
@@ -1837,7 +1828,7 @@ function ACS_can_use_whirl(): bool
 
 	property = GetACSWatcher().vACS_Cooldown_Manager;
 
-	if (ACS_GM_Installed())
+	if (ACS_Is_DLC_Installed('dlc_spectre'))
 	{
 		configValueString = ACSSettingsGetConfigValue('spectreGameplayOptions','spectreMeleeSpecialCooldown');
 		configValue =(float) configValueString;
@@ -1870,7 +1861,7 @@ function ACS_can_use_rend(): bool
 
 	property = GetACSWatcher().vACS_Cooldown_Manager;
 
-	if (ACS_GM_Installed())
+	if (ACS_Is_DLC_Installed('dlc_spectre'))
 	{
 		configValueString = ACSSettingsGetConfigValue('spectreGameplayOptions','spectreMeleeSpecialCooldown');
 		configValue =(float) configValueString;
@@ -1901,7 +1892,7 @@ function ACS_can_spawn_elderblood_assassin(): bool
 
 	property = GetACSWatcher().vACS_Cooldown_Manager;
 
-	return theGame.GetEngineTimeAsSeconds() - property.last_elderblood_assassin_spawn_time > ACS_ElderbloodAssassinSpawnDelayTimeInSeconds();
+	return theGame.GetEngineTimeAsSeconds() - property.last_elderblood_assassin_spawn_time > ACS_Settings_Main_Float('EHmodEventsSettings','EHmodElderbloodAssassinSpawnDelayInSeconds',220);
 }
 
 function ACS_refresh_elderblood_assassin_spawn_cooldown() 
@@ -1919,7 +1910,7 @@ function ACS_can_spawn_blood_spatter(): bool
 
 	property = GetACSWatcher().vACS_Cooldown_Manager;
 
-	return theGame.GetEngineTimeAsSeconds() - property.last_blood_spatter_spawn_time > 0.5;
+	return theGame.GetEngineTimeAsSeconds() - property.last_blood_spatter_spawn_time > 0.125;
 }
 
 function ACS_refresh_blood_spatter_spawn_cooldown() 
@@ -1955,7 +1946,7 @@ function ACS_can_activate_sign_combo_system(): bool
 
 	property = GetACSWatcher().vACS_Cooldown_Manager;
 
-	return theGame.GetEngineTimeAsSeconds() - property.last_sign_combo_system_activation_time > ACS_SignComboSystemCooldown();
+	return theGame.GetEngineTimeAsSeconds() - property.last_sign_combo_system_activation_time > ACS_Settings_Main_Float('EHmodSignComboSystemSettings','EHmodSignComboSystemCooldown', 10);
 }
 
 function ACS_refresh_sign_combo_system_cooldown() 
@@ -1965,4 +1956,22 @@ function ACS_refresh_sign_combo_system_cooldown()
 	watcher = (W3ACSWatcher)theGame.GetEntityByTag( 'acswatcher' );
 
 	watcher.vACS_Cooldown_Manager.last_sign_combo_system_activation_time = theGame.GetEngineTimeAsSeconds();
+}
+
+function ACS_can_apply_oil(): bool 
+{
+	var property: ACS_Cooldown_Manager;
+
+	property = GetACSWatcher().vACS_Cooldown_Manager;
+
+	return theGame.GetEngineTimeAsSeconds() - property.last_apply_oil_activation_time > 1;
+}
+
+function ACS_refresh_apply_oil_cooldown() 
+{
+	var watcher: W3ACSWatcher;
+
+	watcher = (W3ACSWatcher)theGame.GetEntityByTag( 'acswatcher' );
+
+	watcher.vACS_Cooldown_Manager.last_apply_oil_activation_time = theGame.GetEngineTimeAsSeconds();
 }

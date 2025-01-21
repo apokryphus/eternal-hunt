@@ -50,7 +50,7 @@ state WildHuntBlink_Engage in cWildHuntBlink
 
 		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
 
-		ACS_ThingsThatShouldBeRemoved();
+		ACS_ThingsThatShouldBeRemoved(true);
 		
 		ACS_ExplorationDelayHack();
 
@@ -82,7 +82,7 @@ state WildHuntBlink_Engage in cWildHuntBlink
 			thePlayer.SoundEvent( "monster_caretaker_mv_footstep" );
 		}
 
-		if ( ACS_StaminaBlockAction_Enabled() 
+		if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 		&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 		)
 		{
@@ -694,7 +694,7 @@ state WildHuntBlink_Engage in cWildHuntBlink
 
 			ent.DestroyAfter(2);
 
-			if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled())
+			if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false))
 			{
 				GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 				GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -718,7 +718,7 @@ state WildHuntBlink_Engage in cWildHuntBlink
 		{
 			GetACSWatcher().dodge_timer_actual();
 
-			if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled())
+			if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false))
 			{
 				GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails' );
 				GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
@@ -884,7 +884,7 @@ state WildHuntBlink_Engage in cWildHuntBlink
 
 			ent.DestroyAfter(2);
 
-			if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled())
+			if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false))
 			{
 				GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 				GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -971,7 +971,7 @@ state WildHuntBlink_Engage in cWildHuntBlink
 
 			//ent.DestroyAfter(2);
 
-			if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled())
+			if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false))
 			{
 				GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 				GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -1062,7 +1062,7 @@ state WildHuntBlink_Engage in cWildHuntBlink
 
 			//ent.DestroyAfter(2);
 
-			if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled()) 
+			if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false)) 
 			{
 				GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 				GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -1219,7 +1219,7 @@ state WildHuntBlink_Engage in cWildHuntBlink
 
 			//ent.DestroyAfter(2);
 
-			if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+			if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 			{
 				GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 				GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -1306,7 +1306,7 @@ state WildHuntBlink_Engage in cWildHuntBlink
 
 			//ent.DestroyAfter(2);
 
-			if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+			if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 			{
 				GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 				GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -1812,7 +1812,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
 
-		ACS_ThingsThatShouldBeRemoved();
+		ACS_ThingsThatShouldBeRemoved(true);
 		
 		ACS_ExplorationDelayHack();
 
@@ -1845,11 +1845,11 @@ state ACS_RollInit_Engage in cACS_RollInit
 		}
 
 		if (
-		GetWitcherPlayer().HasTag('acs_bow_active')
-		|| GetWitcherPlayer().HasTag('acs_crossbow_active')
+		GetWitcherPlayer().HasTag('acs_crossbow_active')
+		|| FactsQuerySum("ACS_Azkar_Active") > 0
 		)
 		{
-			forgotten_wolf_school_rolls();
+			cat_school_rolls();
 		}
 		else
 		{
@@ -1904,7 +1904,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 					{
 						if (ACS_can_dodge())
 						{
-							if ( ACS_StaminaBlockAction_Enabled() 
+							if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 							&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 							)
 							{
@@ -1915,7 +1915,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 							{
 								ACS_refresh_dodge_cooldown();
 
-								if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+								if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 								{
 									GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 									GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -1937,7 +1937,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 					{
 						if (ACS_can_dodge())
 						{
-							if ( ACS_StaminaBlockAction_Enabled() 
+							if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 							&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 							)
 							{
@@ -1948,7 +1948,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 							{
 								ACS_refresh_dodge_cooldown();
 
-								if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+								if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 								{
 									GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 									GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -1970,7 +1970,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 					{
 						if (ACS_can_dodge())
 						{
-							if ( ACS_StaminaBlockAction_Enabled() 
+							if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 							&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 							)
 							{
@@ -1981,7 +1981,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 							{
 								ACS_refresh_dodge_cooldown();
 
-								if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+								if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 								{
 									GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 									GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -2132,7 +2132,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -2145,7 +2145,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 					
 					//ACS_Dodge();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -2172,7 +2172,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -2185,7 +2185,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 					
 					//ACS_Dodge();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -2210,7 +2210,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -2223,7 +2223,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 					
 					//ACS_Dodge();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -2248,7 +2248,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -2261,7 +2261,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 					
 					//ACS_Dodge();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -2286,7 +2286,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -2299,7 +2299,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 					
 					//ACS_Dodge();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -2326,7 +2326,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -2339,7 +2339,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 					
 					//ACS_Dodge();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -2366,7 +2366,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -2379,7 +2379,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 					
 					//ACS_Dodge();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -2406,7 +2406,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -2419,7 +2419,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 					
 					//ACS_Dodge();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -2446,7 +2446,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -2459,7 +2459,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 					
 					//ACS_Dodge();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -2501,7 +2501,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -2512,7 +2512,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -2534,7 +2534,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -2545,7 +2545,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -2581,7 +2581,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -2592,7 +2592,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -2621,7 +2621,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -2632,7 +2632,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -2661,7 +2661,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -2672,7 +2672,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -2710,7 +2710,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -2721,7 +2721,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -2759,7 +2759,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -2770,7 +2770,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -2801,7 +2801,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -2812,7 +2812,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -2843,7 +2843,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -2854,7 +2854,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -2891,7 +2891,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -2902,7 +2902,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -2924,7 +2924,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -2935,7 +2935,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -2964,7 +2964,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -2975,7 +2975,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3004,7 +3004,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -3015,7 +3015,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3044,7 +3044,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -3055,7 +3055,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3086,7 +3086,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -3097,7 +3097,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3128,7 +3128,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -3139,7 +3139,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3170,7 +3170,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -3181,7 +3181,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3212,7 +3212,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -3223,7 +3223,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3260,7 +3260,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -3271,7 +3271,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3293,7 +3293,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -3304,7 +3304,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3340,7 +3340,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -3351,7 +3351,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3380,7 +3380,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -3391,7 +3391,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3420,7 +3420,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -3431,7 +3431,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3462,7 +3462,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -3473,7 +3473,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3504,7 +3504,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -3515,7 +3515,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3546,7 +3546,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -3557,7 +3557,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3588,7 +3588,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -3599,7 +3599,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3636,7 +3636,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -3647,7 +3647,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3669,7 +3669,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -3680,7 +3680,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3716,7 +3716,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -3727,7 +3727,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3756,7 +3756,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -3767,7 +3767,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3796,7 +3796,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -3807,7 +3807,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3838,7 +3838,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -3849,7 +3849,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3880,7 +3880,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -3891,7 +3891,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3922,7 +3922,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -3933,7 +3933,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3964,7 +3964,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -3975,7 +3975,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -4012,7 +4012,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -4023,7 +4023,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -4045,7 +4045,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -4056,7 +4056,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -4085,7 +4085,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -4096,7 +4096,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -4125,7 +4125,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -4136,7 +4136,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -4165,7 +4165,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -4176,7 +4176,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -4207,7 +4207,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -4218,7 +4218,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -4249,7 +4249,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -4260,7 +4260,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -4291,7 +4291,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -4302,7 +4302,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -4333,7 +4333,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -4344,7 +4344,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -4419,7 +4419,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 					{
 						if (ACS_can_dodge())
 						{
-							if ( ACS_StaminaBlockAction_Enabled() 
+							if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 							&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 							)
 							{
@@ -4430,7 +4430,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 							{
 								ACS_refresh_dodge_cooldown();
 
-								if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+								if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 								{
 									GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 									GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -4452,7 +4452,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 					{
 						if (ACS_can_dodge())
 						{
-							if ( ACS_StaminaBlockAction_Enabled() 
+							if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 							&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 							)
 							{
@@ -4463,7 +4463,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 							{
 								ACS_refresh_dodge_cooldown();
 
-								if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+								if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 								{
 									GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 									GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -4485,7 +4485,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 					{
 						if (ACS_can_dodge())
 						{
-							if ( ACS_StaminaBlockAction_Enabled() 
+							if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 							&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 							)
 							{
@@ -4496,7 +4496,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 							{
 								ACS_refresh_dodge_cooldown();
 
-								if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+								if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 								{
 									GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 									GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -4547,7 +4547,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				}
 				else
 				{
-					if ( ACS_StaminaBlockAction_Enabled() 
+					if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 					&& GetACSWatcher().StaminaCheck()
 					)
 					{							 
@@ -4596,7 +4596,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -4607,7 +4607,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -4619,39 +4619,39 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if (ACS_DefaultGeraltMovesetOverrideModeBackwardRollOptions() == 0)
+					if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeBackwardRollOptions', 5) == 0)
 					{
 						override_mode_back_dodge_1();
 					}
-					else if (ACS_DefaultGeraltMovesetOverrideModeBackwardRollOptions() == 1)
+					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeBackwardRollOptions', 5) == 1)
 					{
 						override_mode_back_dodge_2();
 					}
-					else if (ACS_DefaultGeraltMovesetOverrideModeBackwardRollOptions() == 2)
+					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeBackwardRollOptions', 5) == 2)
 					{
 						override_mode_back_dodge_3();
 					}
-					else if (ACS_DefaultGeraltMovesetOverrideModeBackwardRollOptions() == 3)
+					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeBackwardRollOptions', 5) == 3)
 					{
 						override_mode_back_dodge_4();
 					}
-					else if (ACS_DefaultGeraltMovesetOverrideModeBackwardRollOptions() == 4)
+					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeBackwardRollOptions', 5) == 4)
 					{
 						override_mode_back_dodge_5();
 					}
-					else if (ACS_DefaultGeraltMovesetOverrideModeBackwardRollOptions() == 5)
+					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeBackwardRollOptions', 5) == 5)
 					{
 						override_mode_back_dodge_6();
 					}
-					else if (ACS_DefaultGeraltMovesetOverrideModeBackwardRollOptions() == 6)
+					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeBackwardRollOptions', 5) == 6)
 					{
 						override_mode_back_dodge_7();
 					}
-					else if (ACS_DefaultGeraltMovesetOverrideModeBackwardRollOptions() == 7)
+					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeBackwardRollOptions', 5) == 7)
 					{
 						override_mode_back_dodge_8();
 					}
-					else if (ACS_DefaultGeraltMovesetOverrideModeBackwardRollOptions() == 8)
+					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeBackwardRollOptions', 5) == 8)
 					{
 						override_mode_back_dodge_9();
 					}
@@ -4664,7 +4664,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -4675,7 +4675,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -4693,27 +4693,27 @@ state ACS_RollInit_Engage in cACS_RollInit
 					}
 					else
 					{
-						if (ACS_DefaultGeraltMovesetOverrideModeForwardRollOptions() == 0)
+						if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardRollOptions', 5) == 0)
 						{
 							override_mode_front_dodge_1();
 						}
-						else if (ACS_DefaultGeraltMovesetOverrideModeForwardRollOptions() == 1)
+						else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardRollOptions', 5) == 1)
 						{
 							override_mode_front_dodge_2();
 						}
-						else if (ACS_DefaultGeraltMovesetOverrideModeForwardRollOptions() == 2)
+						else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardRollOptions', 5) == 2)
 						{
 							override_mode_front_dodge_3();
 						}
-						else if (ACS_DefaultGeraltMovesetOverrideModeForwardRollOptions() == 3)
+						else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardRollOptions', 5) == 3)
 						{
 							override_mode_front_dodge_4();
 						}
-						else if (ACS_DefaultGeraltMovesetOverrideModeForwardRollOptions() == 4)
+						else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardRollOptions', 5) == 4)
 						{
 							override_mode_front_dodge_5();
 						}
-						else if (ACS_DefaultGeraltMovesetOverrideModeForwardRollOptions() == 5)
+						else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardRollOptions', 5) == 5)
 						{
 							override_mode_front_dodge_6();
 						}
@@ -4727,7 +4727,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -4738,7 +4738,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -4756,19 +4756,19 @@ state ACS_RollInit_Engage in cACS_RollInit
 					}
 					else
 					{
-						if (ACS_DefaultGeraltMovesetOverrideModeRightRollOptions() == 0)
+						if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeRightRollOptions', 2) == 0)
 						{
 							override_mode_right_dodge_1();
 						}
-						else if (ACS_DefaultGeraltMovesetOverrideModeRightRollOptions() == 1)
+						else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeRightRollOptions', 2) == 1)
 						{
 							override_mode_right_dodge_2();
 						}
-						else if (ACS_DefaultGeraltMovesetOverrideModeRightRollOptions() == 2)
+						else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeRightRollOptions', 2) == 2)
 						{
 							override_mode_right_dodge_3();
 						}
-						else if (ACS_DefaultGeraltMovesetOverrideModeRightRollOptions() == 3)
+						else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeRightRollOptions', 2) == 3)
 						{
 							override_mode_right_dodge_4();
 						}
@@ -4782,7 +4782,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -4793,7 +4793,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -4811,19 +4811,19 @@ state ACS_RollInit_Engage in cACS_RollInit
 					}
 					else
 					{
-						if (ACS_DefaultGeraltMovesetOverrideModeLeftRollOptions() == 0)
+						if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeLeftRollOptions', 2) == 0)
 						{
 							override_mode_left_dodge_1();
 						}
-						else if (ACS_DefaultGeraltMovesetOverrideModeLeftRollOptions() == 1)
+						else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeLeftRollOptions', 2) == 1)
 						{
 							override_mode_left_dodge_2();
 						}
-						else if (ACS_DefaultGeraltMovesetOverrideModeLeftRollOptions() == 2)
+						else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeLeftRollOptions', 2) == 2)
 						{
 							override_mode_left_dodge_3();
 						}
-						else if (ACS_DefaultGeraltMovesetOverrideModeLeftRollOptions() == 3)
+						else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeLeftRollOptions', 2) == 3)
 						{
 							override_mode_left_dodge_4();
 						}
@@ -4837,7 +4837,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -4848,7 +4848,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -4866,47 +4866,47 @@ state ACS_RollInit_Engage in cACS_RollInit
 					}
 					else
 					{
-						if (ACS_DefaultGeraltMovesetOverrideModeRightRollOptions() == 0)
+						if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeRightRollOptions', 2) == 0)
 						{
 							override_mode_right_dodge_1();
 
 							ACSDodgeMovementAdjust('forwardright');
 						}
-						else if (ACS_DefaultGeraltMovesetOverrideModeRightRollOptions() == 1)
+						else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeRightRollOptions', 2) == 1)
 						{
 							override_mode_right_dodge_2();
 
 							ACSDodgeMovementAdjust('forwardright');
 						}
-						else if (ACS_DefaultGeraltMovesetOverrideModeRightRollOptions() == 2)
+						else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeRightRollOptions', 2) == 2)
 						{
 							override_mode_right_dodge_3();
 
 							ACSDodgeMovementAdjust('forwardright');
 						}
-						else if (ACS_DefaultGeraltMovesetOverrideModeRightRollOptions() == 3)
+						else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeRightRollOptions', 2) == 3)
 						{
-							if (ACS_DefaultGeraltMovesetOverrideModeForwardRollOptions() == 0)
+							if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardRollOptions', 5) == 0)
 							{
 								override_mode_front_dodge_1();
 							}
-							else if (ACS_DefaultGeraltMovesetOverrideModeForwardRollOptions() == 1)
+							else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardRollOptions', 5) == 1)
 							{
 								override_mode_front_dodge_2();
 							}
-							else if (ACS_DefaultGeraltMovesetOverrideModeForwardRollOptions() == 2)
+							else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardRollOptions', 5) == 2)
 							{
 								override_mode_front_dodge_3();
 							}
-							else if (ACS_DefaultGeraltMovesetOverrideModeForwardRollOptions() == 3)
+							else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardRollOptions', 5) == 3)
 							{
 								override_mode_front_dodge_4();
 							}
-							else if (ACS_DefaultGeraltMovesetOverrideModeForwardRollOptions() == 4)
+							else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardRollOptions', 5) == 4)
 							{
 								override_mode_front_dodge_5();
 							}
-							else if (ACS_DefaultGeraltMovesetOverrideModeForwardRollOptions() == 5)
+							else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardRollOptions', 5) == 5)
 							{
 								override_mode_front_dodge_6();
 							}
@@ -4923,7 +4923,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -4934,7 +4934,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -4952,47 +4952,47 @@ state ACS_RollInit_Engage in cACS_RollInit
 					}
 					else
 					{
-						if (ACS_DefaultGeraltMovesetOverrideModeLeftRollOptions() == 0)
+						if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeLeftRollOptions', 2) == 0)
 						{
 							override_mode_left_dodge_1();
 
 							ACSDodgeMovementAdjust('forwardleft');
 						}
-						else if (ACS_DefaultGeraltMovesetOverrideModeLeftRollOptions() == 1)
+						else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeLeftRollOptions', 2) == 1)
 						{
 							override_mode_left_dodge_2();
 
 							ACSDodgeMovementAdjust('forwardleft');
 						}
-						else if (ACS_DefaultGeraltMovesetOverrideModeLeftRollOptions() == 2)
+						else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeLeftRollOptions', 2) == 2)
 						{
 							override_mode_left_dodge_3();
 
 							ACSDodgeMovementAdjust('forwardleft');
 						}
-						else if (ACS_DefaultGeraltMovesetOverrideModeLeftRollOptions() == 3)
+						else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeLeftRollOptions', 2) == 3)
 						{
-							if (ACS_DefaultGeraltMovesetOverrideModeForwardRollOptions() == 0)
+							if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardRollOptions', 5) == 0)
 							{
 								override_mode_front_dodge_1();
 							}
-							else if (ACS_DefaultGeraltMovesetOverrideModeForwardRollOptions() == 1)
+							else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardRollOptions', 5) == 1)
 							{
 								override_mode_front_dodge_2();
 							}
-							else if (ACS_DefaultGeraltMovesetOverrideModeForwardRollOptions() == 2)
+							else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardRollOptions', 5) == 2)
 							{
 								override_mode_front_dodge_3();
 							}
-							else if (ACS_DefaultGeraltMovesetOverrideModeForwardRollOptions() == 3)
+							else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardRollOptions', 5) == 3)
 							{
 								override_mode_front_dodge_4();
 							}
-							else if (ACS_DefaultGeraltMovesetOverrideModeForwardRollOptions() == 4)
+							else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardRollOptions', 5) == 4)
 							{
 								override_mode_front_dodge_5();
 							}
-							else if (ACS_DefaultGeraltMovesetOverrideModeForwardRollOptions() == 5)
+							else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardRollOptions', 5) == 5)
 							{
 								override_mode_front_dodge_6();
 							}
@@ -5009,7 +5009,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -5020,7 +5020,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -5038,25 +5038,25 @@ state ACS_RollInit_Engage in cACS_RollInit
 					}
 					else
 					{
-						if (ACS_DefaultGeraltMovesetOverrideModeRightRollOptions() == 0)
+						if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeRightRollOptions', 2) == 0)
 						{
 							override_mode_right_dodge_1();
 
 							ACSDodgeMovementAdjust('backright');
 						}
-						else if (ACS_DefaultGeraltMovesetOverrideModeRightRollOptions() == 1)
+						else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeRightRollOptions', 2) == 1)
 						{
 							override_mode_right_dodge_2();
 
 							ACSDodgeMovementAdjust('backright');
 						}
-						else if (ACS_DefaultGeraltMovesetOverrideModeRightRollOptions() == 2)
+						else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeRightRollOptions', 2) == 2)
 						{
 							override_mode_right_dodge_3();
 
 							ACSDodgeMovementAdjust('backright');
 						}
-						else if (ACS_DefaultGeraltMovesetOverrideModeRightRollOptions() == 3)
+						else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeRightRollOptions', 2) == 3)
 						{
 							override_mode_right_dodge_4();
 
@@ -5072,7 +5072,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -5083,7 +5083,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -5101,25 +5101,25 @@ state ACS_RollInit_Engage in cACS_RollInit
 					}
 					else
 					{
-						if (ACS_DefaultGeraltMovesetOverrideModeLeftRollOptions() == 0)
+						if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeLeftRollOptions', 2) == 0)
 						{
 							override_mode_left_dodge_1();
 
 							ACSDodgeMovementAdjust('backleft');
 						}
-						else if (ACS_DefaultGeraltMovesetOverrideModeLeftRollOptions() == 1)
+						else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeLeftRollOptions', 2) == 1)
 						{
 							override_mode_left_dodge_2();
 
 							ACSDodgeMovementAdjust('backleft');
 						}
-						else if (ACS_DefaultGeraltMovesetOverrideModeLeftRollOptions() == 2)
+						else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeLeftRollOptions', 2) == 2)
 						{
 							override_mode_left_dodge_3();
 
 							ACSDodgeMovementAdjust('backleft');
 						}
-						else if (ACS_DefaultGeraltMovesetOverrideModeLeftRollOptions() == 3)
+						else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeLeftRollOptions', 2) == 3)
 						{
 							override_mode_left_dodge_4();
 
@@ -5135,7 +5135,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -5146,7 +5146,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -5158,39 +5158,39 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if (ACS_DefaultGeraltMovesetOverrideModeNeutralRollOptions() == 0)
+					if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeNeutralRollOptions', 5) == 0)
 					{
 						override_mode_back_dodge_1();
 					}
-					else if (ACS_DefaultGeraltMovesetOverrideModeNeutralRollOptions() == 1)
+					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeNeutralRollOptions', 5) == 1)
 					{
 						override_mode_back_dodge_2();
 					}
-					else if (ACS_DefaultGeraltMovesetOverrideModeNeutralRollOptions() == 2)
+					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeNeutralRollOptions', 5) == 2)
 					{
 						override_mode_back_dodge_3();
 					}
-					else if (ACS_DefaultGeraltMovesetOverrideModeNeutralRollOptions() == 3)
+					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeNeutralRollOptions', 5) == 3)
 					{
 						override_mode_back_dodge_4();
 					}
-					else if (ACS_DefaultGeraltMovesetOverrideModeNeutralRollOptions() == 4)
+					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeNeutralRollOptions', 5) == 4)
 					{
 						override_mode_back_dodge_5();
 					}
-					else if (ACS_DefaultGeraltMovesetOverrideModeNeutralRollOptions() == 5)
+					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeNeutralRollOptions', 5) == 5)
 					{
 						override_mode_back_dodge_6();
 					}
-					else if (ACS_DefaultGeraltMovesetOverrideModeNeutralRollOptions() == 6)
+					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeNeutralRollOptions', 5) == 6)
 					{
 						override_mode_back_dodge_7();
 					}
-					else if (ACS_DefaultGeraltMovesetOverrideModeNeutralRollOptions() == 7)
+					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeNeutralRollOptions', 5) == 7)
 					{
 						override_mode_back_dodge_8();
 					}
-					else if (ACS_DefaultGeraltMovesetOverrideModeNeutralRollOptions() == 8)
+					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeNeutralRollOptions', 5) == 8)
 					{
 						override_mode_back_dodge_9();
 					}
@@ -6258,7 +6258,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -6269,7 +6269,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -6291,7 +6291,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -6302,7 +6302,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -6338,7 +6338,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -6349,7 +6349,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -6378,7 +6378,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -6389,7 +6389,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -6418,7 +6418,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -6429,7 +6429,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -6460,7 +6460,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -6471,7 +6471,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -6502,7 +6502,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -6513,7 +6513,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -6544,7 +6544,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -6555,7 +6555,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -6586,7 +6586,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -6597,7 +6597,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -6623,7 +6623,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -6634,7 +6634,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -6656,7 +6656,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -6667,7 +6667,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -6703,7 +6703,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -6714,7 +6714,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -6743,7 +6743,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -6754,7 +6754,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -6783,7 +6783,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -6794,7 +6794,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -6825,7 +6825,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -6836,7 +6836,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -6867,7 +6867,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -6878,7 +6878,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -6909,7 +6909,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -6920,7 +6920,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -6951,7 +6951,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -6962,7 +6962,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -6988,7 +6988,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -6999,7 +6999,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7021,7 +7021,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -7032,7 +7032,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7061,7 +7061,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -7072,7 +7072,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7101,7 +7101,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -7112,7 +7112,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7141,7 +7141,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -7152,7 +7152,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7183,7 +7183,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -7194,7 +7194,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7225,7 +7225,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -7236,7 +7236,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7267,7 +7267,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -7278,7 +7278,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7309,7 +7309,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -7320,7 +7320,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7346,7 +7346,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -7357,7 +7357,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7379,7 +7379,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -7390,7 +7390,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7426,7 +7426,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -7437,7 +7437,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7466,7 +7466,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -7477,7 +7477,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7506,7 +7506,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -7517,7 +7517,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7548,7 +7548,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -7559,7 +7559,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7590,7 +7590,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -7601,7 +7601,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7632,7 +7632,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -7643,7 +7643,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7674,7 +7674,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -7685,7 +7685,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7711,7 +7711,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -7722,7 +7722,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7744,7 +7744,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -7755,7 +7755,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7791,7 +7791,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -7802,7 +7802,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7831,7 +7831,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -7842,7 +7842,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7871,7 +7871,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -7882,7 +7882,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7913,7 +7913,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -7924,7 +7924,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7955,7 +7955,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -7966,7 +7966,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7997,7 +7997,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -8008,7 +8008,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -8039,7 +8039,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -8050,7 +8050,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -8076,7 +8076,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -8087,7 +8087,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -8109,7 +8109,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -8120,7 +8120,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -8156,7 +8156,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -8167,7 +8167,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -8196,7 +8196,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -8207,7 +8207,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -8236,7 +8236,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -8247,7 +8247,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -8278,7 +8278,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -8289,7 +8289,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -8320,7 +8320,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -8331,7 +8331,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -8362,7 +8362,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -8373,7 +8373,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -8404,7 +8404,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -8415,7 +8415,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -8441,7 +8441,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -8452,7 +8452,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -8474,7 +8474,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -8485,7 +8485,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -8514,7 +8514,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -8525,7 +8525,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -8554,7 +8554,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -8565,7 +8565,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -8594,7 +8594,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -8605,7 +8605,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -8636,7 +8636,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -8647,7 +8647,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -8678,7 +8678,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -8689,7 +8689,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -8720,7 +8720,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -8731,7 +8731,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -8762,7 +8762,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -8773,7 +8773,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_DodgeEffects_Enabled() )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -8814,7 +8814,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -8840,7 +8840,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -8880,7 +8880,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -8913,7 +8913,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -8946,7 +8946,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -8981,7 +8981,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -9016,7 +9016,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -9051,7 +9051,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -9086,7 +9086,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_StaminaBlockAction_Enabled() 
+				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
 				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
 				)
 				{
@@ -10784,7 +10784,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		if (!GetWitcherPlayer().HasTag('ACS_Camo_Active')
 		&& !GetWitcherPlayer().HasTag('acs_blood_sucking')
-		&& ACS_DodgeEffects_Enabled())
+		&& ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false))
 		{
 			GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails_backup' );
 			GetWitcherPlayer().StopEffect( 'bruxa_dash_trails_backup' );
