@@ -1,17 +1,5 @@
 // CNTRL + F THE WORD [SHIELDS] TO LEARN HOW TO SWAP THE SHIELD FOR AXII PRIMARY WEAPON STANCE.
 
-function ACS_Shield_Destroy()
-{		
-	ACS_Axii_Shield_Destroy();
-	ACS_Axii_Shield_Destroy_DELAY();
-	ACS_Quen_Monsters_Despawn();
-	ACS_Bruxa_Camo_Decoy_Deactivate();
-	ACS_AardPull_Deactivate();
-
-	//GetWitcherPlayer().RemoveTag('acs_bow_active');
-	//GetWitcherPlayer().RemoveTag('acs_crossbow_active');
-}
-
 statemachine class cACS_Shield_Summon
 {		
     function Axii_Shield_Summon()
@@ -225,7 +213,14 @@ state BruxaCamoDecoy in cACS_Shield_Summon
 			ACSGetCEntity('acs_helm_4').PlayEffectSingle('shadowdash');
 		}
 
-		GetWitcherPlayer().SoundEvent("monster_bruxa_combat_disappear");
+		//GetWitcherPlayer().SoundEvent("monster_bruxa_combat_disappear");
+
+		if ( !theSound.SoundIsBankLoaded("monster_garkain" + ".bnk") )
+		{
+			theSound.SoundLoadBank( "monster_garkain" + ".bnk", false );
+		}
+
+		GetWitcherPlayer().SoundEvent("monster_garkain_fx_sonar_pre_hit");
 
 		GetWitcherPlayer().SoundEvent( "expl_focus_start" );
 
@@ -253,7 +248,11 @@ state BruxaCamoDecoy in cACS_Shield_Summon
 
 		//ACS_Blood_Armor_Destroy(true);
 
-		GetACSWatcher().ACS_Vampire_Back_Claw_Teleport();
+		if (ACSGetCEntity('acs_vampire_back_claw'))
+		{
+			ACSGetCEntity('acs_vampire_back_claw').BreakAttachment(); 
+			ACSGetCEntity('acs_vampire_back_claw').Teleport( thePlayer.GetWorldPosition() + Vector( 0, 0, -200 ) );
+		}
 
 		GetWitcherPlayer().AddTag('ACS_Camo_Active');
 
@@ -261,15 +260,23 @@ state BruxaCamoDecoy in cACS_Shield_Summon
 
 		NPC_Fear_Start();
 
-		DisableCatViewFx( 0 );
-		
-		EnableCatViewFx( 1.5 );
-		SetTintColorsCatViewFx(Vector(0.1f,0.12f,0.13f,0.6f),Vector(0.075f,0.1f,0.11f,0.6f),1.25);
-		SetBrightnessCatViewFx(100.0f);
-		SetViewRangeCatViewFx(500.0f);
-		SetPositionCatViewFx( Vector(0,0,0,0) , true );	
-		SetHightlightCatViewFx( Vector(0.5f,0.2f,0.2f,1.f),0.05f,10);
-		SetFogDensityCatViewFx( 0.25 );
+		if (!thePlayer.HasBuff(EET_Cat) 
+		&& !thePlayer.HasTag('ACS_Camo_Active')
+		&& FactsQuerySum("ACS_AutoCat_Enabled") <= 0 
+		&& !thePlayer.HasTag('ACS_Is_Sneaking')
+		&& !GetACSWatcher().ACS_IS_SNEAKING
+		)
+		{
+			DisableCatViewFx( 0 );
+			
+			EnableCatViewFx( 1.5 );
+			SetTintColorsCatViewFx(Vector(0.1f,0.12f,0.13f,0.6f),Vector(0.075f,0.1f,0.11f,0.6f),1.25);
+			SetBrightnessCatViewFx(100.0f);
+			SetViewRangeCatViewFx(500.0f);
+			SetPositionCatViewFx( Vector(0,0,0,0) , true );	
+			SetHightlightCatViewFx( Vector(0.5f,0.2f,0.2f,1.f),0.05f,10);
+			SetFogDensityCatViewFx( 0.25 );
+		}
 
 		ACSGetCEntity('ACS_Bruxa_Camo_Trail').Destroy();
 
@@ -333,9 +340,9 @@ state BruxaCamoDecoy in cACS_Shield_Summon
 	{
 		actors.Clear();
 
-		//ACS_Focus_Sound_Red_Destroy();
+		//ACSGetCEntityDestroyAll('ACS_Focus_Sound_Red');
 
-		ACS_Bruxa_Camo_Sonar_NPC_Destroy();
+		ACSGetCEntityDestroyAll('ACS_Bruxa_Camo_Sonar_NPC');
 
 		HighlightEnemies();
 
@@ -469,51 +476,6 @@ function ACS_Bruxa_Camo_Highlighted_Enemies_Remove_Highlight()
 	}
 }
 
-function ACS_Bruxa_Camo_Sonar_NPC_Destroy()
-{	
-	var ents 											: array<CEntity>;
-	var i												: int;
-	
-	ents.Clear();
-
-	theGame.GetEntitiesByTag( 'ACS_Bruxa_Camo_Sonar_NPC', ents );	
-	
-	for( i = 0; i < ents.Size(); i += 1 )
-	{
-		ents[i].Destroy();
-	}
-}
-
-function ACS_Bruxa_Camo_Sonar_Destroy()
-{	
-	var ents 											: array<CEntity>;
-	var i												: int;
-	
-	ents.Clear();
-
-	theGame.GetEntitiesByTag( 'ACS_Bruxa_Camo_Sonar', ents );	
-	
-	for( i = 0; i < ents.Size(); i += 1 )
-	{
-		ents[i].Destroy();
-	}
-}
-
-function ACS_Focus_Sound_Red_Destroy()
-{	
-	var ents 											: array<CEntity>;
-	var i												: int;
-	
-	ents.Clear();
-
-	theGame.GetEntitiesByTag( 'ACS_Focus_Sound_Red', ents );	
-	
-	for( i = 0; i < ents.Size(); i += 1 )
-	{
-		ents[i].Destroy();
-	}
-}
-
 state Yrden_Revive_Normal in cACS_Shield_Summon
 {
 	private var rev_temp																								: CEntityTemplate;
@@ -620,7 +582,7 @@ state Yrden_Revive_Normal in cACS_Shield_Summon
 				((CNewNPC)rev_ent).ForceSetStat( BCS_Morale, maxMorale );  
 				((CNewNPC)rev_ent).ForceSetStat( BCS_Stamina, maxStamina );  
 
-				//((CNewNPC)rev_ent).SetAnimationSpeedMultiplier(RandRangeF(0.75,1.25));
+				//((CNewNPC)rev_ent).ACS_SetAnimationSpeedMultiplier(RandRangeF(0.75,1.25));
 								
 				//((CNewNPC)rev_ent).SetAnimationTimeMultiplier(RandRangeF(0.75,1.25));
 
@@ -742,7 +704,7 @@ state Yrden_Skele_Summon_Normal in cACS_Shield_Summon
 
 				tomb_temp = (CEntityTemplate)LoadResource(tomb_names[RandRange(tomb_names.Size())], true);
 
-				targetBonePositionNPC = ACSPlayerFixZAxis(npc.GetBoneWorldPosition('torso3') + npc.GetWorldForward() * 2 + npc.GetWorldRight() * -1.5);
+				targetBonePositionNPC = ACSFixZAxis(npc.GetBoneWorldPosition('torso3') + npc.GetWorldForward() * 2 + npc.GetWorldRight() * -1.5);
 				targetBonePositionNPC.Z -= 1.5;
 				
 				if (npc.IsHuman())
@@ -760,7 +722,7 @@ state Yrden_Skele_Summon_Normal in cACS_Shield_Summon
 				skelemeshcomp.SetScale(Vector(h,h,h,1));
 				skeleanimcomp.SetScale(Vector(h,h,h,1));	
 
-				((CNewNPC)skele_ent).SetAnimationSpeedMultiplier(RandRangeF(1,1.5));
+				((CNewNPC)skele_ent).ACS_SetAnimationSpeedMultiplier(RandRangeF(1,1.5));
 								
 				((CNewNPC)skele_ent).SetAnimationTimeMultiplier(RandRangeF(1,1.5));
 
@@ -770,11 +732,11 @@ state Yrden_Skele_Summon_Normal in cACS_Shield_Summon
 
 				if (npc.IsHuman())
 				{
-					tomb_ent = theGame.CreateEntity( tomb_temp, ACSPlayerFixZAxis(npc.GetBoneWorldPosition('torso3')), targetRotationNPC );
+					tomb_ent = theGame.CreateEntity( tomb_temp, ACSFixZAxis(npc.GetBoneWorldPosition('torso3')), targetRotationNPC );
 				}
 				else
 				{
-					tomb_ent = theGame.CreateEntity( tomb_temp, ACSPlayerFixZAxis(npc.GetWorldPosition()), targetRotationNPC );
+					tomb_ent = theGame.CreateEntity( tomb_temp, ACSFixZAxis(npc.GetWorldPosition()), targetRotationNPC );
 				}
 
 				tombmeshcomp = tomb_ent.GetComponentByClassName('CMeshComponent');
@@ -1174,7 +1136,7 @@ state Axii_Shield_Entity in cACS_Shield_Summon
 	{
 		shield_entity_destroy_pre();
 
-		if (ACS_IsNight_Adjustable() || GetWitcherPlayer().IsInDarkPlace())
+		if (FactsQuerySum("ACS_Darkness_Upon_Us") > 0 || GetWitcherPlayer().IsInDarkPlace())
 		{
 			Summon_Shield_Entity();
 		}
@@ -1282,7 +1244,7 @@ function ACS_Axii_Shield_Entity_Destroy()
 	GetWitcherPlayer().RemoveBuffImmunity( EET_HeavyKnockdown,			'acs_shield_entity');
 	GetWitcherPlayer().RemoveBuffImmunity( EET_KnockdownTypeApplicator,	'acs_shield_entity');
 
-	shield_entity_despawn_anim();
+	acs_shield_entity_despawn_anim();
 	ACSGetCActor('ACS_Shield_Entity').DestroyAfter(2);
 
 	GetWitcherPlayer().RemoveTag('ACS_Shielded_Entity');
@@ -1290,7 +1252,7 @@ function ACS_Axii_Shield_Entity_Destroy()
 
 function ACS_Axii_Shield_Destroy()
 {
-	shield_entity_despawn_anim();
+	acs_shield_entity_despawn_anim();
 	ACSGetCActor('ACS_Shield_Entity').DestroyAfter(2);
 
 	GetWitcherPlayer().RemoveTag('ACS_Shielded');
@@ -1365,7 +1327,7 @@ function ACS_Axii_Shield_Destroy_IMMEDIATE()
 	}
 }
 
-function shield_entity_despawn_anim()
+function acs_shield_entity_despawn_anim()
 {
 	var shieldAnimatedComponent 					: CAnimatedComponent;
 	var shieldMovementAdjustor						: CMovementAdjustor; 
@@ -1390,14 +1352,6 @@ function shield_entity_despawn_anim()
 
 	ACSGetCActor('ACS_Shield_Entity').PlayEffectSingle('hym_despawn');
 	ACSGetCActor('ACS_Shield_Entity').StopEffect('hym_despawn');
-}
-
-function ACS_Revenant() : CNewNPC
-{
-	var revenant 			 : CNewNPC;
-	
-	revenant = (CNewNPC)theGame.GetEntityByTag( 'ACS_Revenant' );
-	return revenant;
 }
 
 function ACS_Quen_Monsters_Despawn()
@@ -1452,7 +1406,7 @@ function ACS_Bruxa_Camo_Decoy_Deactivate()
 
 		GetWitcherPlayer().SoundEvent( "expl_focus_stop" ); 
 
-		NPC_Fear_Revert();
+		ACS_NPC_Fear_Revert();
 
 		DisableCatViewFx( 0 );
 		
@@ -1474,7 +1428,7 @@ function ACS_Bruxa_Camo_Decoy_Deactivate()
 
 		ACSGetCEntity('ACS_Bruxa_Camo_Trail').Destroy();
 
-		ACS_Bruxa_Camo_Sonar_NPC_Destroy();
+		ACSGetCEntityDestroyAll('ACS_Bruxa_Camo_Sonar_NPC');
 
 		ACS_Bruxa_Camo_Highlighted_Enemies_Remove_Highlight();
 	}
@@ -1557,7 +1511,7 @@ state Bruxa_Camo_Decoy_Deactivate_Claw_Equip_Standalone_Engage in cBruxa_Camo_De
 
 			extra_arms_anchor_r.CreateAttachmentAtBoneWS( GetWitcherPlayer(), 'r_shoulder', bone_vec, bone_rot );
 
-			extra_arms_anchor_r.AddTag('extra_arms_anchor_r');
+			extra_arms_anchor_r.AddTag('acs_extra_arms_anchor_r');
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
@@ -1567,7 +1521,7 @@ state Bruxa_Camo_Decoy_Deactivate_Claw_Equip_Standalone_Engage in cBruxa_Camo_De
 
 			extra_arms_anchor_l.CreateAttachmentAtBoneWS( GetWitcherPlayer(), 'l_shoulder', bone_vec, bone_rot );
 
-			extra_arms_anchor_l.AddTag('extra_arms_anchor_l');
+			extra_arms_anchor_l.AddTag('acs_extra_arms_anchor_l');
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1592,7 +1546,7 @@ state Bruxa_Camo_Decoy_Deactivate_Claw_Equip_Standalone_Engage in cBruxa_Camo_De
 
 			extra_arms_1.PlayEffectSingle('blood');
 
-			extra_arms_1.AddTag('vampire_extra_arms_1');	
+			extra_arms_1.AddTag('acs_vampire_extra_arms_1');	
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1617,7 +1571,7 @@ state Bruxa_Camo_Decoy_Deactivate_Claw_Equip_Standalone_Engage in cBruxa_Camo_De
 
 			extra_arms_2.PlayEffectSingle('blood');
 
-			extra_arms_2.AddTag('vampire_extra_arms_2');	
+			extra_arms_2.AddTag('acs_vampire_extra_arms_2');	
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1642,7 +1596,7 @@ state Bruxa_Camo_Decoy_Deactivate_Claw_Equip_Standalone_Engage in cBruxa_Camo_De
 
 			extra_arms_3.PlayEffectSingle('blood');
 
-			extra_arms_3.AddTag('vampire_extra_arms_3');	
+			extra_arms_3.AddTag('acs_vampire_extra_arms_3');	
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1667,7 +1621,7 @@ state Bruxa_Camo_Decoy_Deactivate_Claw_Equip_Standalone_Engage in cBruxa_Camo_De
 
 			extra_arms_4.PlayEffectSingle('blood');
 
-			extra_arms_4.AddTag('vampire_extra_arms_4');	
+			extra_arms_4.AddTag('acs_vampire_extra_arms_4');	
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1691,7 +1645,7 @@ state Bruxa_Camo_Decoy_Deactivate_Claw_Equip_Standalone_Engage in cBruxa_Camo_De
 
 			vampire_head_anchor.CreateAttachmentAtBoneWS( GetWitcherPlayer(), 'head', bone_vec, bone_rot );
 
-			vampire_head_anchor.AddTag('vampire_head_anchor');
+			vampire_head_anchor.AddTag('acs_vampire_head_anchor');
 
 			head_temp = (CEntityTemplate)LoadResource("dlc\dlc_acs\data\entities\other\dettlaff_monster_head.w2ent", true);	
 
@@ -1712,7 +1666,7 @@ state Bruxa_Camo_Decoy_Deactivate_Claw_Equip_Standalone_Engage in cBruxa_Camo_De
 			
 			vampire_head.CreateAttachment( vampire_head_anchor, , attach_vec, attach_rot );
 
-			vampire_head.AddTag('vampire_head');
+			vampire_head.AddTag('acs_vampire_head');
 		}
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1752,7 +1706,7 @@ state Bruxa_Camo_Decoy_Deactivate_Claw_Equip_Standalone_Engage in cBruxa_Camo_De
 	}
 }
 
-function NPC_Fear_Revert()
+function ACS_NPC_Fear_Revert()
 {
 	var i 						: int;
 	var npc     				: CNewNPC;
@@ -1760,7 +1714,7 @@ function NPC_Fear_Revert()
 	var npcGroupType 			: ENPCGroupType;
 	var animatedComponentA 		: CAnimatedComponent;
 
-	//ACS_Focus_Sound_Red_Destroy();
+	//ACSGetCEntityDestroyAll('ACS_Focus_Sound_Red');
 
 	actors.Clear();
 
@@ -1910,15 +1864,6 @@ function ACS_Centipede_Destroy()
 	GetWitcherPlayer().RemoveTag('ACS_Has_Summoned_Centipede');
 }
 
-function ACS_Summoned_Centipedes() : array<CActor>
-{
-	var centipedes 											: array<CActor>;
-	
-	theGame.GetActorsByTag( 'ACS_Summoned_Centipede', centipedes );	
-	
-	return centipedes;
-}
-
 ////////////////////////////////////////////////////////////////////////////////////////
 
 function ACS_Wolf_Destroy()
@@ -1949,13 +1894,4 @@ function ACS_Wolf_Destroy()
 	}
 	
 	GetWitcherPlayer().RemoveTag('ACS_Has_Summoned_Wolf');
-}
-
-function ACS_Summoned_Wolves() : array<CActor>
-{
-	var wolves 											: array<CActor>;
-	
-	theGame.GetActorsByTag( 'ACS_Summoned_Wolf', wolves );	
-	
-	return wolves;
 }

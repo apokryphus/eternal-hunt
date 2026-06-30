@@ -3,7 +3,7 @@ function ACS_Weapon_Respawn()
 	var vACS_Weapon_Respawn : cACS_Weapon_Respawn;
 	vACS_Weapon_Respawn = new cACS_Weapon_Respawn in theGame;
 	
-	if (ACS_Enabled())
+	if (ACS_Settings_Main_Bool('acs_main_settings','acs_mod_enabled', true) && !thePlayer.IsCiri())
 	{	
 		vACS_Weapon_Respawn.ACS_Weapon_Respawn_Engage();
 	}
@@ -250,22 +250,22 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 			
 			//Sleep(0.125);
 
-			if (!GetWitcherPlayer().HasTag('acs_blood_sucking'))
+			if (!GetWitcherPlayer().HasTag('ACS_Bruxa_Bite_Process'))
 			{
 				if ( GetWitcherPlayer().HasTag('acs_aard_sword_equipped') 
 				&& !GetWitcherPlayer().HasTag('acs_aard_sword_effect_played'))
 				{
-					//acs_aard_sword_summon();
+					//ACSSwordSummonEffect('aard');
 
-					GetACSWatcher().AddTimer('ACS_Weapon_Summon_Delay', 0.125, false);
+					GetACSWatcher().AddTimer('ACS_Weapon_Summon_Delay', 0.125 / theGame.GetTimeScale(), false );
 
 					GetWitcherPlayer().AddTag('acs_aard_sword_effect_played');
 				}
 				else
 				{
-					acs_igni_sword_summon();
+					ACSSwordSummonEffect('igni');
 
-					GetACSWatcher().AddTimer('ACS_Weapon_Summon_Delay', 0.125, false);
+					GetACSWatcher().AddTimer('ACS_Weapon_Summon_Delay', 0.125 / theGame.GetTimeScale(), false );
 				}
 			}
 		}
@@ -279,7 +279,7 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(head_temp);
 			
-		if (ACS_Armor_Equipped_Check() || ACS_GetItem_VampClaw_ACS_Armor())
+		if (ACS_Armor_Set_Check('acs_armor', false) || ACS_GetItem_VampClaw('acs_armor'))
 		{
 			
 		}
@@ -394,11 +394,11 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 		if (GetWitcherPlayer().HasTag('acs_igni_sword_equipped')
 		&& !GetWitcherPlayer().HasTag('acs_igni_sword_effect_played'))
 		{
-			if (!GetWitcherPlayer().HasTag('acs_blood_sucking'))
+			if (!GetWitcherPlayer().HasTag('ACS_Bruxa_Bite_Process'))
 			{
-				acs_igni_sword_summon();
+				ACSSwordSummonEffect('igni');
 
-				GetACSWatcher().AddTimer('ACS_Weapon_Summon_Delay', 0.125, false);
+				GetACSWatcher().AddTimer('ACS_Weapon_Summon_Delay', 0.125 / theGame.GetTimeScale(), false );
 			}
 			
 			GetWitcherPlayer().AddTag('acs_igni_sword_effect_played');
@@ -407,86 +407,86 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 		else if (GetWitcherPlayer().HasTag('acs_axii_sword_equipped')
 		&& !GetWitcherPlayer().HasTag('acs_axii_sword_effect_played'))
 		{
-			acs_igni_sword_summon();
+			ACSSwordSummonEffect('igni');
 
-			//acs_axii_sword_summon();
+			//ACSSwordSummonEffect('axii');
 
-			GetACSWatcher().AddTimer('ACS_Weapon_Summon_Delay', 0.125, false);
+			GetACSWatcher().AddTimer('ACS_Weapon_Summon_Delay', 0.125 / theGame.GetTimeScale(), false );
 
 			GetWitcherPlayer().AddTag('acs_axii_sword_effect_played');
 		}
 		else if (GetWitcherPlayer().HasTag('acs_aard_sword_equipped')
 		&& !GetWitcherPlayer().HasTag('acs_aard_sword_effect_played'))
 		{
-			//acs_aard_sword_summon();
+			//ACSSwordSummonEffect('aard');
 
-			GetACSWatcher().AddTimer('ACS_Weapon_Summon_Delay', 0.125, false);
+			GetACSWatcher().AddTimer('ACS_Weapon_Summon_Delay', 0.125 / theGame.GetTimeScale(), false );
 
 			GetWitcherPlayer().AddTag('acs_aard_sword_effect_played');
 		}
 		else if (GetWitcherPlayer().HasTag('acs_yrden_sword_equipped')
 		&& !GetWitcherPlayer().HasTag('acs_yrden_sword_effect_played'))
 		{
-			acs_igni_sword_summon();
+			ACSSwordSummonEffect('igni');
 
-			//acs_yrden_sword_summon();
+			//ACSSwordSummonEffect('yrden');
 
-			GetACSWatcher().AddTimer('ACS_Weapon_Summon_Delay', 0.125, false);
+			GetACSWatcher().AddTimer('ACS_Weapon_Summon_Delay', 0.125 / theGame.GetTimeScale(), false );
 
 			GetWitcherPlayer().AddTag('acs_yrden_sword_effect_played');
 		}
 		else if (GetWitcherPlayer().HasTag('acs_quen_sword_equipped')
 		&& !GetWitcherPlayer().HasTag('acs_quen_sword_effect_played'))
 		{
-			acs_igni_sword_summon();
+			ACSSwordSummonEffect('igni');
 
-			//acs_quen_sword_summon();
+			//ACSSwordSummonEffect('quen');
 
-			GetACSWatcher().AddTimer('ACS_Weapon_Summon_Delay', 0.125, false);
+			GetACSWatcher().AddTimer('ACS_Weapon_Summon_Delay', 0.125 / theGame.GetTimeScale(), false );
 
 			GetWitcherPlayer().AddTag('acs_quen_sword_effect_played');
 		}
 		else if (GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped')
 		&& !GetWitcherPlayer().HasTag('acs_axii_secondary_sword_effect_played'))
 		{
-			acs_igni_sword_summon();
+			ACSSwordSummonEffect('igni');
 
-			//acs_axii_secondary_sword_summon();
+			//ACSSwordSummonEffect('axii_secondary');
 
-			GetACSWatcher().AddTimer('ACS_Weapon_Summon_Delay', 0.125, false);
+			GetACSWatcher().AddTimer('ACS_Weapon_Summon_Delay', 0.125 / theGame.GetTimeScale(), false );
 
 			GetWitcherPlayer().AddTag('acs_axii_secondary_sword_effect_played');
 		}
 		else if (GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped')
 		&& !GetWitcherPlayer().HasTag('acs_aard_secondary_sword_effect_played'))
 		{
-			acs_igni_sword_summon();
+			ACSSwordSummonEffect('igni');
 
-			//acs_aard_secondary_sword_summon();
+			//ACSSwordSummonEffect('aard_secondary');
 
-			GetACSWatcher().AddTimer('ACS_Weapon_Summon_Delay', 0.125, false);
+			GetACSWatcher().AddTimer('ACS_Weapon_Summon_Delay', 0.125 / theGame.GetTimeScale(), false );
 
 			GetWitcherPlayer().AddTag('acs_aard_secondary_sword_effect_played');
 		}
 		else if (GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped')
 		&& !GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_effect_played'))
 		{
-			acs_igni_sword_summon();
+			ACSSwordSummonEffect('igni');
 
-			//acs_yrden_secondary_sword_summon();
+			//ACSSwordSummonEffect('yrden_secondary');
 
-			GetACSWatcher().AddTimer('ACS_Weapon_Summon_Delay', 0.125, false);
+			GetACSWatcher().AddTimer('ACS_Weapon_Summon_Delay', 0.125 / theGame.GetTimeScale(), false );
 
 			GetWitcherPlayer().AddTag('acs_yrden_secondary_sword_effect_played');
 		}
 		else if (GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped')
 		&& !GetWitcherPlayer().HasTag('acs_quen_secondary_sword_effect_played'))
 		{
-			acs_igni_sword_summon();
+			ACSSwordSummonEffect('igni');
 			
-			//acs_quen_secondary_sword_summon();
+			//ACSSwordSummonEffect('quen_secondary');
 
-			GetACSWatcher().AddTimer('ACS_Weapon_Summon_Delay', 0.125, false);
+			GetACSWatcher().AddTimer('ACS_Weapon_Summon_Delay', 0.125 / theGame.GetTimeScale(), false );
 
 			GetWitcherPlayer().AddTag('acs_quen_secondary_sword_effect_played');
 		}
@@ -494,58 +494,32 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 	
 	latent function IgniSword()
 	{
+		var vACS_EtherSword_Summon : cACS_EtherSword_Summon;
+
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SilverSword, silverID);
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SteelSword, steelID);
 		
 		steelsword = (CDrawableComponent)((GetWitcherPlayer().GetInventory().GetItemEntityUnsafe(steelID)).GetMeshComponent());
 		silversword = (CDrawableComponent)((GetWitcherPlayer().GetInventory().GetItemEntityUnsafe(silverID)).GetMeshComponent());
 		
-		
-		
 		if ( GetWitcherPlayer().GetInventory().IsItemHeld(steelID) )
 		{
-			if (!ACS_Armor_Equipped_Check())
+			if (!ACS_Armor_Set_Check('acs_armor', false))
 			{
 				steelsword.SetVisible(true);
 
 				steelswordentity = GetWitcherPlayer().inv.GetItemEntityUnsafe(steelID);
 				steelswordentity.SetHideInGame(false); 
 			}
-
-			if (!ACS_Settings_Main_Bool('EHmodVisualSettings','EHmodHideSwordsheathes', false))
-			{
-				scabbards_steel.Clear();
-
-				scabbards_steel = GetWitcherPlayer().inv.GetItemsByCategory('steel_scabbards');
-
-				for ( i=0; i < scabbards_steel.Size() ; i+=1 )
-				{
-					scabbard_steel = (CDrawableComponent)((GetWitcherPlayer().inv.GetItemEntityUnsafe(scabbards_steel[i])).GetMeshComponent());
-					//scabbard_steel.SetVisible(true);
-				}
-			}
 		}
 		else if( GetWitcherPlayer().GetInventory().IsItemHeld(silverID) )
 		{
-			if (!ACS_Armor_Equipped_Check())
+			if (!ACS_Armor_Set_Check('acs_armor', false))
 			{
 				silversword.SetVisible(true);
 			
 				silverswordentity = GetWitcherPlayer().inv.GetItemEntityUnsafe(silverID);
 				silverswordentity.SetHideInGame(false); 
-			}
-
-			if (!ACS_Settings_Main_Bool('EHmodVisualSettings','EHmodHideSwordsheathes', false))
-			{
-				scabbards_silver.Clear();
-
-				scabbards_silver = GetWitcherPlayer().inv.GetItemsByCategory('silver_scabbards');
-
-				for ( i=0; i < scabbards_silver.Size() ; i+=1 )
-				{
-					scabbard_silver = (CDrawableComponent)((GetWitcherPlayer().inv.GetItemEntityUnsafe(scabbards_silver[i])).GetMeshComponent());
-					//scabbard_silver.SetVisible(true);
-				}
 			}
 		}
 
@@ -554,20 +528,34 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 		|| thePlayer.HasTag('acs_igni_secondary_sword_equipped_TAG')
 		|| thePlayer.HasTag('acs_igni_sword_equipped')
 		|| thePlayer.HasTag('acs_igni_sword_equipped_TAG'))
-		&& thePlayer.IsAnyWeaponHeld()
+		&& !thePlayer.HasTag('acs_quen_sword_equipped')
+		&& !thePlayer.HasTag('acs_axii_sword_equipped')
+		&& !thePlayer.HasTag('acs_aard_sword_equipped')
+		&& !thePlayer.HasTag('acs_yrden_sword_equipped')
+		&& !thePlayer.HasTag('acs_quen_secondary_sword_equipped')
+		&& !thePlayer.HasTag('acs_axii_secondary_sword_equipped')
+		&& !thePlayer.HasTag('acs_aard_secondary_sword_equipped')
+		&& !thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
+		&& !thePlayer.HasTag('ACS_HideWeaponOnDodge')
+		&& !thePlayer.HasTag('ACS_HideWeaponOnDodge_Claw_Effect')
+		&& !ACS_GetItem_Sword_IsEquipped('all_black_held', 'steel')
+		&& FactsQuerySum("ACS_Azkar_Active") <= 0
+		&& FactsQuerySum("ACS_Slayer_Active") <= 0
 		)
 		{
-			GetACSWatcher().Ether_Sword_Summon();
+			vACS_EtherSword_Summon = new cACS_EtherSword_Summon in this;
+
+			vACS_EtherSword_Summon.EtherSword_Spawner_Engage();
 		}
 	}
 
 	latent function ArmigerModeAxiiSword()
 	{
-		if ( ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerModeWeaponType', 0) == 0 )
+		if ( ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_mode_weapon_type', 0) == 0 )
 		{
 			AxiiSwordEvolving();
 		}
-		else if ( ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerModeWeaponType', 0) == 1 )
+		else if ( ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_mode_weapon_type', 0) == 1 )
 		{
 			AxiiSwordStatic();
 		}
@@ -575,11 +563,11 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 	latent function FocusModeAxiiSword()
 	{
-		if ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeWeaponType', 0) == 0 )
+		if ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_weapon_type', 0) == 0 )
 		{
 			AxiiSwordEvolving();
 		}
-		else if ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeWeaponType', 0) == 1 )
+		else if ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_weapon_type', 0) == 1 )
 		{
 			AxiiSwordStatic();
 		}
@@ -587,11 +575,11 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 	latent function HybridModeAxiiSword()
 	{
-		if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeWeaponType', 0) == 0)
+		if ( ACS_Settings_Main_Int('acs_hybrid_mode_settings','acs_hybrid_mode_weapon_type', 0) == 0)
 		{
 			AxiiSwordEvolving();
 		}
-		else if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeWeaponType', 0) == 1)
+		else if ( ACS_Settings_Main_Int('acs_hybrid_mode_settings','acs_hybrid_mode_weapon_type', 0) == 1)
 		{
 			AxiiSwordStatic();
 		}
@@ -1543,11 +1531,11 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 	latent function ArmigerModeAardSword()
 	{
-		if ( ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerModeWeaponType', 0) == 0 )
+		if ( ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_mode_weapon_type', 0) == 0 )
 		{
 			AardSwordEvolving();
 		}
-		else if ( ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerModeWeaponType', 0) == 1 )
+		else if ( ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_mode_weapon_type', 0) == 1 )
 		{
 			AardSwordStatic();
 		}
@@ -1555,11 +1543,11 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 	latent function FocusModeAardSword()
 	{
-		if ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeWeaponType', 0) == 0 )
+		if ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_weapon_type', 0) == 0 )
 		{
 			AardSwordEvolving();
 		}
-		else if ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeWeaponType', 0) == 1 )
+		else if ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_weapon_type', 0) == 1 )
 		{
 			AardSwordStatic();
 		}
@@ -1567,11 +1555,11 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 	latent function HybridModeAardSword()
 	{	
-		if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeWeaponType', 0) == 0 )
+		if ( ACS_Settings_Main_Int('acs_hybrid_mode_settings','acs_hybrid_mode_weapon_type', 0) == 0 )
 		{
 			AardSwordEvolving();
 		}
-		else if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeWeaponType', 0) == 1 )
+		else if ( ACS_Settings_Main_Int('acs_hybrid_mode_settings','acs_hybrid_mode_weapon_type', 0) == 1 )
 		{
 			AardSwordStatic();
 		}
@@ -1600,10 +1588,6 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 		r_anchor.PlayEffect('mist_regis_q702');
 		l_anchor.PlayEffect('mist_regis_q702');
-		
-		
-
-		ACS_HideSword();
 		
 		if (GetWitcherPlayer().IsWeaponHeld('steelsword'))
 		{
@@ -3820,11 +3804,11 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 	
 	latent function ArmigerModeYrdenSword()
 	{
-		if ( ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerModeWeaponType', 0) == 0 )
+		if ( ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_mode_weapon_type', 0) == 0 )
 		{
 			YrdenSwordEvolving();
 		}
-		else if ( ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerModeWeaponType', 0) == 1 )
+		else if ( ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_mode_weapon_type', 0) == 1 )
 		{
 			YrdenSwordStatic();
 		}
@@ -3832,11 +3816,11 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 	latent function FocusModeYrdenSword()
 	{
-		if ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeWeaponType', 0) == 0 )
+		if ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_weapon_type', 0) == 0 )
 		{
 			YrdenSwordEvolving();
 		}
-		else if ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeWeaponType', 0) == 1 )
+		else if ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_weapon_type', 0) == 1 )
 		{
 			YrdenSwordStatic();
 		}
@@ -3844,11 +3828,11 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 	latent function HybridModeYrdenSword()
 	{
-		if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeWeaponType', 0) == 0 )
+		if ( ACS_Settings_Main_Int('acs_hybrid_mode_settings','acs_hybrid_mode_weapon_type', 0) == 0 )
 		{
 			YrdenSwordEvolving();
 		}
-		else if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeWeaponType', 0) == 1 )
+		else if ( ACS_Settings_Main_Int('acs_hybrid_mode_settings','acs_hybrid_mode_weapon_type', 0) == 1 )
 		{
 			YrdenSwordStatic();
 		}
@@ -5400,11 +5384,11 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 	latent function ArmigerModeQuenSword()
 	{
-		if ( ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerModeWeaponType', 0) == 0 )
+		if ( ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_mode_weapon_type', 0) == 0 )
 		{
 			QuenSwordEvolving();
 		}
-		else if ( ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerModeWeaponType', 0) == 1 )
+		else if ( ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_mode_weapon_type', 0) == 1 )
 		{
 			QuenSwordStatic();
 		}
@@ -5412,11 +5396,11 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 	latent function FocusModeQuenSword()
 	{
-		if ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeWeaponType', 0) == 0 )
+		if ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_weapon_type', 0) == 0 )
 		{
 			QuenSwordEvolving();
 		}
-		else if ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeWeaponType', 0) == 1 )
+		else if ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_weapon_type', 0) == 1 )
 		{
 			QuenSwordStatic();
 		}
@@ -5424,11 +5408,11 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 	latent function HybridModeQuenSword()
 	{
-		if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeWeaponType', 0) == 0 )
+		if ( ACS_Settings_Main_Int('acs_hybrid_mode_settings','acs_hybrid_mode_weapon_type', 0) == 0 )
 		{
 			QuenSwordEvolving();
 		}
-		else if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeWeaponType', 0) == 1 )
+		else if ( ACS_Settings_Main_Int('acs_hybrid_mode_settings','acs_hybrid_mode_weapon_type', 0) == 1 )
 		{
 			QuenSwordStatic();
 		}
@@ -5670,11 +5654,11 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 	latent function ArmigerModeAxiiSecondarySword()
 	{
-		if ( ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerModeWeaponType', 0) == 0 )
+		if ( ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_mode_weapon_type', 0) == 0 )
 		{
 			AxiiSecondarySwordEvolving();
 		}
-		else if ( ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerModeWeaponType', 0) == 1 )
+		else if ( ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_mode_weapon_type', 0) == 1 )
 		{
 			AxiiSecondarySwordStatic();
 		}
@@ -5682,11 +5666,11 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 	latent function FocusModeAxiiSecondarySword()
 	{
-		if ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeWeaponType', 0) == 0 )
+		if ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_weapon_type', 0) == 0 )
 		{
 			AxiiSecondarySwordEvolving();
 		}
-		else if ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeWeaponType', 0) == 1 )
+		else if ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_weapon_type', 0) == 1 )
 		{
 			AxiiSecondarySwordStatic();
 		}
@@ -5694,11 +5678,11 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 	latent function HybridModeAxiiSecondarySword()
 	{
-		if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeWeaponType', 0) == 0)
+		if ( ACS_Settings_Main_Int('acs_hybrid_mode_settings','acs_hybrid_mode_weapon_type', 0) == 0)
 		{
 			AxiiSecondarySwordEvolving();
 		}
-		else if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeWeaponType', 0) == 1)
+		else if ( ACS_Settings_Main_Int('acs_hybrid_mode_settings','acs_hybrid_mode_weapon_type', 0) == 1)
 		{
 			AxiiSecondarySwordStatic();
 		}
@@ -6326,11 +6310,11 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 	latent function ArmigerModeAardSecondarySword()
 	{
-		if ( ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerModeWeaponType', 0) == 0 )
+		if ( ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_mode_weapon_type', 0) == 0 )
 		{
 			AardSecondarySwordEvolving();
 		}
-		else if ( ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerModeWeaponType', 0) == 1 )
+		else if ( ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_mode_weapon_type', 0) == 1 )
 		{
 			AardSecondarySwordStatic();
 		}
@@ -6338,11 +6322,11 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 	latent function FocusModeAardSecondarySword()
 	{
-		if ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeWeaponType', 0) == 0  )
+		if ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_weapon_type', 0) == 0  )
 		{
 			AardSecondarySwordEvolving();
 		}
-		else if ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeWeaponType', 0) == 1 )
+		else if ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_weapon_type', 0) == 1 )
 		{
 			AardSecondarySwordStatic();
 		}
@@ -6350,11 +6334,11 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 	latent function HybridModeAardSecondarySword()
 	{
-		if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeWeaponType', 0) == 0 )
+		if ( ACS_Settings_Main_Int('acs_hybrid_mode_settings','acs_hybrid_mode_weapon_type', 0) == 0 )
 		{
 			AardSecondarySwordEvolving();
 		}
-		else if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeWeaponType', 0) == 1 )
+		else if ( ACS_Settings_Main_Int('acs_hybrid_mode_settings','acs_hybrid_mode_weapon_type', 0) == 1 )
 		{
 			AardSecondarySwordStatic();
 		}
@@ -7559,11 +7543,11 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 	latent function ArmigerModeYrdenSecondarySword()
 	{
-		if ( ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerModeWeaponType', 0) == 0 )
+		if ( ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_mode_weapon_type', 0) == 0 )
 		{
 			YrdenSecondarySwordEvolving();
 		}
-		else if ( ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerModeWeaponType', 0) == 1 )
+		else if ( ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_mode_weapon_type', 0) == 1 )
 		{
 			YrdenSecondarySwordStatic();
 		}
@@ -7571,11 +7555,11 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 	latent function FocusModeYrdenSecondarySword()
 	{
-		if ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeWeaponType', 0) == 0 )
+		if ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_weapon_type', 0) == 0 )
 		{
 			YrdenSecondarySwordEvolving();
 		}
-		else if ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeWeaponType', 0) == 1 )
+		else if ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_weapon_type', 0) == 1 )
 		{
 			YrdenSecondarySwordStatic();
 		}
@@ -7583,11 +7567,11 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 	latent function HybridModeYrdenSecondarySword()
 	{
-		if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeWeaponType', 0) == 0 )
+		if ( ACS_Settings_Main_Int('acs_hybrid_mode_settings','acs_hybrid_mode_weapon_type', 0) == 0 )
 		{
 			YrdenSecondarySwordEvolving();
 		}
-		else if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeWeaponType', 0) == 1 )
+		else if ( ACS_Settings_Main_Int('acs_hybrid_mode_settings','acs_hybrid_mode_weapon_type', 0) == 1 )
 		{
 			YrdenSecondarySwordStatic();
 		}
@@ -8412,11 +8396,11 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 	
 	latent function ArmigerModeQuenSecondarySword()
 	{
-		if ( ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerModeWeaponType', 0) == 0 )
+		if ( ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_mode_weapon_type', 0) == 0 )
 		{
 			QuenSecondarySwordEvolving();
 		}
-		else if ( ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerModeWeaponType', 0) == 1 )
+		else if ( ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_mode_weapon_type', 0) == 1 )
 		{
 			QuenSecondarySwordStatic();
 		}
@@ -8424,11 +8408,11 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 	latent function FocusModeQuenSecondarySword()
 	{
-		if ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeWeaponType', 0) == 0 )
+		if ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_weapon_type', 0) == 0 )
 		{
 			QuenSecondarySwordEvolving();
 		}
-		else if ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeWeaponType', 0) == 1 )
+		else if ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_weapon_type', 0) == 1 )
 		{
 			QuenSecondarySwordStatic();
 		}
@@ -8436,11 +8420,11 @@ state ACS_Weapon_Respawn_Engage in cACS_Weapon_Respawn
 
 	latent function HybridModeQuenSecondarySword()
 	{
-		if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeWeaponType', 0) == 0 )
+		if ( ACS_Settings_Main_Int('acs_hybrid_mode_settings','acs_hybrid_mode_weapon_type', 0) == 0 )
 		{
 			QuenSecondarySwordEvolving();
 		}
-		else if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeWeaponType', 0) == 1 )
+		else if ( ACS_Settings_Main_Int('acs_hybrid_mode_settings','acs_hybrid_mode_weapon_type', 0) == 1 )
 		{
 			QuenSecondarySwordStatic();
 		}

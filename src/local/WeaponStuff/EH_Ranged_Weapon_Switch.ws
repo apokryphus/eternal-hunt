@@ -1,6 +1,6 @@
 statemachine class cACS_RangedWeaponSwitch
 {
-    function Engage()
+    function ACS_RangedWeaponSwitch_Engage()
 	{
 		this.PushState('ACS_RangedWeaponSwitch_Engage');
 	}
@@ -25,11 +25,12 @@ state ACS_RangedWeaponSwitch_Engage in cACS_RangedWeaponSwitch
 	
 	entry function RangedWeaponSwitch()
 	{
-		ACS_HideSwordWitoutScabbardStuff();
-
+		GetACSWatcher().RemoveTimer('ForceControlModuleHudUpdate');
+		GetACSWatcher().AddTimer('ForceControlModuleHudUpdate', 0.25f , false);
+		
 		ACS_BowHandSwitch(false);
 		
-		ACS_ExplorationDelayHack();
+		ACS_ExplorationDelayHack(false, 3);
 		
 		if
 		(
@@ -54,7 +55,7 @@ state ACS_RangedWeaponSwitch_Engage in cACS_RangedWeaponSwitch
 					}
 				}
 			}
-			else if (GetWitcherPlayer().HasTag('acs_crossbow_active'))
+			else if (FactsQuerySum("ACS_Slayer_Active") > 0)
 			{
 				if (!GetWitcherPlayer().HasTag('acs_crossbow_equipped'))
 				{
@@ -76,102 +77,6 @@ state ACS_RangedWeaponSwitch_Engage in cACS_RangedWeaponSwitch
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	latent function GetCurrentMeleeWeapon() : EPlayerWeapon
-	{
-		if (GetWitcherPlayer().IsWeaponHeld('silversword'))
-		{
-			return PW_Silver;
-		}
-		else if (GetWitcherPlayer().IsWeaponHeld('steelsword'))
-		{
-			return PW_Steel;
-		}
-		else if (GetWitcherPlayer().IsWeaponHeld('fist'))
-		{
-			return PW_Fists;
-		}
-		else
-		{
-			return PW_None;
-		}
-	}
-
-	latent function UpdateBehGraph( optional init : bool )
-	{	
-		weapontype = GetCurrentMeleeWeapon();
-		
-		if ( weapontype == PW_None )
-		{
-			weapontype = PW_Fists;
-		}
-		
-		if (thePlayer.GetBehaviorVariable( 'WeaponType') != 0)
-		{
-			GetWitcherPlayer().SetBehaviorVariable( 'WeaponType', 0);
-		}
-		
-		if ( (GetWitcherPlayer().HasTag('acs_vampire_claws_equipped') 
-		|| GetWitcherPlayer().HasTag('acs_sorc_fists_equipped') )
-		&& GetWitcherPlayer().IsInCombat() )
-		{
-			if (thePlayer.GetBehaviorVariable( 'playerWeapon') != (int) PW_Steel)
-			{
-				thePlayer.SetBehaviorVariable( 'playerWeapon', (int) PW_Steel );
-			}
-			
-			if (thePlayer.GetBehaviorVariable( 'playerWeaponForOverlay') != (int) PW_Steel)
-			{
-				thePlayer.SetBehaviorVariable( 'playerWeaponForOverlay', (int) PW_Steel );
-			}
-		}
-		else
-		{
-			if (thePlayer.GetBehaviorVariable( 'playerWeapon') != (int) weapontype)
-			{
-				thePlayer.SetBehaviorVariable( 'playerWeapon', (int) weapontype );
-			}
-			
-			if (thePlayer.GetBehaviorVariable( 'playerWeaponForOverlay') != (int) weapontype)
-			{
-				thePlayer.SetBehaviorVariable( 'playerWeaponForOverlay', (int) weapontype );
-			}
-		}
-		
-		if ( thePlayer.IsUsingHorse() )
-		{
-			if (thePlayer.GetBehaviorVariable( 'isOnHorse') != 1.0)
-			{
-				thePlayer.SetBehaviorVariable( 'isOnHorse', 1.0 );
-			}
-		}
-		else
-		{
-			if (thePlayer.GetBehaviorVariable( 'isOnHorse') != 0.0)
-			{
-				thePlayer.SetBehaviorVariable( 'isOnHorse', 0.0 );
-			}
-		}
-		
-		switch ( weapontype )
-		{
-			case PW_Steel:
-				GetWitcherPlayer().SetBehaviorVariable( 'SelectedWeapon', 0, true);
-				GetWitcherPlayer().SetBehaviorVariable( 'isHoldingWeaponR', 1.0, true );
-				if ( init )
-					res = GetWitcherPlayer().RaiseEvent('DrawWeaponInstant');
-				break;
-			case PW_Silver:
-				GetWitcherPlayer().SetBehaviorVariable( 'SelectedWeapon', 1, true);
-				GetWitcherPlayer().SetBehaviorVariable( 'isHoldingWeaponR', 1.0, true );
-				if ( init )
-					res = GetWitcherPlayer().RaiseEvent('DrawWeaponInstant');
-				break;
-			default:
-				GetWitcherPlayer().SetBehaviorVariable( 'isHoldingWeaponR', 0.0, true );
-				break;
-		}
-	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -235,7 +140,7 @@ state ACS_RangedWeaponSwitch_Engage in cACS_RangedWeaponSwitch
 				}
 			}
 
-			UpdateBehGraph();
+			
 		}
 	}
 
@@ -248,244 +153,29 @@ state ACS_RangedWeaponSwitch_Engage in cACS_RangedWeaponSwitch
 
 		if (FactsQuerySum("ACS_Azkar_Active") > 0)
 		{
-			AzkarBow();
-		}
-		else
-		{
-			if ( ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerModeWeaponType', 0) == 0 )
-			{
-				BowEvolving();
-			}
-			else if ( ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerModeWeaponType', 0) == 1 )
-			{
-				BowStatic();
-			}
+			ACS_WeaponDestroyInit();
+
+			sword1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
+
+			"dlc\dlc_acs\data\entities\ranged\bow_azkar.w2ent" 
+				
+			, true), GetWitcherPlayer().GetWorldPosition() );
+				
+			attach_rot.Roll = 0;
+			attach_rot.Pitch = 0;
+			attach_rot.Yaw = 0;
+			attach_vec.X = 0;
+			attach_vec.Y = -0.025;
+			attach_vec.Z = -0.045;
+				
+			sword1.CreateAttachment( GetWitcherPlayer(), 'l_weapon', attach_vec, attach_rot );
+			sword1.AddTag('acs_bow');
+			sword1.PlayEffect('ghost_06');
+
+			GetACSWatcher().AzkarFXCreate();
 		}
 		
 		GetWitcherPlayer().AddTag('acs_bow_equipped');
-	}
-
-	latent function BowEvolving()
-	{
-		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SilverSword, silverID);
-		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SteelSword, steelID);
-
-		ACS_WeaponDestroyInit(true);
-
-		if ( GetWitcherPlayer().IsWeaponHeld( 'silversword' ) )
-		{
-			if ( GetWitcherPlayer().GetInventory().GetItemLevel( silverID ) <= 10 || GetWitcherPlayer().GetInventory().GetItemQuality( silverID ) == 1 )
-			{
-				sword1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
-	
-				"dlc\dlc_ACS\data\entities\ranged\bow_02.w2ent" 
-					
-				, true), GetWitcherPlayer().GetWorldPosition() );
-					
-				attach_rot.Roll = 0;
-				attach_rot.Pitch = 0;
-				attach_rot.Yaw = 0;
-				attach_vec.X = 0;
-				attach_vec.Y = -0.025;
-				attach_vec.Z = -0.045;
-					
-				sword1.CreateAttachment( GetWitcherPlayer(), 'l_weapon', attach_vec, attach_rot );
-				sword1.AddTag('acs_bow');
-			}
-			else if ( GetWitcherPlayer().GetInventory().GetItemLevel( silverID ) <= 11 && GetWitcherPlayer().GetInventory().GetItemLevel(silverID) <= 20 && GetWitcherPlayer().GetInventory().GetItemQuality( silverID ) > 1 )
-			{
-				sword1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
-	
-				"dlc\dlc_ACS\data\entities\ranged\bow_01.w2ent"
-					
-				, true), GetWitcherPlayer().GetWorldPosition() );
-					
-				attach_rot.Roll = 0;
-				attach_rot.Pitch = 0;
-				attach_rot.Yaw = 0;
-				attach_vec.X = 0;
-				attach_vec.Y = -0.025;
-				attach_vec.Z = -0.045;
-					
-				sword1.CreateAttachment( GetWitcherPlayer(), 'l_weapon', attach_vec, attach_rot );
-				sword1.AddTag('acs_bow');
-			}
-			else if ( GetWitcherPlayer().GetInventory().GetItemLevel( silverID ) >= 21 && GetWitcherPlayer().GetInventory().GetItemQuality( silverID ) >= 2 ) 
-			{
-				sword1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
-
-				"dlc\dlc_acs\data\entities\ranged\bow_azkar.w2ent" 
-					
-				, true), GetWitcherPlayer().GetWorldPosition() );
-					
-				attach_rot.Roll = 0;
-				attach_rot.Pitch = 0;
-				attach_rot.Yaw = 0;
-				attach_vec.X = 0;
-				attach_vec.Y = -0.025;
-				attach_vec.Z = -0.045;
-					
-				sword1.CreateAttachment( GetWitcherPlayer(), 'l_weapon', attach_vec, attach_rot );
-				sword1.AddTag('acs_bow');
-				sword1.PlayEffect('ghost_06');
-			}
-			else
-			{
-				sword1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
-
-				"dlc\dlc_acs\data\entities\ranged\bow_azkar.w2ent" 
-					
-				, true), GetWitcherPlayer().GetWorldPosition() );
-					
-				attach_rot.Roll = 0;
-				attach_rot.Pitch = 0;
-				attach_rot.Yaw = 0;
-				attach_vec.X = 0;
-				attach_vec.Y = -0.025;
-				attach_vec.Z = -0.045;
-					
-				sword1.CreateAttachment( GetWitcherPlayer(), 'l_weapon', attach_vec, attach_rot );
-				sword1.AddTag('acs_bow');
-				sword1.PlayEffect('ghost_06');
-			}
-		}
-		else if ( GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) )
-		{
-			if ( GetWitcherPlayer().GetInventory().GetItemLevel( steelID ) <= 10 || GetWitcherPlayer().GetInventory().GetItemQuality( steelID ) == 1 )
-			{
-				sword1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
-	
-				"dlc\dlc_ACS\data\entities\ranged\bow_01.w2ent" 
-					
-				, true), GetWitcherPlayer().GetWorldPosition() );
-					
-				attach_rot.Roll = 0;
-				attach_rot.Pitch = 0;
-				attach_rot.Yaw = 0;
-				attach_vec.X = 0;
-				attach_vec.Y = -0.025;
-				attach_vec.Z = -0.045;
-					
-				sword1.CreateAttachment( GetWitcherPlayer(), 'l_weapon', attach_vec, attach_rot );
-				sword1.AddTag('acs_bow');
-			}
-			else if ( GetWitcherPlayer().GetInventory().GetItemLevel( steelID ) >= 11 && GetWitcherPlayer().GetInventory().GetItemLevel( steelID ) <= 20 && GetWitcherPlayer().GetInventory().GetItemQuality( steelID ) > 1 )
-			{
-				sword1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
-	
-				"dlc\dlc_ACS\data\entities\ranged\bow_02.w2ent"
-					
-				, true), GetWitcherPlayer().GetWorldPosition() );
-					
-				attach_rot.Roll = 0;
-				attach_rot.Pitch = 0;
-				attach_rot.Yaw = 0;
-				attach_vec.X = 0;
-				attach_vec.Y = -0.025;
-				attach_vec.Z = -0.045;
-					
-				sword1.CreateAttachment( GetWitcherPlayer(), 'l_weapon', attach_vec, attach_rot );
-				sword1.AddTag('acs_bow');
-			}
-			else if ( GetWitcherPlayer().GetInventory().GetItemLevel( steelID ) >= 21 && GetWitcherPlayer().GetInventory().GetItemQuality( steelID ) >= 2 )
-			{
-				sword1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
-
-				"dlc\dlc_acs\data\entities\ranged\bow_azkar.w2ent" 
-					
-				, true), GetWitcherPlayer().GetWorldPosition() );
-					
-				attach_rot.Roll = 0;
-				attach_rot.Pitch = 0;
-				attach_rot.Yaw = 0;
-				attach_vec.X = 0;
-				attach_vec.Y = -0.025;
-				attach_vec.Z = -0.045;
-					
-				sword1.CreateAttachment( GetWitcherPlayer(), 'l_weapon', attach_vec, attach_rot );
-				sword1.AddTag('acs_bow');
-				sword1.PlayEffect('ghost_06');
-			}
-			else
-			{
-				sword1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
-
-				"dlc\dlc_acs\data\entities\ranged\bow_azkar.w2ent" 
-					
-				, true), GetWitcherPlayer().GetWorldPosition() );
-					
-				attach_rot.Roll = 0;
-				attach_rot.Pitch = 0;
-				attach_rot.Yaw = 0;
-				attach_vec.X = 0;
-				attach_vec.Y = -0.025;
-				attach_vec.Z = -0.045;
-					
-				sword1.CreateAttachment( GetWitcherPlayer(), 'l_weapon', attach_vec, attach_rot );
-				sword1.AddTag('acs_bow');
-				sword1.PlayEffect('ghost_06');
-			}
-		}
-	}
-
-	latent function BowStatic()
-	{
-		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SilverSword, silverID);
-		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SteelSword, steelID);
-
-		ACS_WeaponDestroyInit(true);
-
-		if (RandF() < 0.5 )
-		{
-			sword1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
-
-			"dlc\dlc_ACS\data\entities\ranged\bow_02.w2ent" 
-				
-			, true), GetWitcherPlayer().GetWorldPosition() );
-
-		}
-		else
-		{
-			sword1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
-
-			"dlc\dlc_ACS\data\entities\ranged\bow_elven_01.w2ent" 
-				
-			, true), GetWitcherPlayer().GetWorldPosition() );
-		}
-			
-		attach_rot.Roll = 0;
-		attach_rot.Pitch = 0;
-		attach_rot.Yaw = 0;
-		attach_vec.X = 0;
-		attach_vec.Y = -0.025;
-		attach_vec.Z = -0.045;
-			
-		sword1.CreateAttachment( GetWitcherPlayer(), 'l_weapon', attach_vec, attach_rot );
-		sword1.AddTag('acs_bow');
-	}
-
-	latent function AzkarBow()
-	{
-		ACS_WeaponDestroyInit(true);
-
-		sword1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
-
-		"dlc\dlc_acs\data\entities\ranged\bow_azkar.w2ent" 
-			
-		, true), GetWitcherPlayer().GetWorldPosition() );
-			
-		attach_rot.Roll = 0;
-		attach_rot.Pitch = 0;
-		attach_rot.Yaw = 0;
-		attach_vec.X = 0;
-		attach_vec.Y = -0.025;
-		attach_vec.Z = -0.045;
-			
-		sword1.CreateAttachment( GetWitcherPlayer(), 'l_weapon', attach_vec, attach_rot );
-		sword1.AddTag('acs_bow');
-		sword1.PlayEffect('ghost_06');
-
-		GetACSWatcher().AzkarFXCreate();
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -554,32 +244,32 @@ state ACS_RangedWeaponSwitch_Engage in cACS_RangedWeaponSwitch
 			return;
 		}
 
-		CrossbowStatic();
+		if (FactsQuerySum("ACS_Slayer_Active") > 0)
+		{
+			ACS_WeaponDestroyInit();
+			
+			sword1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
+
+			//"dlc\dlc_acs\data\entities\ranged\acs_wolf_crossbow_fake.w2ent"
+
+			"dlc\dlc_acs\data\entities\ranged\shotgun_1.w2ent" 
+				
+			, true), GetWitcherPlayer().GetWorldPosition() );
+				
+			attach_rot.Roll = 0;
+			attach_rot.Pitch = 0;
+			attach_rot.Yaw = 0;
+			attach_vec.X = 0; // + forward - backward
+			attach_vec.Y = 0; // + left - right
+			attach_vec.Z = 0; // + up - down
+				
+			sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
+			sword1.AddTag('acs_crossbow');
+		}
 		
 		GetWitcherPlayer().AddTag('acs_crossbow_equipped');
 	}
 
-	latent function CrossbowStatic()
-	{
-		ACS_WeaponDestroyInit(true);
-		
-		sword1 = (CEntity)theGame.CreateEntity((CEntityTemplate)LoadResource( 
-
-		"dlc\dlc_acs\data\entities\ranged\acs_wolf_crossbow_fake.w2ent"
-			
-		, true), GetWitcherPlayer().GetWorldPosition() );
-			
-		attach_rot.Roll = -90;
-		attach_rot.Pitch = 0;
-		attach_rot.Yaw = 180;
-		attach_vec.X = -0.125; // + forward - backward
-		attach_vec.Y = 0; // + left - right
-		attach_vec.Z = 0.06125; // + up - down
-			
-		sword1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
-		sword1.AddTag('acs_crossbow');
-	}
-	
 	event OnLeaveState( nextStateName : name ) 
 	{
 		super.OnLeaveState(nextStateName);

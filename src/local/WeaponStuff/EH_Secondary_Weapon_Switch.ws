@@ -36,108 +36,14 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 		
 		LockEntryFunction(true);
 		SecondaryWeaponSwitch();
-		UpdateBehGraph();
 		LockEntryFunction(false);
 	}
 
-	function GetCurrentMeleeWeapon() : EPlayerWeapon
-	{
-		if (GetWitcherPlayer().IsWeaponHeld('silversword'))
-		{
-			return PW_Silver;
-		}
-		else if (GetWitcherPlayer().IsWeaponHeld('steelsword'))
-		{
-			return PW_Steel;
-		}
-		else if (GetWitcherPlayer().IsWeaponHeld('fist'))
-		{
-			return PW_Fists;
-		}
-		else
-		{
-			return PW_None;
-		}
-	}
-
-	function UpdateBehGraph( optional init : bool )
-	{
-		weapontype = GetCurrentMeleeWeapon();
-		
-		if ( weapontype == PW_None )
-		{
-			weapontype = PW_Fists;
-		}
-		
-		if (thePlayer.GetBehaviorVariable( 'WeaponType') != 0)
-		{
-			GetWitcherPlayer().SetBehaviorVariable( 'WeaponType', 0);
-		}
-		
-		if ( (GetWitcherPlayer().HasTag('acs_vampire_claws_equipped') 
-		|| GetWitcherPlayer().HasTag('acs_sorc_fists_equipped') )
-		&& GetWitcherPlayer().IsInCombat() )
-		{
-			if (thePlayer.GetBehaviorVariable( 'playerWeapon') != (int) PW_Steel)
-			{
-				thePlayer.SetBehaviorVariable( 'playerWeapon', (int) PW_Steel );
-			}
-			
-			if (thePlayer.GetBehaviorVariable( 'playerWeaponForOverlay') != (int) PW_Steel)
-			{
-				thePlayer.SetBehaviorVariable( 'playerWeaponForOverlay', (int) PW_Steel );
-			}
-		}
-		else
-		{
-			if (thePlayer.GetBehaviorVariable( 'playerWeapon') != (int) weapontype)
-			{
-				thePlayer.SetBehaviorVariable( 'playerWeapon', (int) weapontype );
-			}
-			
-			if (thePlayer.GetBehaviorVariable( 'playerWeaponForOverlay') != (int) weapontype)
-			{
-				thePlayer.SetBehaviorVariable( 'playerWeaponForOverlay', (int) weapontype );
-			}
-		}
-		
-		if ( thePlayer.IsUsingHorse() )
-		{
-			if (thePlayer.GetBehaviorVariable( 'isOnHorse') != 1.0)
-			{
-				thePlayer.SetBehaviorVariable( 'isOnHorse', 1.0 );
-			}
-		}
-		else
-		{
-			if (thePlayer.GetBehaviorVariable( 'isOnHorse') != 0.0)
-			{
-				thePlayer.SetBehaviorVariable( 'isOnHorse', 0.0 );
-			}
-		}
-		
-		switch ( weapontype )
-		{
-			case PW_Steel:
-				GetWitcherPlayer().SetBehaviorVariable( 'SelectedWeapon', 0, true);
-				GetWitcherPlayer().SetBehaviorVariable( 'isHoldingWeaponR', 1.0, true );
-				if ( init )
-					res = GetWitcherPlayer().RaiseEvent('DrawWeaponInstant');
-				break;
-			case PW_Silver:
-				GetWitcherPlayer().SetBehaviorVariable( 'SelectedWeapon', 1, true);
-				GetWitcherPlayer().SetBehaviorVariable( 'isHoldingWeaponR', 1.0, true );
-				if ( init )
-					res = GetWitcherPlayer().RaiseEvent('DrawWeaponInstant');
-				break;
-			default:
-				GetWitcherPlayer().SetBehaviorVariable( 'isHoldingWeaponR', 0.0, true );
-				break;
-		}
-	}
-	
 	entry function SecondaryWeaponSwitch()
 	{
+		GetACSWatcher().RemoveTimer('ForceControlModuleHudUpdate');
+		GetACSWatcher().AddTimer('ForceControlModuleHudUpdate', 0.25f , false);
+		
 		if ( ACS_GetWeaponMode() == 0 )
 		{
 			if
@@ -147,7 +53,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 				|| GetWitcherPlayer().IsWeaponHeld( 'steelsword' ))
 			)
 			{
-				if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerIgniSignWeapon', 0) == 0)
+				if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_igni_sign_weapon', 0) == 0)
 				{
 					if (!GetWitcherPlayer().HasTag('acs_igni_secondary_sword_equipped'))
 					{
@@ -156,7 +62,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 						IgniSecondarySwordSwitch();
 					}
 				}
-				else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerIgniSignWeapon', 0) == 1)
+				else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_igni_sign_weapon', 0) == 1)
 				{
 					if (!GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped'))
 					{
@@ -165,7 +71,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 						QuenSecondarySwordSwitch();
 					}
 				}
-				else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerIgniSignWeapon', 0) == 2)
+				else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_igni_sign_weapon', 0) == 2)
 				{
 					if (!GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped'))
 					{
@@ -174,7 +80,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 						AxiiSecondarySwordSwitch();
 					}
 				}
-				else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerIgniSignWeapon', 0) == 3)
+				else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_igni_sign_weapon', 0) == 3)
 				{
 					if (!GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped'))
 					{
@@ -183,7 +89,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 						AardSecondarySwordSwitch();			
 					}
 				}
-				else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerIgniSignWeapon', 0) == 4)
+				else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_igni_sign_weapon', 0) == 4)
 				{
 					if (!GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped'))
 					{
@@ -200,7 +106,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 				|| GetWitcherPlayer().IsWeaponHeld( 'steelsword' ))
 			)
 			{
-				if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerQuenSignWeapon', 1) == 0)
+				if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_quen_sign_weapon', 1) == 0)
 				{
 					if (!GetWitcherPlayer().HasTag('acs_igni_secondary_sword_equipped'))
 					{
@@ -209,7 +115,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 						IgniSecondarySwordSwitch();
 					}
 				}
-				else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerQuenSignWeapon', 1) == 1)
+				else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_quen_sign_weapon', 1) == 1)
 				{
 					if (!GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped'))
 					{
@@ -218,7 +124,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 						QuenSecondarySwordSwitch();
 					}
 				}
-				else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerQuenSignWeapon', 1) == 2)
+				else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_quen_sign_weapon', 1) == 2)
 				{
 					if (!GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped'))
 					{
@@ -227,7 +133,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 						AxiiSecondarySwordSwitch();
 					}
 				}
-				else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerQuenSignWeapon', 1) == 3)
+				else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_quen_sign_weapon', 1) == 3)
 				{
 					if (!GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped'))
 					{
@@ -236,7 +142,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 						AardSecondarySwordSwitch();			
 					}
 				}
-				else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerQuenSignWeapon', 1) == 4)
+				else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_quen_sign_weapon', 1) == 4)
 				{
 					if (!GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped'))
 					{
@@ -253,7 +159,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 				|| GetWitcherPlayer().IsWeaponHeld( 'steelsword' ))
 			)
 			{
-				if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAardSignWeapon', 3) == 0)
+				if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_aard_sign_weapon', 3) == 0)
 				{
 					if (!GetWitcherPlayer().HasTag('acs_igni_secondary_sword_equipped'))
 					{
@@ -262,7 +168,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 						IgniSecondarySwordSwitch();
 					}
 				}
-				else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAardSignWeapon', 3) == 1)
+				else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_aard_sign_weapon', 3) == 1)
 				{
 					if (!GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped'))
 					{
@@ -271,7 +177,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 						QuenSecondarySwordSwitch();
 					}
 				}
-				else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAardSignWeapon', 3) == 2)
+				else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_aard_sign_weapon', 3) == 2)
 				{
 					if (!GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped'))
 					{
@@ -280,7 +186,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 						AxiiSecondarySwordSwitch();
 					}
 				}
-				else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAardSignWeapon', 3) == 3)
+				else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_aard_sign_weapon', 3) == 3)
 				{
 					if (!GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped'))
 					{
@@ -289,7 +195,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 						AardSecondarySwordSwitch();			
 					}
 				}
-				else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAardSignWeapon', 3) == 4)
+				else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_aard_sign_weapon', 3) == 4)
 				{
 					if (!GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped'))
 					{
@@ -306,7 +212,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 				|| GetWitcherPlayer().IsWeaponHeld( 'steelsword' ))
 			)
 			{
-				if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAxiiSignWeapon', 2) == 0)
+				if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_axii_sign_weapon', 2) == 0)
 				{
 					if (!GetWitcherPlayer().HasTag('acs_igni_secondary_sword_equipped'))
 					{
@@ -315,7 +221,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 						IgniSecondarySwordSwitch();
 					}
 				}
-				else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAxiiSignWeapon', 2) == 1)
+				else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_axii_sign_weapon', 2) == 1)
 				{
 					if (!GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped'))
 					{
@@ -324,7 +230,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 						QuenSecondarySwordSwitch();
 					}
 				}
-				else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAxiiSignWeapon', 2) == 2)
+				else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_axii_sign_weapon', 2) == 2)
 				{
 					if (!GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped'))
 					{
@@ -333,7 +239,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 						AxiiSecondarySwordSwitch();
 					}
 				}
-				else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAxiiSignWeapon', 2) == 3)
+				else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_axii_sign_weapon', 2) == 3)
 				{
 					if (!GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped'))
 					{
@@ -342,7 +248,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 						AardSecondarySwordSwitch();			
 					}
 				}
-				else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAxiiSignWeapon', 2) == 4)
+				else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_axii_sign_weapon', 2) == 4)
 				{
 					if (!GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped'))
 					{
@@ -359,7 +265,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 				|| GetWitcherPlayer().IsWeaponHeld( 'steelsword' ))
 			)
 			{
-				if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerYrdenSignWeapon', 4) == 0)
+				if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_yrden_sign_weapon', 4) == 0)
 				{
 					if (!GetWitcherPlayer().HasTag('acs_igni_secondary_sword_equipped'))
 					{
@@ -368,7 +274,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 						IgniSecondarySwordSwitch();
 					}
 				}
-				else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerYrdenSignWeapon', 4) == 1)
+				else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_yrden_sign_weapon', 4) == 1)
 				{
 					if (!GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped'))
 					{
@@ -377,7 +283,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 						QuenSecondarySwordSwitch();
 					}
 				}
-				else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerYrdenSignWeapon', 4) == 2)
+				else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_yrden_sign_weapon', 4) == 2)
 				{
 					if (!GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped'))
 					{
@@ -386,7 +292,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 						AxiiSecondarySwordSwitch();
 					}
 				}
-				else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerYrdenSignWeapon', 4) == 3)
+				else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_yrden_sign_weapon', 4) == 3)
 				{
 					if (!GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped'))
 					{
@@ -395,7 +301,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 						AardSecondarySwordSwitch();			
 					}
 				}
-				else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerYrdenSignWeapon', 4) == 4)
+				else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_yrden_sign_weapon', 4) == 4)
 				{
 					if (!GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped'))
 					{
@@ -414,11 +320,11 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 		{
 			if 
 			(
-				( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 0 && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('acs_igni_secondary_sword_equipped') )
-				|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 0 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('acs_igni_secondary_sword_equipped') )
+				( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 0 && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('acs_igni_secondary_sword_equipped') )
+				|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 0 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('acs_igni_secondary_sword_equipped') )
 			)
 			{
-				ACS_WeaponDestroyInit(true);
+				ACS_WeaponDestroyInit();
 				
 				IgniSecondarySword();
 
@@ -427,8 +333,8 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 			
 			else if 
 			(
-				( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 4 && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped') )
-				|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 4 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped') )
+				( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 4 && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped') )
+				|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 4 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped') )
 			)
 			{
 				FocusModeAxiiSecondarySword();
@@ -438,8 +344,8 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 			
 			else if 
 			(
-				( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 8  && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped') )
-				|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 8 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped') )
+				( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 8  && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped') )
+				|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 8 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped') )
 			)
 			{
 				FocusModeAardSecondarySword();
@@ -449,8 +355,8 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 			
 			else if 
 			(
-				( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 6  && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped') )
-				|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 6 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped') )
+				( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 6  && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped') )
+				|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 6 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped') )
 			)
 			{
 				FocusModeYrdenSecondarySword();
@@ -460,8 +366,8 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 			
 			else if 
 			(
-				( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 2 && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped') )
-				|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 2 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped') )
+				( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 2 && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped') )
+				|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 2 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped') )
 			)
 			{
 				FocusModeQuenSecondarySword();
@@ -558,13 +464,13 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 		{
 			if 
 			(
-				( ACS_GetItem_Greg_Silver() && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped') )
-				|| ( ACS_GetItem_Greg_Steel() && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped') )
-				|| ( ACS_GetItem_Katana_Steel() && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped') )
-				|| ( ACS_GetItem_Katana_Silver() && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped') )
+				( ACS_GetItem_Sword_IsEquipped('greg_silver', 'silver') && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped') )
+				|| ( ACS_GetItem_Sword_IsEquipped('greg_steel', 'steel') && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped') )
+				|| ( ACS_GetItem_Sword_IsEquipped('katana_steel', 'steel') && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped') )
+				|| ( ACS_GetItem_Sword_IsEquipped('katana_silver', 'silver') && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped') )
 			)
 			{
-				ACS_WeaponDestroyInit(true);
+				ACS_WeaponDestroyInit();
 
 				trail_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\fx\acs_sword_trail.w2ent" , true );
 
@@ -611,11 +517,12 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 			
 			else if 
 			(
-				( ACS_GetItem_Axe_Silver() && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped') )
-				|| ( ACS_GetItem_Axe_Steel() && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped') )
+				( ACS_GetItem_Sword_IsEquipped('axe_silver', 'silver') && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped') )
+				|| ( ACS_GetItem_Sword_IsEquipped('axe_steel', 'steel') && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped') )
+				|| ( ACS_GetItem_Sword_IsEquipped('nithral_steel', 'steel') && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped') )
 			)
 			{
-				ACS_WeaponDestroyInit(true);
+				ACS_WeaponDestroyInit();
 
 				trail_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\fx\acs_sword_trail.w2ent" , true );
 
@@ -662,11 +569,11 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 			
 			else if 
 			(
-				( ACS_GetItem_Hammer_Silver() && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped') )
-				|| ( ACS_GetItem_Hammer_Steel() && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped') )
+				( ACS_GetItem_Sword_IsEquipped('hammer_silver', 'silver') && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped') )
+				|| ( ACS_GetItem_Sword_IsEquipped('hammer_steel', 'steel') && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped') )
 			)
 			{
-				ACS_WeaponDestroyInit(true);
+				ACS_WeaponDestroyInit();
 
 				trail_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\fx\acs_sword_trail.w2ent" , true );
 
@@ -713,11 +620,73 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 			
 			else if 
 			(
-				( ACS_GetItem_Spear_Silver() && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped') )
-				|| ( ACS_GetItem_Spear_Steel() && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped') )
+				( ACS_GetItem_Sword_IsEquipped('spear_silver', 'silver') && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped') )
+				|| ( ACS_GetItem_Sword_IsEquipped('spear_steel', 'steel') && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped') )
 			)
 			{
-				ACS_WeaponDestroyInit(true);
+				ACS_WeaponDestroyInit();
+
+				trail_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\fx\acs_sword_trail.w2ent" , true );
+
+				sword_trail_1 = (CEntity)theGame.CreateEntity( trail_temp, GetWitcherPlayer().GetWorldPosition() + Vector( 0, 0, -20 ) );
+
+				sword_trail_2 = (CEntity)theGame.CreateEntity( trail_temp, GetWitcherPlayer().GetWorldPosition() + Vector( 0, 0, -20 ) );
+
+				sword_trail_3 = (CEntity)theGame.CreateEntity( trail_temp, GetWitcherPlayer().GetWorldPosition() + Vector( 0, 0, -20 ) );
+
+				sword_trail_4 = (CEntity)theGame.CreateEntity( trail_temp, GetWitcherPlayer().GetWorldPosition() + Vector( 0, 0, -20 ) );
+
+				attach_rot.Roll = 0;
+				attach_rot.Pitch = 0;
+				attach_rot.Yaw = 0;
+				attach_vec.X = 0;
+				attach_vec.Y = 0;
+				attach_vec.Z = 0.4;
+
+				sword_trail_1.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
+				sword_trail_1.AddTag('acs_sword_trail_1');
+
+				attach_rot.Roll = 180;
+				attach_rot.Pitch = 0;
+				attach_rot.Yaw = 0;
+				attach_vec.X = 0;
+				attach_vec.Y = 0;
+				attach_vec.Z = -0.2;
+
+				sword_trail_2.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
+				sword_trail_2.AddTag('acs_sword_trail_2');
+
+				attach_rot.Roll = 0;
+				attach_rot.Pitch = 0;
+				attach_rot.Yaw = 0;
+				attach_vec.X = 0;
+				attach_vec.Y = 0;
+				attach_vec.Z = 0.6;
+
+				sword_trail_3.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
+				sword_trail_3.AddTag('acs_sword_trail_3');
+
+				attach_rot.Roll = 180;
+				attach_rot.Pitch = 0;
+				attach_rot.Yaw = 0;
+				attach_vec.X = 0;
+				attach_vec.Y = 0;
+				attach_vec.Z = -0.4;
+
+				sword_trail_4.CreateAttachment( GetWitcherPlayer(), 'r_weapon', attach_vec, attach_rot );
+				sword_trail_4.AddTag('acs_sword_trail_4');
+
+				GetWitcherPlayer().AddTag('acs_quen_secondary_sword_equipped');
+
+				QuenSecondarySwordSwitch();
+			}
+			else if 
+			(
+				( ACS_GetItem_Sword_IsEquipped('jingubang_steel', 'steel') || ACS_GetItem_Sword_IsEquipped('jingubang_silver', 'silver') && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && !GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped') )
+				|| ( ACS_GetItem_Sword_IsEquipped('jingubang_steel', 'steel') || ACS_GetItem_Sword_IsEquipped('jingubang_silver', 'silver') && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && !GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped') )
+			)
+			{
+				ACS_WeaponDestroyInit();
 
 				trail_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\fx\acs_sword_trail.w2ent" , true );
 
@@ -783,9 +752,9 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 		if (GetWitcherPlayer().HasTag('acs_igni_secondary_sword_equipped')
 		&& !GetWitcherPlayer().HasTag('acs_igni_secondary_sword_effect_played'))
 		{
-			acs_igni_sword_summon();
+			ACSSwordSummonEffect('igni');
 
-			GetACSWatcher().AddTimer('ACS_Weapon_Summon_Delay', 0.125, false);
+			GetACSWatcher().AddTimer('ACS_Weapon_Summon_Delay', 0.125 / theGame.GetTimeScale(), false );
 
 			GetWitcherPlayer().AddTag('acs_igni_secondary_sword_effect_played');
 			GetWitcherPlayer().AddTag('acs_igni_sword_effect_played');
@@ -793,44 +762,44 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 		else if (GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped')
 		&& !GetWitcherPlayer().HasTag('acs_axii_secondary_sword_effect_played'))
 		{
-			acs_igni_sword_summon();
+			ACSSwordSummonEffect('igni');
 
-			//acs_axii_secondary_sword_summon();
+			//ACSSwordSummonEffect('axii_secondary');
 
-			GetACSWatcher().AddTimer('ACS_Weapon_Summon_Delay', 0.125, false);
+			GetACSWatcher().AddTimer('ACS_Weapon_Summon_Delay', 0.125 / theGame.GetTimeScale(), false );
 
 			GetWitcherPlayer().AddTag('acs_axii_secondary_sword_effect_played');
 		}
 		else if (GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped')
 		&& !GetWitcherPlayer().HasTag('acs_aard_secondary_sword_effect_played'))
 		{
-			acs_igni_sword_summon();
+			ACSSwordSummonEffect('igni');
 
-			//acs_aard_secondary_sword_summon();
+			//ACSSwordSummonEffect('aard_secondary');
 
-			GetACSWatcher().AddTimer('ACS_Weapon_Summon_Delay', 0.125, false);
+			GetACSWatcher().AddTimer('ACS_Weapon_Summon_Delay', 0.125 / theGame.GetTimeScale(), false );
 
 			GetWitcherPlayer().AddTag('acs_aard_secondary_sword_effect_played');
 		}
 		else if (GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped')
 		&& !GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_effect_played'))
 		{
-			acs_igni_sword_summon();
+			ACSSwordSummonEffect('igni');
 
-			//acs_yrden_secondary_sword_summon();
+			//ACSSwordSummonEffect('yrden_secondary');
 
-			GetACSWatcher().AddTimer('ACS_Weapon_Summon_Delay', 0.125, false);
+			GetACSWatcher().AddTimer('ACS_Weapon_Summon_Delay', 0.125 / theGame.GetTimeScale(), false );
 
 			GetWitcherPlayer().AddTag('acs_yrden_secondary_sword_effect_played');
 		}
 		else if (GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped')
 		&& !GetWitcherPlayer().HasTag('acs_quen_secondary_sword_effect_played'))
 		{
-			acs_igni_sword_summon();
+			ACSSwordSummonEffect('igni');
 			
-			//acs_quen_secondary_sword_summon();
+			//ACSSwordSummonEffect('quen_secondary');
 
-			GetACSWatcher().AddTimer('ACS_Weapon_Summon_Delay', 0.125, false);
+			GetACSWatcher().AddTimer('ACS_Weapon_Summon_Delay', 0.125 / theGame.GetTimeScale(), false );
 
 			GetWitcherPlayer().AddTag('acs_quen_secondary_sword_effect_played');
 		}
@@ -855,7 +824,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_passive_taunt' )
 					{
@@ -874,7 +843,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_passive_taunt' )
 					{
@@ -893,7 +862,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'igni_primary_beh_passive_taunt' )
 					{
@@ -929,7 +898,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 				}
 			}
 
-			UpdateBehGraph();
+			
 		}
 	}
 			
@@ -947,7 +916,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR_passive_taunt' )
 					{
@@ -966,7 +935,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP_passive_taunt' )
 					{
@@ -985,7 +954,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'axii_secondary_beh_passive_taunt' )
 					{
@@ -1021,7 +990,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 				}
 			}
 
-			UpdateBehGraph();
+			
 		}
 	}
 			
@@ -1039,7 +1008,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'aard_secondary_beh_SCAAR_passive_taunt' )
 					{
@@ -1058,7 +1027,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'aard_secondary_beh_E3ARP_passive_taunt' )
 					{
@@ -1077,7 +1046,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'aard_secondary_beh_passive_taunt' )
 					{
@@ -1113,7 +1082,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 				}
 			}
 
-			UpdateBehGraph();
+			
 		}
 	}
 			
@@ -1131,7 +1100,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_SCAAR_passive_taunt' )
 					{
@@ -1150,7 +1119,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_E3ARP_passive_taunt' )
 					{
@@ -1169,7 +1138,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_passive_taunt' )
 					{
@@ -1205,7 +1174,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 				}
 			}
 
-			UpdateBehGraph();
+			
 		}
 	}
 			
@@ -1223,7 +1192,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'quen_secondary_beh_SCAAR_passive_taunt' )
 					{
@@ -1242,7 +1211,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'quen_secondary_beh_E3ARP_passive_taunt' )
 					{
@@ -1261,7 +1230,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					if ( GetWitcherPlayer().GetBehaviorGraphInstanceName() != 'quen_secondary_beh_passive_taunt' )
 					{
@@ -1297,7 +1266,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 				}
 			}
 
-			UpdateBehGraph();
+			
 		}
 	}
 	
@@ -1309,7 +1278,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 		steelsword = (CDrawableComponent)((GetWitcherPlayer().GetInventory().GetItemEntityUnsafe(steelID)).GetMeshComponent());
 		silversword = (CDrawableComponent)((GetWitcherPlayer().GetInventory().GetItemEntityUnsafe(silverID)).GetMeshComponent());
 		
-		ACS_WeaponDestroyInit(true);
+		ACS_WeaponDestroyInit();
 
 		trail_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\fx\acs_sword_trail.w2ent" , true );
 
@@ -1355,17 +1324,6 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 
 			steelswordentity = GetWitcherPlayer().inv.GetItemEntityUnsafe(steelID);
 			steelswordentity.SetHideInGame(false); 
-
-			if (!ACS_Settings_Main_Bool('EHmodVisualSettings','EHmodHideSwordsheathes', false))
-			{
-				scabbards_steel = GetWitcherPlayer().inv.GetItemsByCategory('steel_scabbards');
-
-				for ( i=0; i < scabbards_steel.Size() ; i+=1 )
-				{
-					scabbard_steel = (CDrawableComponent)((GetWitcherPlayer().inv.GetItemEntityUnsafe(scabbards_steel[i])).GetMeshComponent());
-					//scabbard_steel.SetVisible(true);
-				}
-			}
 		}
 		else if( GetWitcherPlayer().GetInventory().IsItemHeld(silverID) )
 		{
@@ -1373,17 +1331,6 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 
 			silverswordentity = GetWitcherPlayer().inv.GetItemEntityUnsafe(silverID);
 			silverswordentity.SetHideInGame(false); 
-
-			if (!ACS_Settings_Main_Bool('EHmodVisualSettings','EHmodHideSwordsheathes', false))
-			{
-				scabbards_silver = GetWitcherPlayer().inv.GetItemsByCategory('silver_scabbards');
-
-				for ( i=0; i < scabbards_silver.Size() ; i+=1 )
-				{
-					scabbard_silver = (CDrawableComponent)((GetWitcherPlayer().inv.GetItemEntityUnsafe(scabbards_silver[i])).GetMeshComponent());
-					//scabbard_silver.SetVisible(true);
-				}
-			}
 		}
 		
 		GetWitcherPlayer().AddTag('acs_igni_secondary_sword_equipped');
@@ -1394,11 +1341,11 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 
 	latent function ArmigerModeAxiiSecondarySword()
 	{
-		if ( ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerModeWeaponType', 0) == 0 )
+		if ( ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_mode_weapon_type', 0) == 0 )
 		{
 			AxiiSecondarySwordEvolving();
 		}
-		else if ( ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerModeWeaponType', 0) == 1 )
+		else if ( ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_mode_weapon_type', 0) == 1 )
 		{
 			AxiiSecondarySwordStatic();
 		}
@@ -1408,11 +1355,11 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 
 	latent function FocusModeAxiiSecondarySword()
 	{
-		if ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeWeaponType', 0) == 0 )
+		if ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_weapon_type', 0) == 0 )
 		{
 			AxiiSecondarySwordEvolving();
 		}
-		else if ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeWeaponType', 0) == 1 )
+		else if ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_weapon_type', 0) == 1 )
 		{
 			AxiiSecondarySwordStatic();
 		}
@@ -1422,11 +1369,11 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 
 	latent function HybridModeAxiiSecondarySword()
 	{
-		if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeWeaponType', 0) == 0)
+		if ( ACS_Settings_Main_Int('acs_hybrid_mode_settings','acs_hybrid_mode_weapon_type', 0) == 0)
 		{
 			AxiiSecondarySwordEvolving();
 		}
-		else if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeWeaponType', 0) == 1)
+		else if ( ACS_Settings_Main_Int('acs_hybrid_mode_settings','acs_hybrid_mode_weapon_type', 0) == 1)
 		{
 			AxiiSecondarySwordStatic();
 		}
@@ -1439,7 +1386,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SilverSword, silverID);
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SteelSword, steelID);
 
-		ACS_WeaponDestroyInit(true);
+		ACS_WeaponDestroyInit();
 		
 		trail_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\fx\acs_sword_trail.w2ent" , true );
 
@@ -2048,7 +1995,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SilverSword, silverID);
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SteelSword, steelID);
 
-		ACS_WeaponDestroyInit(true);
+		ACS_WeaponDestroyInit();
 		
 		trail_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\fx\acs_sword_trail.w2ent" , true );
 
@@ -2128,11 +2075,11 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 
 	latent function ArmigerModeAardSecondarySword()
 	{
-		if ( ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerModeWeaponType', 0) == 0 )
+		if ( ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_mode_weapon_type', 0) == 0 )
 		{
 			AardSecondarySwordEvolving();
 		}
-		else if ( ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerModeWeaponType', 0) == 1 )
+		else if ( ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_mode_weapon_type', 0) == 1 )
 		{
 			AardSecondarySwordStatic();
 		}
@@ -2142,11 +2089,11 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 
 	latent function FocusModeAardSecondarySword()
 	{
-		if ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeWeaponType', 0) == 0  )
+		if ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_weapon_type', 0) == 0  )
 		{
 			AardSecondarySwordEvolving();
 		}
-		else if ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeWeaponType', 0) == 1 )
+		else if ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_weapon_type', 0) == 1 )
 		{
 			AardSecondarySwordStatic();
 		}
@@ -2156,11 +2103,11 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 
 	latent function HybridModeAardSecondarySword()
 	{
-		if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeWeaponType', 0) == 0 )
+		if ( ACS_Settings_Main_Int('acs_hybrid_mode_settings','acs_hybrid_mode_weapon_type', 0) == 0 )
 		{
 			AardSecondarySwordEvolving();
 		}
-		else if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeWeaponType', 0) == 1 )
+		else if ( ACS_Settings_Main_Int('acs_hybrid_mode_settings','acs_hybrid_mode_weapon_type', 0) == 1 )
 		{
 			AardSecondarySwordStatic();
 		}
@@ -2173,7 +2120,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SilverSword, silverID);
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SteelSword, steelID);
 
-		ACS_WeaponDestroyInit(true);
+		ACS_WeaponDestroyInit();
 
 		trail_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\fx\acs_sword_trail.w2ent" , true );
 
@@ -3358,7 +3305,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SilverSword, silverID);
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SteelSword, steelID);
 
-		ACS_WeaponDestroyInit(true);
+		ACS_WeaponDestroyInit();
 
 		trail_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\fx\acs_sword_trail.w2ent" , true );
 
@@ -3438,11 +3385,11 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 
 	latent function ArmigerModeYrdenSecondarySword()
 	{
-		if ( ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerModeWeaponType', 0) == 0 )
+		if ( ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_mode_weapon_type', 0) == 0 )
 		{
 			YrdenSecondarySwordEvolving();
 		}
-		else if ( ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerModeWeaponType', 0) == 1 )
+		else if ( ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_mode_weapon_type', 0) == 1 )
 		{
 			YrdenSecondarySwordStatic();
 		}
@@ -3452,11 +3399,11 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 
 	latent function FocusModeYrdenSecondarySword()
 	{
-		if ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeWeaponType', 0) == 0 )
+		if ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_weapon_type', 0) == 0 )
 		{
 			YrdenSecondarySwordEvolving();
 		}
-		else if ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeWeaponType', 0) == 1 )
+		else if ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_weapon_type', 0) == 1 )
 		{
 			YrdenSecondarySwordStatic();
 		}
@@ -3466,11 +3413,11 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 
 	latent function HybridModeYrdenSecondarySword()
 	{
-		if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeWeaponType', 0) == 0 )
+		if ( ACS_Settings_Main_Int('acs_hybrid_mode_settings','acs_hybrid_mode_weapon_type', 0) == 0 )
 		{
 			YrdenSecondarySwordEvolving();
 		}
-		else if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeWeaponType', 0) == 1 )
+		else if ( ACS_Settings_Main_Int('acs_hybrid_mode_settings','acs_hybrid_mode_weapon_type', 0) == 1 )
 		{
 			YrdenSecondarySwordStatic();
 		}
@@ -3483,7 +3430,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SilverSword, silverID);
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SteelSword, steelID);
 
-		ACS_WeaponDestroyInit(true);
+		ACS_WeaponDestroyInit();
 
 		trail_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\fx\acs_sword_trail.w2ent" , true );
 
@@ -4289,7 +4236,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SilverSword, silverID);
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SteelSword, steelID);
 
-		ACS_WeaponDestroyInit(true);
+		ACS_WeaponDestroyInit();
 
 		trail_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\fx\acs_sword_trail.w2ent" , true );
 
@@ -4369,11 +4316,11 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 	
 	latent function ArmigerModeQuenSecondarySword()
 	{
-		if ( ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerModeWeaponType', 0) == 0 )
+		if ( ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_mode_weapon_type', 0) == 0 )
 		{
 			QuenSecondarySwordEvolving();
 		}
-		else if ( ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerModeWeaponType', 0) == 1 )
+		else if ( ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_mode_weapon_type', 0) == 1 )
 		{
 			QuenSecondarySwordStatic();
 		}
@@ -4383,11 +4330,11 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 
 	latent function FocusModeQuenSecondarySword()
 	{
-		if ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeWeaponType', 0) == 0 )
+		if ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_weapon_type', 0) == 0 )
 		{
 			QuenSecondarySwordEvolving();
 		}
-		else if ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeWeaponType', 0) == 1 )
+		else if ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_weapon_type', 0) == 1 )
 		{
 			QuenSecondarySwordStatic();
 		}
@@ -4397,11 +4344,11 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 
 	latent function HybridModeQuenSecondarySword()
 	{
-		if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeWeaponType', 0) == 0 )
+		if ( ACS_Settings_Main_Int('acs_hybrid_mode_settings','acs_hybrid_mode_weapon_type', 0) == 0 )
 		{
 			QuenSecondarySwordEvolving();
 		}
-		else if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeWeaponType', 0) == 1 )
+		else if ( ACS_Settings_Main_Int('acs_hybrid_mode_settings','acs_hybrid_mode_weapon_type', 0) == 1 )
 		{
 			QuenSecondarySwordStatic();
 		}
@@ -4414,7 +4361,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SilverSword, silverID);
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SteelSword, steelID);
 
-		ACS_WeaponDestroyInit(true);
+		ACS_WeaponDestroyInit();
 
 		trail_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\fx\acs_sword_trail.w2ent" , true );
 
@@ -5203,7 +5150,7 @@ state ACS_Secondary_Weapon_Switch_Engage in cACS_SecondaryWeaponSwitch
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SilverSword, silverID);
 		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SteelSword, steelID);
 		
-		ACS_WeaponDestroyInit(true);
+		ACS_WeaponDestroyInit();
 
 		trail_temp = (CEntityTemplate)LoadResource( "dlc\dlc_acs\data\fx\acs_sword_trail.w2ent" , true );
 

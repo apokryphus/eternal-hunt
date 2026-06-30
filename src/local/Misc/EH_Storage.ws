@@ -60,6 +60,7 @@ statemachine abstract class W3ACSStorage extends CPeristentEntity
 
 	public saved var unseen_blade_death_count					: int;
 
+	/*
 	public function acs_listContainerIds(id: CName): array<CName> 
 	{
         var null: ACSStorageData;
@@ -168,246 +169,170 @@ statemachine abstract class W3ACSStorage extends CPeristentEntity
 	{
 		return killcount;
 	}
+	*/
 
-	public function acs_GetKillCountString() : string
+	public function acs_GetKillCountString(kill_count_type : name) : string
 	{
-		return IntToString(killcount);
+		var killcount_type_to_return : string;
+
+		switch(kill_count_type)
+		{
+			case 'other':
+				killcount_type_to_return = IntToString(other_killcount);
+			break;
+
+			case 'vampire':
+				killcount_type_to_return = IntToString(vampires_killcount);
+			break;
+
+			case 'spectre':
+				killcount_type_to_return = IntToString(specters_killcount);
+			break;
+
+			case 'relict':
+				killcount_type_to_return = IntToString(relicts_killcount);
+			break;
+
+			case 'ogroid':
+				killcount_type_to_return = IntToString(ogroids_killcount);
+			break;
+
+			case 'necrophage':
+				killcount_type_to_return = IntToString(necrophages_killcount);
+			break;
+
+			case 'insectoid':
+				killcount_type_to_return = IntToString(insectoids_killcount);
+			break;
+
+			case 'hybrid':
+				killcount_type_to_return = IntToString(hybrids_killcount);
+			break;
+
+			case 'elemental':
+				killcount_type_to_return = IntToString(elementa_killcount);
+			break;
+
+			case 'draconid':
+				killcount_type_to_return = IntToString(draconids_killcount);
+			break;
+
+			case 'cursed_one':
+				killcount_type_to_return = IntToString(cursed_ones_killcount);
+			break;
+
+			case 'beast':
+				killcount_type_to_return = IntToString(beast_killcount);
+			break;
+
+			case 'human':
+				killcount_type_to_return = IntToString(human_killcount);
+			break;
+
+			case 'total':
+				killcount_type_to_return = IntToString(killcount);
+			break;
+
+			default:
+				killcount_type_to_return = IntToString(killcount);
+			break;
+		}
+
+		return killcount_type_to_return;
 	}
 
-	public function acs_Killcount_Increment()
+	public function acs_Killcount_Increment(kill_count_type : name)
 	{
-		killcount += 1;
+		switch(kill_count_type)
+		{
+			case 'other':
+				other_killcount += 1;
+			break;
+
+			case 'vampire':
+				vampires_killcount += 1;
+			break;
+
+			case 'spectre':
+				specters_killcount += 1;
+			break;
+
+			case 'relict':
+				relicts_killcount += 1;
+			break;
+
+			case 'ogroid':
+				ogroids_killcount += 1;
+			break;
+
+			case 'necrophage':
+				necrophages_killcount += 1;
+			break;
+
+			case 'insectoid':
+				insectoids_killcount += 1;
+			break;
+
+			case 'hybrid':
+				hybrids_killcount += 1;
+			break;
+
+			case 'elementa':
+				elementa_killcount += 1;
+			break;
+
+			case 'draconid':
+				draconids_killcount += 1;
+			break;
+
+			case 'cursed_one':
+				cursed_ones_killcount += 1;
+			break;
+
+			case 'beast':
+				beast_killcount += 1;
+			break;
+
+			case 'human':
+				human_killcount += 1;
+			break;
+
+			case 'total':
+				killcount += 1;
+			break;
+
+			default:
+				killcount += 1;
+			break;
+		}
 	}
 
-	public function acs_GetHumanKillCount() : int
+	public function acs_Number_Of_Unseen_Blade_Slain_Manage(reset : bool)
 	{
-		return human_killcount;
+		if (reset)
+		{
+			number_of_bruxae_slain -= number_of_bruxae_slain;
+		}
+		else
+		{
+			number_of_bruxae_slain += 1;
+		}
 	}
 
-	public function acs_GetHumanKillCountString() : string
+	public function acs_Number_Of_Bruxae_Slain_Manage(reset : bool)
 	{
-		return IntToString(human_killcount);
-	}
-
-	public function acs_HumanKillcount_Increment()
-	{
-		human_killcount += 1;
-	}
-
-	public function acs_GetBeastKillCount() : int
-	{
-		return beast_killcount;
-	}
-
-	public function acs_GetBeastKillCountString() : string
-	{
-		return IntToString(beast_killcount);
-	}
-
-	public function acs_BeastKillcount_Increment()
-	{
-		beast_killcount += 1;
-	}
-
-	public function acs_GetCursedOnesKillCount() : int
-	{
-		return cursed_ones_killcount;
-	}
-
-	public function acs_GetCursedOnesKillCountString() : string
-	{
-		return IntToString(cursed_ones_killcount);
-	}
-
-	public function acs_CursedOnesKillcount_Increment()
-	{
-		cursed_ones_killcount += 1;
-	}
-
-	public function acs_GetDraconidsKillCount() : int
-	{
-		return draconids_killcount;
-	}
-
-	public function acs_GetDraconidsKillCountString() : string
-	{
-		return IntToString(draconids_killcount);
-	}
-
-	public function acs_DraconidsKillcount_Increment()
-	{
-		draconids_killcount += 1;
-	}
-
-	public function acs_GetElementaKillCount() : int
-	{
-		return elementa_killcount;
-	}
-
-	public function acs_GetElementaKillCountString() : string
-	{
-		return IntToString(elementa_killcount);
-	}
-
-	public function acs_ElementaKillcount_Increment()
-	{
-		elementa_killcount += 1;
-	}
-
-	public function acs_GetHybridsKillCount() : int
-	{
-		return hybrids_killcount;
-	}
-
-	public function acs_GetHybridsKillCountString() : string
-	{
-		return IntToString(hybrids_killcount);
-	}
-
-	public function acs_HybridsKillcount_Increment()
-	{
-		hybrids_killcount += 1;
-	}
-
-
-	public function acs_GetInsectoidsKillCount() : int
-	{
-		return insectoids_killcount;
-	}
-
-	public function acs_GetInsectoidsKillCountString() : string
-	{
-		return IntToString(insectoids_killcount);
-	}
-
-	public function acs_InsectoidsKillcount_Increment()
-	{
-		insectoids_killcount += 1;
-	}
-
-
-	public function acs_GetNecrophagesKillCount() : int
-	{
-		return necrophages_killcount;
-	}
-
-	public function acs_GetNecrophagesKillCountString() : string
-	{
-		return IntToString(necrophages_killcount);
-	}
-
-	public function acs_NecrophagesKillcount_Increment()
-	{
-		necrophages_killcount += 1;
-	}
-
-	public function acs_GetOgroidsKillCount() : int
-	{
-		return ogroids_killcount;
-	}
-
-	public function acs_GetOgroidsKillCountString() : string
-	{
-		return IntToString(ogroids_killcount);
-	}
-
-	public function acs_OgroidsKillcount_Increment()
-	{
-		ogroids_killcount += 1;
-	}
-
-	public function acs_GetRelictsKillCount() : int
-	{
-		return relicts_killcount;
-	}
-
-	public function acs_GetRelictsKillCountString() : string
-	{
-		return IntToString(relicts_killcount);
-	}
-
-	public function acs_RelictsKillcount_Increment()
-	{
-		relicts_killcount += 1;
-	}
-
-
-	public function acs_GetSpectersKillCount() : int
-	{
-		return specters_killcount;
-	}
-
-	public function acs_GetSpectersKillCountString() : string
-	{
-		return IntToString(specters_killcount);
-	}
-
-	public function acs_SpectersKillcount_Increment()
-	{
-		specters_killcount += 1;
-	}
-
-	public function acs_GetVampiresKillCount() : int
-	{
-		return vampires_killcount;
-	}
-
-	public function acs_GetVampiresKillCountString() : string
-	{
-		return IntToString(vampires_killcount);
-	}
-
-	public function acs_VampiresKillcount_Increment()
-	{
-		vampires_killcount += 1;
-	}
-
-	public function acs_GetOtherKillCount() : int
-	{
-		return other_killcount;
-	}
-
-	public function acs_GetOtherKillCountString() : string
-	{
-		return IntToString(other_killcount);
-	}
-
-	public function acs_OtherKillcount_Increment()
-	{
-		other_killcount += 1;
-	}
-
-	public function acs_Number_Of_Bruxae_Slain() : int
-	{
-		return number_of_bruxae_slain;
-	}
-
-	public function acs_Number_Of_Bruxae_Slain_Increment()
-	{
-		number_of_bruxae_slain += 1;
-	}
-
-	public function acs_Number_Of_Bruxae_Slain_Reset()
-	{
-		number_of_bruxae_slain -= number_of_bruxae_slain;
-	}
-
-	public function acs_Unseen_Blade_Death_Count() : int
-	{
-		return unseen_blade_death_count;
-	}
-
-	public function acs_Unseen_Blade_Death_Count_Increment()
-	{
-		unseen_blade_death_count += 1;
-	}
-
-	public function acs_Unseen_Blade_Death_Count_Reset()
-	{
-		unseen_blade_death_count -= unseen_blade_death_count;
+		if (reset)
+		{
+			unseen_blade_death_count -= unseen_blade_death_count;
+		}
+		else
+		{
+			unseen_blade_death_count += 1;
+		}
 	}
 
 	private var oneliner_counter: int;
+	default oneliner_counter = 2117035;
 
 	protected var oneliners: array<ACS_Oneliner>;
 
@@ -434,11 +359,53 @@ statemachine abstract class W3ACSStorage extends CPeristentEntity
 		this.fxRemoveOnelinerSFF 	= this.module_flash.GetMemberFlashFunction( "RemoveOneliner" );
 	}
 
+	function ResetOnelinerIDs()
+	{
+		oneliner_counter -= oneliner_counter;
+
+		oneliner_counter = 7035;
+	}
+
+	/*
 	private function acs_onelinerGetNewId(): int 
 	{
-		var id: int = Max(this.oneliner_counter, (int)theGame.GetLocalTimeAsMilliseconds());
+		var id: int;
 
-		this.oneliner_counter = id + 1;
+		//id = Max(this.oneliner_counter, (int)theGame.GetLocalTimeAsMilliseconds());
+
+		//this.oneliner_counter = id + 1;
+
+		//return id;
+
+		id = oneliner_counter;
+
+		oneliner_counter += 1;
+
+		return id;
+	}
+	*/
+
+	/*
+	public function acs_clearOneliners() 
+	{
+		var i: int;
+
+		for (i = 0; i < this.oneliners.Size(); i += 1) 
+		{
+			this.fxRemoveOnelinerSFF.InvokeSelfOneArg(FlashArgInt(oneliners[i].id));
+		}
+
+		oneliner_counter = 2117035;
+
+		this.oneliners.Clear();
+	}
+	*/
+
+	public function acs_getOnelinerID(oneliner: ACS_Oneliner): int 
+	{
+		var id: int;
+
+		id = oneliner.id;
 
 		return id;
 	}
@@ -454,7 +421,9 @@ statemachine abstract class W3ACSStorage extends CPeristentEntity
 			this.acs_onelinerInitialize();
 		}
 
-		oneliner.id = this.acs_onelinerGetNewId();
+		oneliner.id = oneliner_counter;
+
+		oneliner_counter += 1;
 
 		this.acs_updateOneliner(oneliner);
 
@@ -487,6 +456,8 @@ statemachine abstract class W3ACSStorage extends CPeristentEntity
 		var output: array<ACS_Oneliner>;
 		var i: int;
 
+		output.Clear();
+
 		for (i = 0; i < this.oneliners.Size(); i += 1) 
 		{
 			if (this.oneliners[i].tag == tag) 
@@ -498,10 +469,14 @@ statemachine abstract class W3ACSStorage extends CPeristentEntity
 		return output;
 	}
 
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	public function acs_setPositionForOnelinerByTag(tag: string, x, y, z : float)
 	{
 		var output: array<ACS_Oneliner>;
 		var i: int;
+
+		output.Clear();
 
 		output = acs_findOnelinerByTag(tag);
 
@@ -513,10 +488,14 @@ statemachine abstract class W3ACSStorage extends CPeristentEntity
 		}
 	}
 
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	public function acs_setAlphaForOnelinerByTag(tag: string, alpha : float)
 	{
 		var output: array<ACS_Oneliner>;
 		var i: int;
+
+		output.Clear();
 
 		output = acs_findOnelinerByTag(tag);
 
@@ -526,10 +505,61 @@ statemachine abstract class W3ACSStorage extends CPeristentEntity
 		}
 	}
 
+	public function acs_setAlphaForOnelinerByID(id: int, alpha : float)
+	{
+		var output: array<ACS_Oneliner>;
+		var i: int;
+
+		output.Clear();
+
+		output = acs_findOnelinerByID(id);
+
+		for (i = 0; i < output.Size(); i += 1) 
+		{
+			module_flash.GetChildFlashSprite( "mcOneliner" + output[i].id ).SetAlpha(alpha);
+		}
+	}
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	public function acs_setRotationForOnelinerByTag(tag: string, rot : float)
+	{
+		var output: array<ACS_Oneliner>;
+		var i: int;
+
+		output.Clear();
+
+		output = acs_findOnelinerByTag(tag);
+
+		for (i = 0; i < output.Size(); i += 1) 
+		{
+			module_flash.GetChildFlashSprite( "mcOneliner" + output[i].id ).SetRotation(rot);
+		}
+	}
+
+	public function acs_setRotationForOnelinerByID(id: int, rot : float)
+	{
+		var output: array<ACS_Oneliner>;
+		var i: int;
+
+		output.Clear();
+
+		output = acs_findOnelinerByID(id);
+
+		for (i = 0; i < output.Size(); i += 1) 
+		{
+			module_flash.GetChildFlashSprite( "mcOneliner" + output[i].id ).SetRotation(rot);
+		}
+	}
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	public function acs_setScaleForOnelinerByTag(tag: string, scaleX, scaleY, scaleZ : float)
 	{
 		var output: array<ACS_Oneliner>;
 		var i: int;
+
+		output.Clear();
 
 		output = acs_findOnelinerByTag(tag);
 
@@ -541,10 +571,31 @@ statemachine abstract class W3ACSStorage extends CPeristentEntity
 		}
 	}
 
+	public function acs_setScaleForOnelinerByID(id: int, scaleX, scaleY, scaleZ : float)
+	{
+		var output: array<ACS_Oneliner>;
+		var i: int;
+
+		output.Clear();
+
+		output = acs_findOnelinerByID(id);
+
+		for (i = 0; i < output.Size(); i += 1) 
+		{
+			module_flash.GetChildFlashSprite( "mcOneliner" + output[i].id ).SetXScale(scaleX);
+			module_flash.GetChildFlashSprite( "mcOneliner" + output[i].id ).SetYScale(scaleY);
+			module_flash.GetChildFlashSprite( "mcOneliner" + output[i].id ).SetZScale(scaleZ);
+		}
+	}
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	public function acs_findOnelinerByTagPrefix(tag: string): array<ACS_Oneliner> 
 	{
 		var output: array<ACS_Oneliner>;
 		var i: int;
+
+		output.Clear();
 
 		for (i = 0; i < this.oneliners.Size(); i += 1) 
 		{
@@ -562,6 +613,8 @@ statemachine abstract class W3ACSStorage extends CPeristentEntity
 		var output: array<ACS_Oneliner>;
 		var i: int;
 
+		output.Clear();
+
 		output = this.acs_findOnelinerByTag(tag);
 
 		for (i = 0; i < output.Size(); i += 1) 
@@ -577,6 +630,8 @@ statemachine abstract class W3ACSStorage extends CPeristentEntity
 		var output: array<ACS_Oneliner>;
 		var i: int;
 
+		output.Clear();
+
 		output = this.acs_findOnelinerByTagPrefix(tag);
 
 		for (i = 0; i < output.Size(); i += 1) 
@@ -591,6 +646,8 @@ statemachine abstract class W3ACSStorage extends CPeristentEntity
 	{
 		var output: array<ACS_Oneliner>;
 		var i: int;
+
+		output.Clear();
 
 		for (i = 0; i < this.oneliners.Size(); i += 1) 
 		{
@@ -608,6 +665,8 @@ statemachine abstract class W3ACSStorage extends CPeristentEntity
 		var output: array<ACS_Oneliner>;
 		var i: int;
 
+		output.Clear();
+
 		output = this.acs_findOnelinerByID(id);
 
 		for (i = 0; i < output.Size(); i += 1) 
@@ -618,18 +677,79 @@ statemachine abstract class W3ACSStorage extends CPeristentEntity
 		return output;
 	}
 
-	var leviathanPosition : Vector;
 
-	public function acs_recordLeviathanPosition(pos: Vector)
+	public var book_items_to_be_read      : array< SItemUniqueId >;	
+
+	function GetBookItemsToBeRead( book : SItemUniqueId)
 	{
-		leviathanPosition = pos;
+		book_items_to_be_read.PushBack(book);
 	}
 
-	public function acs_getLeviathanPosition() : Vector
+	timer function AutoReadDelay( delta : float , id : int )
 	{
-		return leviathanPosition;
+		var i : int;
+		var itemId : SItemUniqueId;
+		var itemCategory : name;
+		var isItemShematic : bool;
+		var m_bookPopupData : BookPopupFeedback;
+
+		for(i=0; i<book_items_to_be_read.Size(); i+=1)
+		{
+			itemId = book_items_to_be_read[i];
+
+			itemCategory = thePlayer.inv.GetItemCategory( itemId );
+
+			isItemShematic = itemCategory == 'alchemy_recipe' ||  itemCategory == 'crafting_schematic';
+
+			if( !isItemShematic 
+			&& ( thePlayer.GetInventory().ItemHasTag( itemId, 'ReadableItem' ) ) 
+			&& !thePlayer.GetInventory().ItemHasTag( itemId, 'NoShow' ) 
+			&& !thePlayer.GetInventory().IsBookRead ( itemId )
+			)
+			{
+				m_bookPopupData = new BookPopupFeedback in this;
+				m_bookPopupData.SetMessageTitle( GetLocStringByKeyExt(thePlayer.GetInventory().GetItemLocalizedNameByUniqueID(itemId)) );
+				m_bookPopupData.SetMessageText( thePlayer.GetInventory().GetBookText(itemId) );
+				m_bookPopupData.curInventory = thePlayer.GetInventory();
+				m_bookPopupData.BlurBackground = true;
+				m_bookPopupData.PauseGame = true;
+				m_bookPopupData.singleBookMode = false;
+				m_bookPopupData.bookItemId = itemId;
+				
+				theGame.RequestMenu('PopupMenu', m_bookPopupData);
+			}
+		}
+
+		RemoveTimer('AutoReadClear');
+
+		AddTimer('AutoReadClear', 0.125f / theGame.GetTimeScale(), false );
+	} 
+
+	timer function AutoReadClear( delta : float , id : int )
+	{
+		var i : int;
+		var itemId : SItemUniqueId;
+		var itemCategory : name;
+		var isItemShematic : bool;
+
+		for(i=0; i<book_items_to_be_read.Size(); i+=1)
+		{
+			itemId = book_items_to_be_read[i];
+
+			itemCategory = thePlayer.inv.GetItemCategory( itemId );
+
+			isItemShematic = itemCategory == 'alchemy_recipe' ||  itemCategory == 'crafting_schematic';
+
+			if( !isItemShematic && ( thePlayer.GetInventory().ItemHasTag( itemId, 'ReadableItem' ) 
+			|| thePlayer.GetInventory().ItemHasTag( itemId, 'Painting' ) ) && !thePlayer.GetInventory().ItemHasTag( itemId, 'NoNotification' ) )
+			{
+				thePlayer.GetInventory().ReadSchematicsAndRecipes(itemId);
+			}
+		}
+		
+		book_items_to_be_read.Clear();
 	}
-	
+
 }
 
 state acsStorageIdle in W3ACSStorage 
@@ -638,105 +758,6 @@ state acsStorageIdle in W3ACSStorage
 	{
 		super.OnEnterState(previous_state_name);
   	}
-}
-
-function ACS_Kill_Count_Menu() 
-{
-	var msg				: W3TutorialPopupData;
-	var Title			: string;
-	var Message			: string;
-
-	Title = GetLocStringById(2117035570) + ACS_Region_Name_Switch();
-
-	Message = GetLocStringById(2117035594) + GetACSStorage().acs_GetKillCountString() 
-	
-	+ "<br/> <br/>" 
-	
-	+ GetLocStringById(2117035581) + GetACSStorage().acs_GetHumanKillCountString() 
-	
-	+ "<br/>" 
-	
-	+ GetLocStringById(2117035582) + GetACSStorage().acs_GetBeastKillCountString() 
-	
-	+ "<br/>" 
-	
-	+ GetLocStringById(2117035583) + GetACSStorage().acs_GetCursedOnesKillCountString()
-	
-	+ "<br/>" 
-	
-	+ GetLocStringById(2117035584) + GetACSStorage().acs_GetDraconidsKillCountString()
-	
-	+ "<br/>" 
-	
-	+ GetLocStringById(2117035585) + GetACSStorage().acs_GetElementaKillCountString()
-
-	+ "<br/>" 
-	
-	+ GetLocStringById(2117035586) + GetACSStorage().acs_GetHybridsKillCountString()
-
-	+ "<br/>" 
-	
-	+ GetLocStringById(2117035587) + GetACSStorage().acs_GetInsectoidsKillCountString()
-
-	+ "<br/>" 
-	
-	+ GetLocStringById(2117035588) + GetACSStorage().acs_GetNecrophagesKillCountString()
-
-	+ "<br/>" 
-	
-	+ GetLocStringById(2117035589) + GetACSStorage().acs_GetOgroidsKillCountString()
-
-	+ "<br/>" 
-	
-	+ GetLocStringById(2117035590) + GetACSStorage().acs_GetRelictsKillCountString()
-
-	+ "<br/>" 
-	
-	+ GetLocStringById(2117035591) + GetACSStorage().acs_GetSpectersKillCountString()
-
-	+ "<br/>" 
-	
-	+ GetLocStringById(2117035592) + GetACSStorage().acs_GetVampiresKillCountString()
-
-	+ "<br/>" 
-	
-	+ GetLocStringById(2117035593) + GetACSStorage().acs_GetOtherKillCountString()
-	
-	;
-
-	msg = new W3TutorialPopupData in thePlayer;
-
-	msg.managerRef = theGame.GetTutorialSystem();
-
-	msg.messageTitle = Title;
-
-	msg.imagePath = "";
-
-	msg.messageText = Message;
-
-	msg.enableGlossoryLink = true;
-
-	msg.autosize = true;
-
-	msg.blockInput = true;
-
-	msg.pauseGame = true;
-
-	msg.fullscreen = true;
-
-	msg.canBeShownInMenus = true;
-
-	msg.fadeBackground = true;
-
-	msg.duration = -1;
-
-	msg.posX = 0;
-
-	msg.posY = 0;
-
-	msg.enableAcceptButton = true;
-
-	theGame.GetTutorialSystem().ShowTutorialHint(msg);
 }
 
 function ACS_Region_Name_Switch() : string

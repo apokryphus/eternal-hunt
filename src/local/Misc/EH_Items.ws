@@ -1,764 +1,3 @@
-class W3ACSWolvenFangItem extends W3QuestUsableItem
-{
-	private var playerAnimcomp : CAnimatedComponent;
-
-	event OnSpawned( spawnData : SEntitySpawnData )
-	{
-		super.OnSpawned(spawnData);
-	}
-	
-	event OnUsed( usedBy : CEntity )
-	{
-		super.OnUsed( usedBy );
-
-		playerAnimcomp = (CAnimatedComponent)GetWitcherPlayer().GetComponentByClassName('CAnimatedComponent');
-		
-		if ( usedBy == GetWitcherPlayer() )
-		{
-			if ( GetWitcherPlayer().IsInInterior() )
-			{
-				GetWitcherPlayer().DisplayHudMessage(GetLocStringByKeyExt( "menu_cannot_perform_action_here" ));
-				return false;
-			}
-
-			if (GetWitcherPlayer().IsAnyWeaponHeld() && !GetWitcherPlayer().IsWeaponHeld('fist'))
-			{
-				GetWitcherPlayer().DisplayHudMessage( "Weapon must be sheathed." );
-
-				thePlayer.OnMeleeForceHolster( true );
-				thePlayer.OnRangedForceHolster( true );
-
-				return false;
-			}
-
-			if (!GetACSWatcher())
-			{
-				return false;
-			}
-			
-			if (
-			FactsQuerySum("acs_transformation_activated") <= 0
-			&& FactsQuerySum("acs_wolven_curse_activated") <= 0
-			)
-			{
-				GetACSWatcher().AddTimer('ACS_Transformation_Tutorial_Delay', 1, false);
-
-				GetACSWatcher().ACS_Transformation_Create_Savelock();
-
-				GetACSWatcher().RemoveTimer('DisableWerewolfStart');
-
-				GetWitcherPlayer().StopAllEffects();
-
-				FactsAdd("acs_transformation_activated", 1, -1);
-
-				FactsAdd("acs_wolven_curse_activated", 1, -1);
-				
-				GetWitcherPlayer().PlayEffectSingle('smoke_explosion');
-				GetWitcherPlayer().StopEffect('smoke_explosion');
-
-				GetWitcherPlayer().PlayEffectSingle('teleport');
-				GetWitcherPlayer().StopEffect('teleport');
-
-				GetWitcherPlayer().AddBuffImmunity_AllNegative('ACS_Transformation_Immunity_Negative', true); 
-				GetWitcherPlayer().AddBuffImmunity_AllCritical('ACS_Transformation_Immunity_Critical', true); 
-
-				GetACSWatcher().Spawn_Transformation_Werewolf();
-
-				GetACSWatcher().AddTimer('Transformation_Werewolf_Fear', 0.5, true);
-
-				playerAnimcomp.FreezePose();
-
-				GetWitcherPlayer().BlockAction(EIAB_CallHorse,				'ACS_Transformation');
-				GetWitcherPlayer().BlockAction(EIAB_DrawWeapon, 			'ACS_Transformation'); 
-				GetWitcherPlayer().BlockAction(EIAB_FastTravel, 			'ACS_Transformation');
-				GetWitcherPlayer().BlockAction(EIAB_InteractionAction, 		'ACS_Transformation');
-				GetWitcherPlayer().BlockAction(EIAB_Crossbow,				'ACS_Transformation');
-				GetWitcherPlayer().BlockAction(EIAB_UsableItem,				'ACS_Transformation');
-				GetWitcherPlayer().BlockAction(EIAB_ThrowBomb,				'ACS_Transformation');
-				GetWitcherPlayer().BlockAction(EIAB_Jump,					'ACS_Transformation');
-
-				GetWitcherPlayer().BlockAction( EIAB_Parry,					'ACS_Transformation');
-				GetWitcherPlayer().BlockAction( EIAB_MeditationWaiting,		'ACS_Transformation');
-				GetWitcherPlayer().BlockAction( EIAB_OpenMeditation,		'ACS_Transformation');
-				GetWitcherPlayer().BlockAction( EIAB_RadialMenu,			'ACS_Transformation');
-			}
-			else if (
-			FactsQuerySum("acs_transformation_activated") > 0
-			&& FactsQuerySum("acs_wolven_curse_activated") > 0
-			)
-			{
-				GetACSWatcher().DisableWerewolf_Actual();
-			}
-		}		
-	}
-}
-
-class W3ACSVampireRingItem extends W3QuestUsableItem
-{
-	private var playerAnimcomp : CAnimatedComponent;
-
-	event OnSpawned( spawnData : SEntitySpawnData )
-	{
-		super.OnSpawned(spawnData);
-	}
-	
-	event OnUsed( usedBy : CEntity )
-	{
-		super.OnUsed( usedBy );
-
-		playerAnimcomp = (CAnimatedComponent)GetWitcherPlayer().GetComponentByClassName('CAnimatedComponent');
-		
-		if ( usedBy == GetWitcherPlayer() )
-		{
-			if ( GetWitcherPlayer().IsInInterior() )
-			{
-				GetWitcherPlayer().DisplayHudMessage(GetLocStringByKeyExt( "menu_cannot_perform_action_here" ));
-				return false;
-			}
-
-			if (GetWitcherPlayer().IsAnyWeaponHeld() && !GetWitcherPlayer().IsWeaponHeld('fist'))
-			{
-				GetWitcherPlayer().DisplayHudMessage( "Weapon must be sheathed." );
-
-				thePlayer.OnMeleeForceHolster( true );
-				thePlayer.OnRangedForceHolster( true );
-				return false;
-			}
-
-			if (!GetACSWatcher())
-			{
-				return false;
-			}
-			
-			if (
-			FactsQuerySum("acs_transformation_activated") <= 0
-			&& FactsQuerySum("acs_vampire_monster_transformation_activated") <= 0
-			)
-			{
-				GetACSWatcher().ACS_Transformation_Create_Savelock();
-
-				GetACSWatcher().RemoveTimer('DisableTransformationVampireMonsterStart');
-
-				GetWitcherPlayer().StopAllEffects();
-
-				//GetACSWatcher().Activate_Painting_Env();
-
-				FactsAdd("acs_transformation_activated", 1, -1);
-
-				FactsAdd("acs_vampire_monster_transformation_activated", 1, -1);
-				
-				GetWitcherPlayer().PlayEffectSingle('smoke_explosion');
-				GetWitcherPlayer().StopEffect('smoke_explosion');
-
-				GetWitcherPlayer().PlayEffectSingle('teleport');
-				GetWitcherPlayer().StopEffect('teleport');
-
-				GetWitcherPlayer().AddBuffImmunity_AllNegative('ACS_Transformation_Immunity_Negative', true); 
-				GetWitcherPlayer().AddBuffImmunity_AllCritical('ACS_Transformation_Immunity_Critical', true); 
-
-				GetACSWatcher().Spawn_Transformation_Vampire_Monster();
-
-				GetACSWatcher().AddTimer('Transformation_Werewolf_Fear', 0.5, true);
-
-				playerAnimcomp.FreezePose();
-
-				GetWitcherPlayer().BlockAction(EIAB_CallHorse,			'ACS_Transformation');
-				GetWitcherPlayer().BlockAction(EIAB_DrawWeapon, 			'ACS_Transformation'); 
-				GetWitcherPlayer().BlockAction(EIAB_FastTravel, 			'ACS_Transformation');
-				GetWitcherPlayer().BlockAction(EIAB_InteractionAction, 	'ACS_Transformation');
-				GetWitcherPlayer().BlockAction(EIAB_Crossbow,			'ACS_Transformation');
-				GetWitcherPlayer().BlockAction(EIAB_UsableItem,			'ACS_Transformation');
-				GetWitcherPlayer().BlockAction(EIAB_ThrowBomb,			'ACS_Transformation');
-				//GetWitcherPlayer().BlockAction(EIAB_Jump,				'ACS_Transformation');
-
-				GetWitcherPlayer().BlockAction( EIAB_Parry,				'ACS_Transformation');
-				GetWitcherPlayer().BlockAction( EIAB_MeditationWaiting,	'ACS_Transformation');
-				GetWitcherPlayer().BlockAction( EIAB_OpenMeditation,		'ACS_Transformation');
-				GetWitcherPlayer().BlockAction( EIAB_RadialMenu,			'ACS_Transformation');
-
-				GetACSWatcher().AddTimer('ACS_Transformation_Tutorial_Delay', 1, false);
-			}
-			else if (
-			FactsQuerySum("acs_transformation_activated") > 0
-			&& FactsQuerySum("acs_vampire_monster_transformation_activated") > 0
-			)
-			{
-				GetACSWatcher().DisableTransformationVampireMonster_Actual();
-			}
-		}		
-	}
-}
-
-class W3ACSVampireNecklaceItem extends W3QuestUsableItem
-{
-	private var playerAnimcomp : CAnimatedComponent;
-
-	event OnSpawned( spawnData : SEntitySpawnData )
-	{
-		super.OnSpawned(spawnData);
-	}
-	
-	event OnUsed( usedBy : CEntity )
-	{
-		super.OnUsed( usedBy );
-
-		playerAnimcomp = (CAnimatedComponent)GetWitcherPlayer().GetComponentByClassName('CAnimatedComponent');
-		
-		if ( usedBy == GetWitcherPlayer() )
-		{
-			/*
-			if ( GetWitcherPlayer().IsInInterior() )
-			{
-				GetWitcherPlayer().DisplayHudMessage(GetLocStringByKeyExt( "menu_cannot_perform_action_here" ));
-				return false;
-			}
-			*/
-
-			if (GetWitcherPlayer().IsAnyWeaponHeld() && !GetWitcherPlayer().IsWeaponHeld('fist'))
-			{
-				GetWitcherPlayer().DisplayHudMessage( "Weapon must be sheathed." );
-
-				thePlayer.OnMeleeForceHolster( true );
-				thePlayer.OnRangedForceHolster( true );
-				return false;
-			}
-
-			if (!GetACSWatcher())
-			{
-				return false;
-			}
-			
-			if (
-			FactsQuerySum("acs_transformation_activated") <= 0
-			&& FactsQuerySum("acs_vampireess_transformation_activated") <= 0
-			)
-			{
-				GetACSWatcher().ACS_Transformation_Create_Savelock();
-
-				GetACSWatcher().RemoveTimer('DisableVampiressStart');
-
-				GetWitcherPlayer().StopAllEffects();
-
-				FactsAdd("acs_transformation_activated", 1, -1);
-
-				FactsAdd("acs_vampireess_transformation_activated", 1, -1);
-				
-				GetWitcherPlayer().PlayEffectSingle('smoke_explosion');
-				GetWitcherPlayer().StopEffect('smoke_explosion');
-
-				GetWitcherPlayer().PlayEffectSingle('teleport');
-				GetWitcherPlayer().StopEffect('teleport');
-
-				GetWitcherPlayer().AddBuffImmunity_AllNegative('ACS_Transformation_Immunity_Negative', true); 
-				GetWitcherPlayer().AddBuffImmunity_AllCritical('ACS_Transformation_Immunity_Critical', true); 
-
-				GetACSWatcher().Spawn_Transformation_Vampiress();
-
-				GetACSWatcher().AddTimer('Transformation_Werewolf_Fear', 0.5, true);
-
-				playerAnimcomp.FreezePose();
-
-				GetWitcherPlayer().BlockAction(EIAB_CallHorse,				'ACS_Transformation');
-				GetWitcherPlayer().BlockAction(EIAB_DrawWeapon, 			'ACS_Transformation'); 
-				GetWitcherPlayer().BlockAction(EIAB_FastTravel, 			'ACS_Transformation');
-				GetWitcherPlayer().BlockAction(EIAB_InteractionAction, 		'ACS_Transformation');
-				GetWitcherPlayer().BlockAction(EIAB_Crossbow,				'ACS_Transformation');
-				GetWitcherPlayer().BlockAction(EIAB_UsableItem,				'ACS_Transformation');
-				GetWitcherPlayer().BlockAction(EIAB_ThrowBomb,				'ACS_Transformation');
-				GetWitcherPlayer().BlockAction(EIAB_Jump,					'ACS_Transformation');
-
-				GetWitcherPlayer().BlockAction( EIAB_Parry,					'ACS_Transformation');
-				GetWitcherPlayer().BlockAction( EIAB_MeditationWaiting,		'ACS_Transformation');
-				GetWitcherPlayer().BlockAction( EIAB_OpenMeditation,		'ACS_Transformation');
-				GetWitcherPlayer().BlockAction( EIAB_RadialMenu,			'ACS_Transformation');
-
-				GetACSWatcher().AddTimer('ACS_Transformation_Tutorial_Delay', 1, false);
-			}
-			else if (
-			FactsQuerySum("acs_transformation_activated") > 0
-			&& FactsQuerySum("acs_vampireess_transformation_activated") > 0
-			)
-			{
-				GetACSWatcher().DisableVampiress_Actual();
-			}
-		}		
-	}
-}
-
-class W3ACSBruxaFangItem extends W3QuestUsableItem
-{
-	private var playerAnimcomp : CAnimatedComponent;
-
-	event OnSpawned( spawnData : SEntitySpawnData )
-	{
-		super.OnSpawned(spawnData);
-	}
-	
-	event OnUsed( usedBy : CEntity )
-	{
-		super.OnUsed( usedBy );
-
-		playerAnimcomp = (CAnimatedComponent)GetWitcherPlayer().GetComponentByClassName('CAnimatedComponent');
-		
-		if ( usedBy == GetWitcherPlayer() )
-		{
-			/*
-			if ( GetWitcherPlayer().IsInInterior() )
-			{
-				GetWitcherPlayer().DisplayHudMessage(GetLocStringByKeyExt( "menu_cannot_perform_action_here" ));
-				return false;
-			}
-			*/
-
-			if (GetWitcherPlayer().IsAnyWeaponHeld() && !GetWitcherPlayer().IsWeaponHeld('fist'))
-			{
-				GetWitcherPlayer().DisplayHudMessage( "Weapon must be sheathed." );
-
-				thePlayer.OnMeleeForceHolster( true );
-				thePlayer.OnRangedForceHolster( true );
-				return false;
-			}
-
-			if (!GetACSWatcher())
-			{
-				return false;
-			}
-			
-			if (
-			FactsQuerySum("acs_transformation_activated") <= 0
-			&& FactsQuerySum("acs_vampireess_transformation_activated") <= 0
-			)
-			{
-				GetACSWatcher().ACS_Transformation_Create_Savelock();
-
-				GetACSWatcher().RemoveTimer('DisableVampiressStart');
-
-				GetWitcherPlayer().StopAllEffects();
-
-				FactsAdd("acs_transformation_activated", 1, -1);
-
-				FactsAdd("acs_vampireess_transformation_activated", 1, -1);
-				
-				//GetWitcherPlayer().PlayEffectSingle('smoke_explosion');
-				//GetWitcherPlayer().StopEffect('smoke_explosion');
-
-				//GetWitcherPlayer().PlayEffectSingle('teleport');
-				//GetWitcherPlayer().StopEffect('teleport');
-
-				GetWitcherPlayer().AddBuffImmunity_AllNegative('ACS_Transformation_Immunity_Negative', true); 
-				GetWitcherPlayer().AddBuffImmunity_AllCritical('ACS_Transformation_Immunity_Critical', true); 
-
-				GetACSWatcher().Spawn_Transformation_Bruxa();
-
-				GetACSWatcher().AddTimer('Transformation_Werewolf_Fear', 0.5, true);
-
-				playerAnimcomp.FreezePose();
-
-				GetWitcherPlayer().BlockAction(EIAB_CallHorse,				'ACS_Transformation');
-				GetWitcherPlayer().BlockAction(EIAB_DrawWeapon, 			'ACS_Transformation'); 
-				GetWitcherPlayer().BlockAction(EIAB_FastTravel, 			'ACS_Transformation');
-				GetWitcherPlayer().BlockAction(EIAB_InteractionAction, 		'ACS_Transformation');
-				GetWitcherPlayer().BlockAction(EIAB_Crossbow,				'ACS_Transformation');
-				GetWitcherPlayer().BlockAction(EIAB_UsableItem,				'ACS_Transformation');
-				GetWitcherPlayer().BlockAction(EIAB_ThrowBomb,				'ACS_Transformation');
-				GetWitcherPlayer().BlockAction(EIAB_Jump,					'ACS_Transformation');
-
-				GetWitcherPlayer().BlockAction( EIAB_Parry,					'ACS_Transformation');
-				GetWitcherPlayer().BlockAction( EIAB_MeditationWaiting,		'ACS_Transformation');
-				GetWitcherPlayer().BlockAction( EIAB_OpenMeditation,		'ACS_Transformation');
-				GetWitcherPlayer().BlockAction( EIAB_RadialMenu,			'ACS_Transformation');
-
-				GetACSWatcher().AddTimer('ACS_Bruxa_Transformation_Tutorial_Delay', 1, false);
-			}
-			else if (
-			FactsQuerySum("acs_transformation_activated") > 0
-			&& FactsQuerySum("acs_vampireess_transformation_activated") > 0
-			)
-			{
-				GetACSWatcher().DisableVampiress_Actual();
-			}
-		}		
-	}
-}
-
-class W3ACSToadSlimeItem extends W3QuestUsableItem
-{
-	private var playerAnimcomp : CAnimatedComponent;
-
-	event OnSpawned( spawnData : SEntitySpawnData )
-	{
-		super.OnSpawned(spawnData);
-	}
-	
-	event OnUsed( usedBy : CEntity )
-	{
-		super.OnUsed( usedBy );
-
-		playerAnimcomp = (CAnimatedComponent)GetWitcherPlayer().GetComponentByClassName('CAnimatedComponent');
-		
-		if ( usedBy == GetWitcherPlayer() )
-		{
-			/*
-			if ( GetWitcherPlayer().IsInInterior() )
-			{
-				GetWitcherPlayer().DisplayHudMessage(GetLocStringByKeyExt( "menu_cannot_perform_action_here" ));
-				return false;
-			}
-			*/
-
-			if (GetWitcherPlayer().IsAnyWeaponHeld() && !GetWitcherPlayer().IsWeaponHeld('fist'))
-			{
-				GetWitcherPlayer().DisplayHudMessage( "Weapon must be sheathed." );
-
-				thePlayer.OnMeleeForceHolster( true );
-				thePlayer.OnRangedForceHolster( true );
-				return false;
-			}
-
-			if (!GetACSWatcher())
-			{
-				return false;
-			}
-			
-			if (
-			FactsQuerySum("acs_transformation_activated") <= 0
-			&& FactsQuerySum("acs_toad_transformation_activated") <= 0
-			)
-			{
-				GetACSWatcher().ACS_Transformation_Create_Savelock();
-
-				GetACSWatcher().RemoveTimer('DisableToadStart');
-
-				GetWitcherPlayer().StopAllEffects();
-
-				FactsAdd("acs_transformation_activated", 1, -1);
-
-				FactsAdd("acs_toad_transformation_activated", 1, -1);
-				
-				GetWitcherPlayer().PlayEffectSingle('smoke_explosion');
-				GetWitcherPlayer().StopEffect('smoke_explosion');
-
-				GetWitcherPlayer().PlayEffectSingle('teleport');
-				GetWitcherPlayer().StopEffect('teleport');
-
-				GetWitcherPlayer().AddBuffImmunity_AllNegative('ACS_Transformation_Immunity_Negative', true); 
-				GetWitcherPlayer().AddBuffImmunity_AllCritical('ACS_Transformation_Immunity_Critical', true); 
-
-				GetACSWatcher().Spawn_Transformation_Toad();
-
-				GetACSWatcher().AddTimer('Transformation_Werewolf_Fear', 0.5, true);
-
-				playerAnimcomp.FreezePose();
-
-				GetWitcherPlayer().BlockAction(EIAB_CallHorse,				'ACS_Transformation');
-				GetWitcherPlayer().BlockAction(EIAB_DrawWeapon, 			'ACS_Transformation'); 
-				GetWitcherPlayer().BlockAction(EIAB_FastTravel, 			'ACS_Transformation');
-				GetWitcherPlayer().BlockAction(EIAB_InteractionAction, 		'ACS_Transformation');
-				GetWitcherPlayer().BlockAction(EIAB_Crossbow,				'ACS_Transformation');
-				GetWitcherPlayer().BlockAction(EIAB_UsableItem,				'ACS_Transformation');
-				GetWitcherPlayer().BlockAction(EIAB_ThrowBomb,				'ACS_Transformation');
-				GetWitcherPlayer().BlockAction(EIAB_Jump,					'ACS_Transformation');
-
-				GetWitcherPlayer().BlockAction( EIAB_Parry,					'ACS_Transformation');
-				GetWitcherPlayer().BlockAction( EIAB_MeditationWaiting,		'ACS_Transformation');
-				GetWitcherPlayer().BlockAction( EIAB_OpenMeditation,		'ACS_Transformation');
-				GetWitcherPlayer().BlockAction( EIAB_RadialMenu,			'ACS_Transformation');
-
-				GetACSWatcher().AddTimer('ACS_Transformation_Tutorial_Delay', 1, false);
-			}
-			else if (
-			FactsQuerySum("acs_transformation_activated") > 0
-			&& FactsQuerySum("acs_toad_transformation_activated") > 0
-			)
-			{
-				GetACSWatcher().DisableTransformationToad_Actual();
-			}
-		}		
-	}
-}
-
-class W3ACSRedMiasmalFragmentItem extends W3QuestUsableItem
-{
-	private var playerAnimcomp : CAnimatedComponent;
-
-	event OnSpawned( spawnData : SEntitySpawnData )
-	{
-		super.OnSpawned(spawnData);
-	}
-	
-	event OnUsed( usedBy : CEntity )
-	{
-		super.OnUsed( usedBy );
-
-		playerAnimcomp = (CAnimatedComponent)GetWitcherPlayer().GetComponentByClassName('CAnimatedComponent');
-		
-		if ( usedBy == GetWitcherPlayer() )
-		{
-			if ( GetWitcherPlayer().IsInInterior() )
-			{
-				GetWitcherPlayer().DisplayHudMessage(GetLocStringByKeyExt( "menu_cannot_perform_action_here" ));
-				return false;
-			}
-
-			if (GetWitcherPlayer().IsAnyWeaponHeld() && !GetWitcherPlayer().IsWeaponHeld('fist'))
-			{
-				GetWitcherPlayer().DisplayHudMessage( "Weapon must be sheathed." );
-
-				thePlayer.OnMeleeForceHolster( true );
-				thePlayer.OnRangedForceHolster( true );
-
-				return false;
-			}
-
-			if (!GetACSWatcher())
-			{
-				return false;
-			}
-			
-			if (
-			FactsQuerySum("acs_transformation_activated") <= 0
-			&& FactsQuerySum("acs_red_miasmal_curse_activated") <= 0
-			)
-			{
-				GetACSWatcher().AddTimer('ACS_Transformation_Tutorial_Delay', 1, false);
-
-				GetACSWatcher().ACS_Transformation_Create_Savelock();
-
-				GetACSWatcher().RemoveTimer('DisableRedMiasmalStart');
-
-				GetWitcherPlayer().StopAllEffects();
-
-				FactsAdd("acs_transformation_activated", 1, -1);
-
-				FactsAdd("acs_red_miasmal_curse_activated", 1, -1);
-				
-				GetWitcherPlayer().PlayEffectSingle('smoke_explosion');
-				GetWitcherPlayer().StopEffect('smoke_explosion');
-
-				GetWitcherPlayer().PlayEffectSingle('teleport');
-				GetWitcherPlayer().StopEffect('teleport');
-
-				GetWitcherPlayer().AddBuffImmunity_AllNegative('ACS_Transformation_Immunity_Negative', true); 
-				GetWitcherPlayer().AddBuffImmunity_AllCritical('ACS_Transformation_Immunity_Critical', true); 
-
-				GetACSWatcher().Spawn_Transformation_Red_Miasmal();
-
-				GetACSWatcher().AddTimer('Transformation_Werewolf_Fear', 0.5, true);
-
-				playerAnimcomp.FreezePose();
-
-				GetWitcherPlayer().BlockAction(EIAB_CallHorse,				'ACS_Transformation');
-				GetWitcherPlayer().BlockAction(EIAB_DrawWeapon, 			'ACS_Transformation'); 
-				GetWitcherPlayer().BlockAction(EIAB_FastTravel, 			'ACS_Transformation');
-				GetWitcherPlayer().BlockAction(EIAB_InteractionAction, 		'ACS_Transformation');
-				GetWitcherPlayer().BlockAction(EIAB_Crossbow,				'ACS_Transformation');
-				GetWitcherPlayer().BlockAction(EIAB_UsableItem,				'ACS_Transformation');
-				GetWitcherPlayer().BlockAction(EIAB_ThrowBomb,				'ACS_Transformation');
-				GetWitcherPlayer().BlockAction(EIAB_Jump,					'ACS_Transformation');
-
-				GetWitcherPlayer().BlockAction( EIAB_Parry,					'ACS_Transformation');
-				GetWitcherPlayer().BlockAction( EIAB_MeditationWaiting,		'ACS_Transformation');
-				GetWitcherPlayer().BlockAction( EIAB_OpenMeditation,		'ACS_Transformation');
-				GetWitcherPlayer().BlockAction( EIAB_RadialMenu,			'ACS_Transformation');
-			}
-			else if (
-			FactsQuerySum("acs_transformation_activated") > 0
-			&& FactsQuerySum("acs_red_miasmal_curse_activated") > 0
-			)
-			{
-				GetACSWatcher().DisableRedMiasmal_Actual();
-			}
-		}		
-	}
-}
-
-class W3ACSSharleyShardItem extends W3QuestUsableItem
-{
-	private var playerAnimcomp : CAnimatedComponent;
-
-	event OnSpawned( spawnData : SEntitySpawnData )
-	{
-		super.OnSpawned(spawnData);
-	}
-	
-	event OnUsed( usedBy : CEntity )
-	{
-		super.OnUsed( usedBy );
-
-		playerAnimcomp = (CAnimatedComponent)GetWitcherPlayer().GetComponentByClassName('CAnimatedComponent');
-		
-		if ( usedBy == GetWitcherPlayer() )
-		{
-			if ( GetWitcherPlayer().IsInInterior() )
-			{
-				GetWitcherPlayer().DisplayHudMessage(GetLocStringByKeyExt( "menu_cannot_perform_action_here" ));
-				return false;
-			}
-
-			if (GetWitcherPlayer().IsAnyWeaponHeld() && !GetWitcherPlayer().IsWeaponHeld('fist'))
-			{
-				GetWitcherPlayer().DisplayHudMessage( "Weapon must be sheathed." );
-
-				thePlayer.OnMeleeForceHolster( true );
-				thePlayer.OnRangedForceHolster( true );
-
-				return false;
-			}
-
-			if (!GetACSWatcher())
-			{
-				return false;
-			}
-			
-			if (
-			FactsQuerySum("acs_transformation_activated") <= 0
-			&& FactsQuerySum("acs_sharley_curse_activated") <= 0
-			)
-			{
-				GetACSWatcher().AddTimer('ACS_Transformation_Tutorial_Delay', 1, false);
-
-				GetACSWatcher().ACS_Transformation_Create_Savelock();
-
-				GetACSWatcher().RemoveTimer('DisableSharleyStart');
-
-				GetWitcherPlayer().StopAllEffects();
-
-				FactsAdd("acs_transformation_activated", 1, -1);
-
-				FactsAdd("acs_sharley_curse_activated", 1, -1);
-				
-				GetWitcherPlayer().PlayEffectSingle('smoke_explosion');
-				GetWitcherPlayer().StopEffect('smoke_explosion');
-
-				GetWitcherPlayer().PlayEffectSingle('teleport');
-				GetWitcherPlayer().StopEffect('teleport');
-
-				GetWitcherPlayer().AddBuffImmunity_AllNegative('ACS_Transformation_Immunity_Negative', true); 
-				GetWitcherPlayer().AddBuffImmunity_AllCritical('ACS_Transformation_Immunity_Critical', true); 
-
-				GetACSWatcher().Spawn_Transformation_Sharley();
-
-				GetACSWatcher().AddTimer('Transformation_Werewolf_Fear', 0.5, true);
-
-				playerAnimcomp.FreezePose();
-
-				GetWitcherPlayer().BlockAction(EIAB_CallHorse,				'ACS_Transformation');
-				GetWitcherPlayer().BlockAction(EIAB_DrawWeapon, 			'ACS_Transformation'); 
-				GetWitcherPlayer().BlockAction(EIAB_FastTravel, 			'ACS_Transformation');
-				GetWitcherPlayer().BlockAction(EIAB_InteractionAction, 		'ACS_Transformation');
-				GetWitcherPlayer().BlockAction(EIAB_Crossbow,				'ACS_Transformation');
-				GetWitcherPlayer().BlockAction(EIAB_UsableItem,				'ACS_Transformation');
-				GetWitcherPlayer().BlockAction(EIAB_ThrowBomb,				'ACS_Transformation');
-				GetWitcherPlayer().BlockAction(EIAB_Jump,					'ACS_Transformation');
-
-				GetWitcherPlayer().BlockAction( EIAB_Parry,					'ACS_Transformation');
-				GetWitcherPlayer().BlockAction( EIAB_MeditationWaiting,		'ACS_Transformation');
-				GetWitcherPlayer().BlockAction( EIAB_OpenMeditation,		'ACS_Transformation');
-				GetWitcherPlayer().BlockAction( EIAB_RadialMenu,			'ACS_Transformation');
-			}
-			else if (
-			FactsQuerySum("acs_transformation_activated") > 0
-			&& FactsQuerySum("acs_sharley_curse_activated") > 0
-			)
-			{
-				GetACSWatcher().DisableSharley_Actual();
-			}
-		}		
-	}
-}
-
-class W3ACSWolfPeltItem extends W3QuestUsableItem
-{
-	private var playerAnimcomp : CAnimatedComponent;
-
-	event OnSpawned( spawnData : SEntitySpawnData )
-	{
-		super.OnSpawned(spawnData);
-	}
-	
-	event OnUsed( usedBy : CEntity )
-	{
-		super.OnUsed( usedBy );
-
-		playerAnimcomp = (CAnimatedComponent)GetWitcherPlayer().GetComponentByClassName('CAnimatedComponent');
-		
-		if ( usedBy == GetWitcherPlayer() )
-		{
-			if ( GetWitcherPlayer().IsInInterior() )
-			{
-				GetWitcherPlayer().DisplayHudMessage(GetLocStringByKeyExt( "menu_cannot_perform_action_here" ));
-				return false;
-			}
-
-			if (GetWitcherPlayer().IsAnyWeaponHeld() && !GetWitcherPlayer().IsWeaponHeld('fist'))
-			{
-				GetWitcherPlayer().DisplayHudMessage( "Weapon must be sheathed." );
-
-				thePlayer.OnMeleeForceHolster( true );
-				thePlayer.OnRangedForceHolster( true );
-
-				return false;
-			}
-			
-			if (
-			FactsQuerySum("acs_transformation_activated") <= 0
-			&& FactsQuerySum("acs_black_wolf_curse_activated") <= 0
-			)
-			{
-				GetACSWatcher().AddTimer('ACS_Transformation_Tutorial_Delay', 1, false);
-
-				GetACSWatcher().ACS_Transformation_Create_Savelock();
-
-				GetACSWatcher().RemoveTimer('DisableBlackWolfStart');
-
-				GetWitcherPlayer().StopAllEffects();
-
-				FactsAdd("acs_transformation_activated", 1, -1);
-
-				FactsAdd("acs_black_wolf_curse_activated", 1, -1);
-				
-				GetWitcherPlayer().PlayEffectSingle('smoke_explosion');
-				GetWitcherPlayer().StopEffect('smoke_explosion');
-
-				GetWitcherPlayer().PlayEffectSingle('teleport');
-				GetWitcherPlayer().StopEffect('teleport');
-
-				GetWitcherPlayer().AddBuffImmunity_AllNegative('ACS_Transformation_Immunity_Negative', true); 
-				GetWitcherPlayer().AddBuffImmunity_AllCritical('ACS_Transformation_Immunity_Critical', true); 
-
-				GetACSWatcher().Spawn_Transformation_Black_Wolf();
-
-				GetACSWatcher().AddTimer('Transformation_Werewolf_Fear', 0.5, true);
-
-				playerAnimcomp.FreezePose();
-
-				GetWitcherPlayer().BlockAction(EIAB_CallHorse,				'ACS_Transformation');
-				GetWitcherPlayer().BlockAction(EIAB_DrawWeapon, 			'ACS_Transformation'); 
-				GetWitcherPlayer().BlockAction(EIAB_FastTravel, 			'ACS_Transformation');
-				GetWitcherPlayer().BlockAction(EIAB_InteractionAction, 		'ACS_Transformation');
-				GetWitcherPlayer().BlockAction(EIAB_Crossbow,				'ACS_Transformation');
-				GetWitcherPlayer().BlockAction(EIAB_UsableItem,				'ACS_Transformation');
-				GetWitcherPlayer().BlockAction(EIAB_ThrowBomb,				'ACS_Transformation');
-				GetWitcherPlayer().BlockAction(EIAB_Jump,					'ACS_Transformation');
-
-				GetWitcherPlayer().BlockAction( EIAB_Parry,					'ACS_Transformation');
-				GetWitcherPlayer().BlockAction( EIAB_MeditationWaiting,		'ACS_Transformation');
-				GetWitcherPlayer().BlockAction( EIAB_OpenMeditation,		'ACS_Transformation');
-				GetWitcherPlayer().BlockAction( EIAB_RadialMenu,			'ACS_Transformation');
-			}
-			else if (
-			FactsQuerySum("acs_transformation_activated") > 0
-			&& FactsQuerySum("acs_black_wolf_curse_activated") > 0
-			)
-			{
-				GetACSWatcher().DisableBlackWolf_Actual();
-			}
-		}		
-	}
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////
-
 class W3ACSWisp extends W3QuestUsableItem 
 {
     private var wispCurrentRotationCircleAngle 								: float; 
@@ -779,6 +18,9 @@ class W3ACSWisp extends W3QuestUsableItem
    
     event OnUsed(usedBy : CEntity) 
 	{
+		var item 											: array<CEntity>;
+		var i												: int;
+
 		super.OnUsed(usedBy);
 
 		resourcePath = "dlc\dlc_acs\data\entities\items\acs_wisp.w2ent";
@@ -787,11 +29,21 @@ class W3ACSWisp extends W3QuestUsableItem
 
 		if(usedBy == GetWitcherPlayer()) 
 		{
+			
 			if (FactsQuerySum("ACS_Wisp_Released") <= 0)
 			{
-				ACSWispDestroySingle();
+				ACSWisp().Destroy();
 
-				ACSDestroyWispEnts();
+				GetACSWatcher().AddTimer('ACS_Wisp_Tutorial_Delay', 0.5 , false);
+
+				item.Clear();
+
+				theGame.GetEntitiesByTag( 'ACS_Wisp' , item );	
+				
+				for( i = 0; i < item.Size(); i += 1 )
+				{
+					item[i].Destroy();
+				}
 
 				entity = (W3ACSWisp)theGame.CreateEntity(entityTemplate, thePlayer.GetWorldPosition() + Vector(0,0,2), thePlayer.GetWorldRotation());
 
@@ -801,7 +53,7 @@ class W3ACSWisp extends W3QuestUsableItem
 				entity.AddTag('ACS_Wisp');
 
 				entity.PlayEffectSingle('wisp_fx');
-
+				
 				//entity.PlayEffectSingle('502_barrier_hold');
 
 				FactsAdd("ACS_Wisp_Released", 1, -1);
@@ -814,9 +66,9 @@ class W3ACSWisp extends W3QuestUsableItem
 
 				this.StopAllEffects();
 
-				ACSWispDestroySingle();
+				ACSWisp().Destroy();
 
-				ACSDestroyWispEnts();
+				ACSGetCEntityDestroyAll('ACS_Wisp');
 
 				FactsRemove("ACS_Wisp_Released");
 			}
@@ -825,9 +77,9 @@ class W3ACSWisp extends W3QuestUsableItem
 	
 	event OnDestroyed() 
 	{	
-			
+		RemoveTimers();
 	}
-
+	
 	event OnSpawned(spawnData : SEntitySpawnData) 
 	{
 		var bonePos															: Vector;
@@ -835,23 +87,22 @@ class W3ACSWisp extends W3QuestUsableItem
 		var ent																: CEntity;
 
 		//get position of left hand (boneindex for l_hand is 24)
+
 		bonePos = MatrixGetTranslation(thePlayer.GetBoneWorldMatrixByIndex(24));
 
-		this.AddTimer('FollowPlayer', 0.0001, true);
+		this.AddTimer('FollowPlayer', 0.0001 , true);
 
-		this.AddTimer('GatlingGunTimer', 0.00000001, true);
+		//this.AddTimer('DisplayTutorial', 10 , true);
 
 		wispCurrentPosition = bonePos + Vector(0,0,0.1);
 
         wispCurrentVelocity = Vector(3,0,0);
 
 		wispCurrentAcceleration = Vector(0,0,0);
+
 	}
 
-	timer function GatlingGunTimer(deltaTime : float, id : int) 
-	{
-		ACS_Wisp_Gatling_Gun();
-	}	
+	var vACS_Wisp_Gatling_Gun : cACS_Wisp_Gatling_Gun;
 
     timer function FollowPlayer(deltaTime : float, id : int) 
 	{
@@ -890,6 +141,19 @@ class W3ACSWisp extends W3QuestUsableItem
         accelerationMultiplier = 50;
         maxVelocity = 100;
         velocityDampeningFactor = 0.9;
+
+		vACS_Wisp_Gatling_Gun = new cACS_Wisp_Gatling_Gun in this;
+
+		if (FactsQuerySum("ACS_Wisp_Attack_Enable") > 0
+		&& thePlayer.IsInCombat())
+		{
+			if (ACS_wisp_projectile_spawn())
+			{
+				ACS_refresh_wisp_projectile_cooldown();
+
+				vACS_Wisp_Gatling_Gun.Wisp_Gatling_Gun_Engage();
+			}
+		}
  
         // DEFAULT CONFIG end //
 		
@@ -1506,9 +770,9 @@ function ACS_WispCheck()
 
 	if (FactsQuerySum("ACS_Wisp_Released") > 0 && thePlayer.inv.HasItem('acs_wisp'))
 	{
-		ACSWispDestroySingle();
+		ACSWisp().Destroy();
 
-		ACSDestroyWispEnts();
+		ACSGetCEntityDestroyAll('ACS_Wisp');
 
 		if (thePlayer.inv.HasItem('acs_wisp'))
 		{
@@ -1534,29 +798,6 @@ function ACS_WispCheck()
 	}
 }
 
-function ACSWispDestroySingle()
-{
-	var entity 			 : W3ACSWisp;
-	
-	entity = (W3ACSWisp)theGame.GetEntityByTag( 'ACS_Wisp' );
-	entity.Destroy();
-}
-
-function ACSDestroyWispEnts()
-{	
-	var ents 											: array<CEntity>;
-	var i												: int;
-
-	ents.Clear();
-
-	theGame.GetEntitiesByTag( 'ACS_Wisp', ents );	
-	
-	for( i = 0; i < ents.Size(); i += 1 )
-	{
-		ents[i].Destroy();
-	}
-}
-
 function ACSWisp() : W3ACSWisp
 {
 	var entity 			 : W3ACSWisp;
@@ -1565,22 +806,6 @@ function ACSWisp() : W3ACSWisp
 	
 	return entity;
 }
-
-function ACSDestroyWispEntsDelay()
-{	
-	var ents 											: array<CEntity>;
-	var i												: int;
-
-	ents.Clear();
-
-	theGame.GetEntitiesByTag( 'ACS_Wisp', ents );	
-	
-	for( i = 0; i < ents.Size(); i += 1 )
-	{
-		ents[i].DestroyAfter(1);
-	}
-}
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1607,11 +832,11 @@ class W3ACSKestralSkullItem extends W3QuestUsableItem
 			{
 				if (FactsQuerySum("ACS_Kestral_Released") <= 0)
 				{
-					ACSKestralDestroySingle();
+					ACSKestralSkull().Destroy();
 
-					ACSDestroyKestralEnts();
+					ACSGetCEntityDestroyAll('ACS_Kestral_Skull');
 
-					GetACSWatcher().AddTimer('ACS_Kestral_Skull_Tutorial_Delay', 0.5, false);
+					GetACSWatcher().AddTimer('ACS_Kestral_Skull_Tutorial_Delay', 0.5 , false);
 
 					if (thePlayer.IsInInterior())
 					{
@@ -1669,9 +894,9 @@ class W3ACSKestralSkullItem extends W3QuestUsableItem
 						}
 						else
 						{
-							ACSKestralDestroySingle();
+							ACSKestralSkull().Destroy();
 
-							ACSDestroyKestralEnts();
+							ACSGetCEntityDestroyAll('ACS_Kestral_Skull');
 
 							FactsRemove("ACS_Kestral_Released");
 						}
@@ -1753,9 +978,9 @@ class W3ACSKestralSkull extends CGameplayEntity
 
 		bonePos = MatrixGetTranslation(thePlayer.GetBoneWorldMatrixByIndex(24));
 
-		this.AddTimer('AreaCheck', 0.0001, true);
+		this.AddTimer('AreaCheck', 0.0001 , true);
 
-		this.AddTimer('FollowPlayer', 0.0001, true);
+		this.AddTimer('FollowPlayer', 0.0001 , true);
 
 		PlayEffect('teleport_in');
 		StopEffect('teleport_in');
@@ -1820,11 +1045,7 @@ class W3ACSKestralSkull extends CGameplayEntity
 					actortarget = (CActor)entities[i];
 
 					if (actortarget == ACSGetCActor('ACS_Transformation_Black_Wolf')
-					|| actortarget.HasTag('acs_snow_entity')
 					|| actortarget.HasTag('smokeman') 
-					|| actortarget.HasTag('ACS_Tentacle_1') 
-					|| actortarget.HasTag('ACS_Tentacle_2') 
-					|| actortarget.HasTag('ACS_Tentacle_3') 
 					|| actortarget.HasTag('ACS_Necrofiend_Tentacle_1') 
 					|| actortarget.HasTag('ACS_Necrofiend_Tentacle_2') 
 					|| actortarget.HasTag('ACS_Necrofiend_Tentacle_3') 
@@ -2110,7 +1331,7 @@ class W3ACSKestralSkull extends CGameplayEntity
 		if (thePlayer.IsInCombat())
 		{
 			RemoveTimer('kestral_lightning');
-			AddTimer('kestral_lightning', 2, false);
+			AddTimer('kestral_lightning', 2 / theGame.GetTimeScale(), false );
 		}
 	}
 
@@ -2344,7 +1565,7 @@ class W3ACSKestralSkull extends CGameplayEntity
 						DestroyEffect('feathers_fx');
 
 						RemoveTimer('reveal_crow');
-						AddTimer('reveal_crow', 1, false);
+						AddTimer('reveal_crow', 1 / theGame.GetTimeScale(), false );
 
 						this.AddTag('ACS_Kestral_Attack_Mode');
 					}
@@ -2363,7 +1584,7 @@ class W3ACSKestralSkull extends CGameplayEntity
 						DestroyEffect('feathers_fx');
 
 						RemoveTimer('reveal_crow');
-						AddTimer('reveal_crow', 1, false);
+						AddTimer('reveal_crow', 1 / theGame.GetTimeScale(), false );
 
 						this.RemoveTag('ACS_Kestral_Attack_Mode');
 					}
@@ -2421,7 +1642,7 @@ class W3ACSKestralSkull extends CGameplayEntity
 					DestroyEffect('feathers_fx');
 
 					RemoveTimer('reveal_crow');
-					AddTimer('reveal_crow', 2, false);
+					AddTimer('reveal_crow', 2 / theGame.GetTimeScale(), false );
 
 					this.RemoveTag('ACS_Kestral_In_Combat');
 				}
@@ -2505,9 +1726,9 @@ function ACS_KestralCheck()
 
 	if (FactsQuerySum("ACS_Kestral_Released") > 0 && thePlayer.inv.HasItem('acs_kestral_skull'))
 	{
-		ACSKestralDestroySingle();
+		ACSKestralSkull().Destroy();
 
-		ACSDestroyKestralEnts();
+		ACSGetCEntityDestroyAll('ACS_Kestral_Skull');
 
 		if (thePlayer.inv.HasItem('acs_kestral_skull'))
 		{
@@ -2541,32 +1762,6 @@ function ACS_KestralCheck()
 	}
 }
 
-function ACSKestralDestroySingle()
-{
-	var entity 			 : W3ACSKestralSkull;
-	
-	entity = (W3ACSKestralSkull)theGame.GetEntityByTag( 'ACS_Kestral_Skull' );
-	entity.RemoveTag('ACS_Kestral_Skull');
-	entity.Destroy();
-}
-
-function ACSDestroyKestralEnts()
-{	
-	var ents 											: array<CEntity>;
-	var i												: int;
-
-	ents.Clear();
-
-	theGame.GetEntitiesByTag( 'ACS_Kestral_Skull', ents );	
-	
-	for( i = 0; i < ents.Size(); i += 1 )
-	{
-		ents[i].RemoveTag('ACS_Kestral_Skull');
-		
-		ents[i].Destroy();
-	}
-}
-
 function ACSKestralSkull() : W3ACSKestralSkull
 {
 	var entity 			 : W3ACSKestralSkull;
@@ -2574,23 +1769,6 @@ function ACSKestralSkull() : W3ACSKestralSkull
 	entity = (W3ACSKestralSkull)theGame.GetEntityByTag( 'ACS_Kestral_Skull' );
 	
 	return entity;
-}
-
-function ACSDestroyKestralEntsDelay()
-{	
-	var ents 											: array<CEntity>;
-	var i												: int;
-
-	ents.Clear();
-
-	theGame.GetEntitiesByTag( 'ACS_Kestral_Skull', ents );	
-	
-	for( i = 0; i < ents.Size(); i += 1 )
-	{
-		ents[i].RemoveTag('ACS_Kestral_Skull');
-
-		ents[i].DestroyAfter(1);
-	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -2618,11 +1796,11 @@ class W3ACSPhoenixAshesItem extends W3QuestUsableItem
 			{
 				if (FactsQuerySum("ACS_Phoenix_Released") <= 0)
 				{
-					ACSPhoenixDestroySingle();
+					ACSPhoenix().Destroy();
 
-					ACSDestroyPhoenixEnts();
+					ACSGetCEntityDestroyAll('ACS_Phoenix');
 
-					GetACSWatcher().AddTimer('ACS_Phoenix_Ashes_Tutorial_Delay', 0.5, false);
+					GetACSWatcher().AddTimer('ACS_Phoenix_Ashes_Tutorial_Delay', 0.5 / theGame.GetTimeScale(), false );
 
 					if (thePlayer.IsInInterior())
 					{
@@ -2651,9 +1829,9 @@ class W3ACSPhoenixAshesItem extends W3QuestUsableItem
 				}
 				else if (FactsQuerySum("ACS_Phoenix_Released") > 0)
 				{
-					ACSPhoenixDestroySingle();
+					ACSPhoenix().Destroy();
 
-					ACSDestroyPhoenixEnts();
+					ACSGetCEntityDestroyAll('ACS_Phoenix');
 
 					FactsRemove("ACS_Phoenix_Released");
 				}
@@ -2732,9 +1910,9 @@ class W3ACSPhoenix extends CGameplayEntity
 
 		bonePos = MatrixGetTranslation(thePlayer.GetBoneWorldMatrixByIndex(24));
 
-		this.AddTimer('AreaCheck', 0.0001, true);
+		this.AddTimer('AreaCheck', 0.0001 , true);
 
-		this.AddTimer('FollowPlayer', 0.0001, true);
+		this.AddTimer('FollowPlayer', 0.0001 , true);
 
 		PlayEffect('teleport_in');
 		StopEffect('teleport_in');
@@ -2799,11 +1977,7 @@ class W3ACSPhoenix extends CGameplayEntity
 					actortarget = (CActor)entities[i];
 
 					if (actortarget == ACSGetCActor('ACS_Transformation_Black_Wolf')
-					|| actortarget.HasTag('acs_snow_entity')
 					|| actortarget.HasTag('smokeman') 
-					|| actortarget.HasTag('ACS_Tentacle_1') 
-					|| actortarget.HasTag('ACS_Tentacle_2') 
-					|| actortarget.HasTag('ACS_Tentacle_3') 
 					|| actortarget.HasTag('ACS_Necrofiend_Tentacle_1') 
 					|| actortarget.HasTag('ACS_Necrofiend_Tentacle_2') 
 					|| actortarget.HasTag('ACS_Necrofiend_Tentacle_3') 
@@ -3093,7 +2267,7 @@ class W3ACSPhoenix extends CGameplayEntity
 		if (thePlayer.IsInCombat())
 		{
 			RemoveTimer('kestral_lightning');
-			AddTimer('kestral_lightning', 2, false);
+			AddTimer('kestral_lightning', 2 / theGame.GetTimeScale(), false );
 		}
 	}
 
@@ -3327,7 +2501,7 @@ class W3ACSPhoenix extends CGameplayEntity
 						DestroyEffect('feathers_fx');
 
 						RemoveTimer('reveal_crow');
-						AddTimer('reveal_crow', 1, false);
+						AddTimer('reveal_crow', 1 / theGame.GetTimeScale(), false );
 
 						this.AddTag('ACS_Kestral_Attack_Mode');
 					}
@@ -3346,7 +2520,7 @@ class W3ACSPhoenix extends CGameplayEntity
 						DestroyEffect('feathers_fx');
 
 						RemoveTimer('reveal_crow');
-						AddTimer('reveal_crow', 1, false);
+						AddTimer('reveal_crow', 1 / theGame.GetTimeScale(), false );
 
 						this.RemoveTag('ACS_Kestral_Attack_Mode');
 					}
@@ -3404,7 +2578,7 @@ class W3ACSPhoenix extends CGameplayEntity
 					DestroyEffect('feathers_fx');
 
 					RemoveTimer('reveal_crow');
-					AddTimer('reveal_crow', 2, false);
+					AddTimer('reveal_crow', 2 / theGame.GetTimeScale(), false );
 
 					this.RemoveTag('ACS_Kestral_In_Combat');
 				}
@@ -3483,9 +2657,9 @@ function ACS_PhoenixCheck()
 
 	if (FactsQuerySum("ACS_Phoenix_Released") > 0 && thePlayer.inv.HasItem('acs_phoenix_ashes'))
 	{
-		ACSPhoenixDestroySingle();
+		ACSPhoenix().Destroy();
 
-		ACSDestroyPhoenixEnts();
+		ACSGetCEntityDestroyAll('ACS_Phoenix');
 
 		if (thePlayer.inv.HasItem('acs_phoenix_ashes'))
 		{
@@ -3519,32 +2693,6 @@ function ACS_PhoenixCheck()
 	}
 }
 
-function ACSPhoenixDestroySingle()
-{
-	var entity 			 : W3ACSPhoenix;
-	
-	entity = (W3ACSPhoenix)theGame.GetEntityByTag( 'ACS_Phoenix' );
-	entity.RemoveTag('ACS_Phoenix');
-	entity.Destroy();
-}
-
-function ACSDestroyPhoenixEnts()
-{	
-	var ents 											: array<CEntity>;
-	var i												: int;
-
-	ents.Clear();
-
-	theGame.GetEntitiesByTag( 'ACS_Phoenix', ents );	
-	
-	for( i = 0; i < ents.Size(); i += 1 )
-	{
-		ents[i].RemoveTag('ACS_Phoenix');
-		
-		ents[i].Destroy();
-	}
-}
-
 function ACSPhoenix() : W3ACSPhoenix
 {
 	var entity 			 : W3ACSPhoenix;
@@ -3552,23 +2700,6 @@ function ACSPhoenix() : W3ACSPhoenix
 	entity = (W3ACSPhoenix)theGame.GetEntityByTag( 'ACS_Phoenix' );
 	
 	return entity;
-}
-
-function ACSDestroyPhoenixEntsDelay()
-{	
-	var ents 											: array<CEntity>;
-	var i												: int;
-
-	ents.Clear();
-
-	theGame.GetEntitiesByTag( 'ACS_Phoenix', ents );	
-	
-	for( i = 0; i < ents.Size(); i += 1 )
-	{
-		ents[i].RemoveTag('ACS_Phoenix');
-
-		ents[i].DestroyAfter(1);
-	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -3591,7 +2722,7 @@ class W3ACSWolfHeartItem extends W3QuestUsableItem
 				return false;
 			}
 
-			GetACSWatcher().AddTimer('ACS_Wolf_Heart_Tutorial_Delay', 1, false);
+			GetACSWatcher().AddTimer('ACS_Wolf_Heart_Tutorial_Delay', 1 / theGame.GetTimeScale(), false );
 			
 			if (
 			FactsQuerySum("acs_wolf_companion_summoned") <= 0
@@ -3628,32 +2759,45 @@ class W3ACSWolfHeartItem extends W3QuestUsableItem
 	}
 }
 
-function ACS_WolfCompanionCheck()
-{
-	if (
-	FactsQuerySum("acs_wolf_companion_summoned") > 0
-	)
-	{
-		GetACSWatcher().ManageFollower();
-
-		if (
-		FactsQuerySum("acs_wolf_companion_command_stay") > 0
-		)
-		{ 
-			FactsRemove("acs_wolf_companion_command_stay");
-		}
-	}
-}
-
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 class W3ACSKillCountBookItem extends W3QuestUsableItem
 {
 	event OnSpawned( spawnData : SEntitySpawnData )
 	{
+		var item 															: SItemUniqueId;
+		var temp															: CEntityTemplate;
+		var ent																: CEntity;
+		var attach_vec														: Vector;
+		var attach_rot														: EulerAngles;
+		var timeToDestroy, h												: float;
+		var meshcomp														: CComponent;
+		var animcomp 														: CAnimatedComponent;
+
 		super.OnSpawned(spawnData);
 
-		ACS_Create_Book();
+		ACSGetCEntity('ACS_Book').Destroy();
+
+		temp = (CEntityTemplate)LoadResource(
+
+		//"items\readable_books\readable_books_source\elven_sages_full.w2ent"
+
+		"items\readable_books\readable_books_source\basics_of_magic_full.w2ent"
+
+		, true );
+
+		ent = theGame.CreateEntity( temp, thePlayer.GetWorldPosition(), thePlayer.GetWorldRotation() );
+
+		attach_rot.Roll = 0;
+		attach_rot.Pitch = 90;
+		attach_rot.Yaw = -45;
+		attach_vec.X = 0.05;
+		attach_vec.Y = -0.075;
+		attach_vec.Z = 0;
+
+		ent.CreateAttachment( GetWitcherPlayer(), 'l_weapon', attach_vec, attach_rot );
+
+		ent.AddTag('ACS_Book');
 	}
 	
 	event OnUsed( usedBy : CEntity )
@@ -3669,7 +2813,7 @@ class W3ACSKillCountBookItem extends W3QuestUsableItem
 
 			GetACSWatcher().RemoveTimer('KillCountMenuDisplayDelay');
 
-			GetACSWatcher().AddTimer('KillCountMenuDisplayDelay', 0.5, false);
+			GetACSWatcher().AddTimer('KillCountMenuDisplayDelay', 0.5 / theGame.GetTimeScale(), false );
 		}		
 	}
 
@@ -3695,140 +2839,11 @@ class W3ACSKillCountBookItem extends W3QuestUsableItem
 	}
 }
 
-function ACS_Create_Book()
-{
-	var item 															: SItemUniqueId;
-	var temp															: CEntityTemplate;
-	var ent																: CEntity;
-	var attach_vec														: Vector;
-	var attach_rot														: EulerAngles;
-	var timeToDestroy, h												: float;
-	var meshcomp														: CComponent;
-	var animcomp 														: CAnimatedComponent;
-
-	ACSGetCEntity('ACS_Book').Destroy();
-
-	temp = (CEntityTemplate)LoadResource(
-
-	//"items\readable_books\readable_books_source\elven_sages_full.w2ent"
-
-	"items\readable_books\readable_books_source\basics_of_magic_full.w2ent"
-
-	, true );
-
-	ent = theGame.CreateEntity( temp, thePlayer.GetWorldPosition(), thePlayer.GetWorldRotation() );
-
-	attach_rot.Roll = 0;
-	attach_rot.Pitch = 90;
-	attach_rot.Yaw = -45;
-	attach_vec.X = 0.05;
-	attach_vec.Y = -0.075;
-	attach_vec.Z = 0;
-
-	ent.CreateAttachment( GetWitcherPlayer(), 'l_weapon', attach_vec, attach_rot );
-
-	ent.AddTag('ACS_Book');
-}
-
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 class W3ACSSchoolMedallionItem extends W3QuestUsableItem
 {
-	event OnSpawned( spawnData : SEntitySpawnData )
-	{
-		super.OnSpawned(spawnData);
-	}
-	
-	event OnUsed( usedBy : CEntity )
-	{
-		super.OnUsed( usedBy );
 
-		if ( usedBy == GetWitcherPlayer() )
-		{
-			if (!GetACSWatcher())
-			{
-				return false;
-			}
-
-			if (ACS_Wolf_School_Check_For_Item())
-			{
-				if ( FactsQuerySum("ACS_Wolf_Style_Activate") <= 0 )
-				{
-					FactsAdd("ACS_Wolf_Style_Activate", 1, -1);
-				}
-				else if (FactsQuerySum("ACS_Wolf_Style_Activate") > 0)
-				{
-					FactsRemove("ACS_Wolf_Style_Activate");
-				} 
-			}
-			else if (ACS_Bear_School_Check_For_Item())
-			{
-				if ( FactsQuerySum("ACS_Bear_Style_Activate") <= 0 )
-				{
-					FactsAdd("ACS_Bear_Style_Activate", 1, -1);
-				}
-				else if (FactsQuerySum("ACS_Bear_Style_Activate") > 0)
-				{
-					FactsRemove("ACS_Bear_Style_Activate");
-				} 
-			}
-			else if (ACS_Cat_School_Check_For_Item())
-			{
-				if ( FactsQuerySum("ACS_Cat_Style_Activate") <= 0 )
-				{
-					FactsAdd("ACS_Cat_Style_Activate", 1, -1);
-				}
-				else if (FactsQuerySum("ACS_Cat_Style_Activate") > 0)
-				{
-					FactsRemove("ACS_Cat_Style_Activate");
-				} 
-			}
-			else if (ACS_Griffin_School_Check_For_Item())
-			{
-				if ( FactsQuerySum("ACS_Griffin_Style_Activate") <= 0 )
-				{
-					FactsAdd("ACS_Griffin_Style_Activate", 1, -1);
-				}
-				else if (FactsQuerySum("ACS_Griffin_Style_Activate") > 0)
-				{
-					FactsRemove("ACS_Griffin_Style_Activate");
-				} 
-			}
-			else if (ACS_Manticore_School_Check_For_Item())
-			{
-				if ( FactsQuerySum("ACS_Manticore_Style_Activate") <= 0 )
-				{
-					FactsAdd("ACS_Manticore_Style_Activate", 1, -1);
-				}
-				else if (FactsQuerySum("ACS_Manticore_Style_Activate") > 0)
-				{
-					FactsRemove("ACS_Manticore_Style_Activate");
-				}
-			}
-			else if (ACS_Forgotten_Wolf_Check_For_Item())
-			{
-				if ( FactsQuerySum("ACS_Forgotten_Wolf_Style_Activate") <= 0 )
-				{
-					FactsAdd("ACS_Forgotten_Wolf_Style_Activate", 1, -1);
-				}
-				else if (FactsQuerySum("ACS_Forgotten_Wolf_Style_Activate") > 0)
-				{
-					FactsRemove("ACS_Forgotten_Wolf_Style_Activate");
-				}
-			}
-			else if (ACS_Viper_School_Check_For_Item())
-			{
-				if ( FactsQuerySum("ACS_Viper_Style_Activate") <= 0 )
-				{
-					FactsAdd("ACS_Viper_Style_Activate", 1, -1);
-				}
-				else if (FactsQuerySum("ACS_Viper_Style_Activate") > 0)
-				{
-					FactsRemove("ACS_Viper_Style_Activate");
-				}
-			}
-		}		
-	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -3851,7 +2866,7 @@ class W3ACSPirateAmuletItem extends W3QuestUsableItem
 				return false;
 			}
 
-			GetACSWatcher().AddTimer('ACS_Pirate_Amulet_Tutorial_Delay', 1, false);
+			GetACSWatcher().AddTimer('ACS_Pirate_Amulet_Tutorial_Delay', 1 / theGame.GetTimeScale(), false );
 			
 			if (RandF() < 0.5)
 			{
@@ -3873,7 +2888,7 @@ class W3ACSPirateAmuletItem extends W3QuestUsableItem
 					GetACSWatcher().Lightning_Strike_No_Condition();
 
 					GetACSWatcher().RemoveTimer('MelusineSpawnDelay');
-					GetACSWatcher().AddTimer('MelusineSpawnDelay', RandRangeF(10,5), false);
+					GetACSWatcher().AddTimer('MelusineSpawnDelay', RandRangeF(10,5) / theGame.GetTimeScale(), false );
 				}
 				else
 				{
@@ -3891,28 +2906,7 @@ class W3ACSPirateAmuletItem extends W3QuestUsableItem
 
 class W3ACSDullahanSteedSummonItem extends W3QuestUsableItem
 {
-	event OnSpawned( spawnData : SEntitySpawnData )
-	{
-		super.OnSpawned(spawnData);
-	}
-	
-	event OnUsed( usedBy : CEntity )
-	{
-		var initpos, targetPosition_1				: Vector;
-		var meteor_proj_1 							: W3ACSDullahanProjectile;
 
-		super.OnUsed( usedBy );
-
-		if ( usedBy == GetWitcherPlayer() )
-		{
-			if (!GetACSWatcher())
-			{
-				return false;
-			}
-
-			ACS_SummonDullahanSteed();
-		}		
-	}
 }
 
 function ACS_SummonDullahanSteed()
@@ -3933,4 +2927,291 @@ function ACS_SummonDullahanSteed()
 	meteor_proj_1.AddTag('ACS_Dullahan_Steed_Spawning_Proj');
 	meteor_proj_1.ShootProjectileAtPosition( 0, 15, targetPosition_1, 500 );
 	meteor_proj_1.DestroyAfter(20);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////
+
+class W3ACSTrophyItem extends W3QuestUsableItem
+{
+	var ent_1, ent_2, ent_3, ent_4, ent_5, ent_6, ent_7            : CEntity;
+	var rot, attach_rot                        						 	: EulerAngles;
+    var pos, attach_vec													: Vector;
+	var meshcomp														: CComponent;
+	var animcomp 														: CAnimatedComponent;
+	var h 																: float;
+	var camera 															: CCustomCamera;
+
+	var actors		    												: array<CActor>;
+	var i 																: int;
+
+	var trophy_name														: string;
+
+	event OnSpawned( spawnData : SEntitySpawnData )
+	{
+		var horse : CNewNPC;	
+		var trophy_path : string;
+		var trophy_attach_vector : Vector;
+
+		super.OnSpawned(spawnData);
+
+		rot = thePlayer.GetWorldRotation();
+
+		pos = thePlayer.GetWorldPosition();
+
+		if (!thePlayer.IsUsingHorse()
+		&& !thePlayer.IsUsingVehicle()
+		)
+		{
+			ent_1 = theGame.CreateEntity( (CEntityTemplate)LoadResource( 
+
+			"dlc\dlc_acs\data\entities\other\acs_fear_entity.w2ent"
+
+			, true ), pos, rot );
+
+			ent_1.AddTag('ACS_Fear_Ent');
+
+			animcomp = (CAnimatedComponent)ent_1.GetComponentByClassName('CAnimatedComponent');
+			meshcomp = ent_1.GetComponentByClassName('CMeshComponent');
+			h = 0;
+			animcomp.SetScale(Vector(h,h,h,1));
+			meshcomp.SetScale(Vector(h,h,h,1));	
+
+			animcomp.FreezePose();
+
+			((CNewNPC)ent_1).SetAttitude(thePlayer, AIA_Friendly);
+
+			if (thePlayer.GetTarget())
+			{
+				((CNewNPC)ent_1).SetAttitude(((CNewNPC)thePlayer.GetTarget()), AIA_Hostile);
+			}
+
+			((CNewNPC)ent_1).SetCanPlayHitAnim(false);
+
+			((CNewNPC)ent_1).EnableCollisions(false);
+
+			((CNewNPC)ent_1).EnableCharacterCollisions(false);
+
+			((CActor)ent_1).SetImmortalityMode( AIM_Invulnerable, AIC_Default, true );
+
+			ent_1.CreateAttachment( thePlayer, , Vector( 0, 0, 2 ), EulerAngles(0,90,0) );
+		}
+			
+		//ent.PlayEffectSingle('fear_icon_activate');
+
+		if (GetACSWatcher().use_horse_trophy)
+		{
+			horse = thePlayer.GetHorseWithInventory();
+
+			horse.ACS_HorseTrophyVisibility(false, trophy_name);
+		}
+		else
+		{
+			trophy_name = GetACSWatcher().trophy_name_to_use;
+		}
+		
+		switch(trophy_name)
+		{
+			case "mq7018_basilisk_trophy":
+				trophy_path = "dlc\dlc_acs\data\models\trophies\basilisk_white\acs_trophy_basilisk_white.w2ent";
+
+				trophy_attach_vector = Vector( 0, 0, 0.3 );
+			break;
+
+			case "mh201_cave_troll_trophy":
+				trophy_path = "dlc\dlc_acs\data\models\trophies\cave_troll\acs_trophy_cave_troll.w2ent";
+
+				trophy_attach_vector = Vector( 0, 0, 0.3 );
+			break;
+
+			case "mh101_cockatrice_trophy":
+				trophy_path = "dlc\dlc_acs\data\models\trophies\cockatris\acs_trophy_cockatris.w2ent";
+
+				trophy_attach_vector = Vector( 0, 0, 0.3 );
+			break;
+
+			case "acs_cyklop_trophy":
+				trophy_path = "dlc\dlc_acs\data\models\trophies\cyklop\acs_cyklop_trophy.w2ent";
+
+				trophy_attach_vector = Vector( 0, 0, 0.3 );
+			break;
+
+			case "mh107_czart_trophy":
+				trophy_path = "dlc\dlc_acs\data\models\trophies\czart\acs_trophy_czart.w2ent";
+
+				trophy_attach_vector = Vector( 0, 0, 0.3 );
+			break;
+
+			case "mh104_ekimma_trophy":
+				trophy_path = "dlc\dlc_acs\data\models\trophies\ekima\acs_trophy_ekima.w2ent";
+
+				trophy_attach_vector = Vector( 0, 0, 0.3 );
+			break;
+
+			case "q704_garkain_trophy":
+				if (RandF() < 0.5)
+				{
+					trophy_path = "dlc\dlc_acs\data\models\trophies\garkain\acs_garkain_trophy.w2ent";
+				}
+				else
+				{
+					trophy_path = "dlc\dlc_acs\data\models\trophies\garkain_mh\acs_garkain_mh_trophy.w2ent";
+				}
+
+				trophy_attach_vector = Vector( 0, 0, 0.3 );
+			break;
+
+			case "q701_cyclops_trophy":
+				trophy_path = "dlc\dlc_acs\data\models\trophies\giant_windmill\acs_giant_windmill_trophy.w2ent";
+
+				trophy_attach_vector = Vector( 0, 0, 0.3 );
+			break;
+
+			case "q002_griffin_trophy":
+			case "mq7009_griffin_trophy":
+				trophy_path = "dlc\dlc_acs\data\models\trophies\gryphon\acs_gryphon_trophy.w2ent";
+
+				trophy_attach_vector = Vector( 0, 0, 0.3 );
+			break;
+
+			case "mh301_gryphon_trophy":
+				trophy_path = "dlc\dlc_acs\data\models\trophies\gryphon_mh\acs_gryphon_mh_trophy.w2ent";
+
+				trophy_attach_vector = Vector( 0, 0, 0.3 );
+			break;
+
+			case "mh304_katakan_trophy":
+				trophy_path = "dlc\dlc_acs\data\models\trophies\katakan\acs_trophy_katakan.w2ent";
+
+				trophy_attach_vector = Vector( 0, 0, 0.3 );
+			break;
+
+			case "mh204_leshy_trophy":
+			case "mh205_leshy_trophy":
+			case "mh302_leshy_trophy":
+				trophy_path = "dlc\dlc_acs\data\models\trophies\lessun\acs_trophy_lessun.w2ent";
+
+				trophy_attach_vector = Vector( 0, 0, 0.3 );
+			break;
+
+			case "mq7010_dracolizard_trophy":
+				trophy_path = "dlc\dlc_acs\data\models\trophies\oszluzg\acs_trophy_oszluzg.w2ent";
+
+				trophy_attach_vector = Vector( 0, 0, 0.3 );
+			break;
+
+			case "mh701_sharley_matriarch_trophy":
+				trophy_path = "dlc\dlc_acs\data\models\trophies\sharley\acs_sharley_trophy.w2ent";
+
+				trophy_attach_vector = Vector( 0, 0, 0.3 );
+			break;
+
+			case "q702_wicht_trophy":
+				trophy_path = "dlc\dlc_acs\data\models\trophies\spooncollector\acs_trophy_spooncollector_01.w2ent";
+
+				trophy_attach_vector = Vector( 0, 0, 0.3 );
+			break;
+
+			case "mq7002_spriggan_trophy":
+				trophy_path = "dlc\dlc_acs\data\models\trophies\spriggan\acs_spriggan_trophy.w2ent";
+
+				trophy_attach_vector = Vector( 0, 0, 0.3 );
+			break;
+
+			case "mh105_wyvern_trophy":
+			case "mq1051_wyvern_trophy":
+				trophy_path = "dlc\dlc_acs\data\models\trophies\wyvern\acs_wyvern_trophy.w2ent";
+
+				trophy_attach_vector = Vector( 0, 0, 0.3 );
+			break;
+
+			case "mh211_bies_trophy":
+			case "mh206_fiend_trophy":
+				trophy_path = "dlc\dlc_acs\data\models\trophies\bies\acs_trophy_bies.w2ent";
+
+				trophy_attach_vector = Vector( 0, 0, 0.3 );
+			break;
+
+			case "mh208_forktail_trophy":
+				trophy_path = "dlc\dlc_acs\data\models\trophies\forktail\acs_trophy_forktail.w2ent";
+
+				trophy_attach_vector = Vector( 0, 0, 0.3 );
+			break;
+
+			default:
+				trophy_path = "dlc\dlc_acs\data\models\trophies\universal\acs_trophy_universal.w2ent";
+
+				trophy_attach_vector = Vector( 0, 0, 0.3 );
+			break;
+		}
+
+		ent_2 = theGame.CreateEntity( (CEntityTemplate)LoadResource( 
+
+		trophy_path
+
+		, true ), pos, rot );
+
+		ent_2.CreateAttachment( this, 'fx', trophy_attach_vector, EulerAngles(0,0,0) );
+
+		theSound.SoundEvent("gui_global_loot");
+
+		RemoveTimer('blood_drip_fx_loop');
+		AddTimer('blood_drip_fx_loop', 0.001, true);
+
+	}
+
+	timer function blood_drip_fx_loop( time : float , id : int )
+	{
+		if (!IsEffectActive('blood_drip', false))
+		{
+			PlayEffectSingle('blood_drip');
+		}
+	}
+	
+	event OnUsed( usedBy : CEntity )
+	{
+		super.OnUsed( usedBy );
+
+		if ( usedBy == GetWitcherPlayer() )
+		{
+			if (!GetACSWatcher())
+			{
+				return false;
+			}
+
+			
+		}		
+	}
+
+	event OnHidden( hiddenBy : CEntity )
+	{
+		var horse : CNewNPC;	
+		var distance_from_horse : float;
+
+		super.OnHidden(hiddenBy);
+
+		if ( hiddenBy == GetWitcherPlayer() )
+		{
+			if (!GetACSWatcher())
+			{
+				return false;
+			}
+
+			RemoveTimer('blood_drip_fx_loop');
+
+			ent_1.Destroy();
+
+			ent_2.BreakAttachment();
+
+			ent_2.Teleport(this.GetWorldPosition() + Vector(0,0,-200));
+
+			ent_2.DestroyAfter(0.125f);
+
+			horse = thePlayer.GetHorseWithInventory();
+
+			theSound.SoundEvent("gui_inventory_armor_attach");
+
+			horse.ACS_HorseTrophyVisibility(true, trophy_name);
+		}
+	}
 }

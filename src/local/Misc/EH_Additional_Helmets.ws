@@ -32,11 +32,15 @@ state ACS_Hood_Enable_Engage in cACS_Hood
 		var ids : array<SItemUniqueId>;
 		var size : int;
 		var i : int;
-
+		var dyeColor: name;
+		var hoodId, dyeId: array<SItemUniqueId>;
+		var equippedItemsId : array<SItemUniqueId>;
+		var j : int;
+	
 		l_actor = thePlayer;
 		l_comp = l_actor.GetComponentByClassName( 'CAppearanceComponent' );	
 
-		if (ACS_Eredin_Armor_Equipped_Check())
+		if (ACS_Armor_Set_Check('eredin_armor', false))
 		{
 			if ( FactsQuerySum("ACS_Eredin_Helm_Equipped") <= 0 )
 			{
@@ -47,7 +51,7 @@ state ACS_Hood_Enable_Engage in cACS_Hood
 
 			temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\models\wh_armors\acs_eredin_armor\acs_eredin_helmet.w2ent", true);	
 		}
-		else if (ACS_WH_Armor_Equipped_Check() )
+		else if (ACS_Armor_Set_Check('wh_armor', false) )
 		{
 			if ( FactsQuerySum("ACS_Wild_Hunt_Hood_Equipped") <= 0 )
 			{
@@ -58,7 +62,7 @@ state ACS_Hood_Enable_Engage in cACS_Hood
 
 			temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\armor\old_stuff\revenant_hood.w2ent", true);	
 		}
-		else if (ACS_Imlerith_Armor_Equipped_Check())
+		else if (ACS_Armor_Set_Check('imlerith_armor', false))
 		{
 			if ( FactsQuerySum("ACS_Imlerith_Helm_Equipped") <= 0 )
 			{
@@ -69,7 +73,7 @@ state ACS_Hood_Enable_Engage in cACS_Hood
 
 			temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\models\wh_armors\acs_imlerith_armor\acs_imlerith_helmet.w2ent", true);		
 		}
-		else if (ACS_Caranthir_Armor_Equipped_Check())
+		else if (ACS_Armor_Set_Check('caranthir_armor', false))
 		{
 			if ( FactsQuerySum("ACS_Caranthir_Helm_Equipped") <= 0 )
 			{
@@ -80,7 +84,7 @@ state ACS_Hood_Enable_Engage in cACS_Hood
 
 			temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\models\wh_armors\acs_caranthir_armor\acs_caranthir_helmet.w2ent", true);		
 		}
-		else if (ACS_VGX_Eredin_Armor_Equipped_Check())
+		else if (ACS_Armor_Set_Check('vgx_eredin_armor', false))
 		{
 			if ( FactsQuerySum("ACS_VGX_Eredin_Helm_Equipped") <= 0 )
 			{
@@ -91,7 +95,8 @@ state ACS_Hood_Enable_Engage in cACS_Hood
 
 			temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\models\wh_armors\acs_vgx_eredin_arrmor\acs_vgx_eredin_helmet.w2ent", true);	
 		}
-		else if (ACS_Legion_Armor_Equipped_Check())
+		else if (GetWitcherPlayer().IsItemEquippedByName('ACS_Legion_Knight_Armor')
+		|| GetWitcherPlayer().IsItemEquippedByName('NGP_ACS_Legion_Knight_Armor'))
 		{
 			if ( FactsQuerySum("ACS_Legion_Helm_Equipped") <= 0 )
 			{
@@ -102,7 +107,8 @@ state ACS_Hood_Enable_Engage in cACS_Hood
 
 			temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\models\knight_armors\entities\alien\acs_alien_helm.w2ent", true);	
 		}
-		else if (ACS_Cavalier_Armor_Equipped_Check())
+		else if (GetWitcherPlayer().IsItemEquippedByName('ACS_Cavalier_Knight_Armor')
+		|| GetWitcherPlayer().IsItemEquippedByName('NGP_ACS_Cavalier_Knight_Armor'))
 		{
 			if ( FactsQuerySum("ACS_Cavalier_Helm_Equipped") <= 0 )
 			{
@@ -113,7 +119,8 @@ state ACS_Hood_Enable_Engage in cACS_Hood
 
 			temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\models\knight_armors\entities\cava\acs_cava_helm.w2ent", true);	
 		}
-		else if (ACS_Leonidas_Armor_Equipped_Check())
+		else if (GetWitcherPlayer().IsItemEquippedByName('ACS_Leonidas_Knight_Armor')
+		|| GetWitcherPlayer().IsItemEquippedByName('NGP_ACS_Leonidas_Knight_Armor'))
 		{
 			if ( FactsQuerySum("ACS_Leonidas_Helm_Equipped") <= 0 )
 			{
@@ -124,7 +131,8 @@ state ACS_Hood_Enable_Engage in cACS_Hood
 
 			temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\models\knight_armors\entities\leo\acs_leo_helm.w2ent", true);	
 		}
-		else if (ACS_Centurion_Armor_Equipped_Check())
+		else if (GetWitcherPlayer().IsItemEquippedByName('ACS_Centurion_Knight_Armor')
+		|| GetWitcherPlayer().IsItemEquippedByName('NGP_ACS_Centurion_Knight_Armor'))
 		{
 			if ( FactsQuerySum("ACS_Centurion_Helm_Equipped") <= 0 )
 			{
@@ -135,7 +143,8 @@ state ACS_Hood_Enable_Engage in cACS_Hood
 
 			temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\models\knight_armors\entities\rome\acs_rome_helm.w2ent", true);	
 		}
-		else if (ACS_Templar_Armor_Equipped_Check())
+		else if (GetWitcherPlayer().IsItemEquippedByName('ACS_Templar_Knight_Armor')
+		|| GetWitcherPlayer().IsItemEquippedByName('NGP_ACS_Templar_Knight_Armor'))
 		{
 			if ( FactsQuerySum("ACS_Templar_Helm_Equipped") <= 0 )
 			{
@@ -146,7 +155,13 @@ state ACS_Hood_Enable_Engage in cACS_Hood
 
 			temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\models\knight_armors\entities\templar\acs_templar_helm.w2ent", true);	
 		}
-		else if (ACS_Knight_Armor_Check())
+		else if (GetWitcherPlayer().IsItemEquippedByName('sq701_geralt_armor')
+		|| GetWitcherPlayer().IsItemEquippedByName('Knight Geralt Armor 3')
+		|| GetWitcherPlayer().IsItemEquippedByName('Knight Geralt Armor 2')
+		|| GetWitcherPlayer().IsItemEquippedByName('Knight Geralt Armor 1')
+		|| GetWitcherPlayer().IsItemEquippedByName('Knight Geralt A Armor 3')
+		|| GetWitcherPlayer().IsItemEquippedByName('Knight Geralt A Armor 2')
+		|| GetWitcherPlayer().IsItemEquippedByName('Knight Geralt A Armor 1'))
 		{
 			if ( FactsQuerySum("ACS_Knight_Helm_Equipped") <= 0 )
 			{
@@ -157,7 +172,8 @@ state ACS_Hood_Enable_Engage in cACS_Hood
 
 			temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\models\knight_armors_errant\entities\helms\acs_knight_helmet_05.w2ent", true);	
 		}
-		else if (ACS_Knight_Armor_Gold_Check())
+		else if (GetWitcherPlayer().IsItemEquippedByName('Toussaint Armor 3')
+		|| GetWitcherPlayer().IsItemEquippedByName('Toussaint Armor 2'))
 		{
 			if ( FactsQuerySum("ACS_Knight_Helm_Gold_Equipped") <= 0 )
 			{
@@ -168,7 +184,8 @@ state ACS_Hood_Enable_Engage in cACS_Hood
 
 			temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\models\knight_armors_errant\entities\helms\gold\gold_acs_knight_helmet_05.w2ent", true);	
 		}
-		else if (ACS_Vampire_Armor_Black_Check())
+		else if (GetWitcherPlayer().IsItemEquippedByName('q702_vampire_armor')
+		|| GetWitcherPlayer().IsItemEquippedByName('NGP q702_vampire_armor'))
 		{
 			if ( FactsQuerySum("ACS_Vampire_Helm_Black_Equipped") <= 0 )
 			{
@@ -179,7 +196,8 @@ state ACS_Hood_Enable_Engage in cACS_Hood
 
 			temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\models\knight_armors_errant\entities\helms\black\black_acs_knight_helmet_05.w2ent", true);	
 		}
-		else if (ACS_Vampire_Armor_Red_Check())
+		else if (GetWitcherPlayer().IsItemEquippedByName('q704_vampire_armor')
+	|| GetWitcherPlayer().IsItemEquippedByName('NGP q704_vampire_armor'))
 		{
 			if ( FactsQuerySum("ACS_Vampire_Helm_Red_Equipped") <= 0 )
 			{
@@ -191,7 +209,8 @@ state ACS_Hood_Enable_Engage in cACS_Hood
 			temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\models\knight_armors_errant\entities\helms\red\red_acs_knight_helmet_05.w2ent", true);	
 		}
 		/*
-		else if (ACS_Artorias_Armor_Equipped_Check())
+		else if (GetWitcherPlayer().IsItemEquippedByName('ACS_Artorias_Armor')
+	|| GetWitcherPlayer().IsItemEquippedByName('NGP_ACS_Artorias_Armor'))
 		{
 			GetACSWatcher().Facegear_Include_No_Anim();
 
@@ -258,6 +277,10 @@ state ACS_Hood_Disable_Engage in cACS_Hood
 	private var ids 																											: array<SItemUniqueId>;
 	private var size 																											: int;
 	private var i 																												: int;
+	private var dyeColor																										: name;
+	private var hoodId, dyeId																									: array<SItemUniqueId>;
+	private var equippedItemsId 																								: array<SItemUniqueId>;
+	private var j 																												: int;
 
 	event OnEnterState(prevStateName : name)
 	{
@@ -483,15 +506,20 @@ state ACS_Hood_Disable_Engage in cACS_Hood
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-statemachine class cACS_Facegear_Include
+statemachine class cACS_Facegear
 {
     function cACS_Facegear_Include_Engage()
 	{
 		this.PushState('cACS_Facegear_Include_Engage');
 	}
+
+	 function cACS_Facegear_Exclude_Engage()
+	{
+		this.PushState('cACS_Facegear_Exclude_Engage');
+	}
 }
 
-state cACS_Facegear_Include_Engage in cACS_Facegear_Include
+state cACS_Facegear_Include_Engage in cACS_Facegear
 {
 	private var temp_1																											: CEntityTemplate;
 	private var l_actor 																										: CActor;
@@ -518,17 +546,7 @@ state cACS_Facegear_Include_Engage in cACS_Facegear_Include
 	}
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-statemachine class cACS_Facegear_Exclude
-{
-    function Engage()
-	{
-		this.PushState('Facegear_Exclude_Engage');
-	}
-}
-
-state Facegear_Exclude_Engage in cACS_Facegear_Exclude
+state cACS_Facegear_Exclude_Engage in cACS_Facegear
 {
 	private var temp_1																											: CEntityTemplate;
 	private var l_actor 																										: CActor;
@@ -601,21 +619,19 @@ state AttachEredinSkirt in cACS_Wildhunt_Additional_Pieces
 
 		anchor_temp = (CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\entities\other\fx_ent.w2ent", true );
 
-
 		thePlayer.GetBoneWorldPositionAndRotationByIndex( thePlayer.GetBoneIndex( 'pelvis' ), bone_vec, bone_rot );
 
 		anchor = (CEntity)theGame.CreateEntity( anchor_temp, thePlayer.GetWorldPosition() + Vector( 0, 0, -10 ) );
 
 		anchor.AddTag('ACS_Eredin_Skirt_Anchor');
 
+		bone_rot.Roll -= 90;
+
 		anchor.CreateAttachmentAtBoneWS( thePlayer, 'pelvis', bone_vec, bone_rot );
 
 		rot = thePlayer.GetWorldRotation();
 
 		pos = thePlayer.GetWorldPosition();
-
-
-
 
 		ent = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( 
 
@@ -625,12 +641,12 @@ state AttachEredinSkirt in cACS_Wildhunt_Additional_Pieces
 
 		ent.AddTag('ACS_Eredin_Skirt');
 
-		attach_rot.Roll = 90;
-		attach_rot.Pitch = 0;
-		attach_rot.Yaw = -90;
-		attach_vec.X = -0.05;
-		attach_vec.Y = 1.05;
-		attach_vec.Z = 0;
+		attach_rot.Roll += 6.5;
+		attach_rot.Pitch += 90;
+		attach_rot.Yaw += 0;
+		attach_vec.X -= 0.125;
+		attach_vec.Y += 1.025;
+		attach_vec.Z += 0;
 
 		ent.CreateAttachment( anchor, , attach_vec, attach_rot );
 	}
@@ -990,8 +1006,7 @@ state ACS_Witcher_Bear_Armor_Fur_Include in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
-
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 
 		temp = (CEntityTemplate)LoadResourceAsync(
 
@@ -999,7 +1014,7 @@ state ACS_Witcher_Bear_Armor_Fur_Include in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 		
 	}
 	
@@ -1031,7 +1046,7 @@ state ACS_Witcher_Bear_Armor_Fur_Exclude in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 
 
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -1040,7 +1055,7 @@ state ACS_Witcher_Bear_Armor_Fur_Exclude in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 		
 	}
 	
@@ -1074,7 +1089,7 @@ state ACS_Knight_Armor_V1_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 
 		/*
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -1083,7 +1098,7 @@ state ACS_Knight_Armor_V1_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 		*/
 
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -1092,7 +1107,7 @@ state ACS_Knight_Armor_V1_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 
 		
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -1101,7 +1116,7 @@ state ACS_Knight_Armor_V1_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 		
 
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -1110,7 +1125,7 @@ state ACS_Knight_Armor_V1_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 
 		
 
@@ -1120,7 +1135,7 @@ state ACS_Knight_Armor_V1_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 	}
 	
 	event OnLeaveState( nextStateName : name ) 
@@ -1150,7 +1165,7 @@ state ACS_Knight_Armor_V1_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 
 		/*
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -1159,7 +1174,7 @@ state ACS_Knight_Armor_V1_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 		*/
 
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -1168,7 +1183,7 @@ state ACS_Knight_Armor_V1_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 
 		
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -1177,7 +1192,7 @@ state ACS_Knight_Armor_V1_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 
 		
 
@@ -1187,7 +1202,7 @@ state ACS_Knight_Armor_V1_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 
 		
 
@@ -1197,7 +1212,7 @@ state ACS_Knight_Armor_V1_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 
 		
 	}
@@ -1231,7 +1246,7 @@ state ACS_Knight_Armor_V2_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 
 		/*
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -1240,7 +1255,7 @@ state ACS_Knight_Armor_V2_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 		*/
 
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -1249,7 +1264,7 @@ state ACS_Knight_Armor_V2_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 
 		
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -1258,7 +1273,7 @@ state ACS_Knight_Armor_V2_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 
 		
 
@@ -1268,7 +1283,7 @@ state ACS_Knight_Armor_V2_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 
 		
 
@@ -1278,7 +1293,7 @@ state ACS_Knight_Armor_V2_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 	}
 	
 	event OnLeaveState( nextStateName : name ) 
@@ -1308,7 +1323,7 @@ state ACS_Knight_Armor_V2_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 
 		/*
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -1317,7 +1332,7 @@ state ACS_Knight_Armor_V2_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 		*/
 
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -1326,7 +1341,7 @@ state ACS_Knight_Armor_V2_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 
 		
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -1335,7 +1350,7 @@ state ACS_Knight_Armor_V2_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 
 		
 
@@ -1345,7 +1360,7 @@ state ACS_Knight_Armor_V2_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 
 		
 
@@ -1355,7 +1370,7 @@ state ACS_Knight_Armor_V2_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 	}
 	
 	event OnLeaveState( nextStateName : name ) 
@@ -1387,7 +1402,7 @@ state ACS_Knight_Armor_V3_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 
 		/*
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -1396,7 +1411,7 @@ state ACS_Knight_Armor_V3_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 		*/
 
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -1405,7 +1420,7 @@ state ACS_Knight_Armor_V3_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 
 
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -1414,7 +1429,7 @@ state ACS_Knight_Armor_V3_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 
 		
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -1423,7 +1438,7 @@ state ACS_Knight_Armor_V3_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 
 		
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -1432,7 +1447,7 @@ state ACS_Knight_Armor_V3_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 
 
 
@@ -1442,7 +1457,7 @@ state ACS_Knight_Armor_V3_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 	}
 	
 	event OnLeaveState( nextStateName : name ) 
@@ -1472,7 +1487,7 @@ state ACS_Knight_Armor_V3_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 
 		/*
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -1481,7 +1496,7 @@ state ACS_Knight_Armor_V3_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 		*/
 
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -1490,7 +1505,7 @@ state ACS_Knight_Armor_V3_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 
 
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -1499,7 +1514,7 @@ state ACS_Knight_Armor_V3_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 
 		
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -1508,7 +1523,7 @@ state ACS_Knight_Armor_V3_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 
 
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -1517,7 +1532,7 @@ state ACS_Knight_Armor_V3_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 
 		
 
@@ -1527,7 +1542,7 @@ state ACS_Knight_Armor_V3_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 	}
 	
 	event OnLeaveState( nextStateName : name ) 
@@ -1559,7 +1574,7 @@ state ACS_Witcher_Knight_Armor_V1_Pieces_Include in cACS_Knight_Additional_Piece
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 
 		/*
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -1568,7 +1583,7 @@ state ACS_Witcher_Knight_Armor_V1_Pieces_Include in cACS_Knight_Additional_Piece
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 		*/
 
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -1577,7 +1592,7 @@ state ACS_Witcher_Knight_Armor_V1_Pieces_Include in cACS_Knight_Additional_Piece
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 		
 
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -1586,7 +1601,7 @@ state ACS_Witcher_Knight_Armor_V1_Pieces_Include in cACS_Knight_Additional_Piece
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 	}
 	
 	event OnLeaveState( nextStateName : name ) 
@@ -1616,7 +1631,7 @@ state ACS_Witcher_Knight_Armor_V1_Pieces_Exclude in cACS_Knight_Additional_Piece
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 
 		/*
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -1625,7 +1640,7 @@ state ACS_Witcher_Knight_Armor_V1_Pieces_Exclude in cACS_Knight_Additional_Piece
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 		*/
 
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -1634,7 +1649,7 @@ state ACS_Witcher_Knight_Armor_V1_Pieces_Exclude in cACS_Knight_Additional_Piece
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 
 
 
@@ -1644,7 +1659,7 @@ state ACS_Witcher_Knight_Armor_V1_Pieces_Exclude in cACS_Knight_Additional_Piece
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 
 		
 	}
@@ -1678,7 +1693,7 @@ state ACS_Witcher_Knight_Armor_V2_Pieces_Include in cACS_Knight_Additional_Piece
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 
 		/*
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -1687,7 +1702,7 @@ state ACS_Witcher_Knight_Armor_V2_Pieces_Include in cACS_Knight_Additional_Piece
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 		*/
 
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -1696,7 +1711,7 @@ state ACS_Witcher_Knight_Armor_V2_Pieces_Include in cACS_Knight_Additional_Piece
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 		
 
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -1705,7 +1720,7 @@ state ACS_Witcher_Knight_Armor_V2_Pieces_Include in cACS_Knight_Additional_Piece
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 
 	
 	}
@@ -1737,7 +1752,7 @@ state ACS_Witcher_Knight_Armor_V2_Pieces_Exclude in cACS_Knight_Additional_Piece
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 
 		/*
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -1746,7 +1761,7 @@ state ACS_Witcher_Knight_Armor_V2_Pieces_Exclude in cACS_Knight_Additional_Piece
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 		*/
 
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -1755,7 +1770,7 @@ state ACS_Witcher_Knight_Armor_V2_Pieces_Exclude in cACS_Knight_Additional_Piece
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 
 
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -1764,7 +1779,7 @@ state ACS_Witcher_Knight_Armor_V2_Pieces_Exclude in cACS_Knight_Additional_Piece
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 
 	
 	}
@@ -1798,7 +1813,7 @@ state ACS_Witcher_Knight_Armor_V3_Pieces_Include in cACS_Knight_Additional_Piece
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 
 		/*
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -1807,7 +1822,7 @@ state ACS_Witcher_Knight_Armor_V3_Pieces_Include in cACS_Knight_Additional_Piece
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 		*/
 		
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -1816,7 +1831,7 @@ state ACS_Witcher_Knight_Armor_V3_Pieces_Include in cACS_Knight_Additional_Piece
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 
 		
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -1825,7 +1840,7 @@ state ACS_Witcher_Knight_Armor_V3_Pieces_Include in cACS_Knight_Additional_Piece
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 
 		
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -1834,7 +1849,7 @@ state ACS_Witcher_Knight_Armor_V3_Pieces_Include in cACS_Knight_Additional_Piece
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 
 	}
 	
@@ -1865,7 +1880,7 @@ state ACS_Witcher_Knight_Armor_V3_Pieces_Exclude in cACS_Knight_Additional_Piece
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 
 		/*
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -1874,7 +1889,7 @@ state ACS_Witcher_Knight_Armor_V3_Pieces_Exclude in cACS_Knight_Additional_Piece
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 		*/
 
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -1883,7 +1898,7 @@ state ACS_Witcher_Knight_Armor_V3_Pieces_Exclude in cACS_Knight_Additional_Piece
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 
 
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -1892,7 +1907,7 @@ state ACS_Witcher_Knight_Armor_V3_Pieces_Exclude in cACS_Knight_Additional_Piece
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 
 
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -1901,7 +1916,7 @@ state ACS_Witcher_Knight_Armor_V3_Pieces_Exclude in cACS_Knight_Additional_Piece
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 
 	}
 	
@@ -1934,7 +1949,7 @@ state ACS_Knight_Armor_Gold_V1_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 
 
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -1943,7 +1958,7 @@ state ACS_Knight_Armor_Gold_V1_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 
 
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -1952,7 +1967,7 @@ state ACS_Knight_Armor_Gold_V1_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 
 		
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -1961,7 +1976,7 @@ state ACS_Knight_Armor_Gold_V1_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 
 		
 
@@ -1971,7 +1986,7 @@ state ACS_Knight_Armor_Gold_V1_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 
 		
 
@@ -1981,7 +1996,7 @@ state ACS_Knight_Armor_Gold_V1_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 	}
 	
 	event OnLeaveState( nextStateName : name ) 
@@ -2011,7 +2026,7 @@ state ACS_Knight_Armor_Gold_V1_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 
 
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -2020,7 +2035,7 @@ state ACS_Knight_Armor_Gold_V1_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 
 
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -2029,7 +2044,7 @@ state ACS_Knight_Armor_Gold_V1_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 
 		
 
@@ -2039,7 +2054,7 @@ state ACS_Knight_Armor_Gold_V1_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 
 		
 
@@ -2049,7 +2064,7 @@ state ACS_Knight_Armor_Gold_V1_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 
 		
 
@@ -2059,7 +2074,7 @@ state ACS_Knight_Armor_Gold_V1_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 	}
 	
 	event OnLeaveState( nextStateName : name ) 
@@ -2089,7 +2104,7 @@ state ACS_Knight_Armor_Gold_V2_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 
 		temp = (CEntityTemplate)LoadResourceAsync(
 
@@ -2097,7 +2112,7 @@ state ACS_Knight_Armor_Gold_V2_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 
 
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -2106,7 +2121,7 @@ state ACS_Knight_Armor_Gold_V2_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 
 
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -2115,7 +2130,7 @@ state ACS_Knight_Armor_Gold_V2_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 
 
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -2124,7 +2139,7 @@ state ACS_Knight_Armor_Gold_V2_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 
 
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -2133,7 +2148,7 @@ state ACS_Knight_Armor_Gold_V2_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 
 
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -2142,7 +2157,7 @@ state ACS_Knight_Armor_Gold_V2_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 	}
 	
 	event OnLeaveState( nextStateName : name ) 
@@ -2172,7 +2187,7 @@ state ACS_Knight_Armor_Gold_V2_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 
 		temp = (CEntityTemplate)LoadResourceAsync(
 
@@ -2180,7 +2195,7 @@ state ACS_Knight_Armor_Gold_V2_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 
 
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -2189,7 +2204,7 @@ state ACS_Knight_Armor_Gold_V2_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 
 
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -2198,7 +2213,7 @@ state ACS_Knight_Armor_Gold_V2_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 
 		
 
@@ -2208,7 +2223,7 @@ state ACS_Knight_Armor_Gold_V2_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 
 
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -2217,7 +2232,7 @@ state ACS_Knight_Armor_Gold_V2_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 
 
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -2226,7 +2241,7 @@ state ACS_Knight_Armor_Gold_V2_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 	}
 	
 	event OnLeaveState( nextStateName : name ) 
@@ -2258,7 +2273,7 @@ state ACS_Vampire_Armor_Black_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 
 
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -2267,7 +2282,7 @@ state ACS_Vampire_Armor_Black_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 
 
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -2276,7 +2291,7 @@ state ACS_Vampire_Armor_Black_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 
 		
 
@@ -2286,7 +2301,7 @@ state ACS_Vampire_Armor_Black_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 
 		
 
@@ -2296,7 +2311,7 @@ state ACS_Vampire_Armor_Black_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 
 		
 
@@ -2306,7 +2321,7 @@ state ACS_Vampire_Armor_Black_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 	}
 	
 	event OnLeaveState( nextStateName : name ) 
@@ -2336,7 +2351,7 @@ state ACS_Vampire_Armor_Black_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 
 		temp = (CEntityTemplate)LoadResourceAsync(
 
@@ -2344,7 +2359,7 @@ state ACS_Vampire_Armor_Black_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 
 
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -2353,7 +2368,7 @@ state ACS_Vampire_Armor_Black_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 		
 		
 
@@ -2363,7 +2378,7 @@ state ACS_Vampire_Armor_Black_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 
 		
 
@@ -2373,7 +2388,7 @@ state ACS_Vampire_Armor_Black_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 
 		
 
@@ -2383,7 +2398,7 @@ state ACS_Vampire_Armor_Black_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 	}
 	
 	event OnLeaveState( nextStateName : name ) 
@@ -2415,7 +2430,7 @@ state ACS_Vampire_Armor_Red_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 
 		temp = (CEntityTemplate)LoadResourceAsync(
 
@@ -2423,7 +2438,7 @@ state ACS_Vampire_Armor_Red_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 
 
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -2432,7 +2447,7 @@ state ACS_Vampire_Armor_Red_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 
 		
 	
@@ -2442,7 +2457,7 @@ state ACS_Vampire_Armor_Red_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 
 		
 
@@ -2452,7 +2467,7 @@ state ACS_Vampire_Armor_Red_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 
 		
 
@@ -2462,7 +2477,7 @@ state ACS_Vampire_Armor_Red_Pieces_Include in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).IncludeAppearanceTemplate(temp); SleepOneFrame();
 	}
 	
 	event OnLeaveState( nextStateName : name ) 
@@ -2492,7 +2507,7 @@ state ACS_Vampire_Armor_Red_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 
 		
 
@@ -2502,7 +2517,7 @@ state ACS_Vampire_Armor_Red_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 
 		
 
@@ -2512,7 +2527,7 @@ state ACS_Vampire_Armor_Red_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 
 		
 
@@ -2522,7 +2537,7 @@ state ACS_Vampire_Armor_Red_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 
 
 		temp = (CEntityTemplate)LoadResourceAsync(
@@ -2531,7 +2546,7 @@ state ACS_Vampire_Armor_Red_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 
 		temp = (CEntityTemplate)LoadResourceAsync(
 
@@ -2539,7 +2554,7 @@ state ACS_Vampire_Armor_Red_Pieces_Exclude in cACS_Knight_Additional_Pieces
 		
 		, true);
 		
-		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp);
+		((CAppearanceComponent)p_comp).ExcludeAppearanceTemplate(temp); SleepOneFrame();
 	}
 	
 	event OnLeaveState( nextStateName : name ) 
@@ -2550,89 +2565,20 @@ state ACS_Vampire_Armor_Red_Pieces_Exclude in cACS_Knight_Additional_Pieces
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-statemachine class cACS_Crach_Cape_Include
+statemachine class cACS_Warden_Tail
 {
-    function Engage()
-	{
-		this.PushState('ACS_Crach_Cape_Include_Engage');
-	}
-}
-
-state ACS_Crach_Cape_Include_Engage in cACS_Crach_Cape_Include
-{
-	private var temp_1																											: CEntityTemplate;
-	private var l_actor 																										: CActor;
-	private var l_comp, meshcomp 																								: CComponent;
-		
-	event OnEnterState(prevStateName : name)
-	{
-		super.OnEnterState(prevStateName);
-		Crach_Cape_Include();
-	}
-	
-	entry function Crach_Cape_Include()
-	{	
-		l_actor = thePlayer;
-		l_comp = l_actor.GetComponentByClassName( 'CAppearanceComponent' );
-
-		temp_1 = (CEntityTemplate)LoadResourceAsync("characters\models\crowd_npc\skellige_villager\items\i_06_mb__skellige_villager_px.w2ent", true);		
-		((CAppearanceComponent)l_comp).IncludeAppearanceTemplate(temp_1);
-	}
-	
-	event OnLeaveState( nextStateName : name ) 
-	{
-		super.OnLeaveState(nextStateName);
-	}
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-statemachine class cACS_Crach_Cape_Exclude
-{
-    function Engage()
-	{
-		this.PushState('ACS_Crach_Cape_Exclude_Engage');
-	}
-}
-
-state ACS_Crach_Cape_Exclude_Engage in cACS_Crach_Cape_Exclude
-{
-	private var temp_1																											: CEntityTemplate;
-	private var l_actor 																										: CActor;
-	private var l_comp, meshcomp 																								: CComponent;
-		
-	event OnEnterState(prevStateName : name)
-	{
-		super.OnEnterState(prevStateName);
-		Crach_Cape_Exclude();
-	}
-	
-	entry function Crach_Cape_Exclude()
-	{	
-		l_actor = thePlayer;
-		l_comp = l_actor.GetComponentByClassName( 'CAppearanceComponent' );
-
-		temp_1 = (CEntityTemplate)LoadResourceAsync("characters\models\crowd_npc\skellige_villager\items\i_06_mb__skellige_villager_px.w2ent", true);		
-		((CAppearanceComponent)l_comp).ExcludeAppearanceTemplate(temp_1);
-	}
-	
-	event OnLeaveState( nextStateName : name ) 
-	{
-		super.OnLeaveState(nextStateName);
-	}
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-statemachine class cACS_Warden_Tail_Include
-{
-    function Engage()
+    function ACS_Warden_Tail_Include_Engage()
 	{
 		this.PushState('ACS_Warden_Tail_Include_Engage');
 	}
+
+	function ACS_Warden_Tail_Exclude_Engage()
+	{
+		this.PushState('ACS_Warden_Tail_Exclude_Engage');
+	}
 }
 
-state ACS_Warden_Tail_Include_Engage in cACS_Warden_Tail_Include
+state ACS_Warden_Tail_Include_Engage in cACS_Warden_Tail
 {
 	private var temp_1, temp_2, temp_3																							: CEntityTemplate;
 	private var l_actor 																										: CActor;
@@ -2663,17 +2609,7 @@ state ACS_Warden_Tail_Include_Engage in cACS_Warden_Tail_Include
 	}
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-statemachine class cACS_Warden_Tail_Exclude
-{
-    function Engage()
-	{
-		this.PushState('ACS_Warden_Tail_Exclude_Engage');
-	}
-}
-
-state ACS_Warden_Tail_Exclude_Engage in cACS_Warden_Tail_Exclude
+state ACS_Warden_Tail_Exclude_Engage in cACS_Warden_Tail
 {
 	private var temp_1, temp_2																									: CEntityTemplate;
 	private var l_actor 																										: CActor;
@@ -2708,9 +2644,14 @@ state ACS_Warden_Tail_Exclude_Engage in cACS_Warden_Tail_Exclude
 
 statemachine class cACS_Additional_Helmets
 {
-    function Engage()
+    function ACS_Additional_Helmets_Include_Engage()
 	{
 		this.PushState('ACS_Additional_Helmets_Include_Engage');
+	}
+
+	function ACS_Additional_Helmets_Exclude_Engage()
+	{
+		this.PushState('ACS_Additional_Helmets_Exclude_Engage');
 	}
 }
 
@@ -2753,11 +2694,11 @@ state ACS_Additional_Helmets_Include_Engage in cACS_Additional_Helmets
 
 		helm_temp_4 = (CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\armor\old_stuff\c_01_mw__eredin.w2ent", true );
 
-		if (ACS_Armor_Alpha_Equipped_Check())
+		if (ACS_Armor_Set_Check('acs_armor_alpha', false))
 		{
 			helm_temp_5 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\armor\old_stuff\warden_alt.w2ent", true);	
 		}
-		else if (ACS_Armor_Omega_Equipped_Check())
+		else if (ACS_Armor_Set_Check('acs_armor_omega', false))
 		{
 			helm_temp_5 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\armor\old_stuff\warden.w2ent", true);	
 		}
@@ -2867,17 +2808,7 @@ state ACS_Additional_Helmets_Include_Engage in cACS_Additional_Helmets
 	}
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-statemachine class cACS_Additional_Helmet_Appearance_Destroy
-{
-    function Engage()
-	{
-		this.PushState('ACS_Additional_Helmet_Appearance_Destroy_Engage');
-	}
-}
-
-state ACS_Additional_Helmet_Appearance_Destroy_Engage in cACS_Additional_Helmet_Appearance_Destroy
+state ACS_Additional_Helmets_Exclude_Engage in cACS_Additional_Helmets
 {
 	private var helm_temp_1, helm_temp_2, helm_temp_3, helm_temp_4																: CEntityTemplate;
 	private var l_actor 																										: CActor;
@@ -2892,10 +2823,10 @@ state ACS_Additional_Helmet_Appearance_Destroy_Engage in cACS_Additional_Helmet_
 	{
 		super.OnEnterState(prevStateName);
 
-		Helmet_Appearance_Exclude_Shades();
+		Additional_Helmets_Exclude();
 	}
 	
-	entry function Helmet_Appearance_Exclude_Shades()
+	entry function Additional_Helmets_Exclude()
 	{	
 		l_actor = thePlayer;
 		l_comp = l_actor.GetComponentByClassName( 'CAppearanceComponent' );
@@ -2928,294 +2859,6 @@ state ACS_Additional_Helmet_Appearance_Destroy_Engage in cACS_Additional_Helmet_
 			}	
 		}			
 		ids.Clear();
-	}
-	
-	event OnLeaveState( nextStateName : name ) 
-	{
-		super.OnLeaveState(nextStateName);
-	}
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-function ACS_Shoulder_Armor_Toggle_On()
-{
-	var vACS_Shoulder_Armor_Toggle_On : cACS_Shoulder_Armor_Toggle_On;
-	vACS_Shoulder_Armor_Toggle_On = new cACS_Shoulder_Armor_Toggle_On in theGame;
-			
-	vACS_Shoulder_Armor_Toggle_On.Engage();
-}
-
-statemachine class cACS_Shoulder_Armor_Toggle_On
-{
-    function Engage()
-	{
-		this.PushState('ACS_Shoulder_Armor_Toggle_On_Engage');
-	}
-}
-
-state ACS_Shoulder_Armor_Toggle_On_Engage in cACS_Shoulder_Armor_Toggle_On
-{
-	private var temp_1, temp_2, temp_3, temp_4, temp_5																			: CEntityTemplate;
-	private var l_actor 																										: CActor;
-	private var l_comp, meshcomp 																								: CComponent;
-		
-	event OnEnterState(prevStateName : name)
-	{
-		super.OnEnterState(prevStateName);
-		Shoulder_Armor_Toggle_On();
-	}
-
-	entry function Shoulder_Armor_Toggle_On()
-	{	
-		l_actor = thePlayer;
-		l_comp = l_actor.GetComponentByClassName( 'CAppearanceComponent' );
-
-		temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\armor\old_stuff\berserkercape.w2ent", true);		
-		((CAppearanceComponent)l_comp).IncludeAppearanceTemplate(temp_1);
-
-		temp_3 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\armor\old_stuff\imlerith_arms.w2ent", true);		
-		((CAppearanceComponent)l_comp).IncludeAppearanceTemplate(temp_3);
-
-		temp_5 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\armor\old_stuff\wild_hunt_arm_cloth.w2ent", true);		
-		((CAppearanceComponent)l_comp).IncludeAppearanceTemplate(temp_5);
-	}
-	
-	event OnLeaveState( nextStateName : name ) 
-	{
-		super.OnLeaveState(nextStateName);
-	}
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-function ACS_Shoulder_Armor_Toggle_Off()
-{
-	var vACS_Shoulder_Armor_Toggle_Off : cACS_Shoulder_Armor_Toggle_Off;
-	vACS_Shoulder_Armor_Toggle_Off = new cACS_Shoulder_Armor_Toggle_Off in theGame;
-			
-	vACS_Shoulder_Armor_Toggle_Off.Engage();
-}
-
-statemachine class cACS_Shoulder_Armor_Toggle_Off
-{
-    function Engage()
-	{
-		this.PushState('ACS_Shoulder_Armor_Toggle_Off_Engage');
-	}
-}
-
-state ACS_Shoulder_Armor_Toggle_Off_Engage in cACS_Shoulder_Armor_Toggle_Off
-{
-	private var temp_1, temp_2, temp_3, temp_4, temp_5																			: CEntityTemplate;
-	private var l_actor 																										: CActor;
-	private var l_comp, meshcomp 																								: CComponent;
-		
-	event OnEnterState(prevStateName : name)
-	{
-		super.OnEnterState(prevStateName);
-		Shoulder_Armor_Toggle_Off();
-	}
-
-	entry function Shoulder_Armor_Toggle_Off()
-	{	
-		l_actor = thePlayer;
-		l_comp = l_actor.GetComponentByClassName( 'CAppearanceComponent' );
-
-		temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\armor\old_stuff\berserkercape.w2ent", true);
-		((CAppearanceComponent)l_comp).ExcludeAppearanceTemplate(temp_1);
-
-		temp_3 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\armor\old_stuff\imlerith_arms.w2ent", true);	
-		((CAppearanceComponent)l_comp).ExcludeAppearanceTemplate(temp_3);
-
-		temp_5 = (CEntityTemplate)LoadResourceAsync("dlc\dlc_acs\data\armor\old_stuff\wild_hunt_arm_cloth.w2ent", true);		
-		((CAppearanceComponent)l_comp).ExcludeAppearanceTemplate(temp_5);
-	}
-	
-	event OnLeaveState( nextStateName : name ) 
-	{
-		super.OnLeaveState(nextStateName);
-	}
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-function ACS_Fur_Toggle_On()
-{
-	var vACS_Fur_Toggle_On : cACS_Fur_Toggle_On;
-	vACS_Fur_Toggle_On = new cACS_Fur_Toggle_On in theGame;
-			
-	vACS_Fur_Toggle_On.Engage();
-}
-
-statemachine class cACS_Fur_Toggle_On
-{
-    function Engage()
-	{
-		this.PushState('ACS_Fur_Toggle_On_Engage');
-	}
-}
-
-state ACS_Fur_Toggle_On_Engage in cACS_Fur_Toggle_On
-{
-	private var temp_1, temp_2																									: CEntityTemplate;
-	private var l_actor 																										: CActor;
-	private var l_comp, meshcomp 																								: CComponent;
-		
-	event OnEnterState(prevStateName : name)
-	{
-		super.OnEnterState(prevStateName);
-		Fur_Toggle_On();
-	}
-
-	entry function Fur_Toggle_On()
-	{	
-		l_actor = thePlayer;
-		l_comp = l_actor.GetComponentByClassName( 'CAppearanceComponent' );
-
-		temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\modtemplates\batman\data\caranthir_fur.w2ent", true);		
-		((CAppearanceComponent)l_comp).IncludeAppearanceTemplate(temp_1);
-
-		temp_2 = (CEntityTemplate)LoadResourceAsync("dlc\modtemplates\batman\data\fur\red_fur_black.w2ent", true);		
-		((CAppearanceComponent)l_comp).IncludeAppearanceTemplate(temp_2);
-	}
-	
-	event OnLeaveState( nextStateName : name ) 
-	{
-		super.OnLeaveState(nextStateName);
-	}
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-function ACS_Fur_Toggle_Off()
-{
-	var vACS_Fur_Toggle_Off : cACS_Fur_Toggle_Off;
-	vACS_Fur_Toggle_Off = new cACS_Fur_Toggle_Off in theGame;
-			
-	vACS_Fur_Toggle_Off.Engage();
-}
-
-statemachine class cACS_Fur_Toggle_Off
-{
-    function Engage()
-	{
-		this.PushState('ACS_Fur_Toggle_Off_Engage');
-	}
-}
-
-state ACS_Fur_Toggle_Off_Engage in cACS_Fur_Toggle_Off
-{
-	private var temp_1, temp_2																									: CEntityTemplate;
-	private var l_actor 																										: CActor;
-	private var l_comp, meshcomp 																								: CComponent;
-		
-	event OnEnterState(prevStateName : name)
-	{
-		super.OnEnterState(prevStateName);
-		Fur_Toggle_Off();
-	}
-
-	entry function Fur_Toggle_Off()
-	{
-		l_actor = thePlayer;
-		l_comp = l_actor.GetComponentByClassName( 'CAppearanceComponent' );
-
-		temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\modtemplates\batman\data\caranthir_fur.w2ent", true);		
-		((CAppearanceComponent)l_comp).ExcludeAppearanceTemplate(temp_1);
-
-		temp_2 = (CEntityTemplate)LoadResourceAsync("dlc\modtemplates\batman\data\fur\red_fur_black.w2ent", true);		
-		((CAppearanceComponent)l_comp).ExcludeAppearanceTemplate(temp_2);
-	}
-	
-	event OnLeaveState( nextStateName : name ) 
-	{
-		super.OnLeaveState(nextStateName);
-	}
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-function ACS_Cape_Toggle_On()
-{
-	var vACS_Cape_Toggle_On : cACS_Cape_Toggle_On;
-	vACS_Cape_Toggle_On = new cACS_Cape_Toggle_On in theGame;
-			
-	vACS_Cape_Toggle_On.Engage();
-}
-
-statemachine class cACS_Cape_Toggle_On
-{
-    function Engage()
-	{
-		this.PushState('ACS_Cape_Toggle_On_Engage');
-	}
-}
-
-state ACS_Cape_Toggle_On_Engage in cACS_Cape_Toggle_On
-{
-	private var temp_1																											: CEntityTemplate;
-	private var l_actor 																										: CActor;
-	private var l_comp, meshcomp 																								: CComponent;
-		
-	event OnEnterState(prevStateName : name)
-	{
-		super.OnEnterState(prevStateName);
-		Cape_Toggle_On();
-	}
-	
-	entry function Cape_Toggle_On()
-	{	
-		l_actor = thePlayer;
-		l_comp = l_actor.GetComponentByClassName( 'CAppearanceComponent' );
-
-		temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\modtemplates\batman\data\berserkercape.w2ent", true);		
-		((CAppearanceComponent)l_comp).IncludeAppearanceTemplate(temp_1);
-	}
-	
-	event OnLeaveState( nextStateName : name ) 
-	{
-		super.OnLeaveState(nextStateName);
-	}
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-function ACS_Cape_Toggle_Off()
-{
-	var vACS_Cape_Toggle_Off : cACS_Cape_Toggle_Off;
-	vACS_Cape_Toggle_Off = new cACS_Cape_Toggle_Off in theGame;
-			
-	vACS_Cape_Toggle_Off.Engage();
-}
-
-statemachine class cACS_Cape_Toggle_Off
-{
-    function Engage()
-	{
-		this.PushState('ACS_Cape_Toggle_Off_Engage');
-	}
-}
-
-state ACS_Cape_Toggle_Off_Engage in cACS_Cape_Toggle_Off
-{
-	private var temp_1																											: CEntityTemplate;
-	private var l_actor 																										: CActor;
-	private var l_comp, meshcomp 																								: CComponent;
-		
-	event OnEnterState(prevStateName : name)
-	{
-		super.OnEnterState(prevStateName);
-		Cape_Toggle_Off();
-	}
-	
-	entry function Cape_Toggle_Off()
-	{	
-		l_actor = thePlayer;
-		l_comp = l_actor.GetComponentByClassName( 'CAppearanceComponent' );
-
-		temp_1 = (CEntityTemplate)LoadResourceAsync("dlc\modtemplates\batman\data\berserkercape.w2ent", true);		
-		((CAppearanceComponent)l_comp).ExcludeAppearanceTemplate(temp_1);
 	}
 	
 	event OnLeaveState( nextStateName : name ) 

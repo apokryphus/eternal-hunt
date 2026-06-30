@@ -4,32 +4,32 @@ function ACS_Dodge()
 	//var vACS_Dodge : cACS_Dodge;
 	//vACS_Dodge = new cACS_Dodge in theGame;
 	
-	if ( ACS_Enabled())
+	if ( ACS_Settings_Main_Bool('acs_main_settings','acs_mod_enabled', true) && !thePlayer.IsCiri())
 	{
 		if (!GetWitcherPlayer().IsCiri()
 		&& !GetWitcherPlayer().IsPerformingFinisher()
 		&& !GetWitcherPlayer().HasTag('acs_in_wraith')
-		&& !GetWitcherPlayer().HasTag('acs_blood_sucking')
+		&& !GetWitcherPlayer().HasTag('ACS_Bruxa_Bite_Process')
 		)
 		{	
 			//vACS_Dodge.ACS_Dodge_Engage();
 
-			if( ACS_Armor_Equipped_Check()
-			|| ACS_Wolf_School_Check()
-			|| ACS_Bear_School_Check()
-			|| ACS_Cat_School_Check()
-			|| ACS_Griffin_School_Check()
-			|| ACS_Manticore_School_Check()
-			|| ACS_Forgotten_Wolf_Check()
-			|| ACS_Viper_School_Check()
+			if( ACS_Armor_Set_Check('acs_armor', false)
+			|| ACS_Armor_Set_Check('wolf', true)
+			|| ACS_Armor_Set_Check('bear', true)
+			|| ACS_Armor_Set_Check('cat', true)
+			|| ACS_Armor_Set_Check('griffin', true)
+			|| ACS_Armor_Set_Check('manticore', true)
+			|| ACS_Armor_Set_Check('forgotten_wolf', true)
+			|| ACS_Armor_Set_Check('viper', true)
 			)
 			{
 				return;
 			}
 
-			if (ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaCostAction', false))
+			if (ACS_Settings_Main_Bool('acs_stamina_settings','acs_stamina_cost_action', false))
 			{
-				thePlayer.DrainStamina( ESAT_FixedValue,  thePlayer.GetStatMax( BCS_Stamina ) * ACS_Settings_Main_Float('EHmodStaminaSettings','EHmodDodgeStaminaCost', 0.05), ACS_Settings_Main_Float('EHmodStaminaSettings','EHmodDodgeStaminaRegenDelay', 1) );
+				thePlayer.DrainStamina( ESAT_FixedValue,  thePlayer.GetStatMax( BCS_Stamina ) * ACS_Settings_Main_Float('acs_stamina_settings','acs_dodge_stamina_cost', 0.05), ACS_Settings_Main_Float('acs_stamina_settings','acs_dodge_stamina_regen_delay', 1) );
 			}
 		}
 	}
@@ -61,7 +61,7 @@ state ACS_Dodge_Engage in cACS_Dodge
 	entry function Dodge()
 	{
 		if (!GetWitcherPlayer().HasTag('ACS_Camo_Active')
-		&& ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false))
+		&& ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false))
 		{
 			GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 			GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -95,22 +95,22 @@ state ACS_Dodge_Engage in cACS_Dodge
 
 	latent function DodgeStaminaDrain()
 	{
-		if( ACS_Armor_Equipped_Check()
-		|| ACS_Wolf_School_Check()
-		|| ACS_Bear_School_Check()
-		|| ACS_Cat_School_Check()
-		|| ACS_Griffin_School_Check()
-		|| ACS_Manticore_School_Check()
-		|| ACS_Forgotten_Wolf_Check()
-		|| ACS_Viper_School_Check()
+		if( ACS_Armor_Set_Check('acs_armor', false)
+		|| ACS_Armor_Set_Check('wolf', true)
+		|| ACS_Armor_Set_Check('bear', true)
+		|| ACS_Armor_Set_Check('cat', true)
+		|| ACS_Armor_Set_Check('griffin', true)
+		|| ACS_Armor_Set_Check('manticore', true)
+		|| ACS_Armor_Set_Check('forgotten_wolf', true)
+		|| ACS_Armor_Set_Check('viper', true)
 		)
 		{
 			return;
 		}
 
-		if (ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaCostAction', false))
+		if (ACS_Settings_Main_Bool('acs_stamina_settings','acs_stamina_cost_action', false))
 		{
-			thePlayer.DrainStamina( ESAT_FixedValue,  thePlayer.GetStatMax( BCS_Stamina ) * ACS_Settings_Main_Float('EHmodStaminaSettings','EHmodDodgeStaminaCost', 0.05), ACS_Settings_Main_Float('EHmodStaminaSettings','EHmodDodgeStaminaRegenDelay', 1) );
+			thePlayer.DrainStamina( ESAT_FixedValue,  thePlayer.GetStatMax( BCS_Stamina ) * ACS_Settings_Main_Float('acs_stamina_settings','acs_dodge_stamina_cost', 0.05), ACS_Settings_Main_Float('acs_stamina_settings','acs_dodge_stamina_regen_delay', 1) );
 		}
 	}
 	
@@ -125,115 +125,115 @@ state ACS_Dodge_Engage in cACS_Dodge
 				{
 					if (GetWitcherPlayer().GetEquippedSign() == ST_Igni )
 					{
-						if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerIgniSignWeapon', 0) == 0)
+						if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_igni_sign_weapon', 0) == 0)
 						{
 							FireDodge();
 						}
-						else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerIgniSignWeapon', 0) == 1)
+						else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_igni_sign_weapon', 0) == 1)
 						{
 							ShadowDodge();
 						}
-						else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerIgniSignWeapon', 0) == 2)
+						else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_igni_sign_weapon', 0) == 2)
 						{
 							IceDodge();
 						}
-						else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerIgniSignWeapon', 0) == 3)
+						else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_igni_sign_weapon', 0) == 3)
 						{
 							BloodDodge();
 						}
-						else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerIgniSignWeapon', 0) == 4)
+						else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_igni_sign_weapon', 0) == 4)
 						{
 							ParalyzeDodge();
 						}
 					}
 					else if (GetWitcherPlayer().GetEquippedSign() == ST_Axii )
 					{
-						if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAxiiSignWeapon', 2) == 0)
+						if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_axii_sign_weapon', 2) == 0)
 						{
 							FireDodge();
 						}
-						else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAxiiSignWeapon', 2) == 1)
+						else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_axii_sign_weapon', 2) == 1)
 						{
 							ShadowDodge();
 						}
-						else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAxiiSignWeapon', 2) == 2)
+						else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_axii_sign_weapon', 2) == 2)
 						{
 							IceDodge();
 						}
-						else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAxiiSignWeapon', 2) == 3)
+						else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_axii_sign_weapon', 2) == 3)
 						{
 							BloodDodge();
 						}
-						else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAxiiSignWeapon', 2) == 4)
+						else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_axii_sign_weapon', 2) == 4)
 						{
 							ParalyzeDodge();
 						}
 					}
 					else if (GetWitcherPlayer().GetEquippedSign() == ST_Aard )
 					{
-						if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAardSignWeapon', 3) == 0)
+						if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_aard_sign_weapon', 3) == 0)
 						{
 							FireDodge();
 						}
-						else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAardSignWeapon', 3) == 1)
+						else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_aard_sign_weapon', 3) == 1)
 						{
 							ShadowDodge();
 						}
-						else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAardSignWeapon', 3) == 2)
+						else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_aard_sign_weapon', 3) == 2)
 						{
 							IceDodge();
 						}
-						else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAardSignWeapon', 3) == 3)
+						else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_aard_sign_weapon', 3) == 3)
 						{
 							BloodDodge();
 						}
-						else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAardSignWeapon', 3) == 4)
+						else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_aard_sign_weapon', 3) == 4)
 						{
 							ParalyzeDodge();
 						}
 					}
 					else if (GetWitcherPlayer().GetEquippedSign() == ST_Yrden )
 					{
-						if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerYrdenSignWeapon', 4) == 0)
+						if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_yrden_sign_weapon', 4) == 0)
 						{
 							FireDodge();
 						}
-						else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerYrdenSignWeapon', 4) == 1)
+						else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_yrden_sign_weapon', 4) == 1)
 						{
 							ShadowDodge();
 						}
-						else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerYrdenSignWeapon', 4) == 2)
+						else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_yrden_sign_weapon', 4) == 2)
 						{
 							IceDodge();
 						}
-						else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerYrdenSignWeapon', 4) == 3)
+						else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_yrden_sign_weapon', 4) == 3)
 						{
 							BloodDodge();
 						}
-						else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerYrdenSignWeapon', 4) == 4)
+						else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_yrden_sign_weapon', 4) == 4)
 						{
 							ParalyzeDodge();
 						}
 					}
 					else if (GetWitcherPlayer().GetEquippedSign() == ST_Quen )
 					{
-						if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerQuenSignWeapon', 1) == 0)
+						if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_quen_sign_weapon', 1) == 0)
 						{
 							FireDodge();
 						}
-						else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerQuenSignWeapon', 1) == 1)
+						else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_quen_sign_weapon', 1) == 1)
 						{
 							ShadowDodge();
 						}
-						else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerQuenSignWeapon', 1) == 2)
+						else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_quen_sign_weapon', 1) == 2)
 						{
 							IceDodge();
 						}
-						else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerQuenSignWeapon', 1) == 3)
+						else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_quen_sign_weapon', 1) == 3)
 						{
 							BloodDodge();
 						}
-						else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerQuenSignWeapon', 1) == 4)
+						else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_quen_sign_weapon', 1) == 4)
 						{
 							ParalyzeDodge();
 						}
@@ -248,65 +248,65 @@ state ACS_Dodge_Engage in cACS_Dodge
 		else if ( ACS_GetWeaponMode() == 1 )
 		{
 			if ( 
-			ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 1 && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && GetWitcherPlayer().HasTag('acs_quen_sword_equipped') 
-			|| ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 1 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && GetWitcherPlayer().HasTag('acs_quen_sword_equipped') 
+			ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 1 && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && GetWitcherPlayer().HasTag('acs_quen_sword_equipped') 
+			|| ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 1 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && GetWitcherPlayer().HasTag('acs_quen_sword_equipped') 
 			)
 			{
 				ShadowDodge();
 			}
 			else if ( 
-			ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 7 && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && GetWitcherPlayer().HasTag('acs_aard_sword_equipped') 
-			|| ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 7 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && GetWitcherPlayer().HasTag('acs_aard_sword_equipped') 
+			ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 7 && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && GetWitcherPlayer().HasTag('acs_aard_sword_equipped') 
+			|| ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 7 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && GetWitcherPlayer().HasTag('acs_aard_sword_equipped') 
 			)
 			{
 				BloodDodge();
 			}
 			else if ( 
-			ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 3 && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && GetWitcherPlayer().HasTag('acs_axii_sword_equipped') 
-			|| ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 3 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && GetWitcherPlayer().HasTag('acs_axii_sword_equipped')
+			ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 3 && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && GetWitcherPlayer().HasTag('acs_axii_sword_equipped') 
+			|| ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 3 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && GetWitcherPlayer().HasTag('acs_axii_sword_equipped')
 			)
 			{
 				IceDodge();	
 			}
-			else if ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 5 && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && GetWitcherPlayer().HasTag('acs_yrden_sword_equipped') 
-			|| ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 5 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && GetWitcherPlayer().HasTag('acs_yrden_sword_equipped') 
+			else if ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 5 && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && GetWitcherPlayer().HasTag('acs_yrden_sword_equipped') 
+			|| ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 5 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && GetWitcherPlayer().HasTag('acs_yrden_sword_equipped') 
 			)
 			{
 				ParalyzeDodge();	
 			}	
 			else if ( 
-			ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 0 && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && GetWitcherPlayer().HasTag('acs_igni_sword_equipped') 
-			|| ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 0 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && GetWitcherPlayer().HasTag('acs_igni_sword_equipped')
-			|| ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 0 && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && GetWitcherPlayer().HasTag('acs_igni_secondary_sword_equipped') 
-			|| ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 0 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && GetWitcherPlayer().HasTag('acs_igni_secondary_sword_equipped')
+			ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 0 && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && GetWitcherPlayer().HasTag('acs_igni_sword_equipped') 
+			|| ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 0 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && GetWitcherPlayer().HasTag('acs_igni_sword_equipped')
+			|| ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 0 && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && GetWitcherPlayer().HasTag('acs_igni_secondary_sword_equipped') 
+			|| ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 0 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && GetWitcherPlayer().HasTag('acs_igni_secondary_sword_equipped')
 			)
 			{
 				FireDodge();	
 			}
 			else if ( 
-			ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 2 && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped') 
-			|| ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 2 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped') 
+			ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 2 && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped') 
+			|| ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 2 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped') 
 			)
 			{
 				ParalyzeDodge();	
 			}
 			else if ( 
-			ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 4 && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped') 
-			|| ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 4 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped') 
+			ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 4 && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped') 
+			|| ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 4 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped') 
 			)
 			{
 				IceDodge();	
 			}
 			else if ( 
-			ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 6  && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped') 
-			|| ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 6 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped') 
+			ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 6  && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped') 
+			|| ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 6 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped') 
 			)
 			{
 				ParalyzeDodge();	
 			}
 			else if ( 
-			ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 8  && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped') 
-			|| ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 8 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped') 
+			ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 8  && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped') 
+			|| ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 8 && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped') 
 			)
 			{
 				FireDodge();	
@@ -319,57 +319,57 @@ state ACS_Dodge_Engage in cACS_Dodge
 		else if ( ACS_GetWeaponMode() == 3 )
 		{
 			if ( 
-			ACS_GetItem_Olgierd_Silver() && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && GetWitcherPlayer().HasTag('acs_quen_sword_equipped') 
-			|| ACS_GetItem_Olgierd_Steel() && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && GetWitcherPlayer().HasTag('acs_quen_sword_equipped')
+			ACS_GetItem_Sword_IsEquipped('olgierd_silver', 'silver') && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && GetWitcherPlayer().HasTag('acs_quen_sword_equipped') 
+			|| ACS_GetItem_Sword_IsEquipped('olgierd_steel', 'steel') && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && GetWitcherPlayer().HasTag('acs_quen_sword_equipped')
 			)
 			{
 				ShadowDodge();
 			}
 			else if ( 
-			ACS_GetItem_Claws_Silver() && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && GetWitcherPlayer().HasTag('acs_aard_sword_equipped') 
-			|| ACS_GetItem_Claws_Steel() && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && GetWitcherPlayer().HasTag('acs_aard_sword_equipped')
+			ACS_GetItem_Sword_IsEquipped('claws_silver', 'silver') && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && GetWitcherPlayer().HasTag('acs_aard_sword_equipped') 
+			|| ACS_GetItem_Sword_IsEquipped('claws_steel', 'steel') && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && GetWitcherPlayer().HasTag('acs_aard_sword_equipped')
 			)
 			{
 				BloodDodge();
 			}
 			else if ( 
-			ACS_GetItem_Eredin_Silver() && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && GetWitcherPlayer().HasTag('acs_axii_sword_equipped') 
-			|| ACS_GetItem_Eredin_Steel() && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && GetWitcherPlayer().HasTag('acs_axii_sword_equipped')
+			ACS_GetItem_Sword_IsEquipped('shield_sword_silver', 'silver') && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && GetWitcherPlayer().HasTag('acs_axii_sword_equipped') 
+			|| ACS_GetItem_Sword_IsEquipped('shield_sword_steel', 'steel') && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && GetWitcherPlayer().HasTag('acs_axii_sword_equipped')
 			)
 			{
 				IceDodge();	
 			}
 			else if ( 
-			ACS_GetItem_Imlerith_Silver() && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && GetWitcherPlayer().HasTag('acs_yrden_sword_equipped') 
-			|| ACS_GetItem_Imlerith_Steel() && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && GetWitcherPlayer().HasTag('acs_yrden_sword_equipped')
+			ACS_GetItem_Sword_IsEquipped('imlerith_moveset_silver', 'silver') && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && GetWitcherPlayer().HasTag('acs_yrden_sword_equipped') 
+			|| ACS_GetItem_Sword_IsEquipped('imlerith_moveset_steel', 'steel') && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && GetWitcherPlayer().HasTag('acs_yrden_sword_equipped')
 			)
 			{
 				ParalyzeDodge();	
 			}	
 			else if ( 
-			ACS_GetItem_Spear_Silver() && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped') 
-			|| ACS_GetItem_Spear_Steel() && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped')
+			ACS_GetItem_Sword_IsEquipped('spear_silver', 'silver') && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped') 
+			|| ACS_GetItem_Sword_IsEquipped('spear_steel', 'steel') && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped')
 			)
 			{
 				ShadowDodge();	
 			}
 			else if ( 
-			ACS_GetItem_Greg_Silver() && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped') 
-			|| ACS_GetItem_Greg_Steel() && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped')
+			ACS_GetItem_Sword_IsEquipped('greg_silver', 'silver') && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped') 
+			|| ACS_GetItem_Sword_IsEquipped('greg_steel', 'steel') && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped')
 			)
 			{
 				IceDodge();	
 			}
 			else if ( 
-			ACS_GetItem_Hammer_Silver() && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped') 
-			|| ACS_GetItem_Hammer_Steel() && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped')
+			ACS_GetItem_Sword_IsEquipped('hammer_silver', 'silver') && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped') 
+			|| ACS_GetItem_Sword_IsEquipped('hammer_steel', 'steel') && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped')
 			)
 			{
 				ParalyzeDodge();	
 			}
 			else if ( 
-			ACS_GetItem_Axe_Silver() && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped') 
-			|| ACS_GetItem_Axe_Steel() && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped')
+			ACS_GetItem_Sword_IsEquipped('axe_silver', 'silver') && GetWitcherPlayer().IsWeaponHeld( 'silversword' ) && GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped') 
+			|| ACS_GetItem_Sword_IsEquipped('axe_steel', 'steel') && GetWitcherPlayer().IsWeaponHeld( 'steelsword' ) && GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped')
 			)
 			{
 				ParalyzeDodge();	

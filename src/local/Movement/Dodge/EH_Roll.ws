@@ -6,7 +6,6 @@ statemachine class cWildHuntBlink
 	}
 }
  
-
 state WildHuntBlink_Engage in cWildHuntBlink
 {
 	private var pActor, actor 							: CActor;
@@ -27,6 +26,58 @@ state WildHuntBlink_Engage in cWildHuntBlink
 	
 	entry function WildHuntBlink()
 	{
+		if (ACSGetCEntity('ACS_Aim_Impact_Entity'))
+		{
+			ACSGetCEntity('ACS_Aim_Impact_Entity').Destroy();
+		}
+
+		if ( ACS_Settings_Main_Bool('acs_stamina_settings','acs_stamina_block_action', false) 
+		&& GetACSWatcher().StaminaCheck('default')
+		)
+		{
+			if (thePlayer.HasTag('ACS_IsSwordWalking')){thePlayer.RemoveTag('ACS_IsSwordWalking');}
+			GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
+			GetWitcherPlayer().SoundEvent("gui_no_stamina");
+
+			return;
+		}
+
+		if (ACSGetCActor('ACS_Enemy_Attacking_From_Behind')
+		&& ACS_Settings_Main_Float('acs_dodge_settings','acs_flip_dodge_cooldown', 4) > 0
+		)
+		{
+			GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
+			
+			thePlayer.PlayEffectSingle('acs_fast_sprint_trail');
+			thePlayer.StopEffect('acs_fast_sprint_trail');
+
+			thePlayer.RaiseEvent('ACS_FrontTwistFlip');
+
+			if (RandF() < 0.5)
+			{
+				thePlayer.RaiseEvent( 'ACS_CastAardLocomotion' );
+			}
+			else
+			{
+				thePlayer.RaiseEvent( 'ACS_CastIgniLocomotion' );
+			}
+
+			ACSGetCActorRemoveTag('ACS_Enemy_Attacking_From_Behind');
+		}
+
+		thePlayer.SetSprintActionPressed( false );
+		thePlayer.SetSprintToggle( false );
+
+		if (ACS_Settings_Main_Bool('acs_movement_main_settings','acs_walking_by_default_enabled', true))
+		{
+			thePlayer.SetWalkToggle( true );	
+		}
+
+		if(ACSGetCEntity('ACS_Viper_Dagger_L'))
+		{
+			thePlayer.RaiseEvent('ACS_LHandAttack01');
+		}
+
 		targetDistance = VecDistanceSquared2D( GetWitcherPlayer().GetWorldPosition(), actor.GetWorldPosition() ) ;
 				
 		dist = ((CMovingPhysicalAgentComponent)actor.GetMovingAgentComponent()).GetCapsuleRadius() 
@@ -48,26 +99,172 @@ state WildHuntBlink_Engage in cWildHuntBlink
 
 		GetWitcherPlayer().RemoveTag('ACS_Bruxa_Jump_End');
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
-
-		ACS_ThingsThatShouldBeRemoved(true);
-		
-		ACS_ExplorationDelayHack();
-
-		DodgePunishment();
-
-		ACS_Geralt_Phantom_Destroy();
-
-		if ( thePlayer.inv.IsItemCrossbow( thePlayer.inv.GetItemFromSlot( 'l_weapon' ) ) )
+		if (GetWitcherPlayer().HasTag('ACS_Vampire_Claws_Roll') && ACSGetCEntity('ACS_Vampire_Roll_FX'))
 		{
-			thePlayer.OnRangedForceHolster(false, true, false);
+			ACSGetCEntity('ACS_Vampire_Roll_FX').Destroy();
+
+			thePlayer.SoundEvent("monster_dettlaff_monster_combat_construct_dash_vfx");
+
+			thePlayer.DestroyEffect('avatar_death_swollen_no_decal_construct');
+
+			thePlayer.DestroyEffect('shadowdash_body_blood_construct');
+
+			thePlayer.DestroyEffect('shadowdash_ground_blood_construct');
+
+			thePlayer.PlayEffect('avatar_death_swollen_no_decal_construct');
+			thePlayer.StopEffect('avatar_death_swollen_no_decal_construct');
+
+			thePlayer.PlayEffect('shadowdash_body_blood_construct');
+			thePlayer.StopEffect('shadowdash_body_blood_construct');
+
+			thePlayer.PlayEffect('shadowdash_ground_blood_construct');
+			thePlayer.StopEffect('shadowdash_ground_blood_construct');
+
+			thePlayer.SetVisibility(true);
+
+			thePlayer.SetCanPlayHitAnim(true); 
+
+			thePlayer.EnableCharacterCollisions(true); 
+
+			GetWitcherPlayer().RemoveTag('ACS_Vampire_Claws_Roll');
+		}
+
+		if (((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'wood_hollow'
+		|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'wood_debris'
+		|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'dirt_hard'
+		|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'dirt_soil'
+		|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'hay'
+		|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'stone_debris'
+		|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'stone_solid'
+		|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'clay_tile'
+		|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'gravel_large'
+		|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'gravel_small'
+		|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'sand'
+		|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'water_shallow'
+		|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'water_deep'
+		|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'grass_short'
+		|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'grass_long'
+		|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'carpet'
+		)
+		{
+
+			thePlayer.StopEffect('jump_ground_fx1');
+			thePlayer.PlayEffect('jump_ground_fx1');
+
+			if (((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'dirt_hard'
+			|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'dirt_soil'
+			|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'hay'
+			|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'stone_debris'
+			|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'clay_tile'
+			|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'gravel_large'
+			|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'gravel_small'
+			|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'sand'
+			|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'grass_short'
+			|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'grass_long'
+			)
+			{
+				//thePlayer.StopEffect('covered_dirt_ACS');
+				//thePlayer.PlayEffect('covered_dirt_ACS');
+
+				if( GetRainStrength() > 0 
+				&& !thePlayer.IsInInterior()
+				&& !GetACSWatcher().RoofCheck()
+				) 
+				{
+
+				}
+				else if (ACS_Settings_Main_Bool('acs_player_misc_settings','acs_dirt_vfx_enabled', true))
+				{
+					switch(GetACSWatcher().dirt_counter)
+					{
+						case 5:
+							thePlayer.StopEffect('covered_dirt_small_ACS');
+							thePlayer.PlayEffect('covered_dirt_small_ACS');
+							
+							GetACSWatcher().ManageDirtCounter(false);
+						break;
+
+						case 4:
+
+							GetACSWatcher().ManageDirtCounter(true);
+						break;
+
+						case 3:
+
+							thePlayer.StopEffect('covered_dirt_big_ACS');
+							thePlayer.PlayEffect('covered_dirt_big_ACS');
+
+							GetACSWatcher().ManageDirtCounter(true);
+						break;
+
+						case 2:
+
+							GetACSWatcher().ManageDirtCounter(true);
+						break;
+
+						case 1:
+
+							GetACSWatcher().ManageDirtCounter(true);
+
+						break;
+
+						default:
+							GetACSWatcher().ManageDirtCounter(true);
+
+						break;
+					}
+				}
+			}
+		}
+
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
+
+		ACS_ThingsThatShouldBeRemoved();
+		
+		ACS_ExplorationDelayHack(false, 3);
+
+		thePlayer.ACS_DealPlayerPostureDamage(5, false);
+
+		if (ACS_Settings_Main_Bool('acs_movement_main_settings','acs_walking_by_default_enabled', true))
+		{
+			thePlayer.SetWalkToggle( true );	
+		}
+
+		if (RandF() < 0.25)
+		{
+			if (thePlayer.IsAnyWeaponHeld() 
+			&& !thePlayer.IsWeaponHeld('fist')
+			&& !thePlayer.HasTag('acs_vampire_claws_equipped')
+			&& !thePlayer.HasTag('acs_aard_sword_equipped')
+			)
+			{
+				GetACSWatcher().RemoveTimer('SwordTauntSwitch'); 
+				GetACSWatcher().RemoveTimer('SwordTauntRunningSwitch'); 
+				 
+				 
+				GetACSWatcher().RemoveTimer('CombatTauntDelay');GetACSWatcher().RemoveTimer('SwordTauntRunningSwitchSecondary'); 
+				GetACSWatcher().RemoveTimer('SwordTauntRunningSwitchSecondaryWeaponBlood'); 
+				GetACSWatcher().AddTimer('SwordTauntRunningSwitchSecondary', 0.01 / theGame.GetTimeScale(), false ); 
+
+				if (thePlayer.HasTag('ACS_Sword_Hit_Blood_Trigger'))
+				{
+					GetACSWatcher().AddTimer('SwordTauntRunningSwitchSecondaryWeaponBlood', 1.01 / theGame.GetTimeScale(), false ); 
+
+					thePlayer.RemoveTag('ACS_Sword_Hit_Blood_Trigger');
+				}
+			}
+		}
+
+		ACSGetCActorDestroyAll('ACS_Geralt_Phantom');
+
+		if ( thePlayer.IsCrossbowHeld() ) 
+		{
+			thePlayer.OnRangedForceHolster( false, true );
 		}
 
 		GetWitcherPlayer().ResetUninterruptedHitsCount();
 
-		GetWitcherPlayer().SendAttackReactionEvent();
-
-		//GetACSWatcher().ACS_Combo_Mode_Reset_Hard();
+		//GetWitcherPlayer().SendAttackReactionEvent();
 
 		if (ACSGetCEntity('ACS_Bruxa_Camo_Trail'))
 		{
@@ -75,249 +272,261 @@ state WildHuntBlink_Engage in cWildHuntBlink
 			ACSGetCEntity('ACS_Bruxa_Camo_Trail').PlayEffectSingle('smoke');
 		}
 
-		if (ACS_Armor_Equipped_Check())
+		if (ACS_Armor_Set_Check('acs_armor', false))
 		{
 			thePlayer.SoundEvent( "monster_caretaker_mv_cloth_hard" );
 
 			thePlayer.SoundEvent( "monster_caretaker_mv_footstep" );
 		}
 
-		if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-		&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
+		
+		if (GetWitcherPlayer().HasTag('acs_vampire_claws_equipped')
+		|| GetWitcherPlayer().HasTag('acs_aard_sword_equipped')
+		|| GetWitcherPlayer().HasTag('acs_sorc_fists_equipped')
+		|| ACS_Vampire_Claws_Access()
 		)
 		{
-			GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-			GetWitcherPlayer().SoundEvent("gui_no_stamina");
-		}
-		else
-		{
-			if (GetWitcherPlayer().HasTag('acs_vampire_claws_equipped')
-			|| GetWitcherPlayer().HasTag('acs_aard_sword_equipped')
-			|| GetWitcherPlayer().HasTag('acs_sorc_fists_equipped')
-			)
+			if (ACS_can_special_dodge())
 			{
-				if (ACS_can_special_dodge())
-				{
-					ACS_refresh_special_dodge_cooldown();
+				ACS_refresh_special_dodge_cooldown();
+			
+				GetWitcherPlayer().SoundEvent("monster_dettlaff_monster_movement_whoosh_large");
+
+				bruxa_jump_up();	
 				
-					GetWitcherPlayer().SoundEvent("monster_dettlaff_monster_movement_whoosh_large");
-
-					bruxa_jump_up();	
-					
-					GetWitcherPlayer().DrainStamina( ESAT_FixedValue,  GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.5, 1 );	
-				}
+				GetWitcherPlayer().DrainStamina( ESAT_FixedValue,  GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.5, 1 );	
 			}
-			else if (
-			GetWitcherPlayer().HasTag('acs_yrden_sword_equipped')
-			)
-			{
-				TeleportWeaponSpawn();
+		}
+		else if (
+		GetWitcherPlayer().HasTag('acs_yrden_sword_equipped')
+		)
+		{
+			TeleportWeaponSpawn();
 
-				if (ACS_can_special_dodge())
+			if (ACS_can_special_dodge())
+			{
+				ACS_refresh_special_dodge_cooldown();
+				
+				if (ACS_Armor_Set_Check('acs_armor', false)
+				|| ACS_Armor_Set_Check('wh_armor', false)
+				|| ACS_Armor_Set_Check('eredin_armor', false)
+				|| ACS_Armor_Set_Check('imlerith_armor', false)
+				|| ACS_Armor_Set_Check('caranthir_armor', false)
+				|| ACS_Armor_Set_Check('vgx_eredin_armor', false)
+				)
 				{
-					ACS_refresh_special_dodge_cooldown();
-					
-					if (ACS_Armor_Equipped_Check()
-					|| ACS_WH_Armor_Equipped_Check()
-					|| ACS_Eredin_Armor_Equipped_Check()
-					|| ACS_Imlerith_Armor_Equipped_Check()
-					|| ACS_Caranthir_Armor_Equipped_Check()
-					|| ACS_VGX_Eredin_Armor_Equipped_Check()
+					wild_hunt_blink();
+				}
+				else
+				{
+					mage_teleport();
+				}
+
+				GetWitcherPlayer().DrainStamina( ESAT_FixedValue,  GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.5, 1 );
+			}
+		}
+		else if (
+		GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped')
+		)
+		{
+			TeleportWeaponSpawn();
+
+			if (ACS_can_special_dodge())
+			{
+				ACS_refresh_special_dodge_cooldown();
+				
+				if (ACS_Armor_Set_Check('acs_armor', false)
+				|| ACS_Armor_Set_Check('wh_armor', false)
+				|| ACS_Armor_Set_Check('eredin_armor', false)
+				|| ACS_Armor_Set_Check('imlerith_armor', false)
+				|| ACS_Armor_Set_Check('caranthir_armor', false)
+				|| ACS_Armor_Set_Check('vgx_eredin_armor', false)
+				)
+				{
+					wild_hunt_blink();
+				}
+				else
+				{
+					lightning_teleport();
+				}	
+
+				GetWitcherPlayer().DrainStamina( ESAT_FixedValue,  GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.5, 1 );
+			}
+		}
+		else if (
+		GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped')
+		)
+		{
+			TeleportWeaponSpawn();
+
+			if (ACS_can_special_dodge())
+			{
+				ACS_refresh_special_dodge_cooldown();
+				
+				if (ACS_Armor_Set_Check('acs_armor', false)
+				|| ACS_Armor_Set_Check('wh_armor', false)
+				|| ACS_Armor_Set_Check('eredin_armor', false)
+				|| ACS_Armor_Set_Check('imlerith_armor', false)
+				|| ACS_Armor_Set_Check('caranthir_armor', false)
+				|| ACS_Armor_Set_Check('vgx_eredin_armor', false)
+				)
+				{
+					wild_hunt_blink();
+				}
+				else
+				{
+					fountain_portal_teleport();	
+				}
+
+				GetWitcherPlayer().DrainStamina( ESAT_FixedValue,  GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.5, 1 );
+			}
+		}
+		else if (
+		GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped')
+		)
+		{
+			TeleportWeaponSpawn();
+
+			if (ACS_can_special_dodge())
+			{
+				ACS_refresh_special_dodge_cooldown();
+				
+				if (ACS_Armor_Set_Check('acs_armor', false)
+				|| ACS_Armor_Set_Check('wh_armor', false)
+				|| ACS_Armor_Set_Check('eredin_armor', false)
+				|| ACS_Armor_Set_Check('imlerith_armor', false)
+				|| ACS_Armor_Set_Check('caranthir_armor', false)
+				|| ACS_Armor_Set_Check('vgx_eredin_armor', false)
+				)
+				{
+					wild_hunt_blink();
+				}
+				else
+				{
+					explosion_teleport();	
+				}
+
+				GetWitcherPlayer().DrainStamina( ESAT_FixedValue,  GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.5, 1 );
+			}
+		}
+		else if (
+		GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped')
+		)
+		{
+			TeleportWeaponSpawn();
+
+			if (ACS_can_special_dodge())
+			{
+				ACS_refresh_special_dodge_cooldown();
+
+				if (ACS_Armor_Set_Check('acs_armor', false)
+				|| ACS_Armor_Set_Check('wh_armor', false)
+				|| ACS_Armor_Set_Check('eredin_armor', false)
+				|| ACS_Armor_Set_Check('imlerith_armor', false)
+				|| ACS_Armor_Set_Check('caranthir_armor', false)
+				|| ACS_Armor_Set_Check('vgx_eredin_armor', false)
+				)
+				{
+					wild_hunt_blink();
+				}
+				else
+				{
+					dolphin_teleport();	
+				}
+
+				GetWitcherPlayer().DrainStamina( ESAT_FixedValue,  GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.5, 1 );
+			}
+		}
+		else if (
+		GetWitcherPlayer().HasTag('acs_quen_sword_equipped')
+		)
+		{
+			TeleportWeaponSpawn();
+
+			if (ACS_can_special_dodge())
+			{
+				ACS_refresh_special_dodge_cooldown();
+
+				if (ACS_Armor_Set_Check('acs_armor', false)
+				|| ACS_Armor_Set_Check('wh_armor', false)
+				|| ACS_Armor_Set_Check('eredin_armor', false)
+				|| ACS_Armor_Set_Check('imlerith_armor', false)
+				|| ACS_Armor_Set_Check('caranthir_armor', false)
+				|| ACS_Armor_Set_Check('vgx_eredin_armor', false)
+				)
+				{
+					wild_hunt_blink();
+				}
+				else
+				{
+					iris_teleport();	
+				}
+
+				GetWitcherPlayer().DrainStamina( ESAT_FixedValue,  GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.5, 1 );
+			}
+		}
+		else if (
+		GetWitcherPlayer().HasTag('acs_igni_sword_equipped')
+		|| GetWitcherPlayer().HasTag('acs_igni_secondary_sword_equipped')
+		)
+		{
+			TeleportWeaponSpawn();
+
+			if (ACS_can_special_dodge())
+			{
+				ACS_refresh_special_dodge_cooldown();
+				
+				if (ACS_Armor_Set_Check('acs_armor', false)
+				|| ACS_Armor_Set_Check('wh_armor', false)
+				|| ACS_Armor_Set_Check('eredin_armor', false)
+				|| ACS_Armor_Set_Check('imlerith_armor', false)
+				|| ACS_Armor_Set_Check('caranthir_armor', false)
+				|| ACS_Armor_Set_Check('vgx_eredin_armor', false)
+				)
+				{
+					wild_hunt_blink();
+				}
+				else
+				{
+					if (GetWitcherPlayer().HasTag('acs_vampire_claws_equipped')
+					|| GetWitcherPlayer().HasTag('acs_aard_sword_equipped')
+					|| GetWitcherPlayer().HasTag('acs_sorc_fists_equipped')
+					|| ACS_Vampire_Claws_Access()
 					)
 					{
-						wild_hunt_blink();
-					}
-					else
-					{
-						mage_teleport();
-					}
+						if (ACS_can_special_dodge())
+						{
+							ACS_refresh_special_dodge_cooldown();
+						
+							GetWitcherPlayer().SoundEvent("monster_dettlaff_monster_movement_whoosh_large");
 
-					GetWitcherPlayer().DrainStamina( ESAT_FixedValue,  GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.5, 1 );
-				}
-			}
-			else if (
-			GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped')
-			)
-			{
-				TeleportWeaponSpawn();
-
-				if (ACS_can_special_dodge())
-				{
-					ACS_refresh_special_dodge_cooldown();
-					
-					if (ACS_Armor_Equipped_Check()
-					|| ACS_WH_Armor_Equipped_Check()
-					|| ACS_Eredin_Armor_Equipped_Check()
-					|| ACS_Imlerith_Armor_Equipped_Check()
-					|| ACS_Caranthir_Armor_Equipped_Check()
-					|| ACS_VGX_Eredin_Armor_Equipped_Check()
-					)
-					{
-						wild_hunt_blink();
-					}
-					else
-					{
-						lightning_teleport();
-					}	
-
-					GetWitcherPlayer().DrainStamina( ESAT_FixedValue,  GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.5, 1 );
-				}
-			}
-			else if (
-			GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped')
-			)
-			{
-				TeleportWeaponSpawn();
-
-				if (ACS_can_special_dodge())
-				{
-					ACS_refresh_special_dodge_cooldown();
-					
-					if (ACS_Armor_Equipped_Check()
-					|| ACS_WH_Armor_Equipped_Check()
-					|| ACS_Eredin_Armor_Equipped_Check()
-					|| ACS_Imlerith_Armor_Equipped_Check()
-					|| ACS_Caranthir_Armor_Equipped_Check()
-					|| ACS_VGX_Eredin_Armor_Equipped_Check()
-					)
-					{
-						wild_hunt_blink();
-					}
-					else
-					{
-						fountain_portal_teleport();	
-					}
-
-					GetWitcherPlayer().DrainStamina( ESAT_FixedValue,  GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.5, 1 );
-				}
-			}
-			else if (
-			GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped')
-			)
-			{
-				TeleportWeaponSpawn();
-
-				if (ACS_can_special_dodge())
-				{
-					ACS_refresh_special_dodge_cooldown();
-					
-					if (ACS_Armor_Equipped_Check()
-					|| ACS_WH_Armor_Equipped_Check()
-					|| ACS_Eredin_Armor_Equipped_Check()
-					|| ACS_Imlerith_Armor_Equipped_Check()
-					|| ACS_Caranthir_Armor_Equipped_Check()
-					|| ACS_VGX_Eredin_Armor_Equipped_Check()
-					)
-					{
-						wild_hunt_blink();
-					}
-					else
-					{
-						explosion_teleport();	
-					}
-
-					GetWitcherPlayer().DrainStamina( ESAT_FixedValue,  GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.5, 1 );
-				}
-			}
-			else if (
-			GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped')
-			)
-			{
-				TeleportWeaponSpawn();
-
-				if (ACS_can_special_dodge())
-				{
-					ACS_refresh_special_dodge_cooldown();
-
-					if (ACS_Armor_Equipped_Check()
-					|| ACS_WH_Armor_Equipped_Check()
-					|| ACS_Eredin_Armor_Equipped_Check()
-					|| ACS_Imlerith_Armor_Equipped_Check()
-					|| ACS_Caranthir_Armor_Equipped_Check()
-					|| ACS_VGX_Eredin_Armor_Equipped_Check()
-					)
-					{
-						wild_hunt_blink();
-					}
-					else
-					{
-						dolphin_teleport();	
-					}
-
-					GetWitcherPlayer().DrainStamina( ESAT_FixedValue,  GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.5, 1 );
-				}
-			}
-			else if (
-			GetWitcherPlayer().HasTag('acs_quen_sword_equipped')
-			)
-			{
-				TeleportWeaponSpawn();
-
-				if (ACS_can_special_dodge())
-				{
-					ACS_refresh_special_dodge_cooldown();
-
-					if (ACS_Armor_Equipped_Check()
-					|| ACS_WH_Armor_Equipped_Check()
-					|| ACS_Eredin_Armor_Equipped_Check()
-					|| ACS_Imlerith_Armor_Equipped_Check()
-					|| ACS_Caranthir_Armor_Equipped_Check()
-					|| ACS_VGX_Eredin_Armor_Equipped_Check()
-					)
-					{
-						wild_hunt_blink();
-					}
-					else
-					{
-						iris_teleport();	
-					}
-
-					GetWitcherPlayer().DrainStamina( ESAT_FixedValue,  GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.5, 1 );
-				}
-			}
-			else if (
-			GetWitcherPlayer().HasTag('acs_igni_sword_equipped')
-			|| GetWitcherPlayer().HasTag('acs_igni_secondary_sword_equipped')
-			)
-			{
-				TeleportWeaponSpawn();
-
-				if (ACS_can_special_dodge())
-				{
-					ACS_refresh_special_dodge_cooldown();
-					
-					if (ACS_Armor_Equipped_Check()
-					|| ACS_WH_Armor_Equipped_Check()
-					|| ACS_Eredin_Armor_Equipped_Check()
-					|| ACS_Imlerith_Armor_Equipped_Check()
-					|| ACS_Caranthir_Armor_Equipped_Check()
-					|| ACS_VGX_Eredin_Armor_Equipped_Check()
-					)
-					{
-						wild_hunt_blink();
+							bruxa_jump_up();	
+							
+							GetWitcherPlayer().DrainStamina( ESAT_FixedValue,  GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.5, 1 );	
+						}
 					}
 					else
 					{
 						fire_blink();	
-					}
-
-					GetWitcherPlayer().DrainStamina( ESAT_FixedValue,  GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.5, 1 );
+					}	
 				}
+
+				GetWitcherPlayer().DrainStamina( ESAT_FixedValue,  GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.5, 1 );
 			}
-			else if (
-			GetWitcherPlayer().HasTag('acs_axii_sword_equipped')
-			)
+		}
+		else if (
+		GetWitcherPlayer().HasTag('acs_axii_sword_equipped')
+		)
+		{
+			TeleportWeaponSpawn();
+
+			if (ACS_can_special_dodge())
 			{
-				TeleportWeaponSpawn();
+				ACS_refresh_special_dodge_cooldown();
+					
+				wild_hunt_blink();	
 
-				if (ACS_can_special_dodge())
-				{
-					ACS_refresh_special_dodge_cooldown();
-						
-					wild_hunt_blink();	
-
-					GetWitcherPlayer().DrainStamina( ESAT_FixedValue,  GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.5, 1 );
-				}
+				GetWitcherPlayer().DrainStamina( ESAT_FixedValue,  GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.5, 1 );
 			}
 		}
 	}
@@ -325,7 +534,7 @@ state WildHuntBlink_Engage in cWildHuntBlink
 	latent function TeleportWeaponSpawn()
 	{
 		if (GetWitcherPlayer().HasTag('ACS_HideWeaponOnDodge') 
-		&& !GetWitcherPlayer().HasTag('acs_blood_sucking')
+		&& !GetWitcherPlayer().HasTag('ACS_Bruxa_Bite_Process')
 		)
 		{
 			ACS_Weapon_Respawn();
@@ -333,66 +542,6 @@ state WildHuntBlink_Engage in cWildHuntBlink
 			GetWitcherPlayer().RemoveTag('ACS_HideWeaponOnDodge');
 
 			GetWitcherPlayer().RemoveTag('ACS_HideWeaponOnDodge_Claw_Effect');
-		}
-	}
-
-	latent function DodgePunishment()
-	{
-		actors.Clear();
-		
-		actors = GetWitcherPlayer().GetNPCsAndPlayersInRange( 3.5, 50, , FLAG_ExcludePlayer + FLAG_Attitude_Hostile + FLAG_OnlyAliveActors);
-
-		if( actors.Size() == 1 )
-		{
-			for( i = 0; i < actors.Size(); i += 1 )
-			{
-				npc = (CNewNPC)actors[i];
-
-				actor = actors[i];
-
-				if (npc.IsHuman())
-				{
-					npc.GainStat( BCS_Morale, npc.GetStatMax( BCS_Morale ) * 0.5 );  
-
-					npc.GainStat( BCS_Focus, npc.GetStatMax( BCS_Focus ) * 0.5 );  
-						
-					npc.GainStat( BCS_Stamina, npc.GetStatMax( BCS_Stamina ) * 0.5 );
-				}
-				else
-				{
-					npc.GainStat( BCS_Morale, npc.GetStatMax( BCS_Morale ) );  
-
-					npc.GainStat( BCS_Focus, npc.GetStatMax( BCS_Focus ) );  
-						
-					npc.GainStat( BCS_Stamina, npc.GetStatMax( BCS_Stamina ) );
-				}
-			}
-		}
-		else if( actors.Size() > 1 )
-		{
-			for( i = 0; i < actors.Size(); i += 1 )
-			{
-				npc = (CNewNPC)actors[i];
-
-				actor = actors[i];
-
-				if (npc.IsHuman())
-				{
-					npc.GainStat( BCS_Morale, npc.GetStatMax( BCS_Morale ) * 0.05 );  
-
-					npc.GainStat( BCS_Focus, npc.GetStatMax( BCS_Focus ) * 0.05 );  
-						
-					npc.GainStat( BCS_Stamina, npc.GetStatMax( BCS_Stamina ) * 0.05 );
-				}
-				else
-				{
-					npc.GainStat( BCS_Morale, npc.GetStatMax( BCS_Morale ) );  
-
-					npc.GainStat( BCS_Focus, npc.GetStatMax( BCS_Focus ) );  
-						
-					npc.GainStat( BCS_Stamina, npc.GetStatMax( BCS_Stamina ) * 0.5 );
-				}
-			}
 		}
 	}
 
@@ -453,17 +602,17 @@ state WildHuntBlink_Engage in cWildHuntBlink
 			actor = (CActor)( GetWitcherPlayer().moveTarget );		
 		}
 
-		ticket = movementAdjustor.GetRequest( 'wildhunt_blink');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'wildhunt_blink' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'wildhunt_blink' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading()); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.1 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000 );
 		
@@ -482,12 +631,12 @@ state WildHuntBlink_Engage in cWildHuntBlink
 		
 		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() && actor.IsOnGround() )
 		{
-			if (ACS_Armor_Equipped_Check()
-			|| ACS_WH_Armor_Equipped_Check()
-			|| ACS_Eredin_Armor_Equipped_Check()
-			|| ACS_Imlerith_Armor_Equipped_Check()
-			|| ACS_Caranthir_Armor_Equipped_Check()
-			|| ACS_VGX_Eredin_Armor_Equipped_Check()
+			if (ACS_Armor_Set_Check('acs_armor', false)
+			|| ACS_Armor_Set_Check('wh_armor', false)
+			|| ACS_Armor_Set_Check('eredin_armor', false)
+			|| ACS_Armor_Set_Check('imlerith_armor', false)
+			|| ACS_Armor_Set_Check('caranthir_armor', false)
+			|| ACS_Armor_Set_Check('vgx_eredin_armor', false)
 			)
 			{
 				if (!GetWitcherPlayer().IsAnyQuenActive())
@@ -526,14 +675,14 @@ state WildHuntBlink_Engage in cWildHuntBlink
 			//teleport_fx.AddTag('wh_teleportfx');
 			//teleport_fx.PlayEffectSingle('disappear');
 			
-			theGame.GetSurfacePostFX().AddSurfacePostFXGroup( ACSPlayerFixZAxis( GetWitcherPlayer().GetWorldPosition() ), 1.f, 15, 2.f, 12.5f, 0);
+			theGame.GetSurfacePostFX().AddSurfacePostFXGroup( ACSFixZAxis( GetWitcherPlayer().GetWorldPosition() ), 1.f, 15, 2.f, 12.5f, 0);
 
 			//Sleep ( 0.45 / GetWitcherPlayer().GetAnimationTimeMultiplier() );
 
 			TeleportBlockAction();
 			
 			GetACSWatcher().RemoveTimer('ACS_dodge_timer_wildhunt');
-			GetACSWatcher().AddTimer('ACS_dodge_timer_wildhunt', 0.45 / GetWitcherPlayer().GetAnimationTimeMultiplier() , false);
+			GetACSWatcher().AddTimer('ACS_dodge_timer_wildhunt', 0.45 / GetWitcherPlayer().GetAnimationTimeMultiplier()  / theGame.GetTimeScale(), false );
 
 			actors.Clear();
 
@@ -569,17 +718,17 @@ state WildHuntBlink_Engage in cWildHuntBlink
 			actor = (CActor)( GetWitcherPlayer().moveTarget );		
 		}
 
-		ticket = movementAdjustor.GetRequest( 'fire_blink');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'fire_blink' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'fire_blink' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.1 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000 );
 		
@@ -616,7 +765,7 @@ state WildHuntBlink_Engage in cWildHuntBlink
 
 			TeleportBlockAction();
 			
-			GetACSWatcher().AddTimer('ACS_dodge_timer_fire', 0.45 / GetWitcherPlayer().GetAnimationTimeMultiplier() , false);
+			GetACSWatcher().AddTimer('ACS_dodge_timer_fire', 0.45 / GetWitcherPlayer().GetAnimationTimeMultiplier()  / theGame.GetTimeScale(), false );
 			
 			actors.Clear();
 
@@ -646,6 +795,8 @@ state WildHuntBlink_Engage in cWildHuntBlink
 		var rot                         : EulerAngles;
 		var pos							: Vector;
 
+		thePlayer.DrainVitality( thePlayer.GetStat( BCS_Vitality ) * 0.125 );
+
 		if ( GetWitcherPlayer().IsHardLockEnabled() && GetWitcherPlayer().GetTarget() )
 			actor = (CActor)( GetWitcherPlayer().GetTarget() );	
 		else
@@ -654,26 +805,26 @@ state WildHuntBlink_Engage in cWildHuntBlink
 			actor = (CActor)( GetWitcherPlayer().moveTarget );		
 		}
 
-		ticket = movementAdjustor.GetRequest( 'bruxa_jump_up');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'bruxa_jump_up' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'bruxa_jump_up' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.1 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000 );
 		
 		movementAdjustor.MaxLocationAdjustmentSpeed( ticket, 50000 );
+
+		GetACSWatcher().dodge_timer_actual();
 		
 		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() && actor.IsOnGround() )
 		{	
-			GetWitcherPlayer().SetIsCurrentlyDodging(true);
-
 			movementAdjustor.RotateTowards( ticket, actor );
 						
 			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'bruxa_jump_up_start_ACS', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
@@ -694,7 +845,7 @@ state WildHuntBlink_Engage in cWildHuntBlink
 
 			ent.DestroyAfter(2);
 
-			if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false))
+			if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false))
 			{
 				GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 				GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -712,13 +863,11 @@ state WildHuntBlink_Engage in cWildHuntBlink
 
 			TeleportBlockAction();
 			
-			GetACSWatcher().AddTimer('ACS_dodge_timer_wildhunt', 0.65  , false);
+			GetACSWatcher().AddTimer('ACS_dodge_timer_wildhunt', 0.65   / theGame.GetTimeScale(), false );
 		}
 		else
 		{
-			GetACSWatcher().dodge_timer_actual();
-
-			if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false))
+			if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false))
 			{
 				GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails' );
 				GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
@@ -742,17 +891,17 @@ state WildHuntBlink_Engage in cWildHuntBlink
 			actor = (CActor)( GetWitcherPlayer().moveTarget );		
 		}
 
-		ticket = movementAdjustor.GetRequest( 'mage_teleport');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'mage_teleport' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'mage_teleport' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.1 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000 );
 		
@@ -769,7 +918,7 @@ state WildHuntBlink_Engage in cWildHuntBlink
 			//GetWitcherPlayer().PlayEffectSingle('teleport_out');
 			//GetWitcherPlayer().StopEffect('teleport_out');
 
-			if (ACS_GetItem_MageStaff_Water())
+			if (ACS_GetItem_Sword_IsEquipped('water_staff_steel', 'steel'))
 			{
 				thePlayer.StopEffect( 'hand_sand_fx_water_ACS' );
 				thePlayer.PlayEffectSingle( 'hand_sand_fx_water_ACS' );
@@ -782,7 +931,7 @@ state WildHuntBlink_Engage in cWildHuntBlink
 				thePlayer.PlayEffect('teleport_out_water_ACS');
 				thePlayer.StopEffect('teleport_out_water_ACS');
 			}
-			else if (ACS_GetItem_MageStaff_Sand())
+			else if (ACS_GetItem_Sword_IsEquipped('sand_staff_steel', 'steel'))
 			{
 				thePlayer.StopEffect( 'hand_sand_fx_sand_ACS' );
 				thePlayer.PlayEffectSingle( 'hand_sand_fx_sand_ACS' );
@@ -795,7 +944,7 @@ state WildHuntBlink_Engage in cWildHuntBlink
 				thePlayer.PlayEffect('teleport_out_sand_ACS');
 				thePlayer.StopEffect('teleport_out_sand_ACS');
 			}
-			else if (ACS_GetItem_MageStaff_Fire())
+			else if (ACS_GetItem_Sword_IsEquipped('fire_staff_steel', 'steel'))
 			{
 				thePlayer.StopEffect( 'hand_sand_fx_fire_ACS' );
 				thePlayer.PlayEffectSingle( 'hand_sand_fx_fire_ACS' );
@@ -808,7 +957,7 @@ state WildHuntBlink_Engage in cWildHuntBlink
 				thePlayer.PlayEffect('teleport_out_fire_ACS');
 				thePlayer.StopEffect('teleport_out_fire_ACS');
 			}
-			else if (ACS_GetItem_MageStaff_Ice())
+			else if (ACS_GetItem_Sword_IsEquipped('ice_staff_steel', 'steel'))
 			{
 				thePlayer.PlayEffectSingle('eredin_disappear');
 				thePlayer.StopEffect('eredin_disappear');
@@ -824,7 +973,7 @@ state WildHuntBlink_Engage in cWildHuntBlink
 
 			TeleportBlockAction();
 			
-			GetACSWatcher().AddTimer('ACS_dodge_timer_mage', 0.65  , false);
+			GetACSWatcher().AddTimer('ACS_dodge_timer_mage', 0.65   / theGame.GetTimeScale(), false );
 		}
 	}
 
@@ -842,17 +991,17 @@ state WildHuntBlink_Engage in cWildHuntBlink
 			actor = (CActor)( GetWitcherPlayer().moveTarget );		
 		}
 
-		ticket = movementAdjustor.GetRequest( 'sorceress_teleport');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'sorceress_teleport' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'sorceress_teleport' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.1 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000 );
 		
@@ -884,7 +1033,7 @@ state WildHuntBlink_Engage in cWildHuntBlink
 
 			ent.DestroyAfter(2);
 
-			if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false))
+			if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false))
 			{
 				GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 				GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -898,7 +1047,7 @@ state WildHuntBlink_Engage in cWildHuntBlink
 			
 			TeleportBlockAction();
 
-			GetACSWatcher().AddTimer('ACS_dodge_timer_mage', 0.65  , false);
+			GetACSWatcher().AddTimer('ACS_dodge_timer_mage', 0.65   / theGame.GetTimeScale(), false );
 		}
 	}
 
@@ -916,17 +1065,17 @@ state WildHuntBlink_Engage in cWildHuntBlink
 			actor = (CActor)( GetWitcherPlayer().moveTarget );		
 		}
 
-		ticket = movementAdjustor.GetRequest( 'dolphin_teleport');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'dolphin_teleport' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'dolphin_teleport' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.1 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000 );
 		
@@ -971,7 +1120,7 @@ state WildHuntBlink_Engage in cWildHuntBlink
 
 			//ent.DestroyAfter(2);
 
-			if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false))
+			if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false))
 			{
 				GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 				GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -985,7 +1134,7 @@ state WildHuntBlink_Engage in cWildHuntBlink
 
 			TeleportBlockAction();
 			
-			GetACSWatcher().AddTimer('ACS_dodge_timer_dolphin', 0.65  , false);
+			GetACSWatcher().AddTimer('ACS_dodge_timer_dolphin', 0.65   / theGame.GetTimeScale(), false );
 		}
 	}
 
@@ -1003,17 +1152,17 @@ state WildHuntBlink_Engage in cWildHuntBlink
 			actor = (CActor)( GetWitcherPlayer().moveTarget );		
 		}
 
-		ticket = movementAdjustor.GetRequest( 'lightning_teleport');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'lightning_teleport' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'lightning_teleport' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.1 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000 );
 		
@@ -1062,7 +1211,7 @@ state WildHuntBlink_Engage in cWildHuntBlink
 
 			//ent.DestroyAfter(2);
 
-			if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false)) 
+			if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false)) 
 			{
 				GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 				GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -1076,7 +1225,7 @@ state WildHuntBlink_Engage in cWildHuntBlink
 
 			TeleportBlockAction();
 			
-			GetACSWatcher().AddTimer('ACS_dodge_timer_lightning', 0.65  , false);
+			GetACSWatcher().AddTimer('ACS_dodge_timer_lightning', 0.65   / theGame.GetTimeScale(), false );
 		}
 	}
 
@@ -1094,17 +1243,17 @@ state WildHuntBlink_Engage in cWildHuntBlink
 			actor = (CActor)( GetWitcherPlayer().moveTarget );		
 		}
 
-		ticket = movementAdjustor.GetRequest( 'iris_teleport');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'iris_teleport' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'iris_teleport' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.1 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000 );
 		
@@ -1147,7 +1296,38 @@ state WildHuntBlink_Engage in cWildHuntBlink
 
 			TeleportBlockAction();
 			
-			GetACSWatcher().AddTimer('ACS_dodge_timer_iris', 0.65  , false);
+			GetACSWatcher().AddTimer('ACS_dodge_timer_iris', 0.65   / theGame.GetTimeScale(), false );
+
+			actors.Clear();
+
+			actors = GetActorsInRange(GetWitcherPlayer(), 3, 5);
+
+			for( i = 0; i < actors.Size(); i += 1 )
+			{
+				npc = (CNewNPC)actors[i];
+
+				if( actors.Size() > 0 )
+				{		
+					if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && npc.IsAlive() )
+					{
+						if ( RandF() < 0.5 )
+						{
+							npc.StopEffect('demonic_possession');
+							npc.PlayEffectSingle('demonic_possession');
+							npc.StopEffect('demonic_possession');
+
+							if (npc.IsHuman())
+							{
+								npc.AddEffectDefault( EET_Swarm, npc, 'console' );
+							}
+							else
+							{
+								npc.AddEffectDefault( EET_Paralyzed, npc, 'console' );
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 
@@ -1165,17 +1345,17 @@ state WildHuntBlink_Engage in cWildHuntBlink
 			actor = (CActor)( GetWitcherPlayer().moveTarget );		
 		}
 
-		ticket = movementAdjustor.GetRequest( 'explosion_teleport');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'explosion_teleport' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'explosion_teleport' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.1 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000 );
 		
@@ -1219,7 +1399,7 @@ state WildHuntBlink_Engage in cWildHuntBlink
 
 			//ent.DestroyAfter(2);
 
-			if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+			if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 			{
 				GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 				GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -1233,7 +1413,7 @@ state WildHuntBlink_Engage in cWildHuntBlink
 
 			TeleportBlockAction();
 			
-			GetACSWatcher().AddTimer('ACS_dodge_timer_explosion', 0.65  , false);
+			GetACSWatcher().AddTimer('ACS_dodge_timer_explosion', 0.65   / theGame.GetTimeScale(), false );
 		}
 	}
 
@@ -1251,17 +1431,17 @@ state WildHuntBlink_Engage in cWildHuntBlink
 			actor = (CActor)( GetWitcherPlayer().moveTarget );		
 		}
 
-		ticket = movementAdjustor.GetRequest( 'fountain_portal_teleport');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'fountain_portal_teleport' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'fountain_portal_teleport' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.1 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000 );
 		
@@ -1306,7 +1486,7 @@ state WildHuntBlink_Engage in cWildHuntBlink
 
 			//ent.DestroyAfter(2);
 
-			if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+			if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 			{
 				GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 				GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -1320,7 +1500,7 @@ state WildHuntBlink_Engage in cWildHuntBlink
 			
 			TeleportBlockAction();
 			
-			GetACSWatcher().AddTimer('ACS_dodge_timer_fountain_portal', 0.65  , false);
+			GetACSWatcher().AddTimer('ACS_dodge_timer_fountain_portal', 0.65   / theGame.GetTimeScale(), false );
 		}
 	}
 
@@ -1328,17 +1508,17 @@ state WildHuntBlink_Engage in cWildHuntBlink
 
 	latent function bruxa_regular_dodge()
 	{
-		ticket = movementAdjustor.GetRequest( 'bruxa_regular_dodge');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'bruxa_regular_dodge' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'bruxa_regular_dodge' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.1 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -1352,9 +1532,9 @@ state WildHuntBlink_Engage in cWildHuntBlink
 		
 			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'utility_dodge_attack_ACS', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
 			
-			//movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * 1.25 ) + theCamera.GetCameraDirection() * 1.25 );		
+			if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * -3.25 ) + theCamera.GetCameraDirection() );		
 
-			//movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * -1.25 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -1.5 );
+			//if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * -1.25 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -1.5 );
 		}
 		else
 		{			
@@ -1364,9 +1544,9 @@ state WildHuntBlink_Engage in cWildHuntBlink
 				
 			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'utility_dodge_attack_ACS', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
 			
-			//movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * 1.25 ) + theCamera.GetCameraDirection() * 1.25 );		
+			if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * -3.25 ) + theCamera.GetCameraDirection() );		
 
-			//movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * -1.25 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -1.5 );
+			//if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * -1.25 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -1.5 );
 		}
 	}
 
@@ -1374,17 +1554,17 @@ state WildHuntBlink_Engage in cWildHuntBlink
 
 	latent function two_hand_back_dodge()
 	{
-		ticket = movementAdjustor.GetRequest( 'two_hand_back_dodge');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'two_hand_back_dodge' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'two_hand_back_dodge' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.1 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -1394,11 +1574,11 @@ state WildHuntBlink_Engage in cWildHuntBlink
 
 		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) );
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 
 		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
 		{	
@@ -1435,17 +1615,17 @@ state WildHuntBlink_Engage in cWildHuntBlink
 
 	latent function two_hand_sword_back_dodge()
 	{
-		ticket = movementAdjustor.GetRequest( 'two_hand_sword_back_dodge');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'two_hand_sword_back_dodge' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'two_hand_sword_back_dodge' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.1 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -1455,11 +1635,11 @@ state WildHuntBlink_Engage in cWildHuntBlink
 
 		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) );
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 
 		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
 		{	
@@ -1504,17 +1684,17 @@ state WildHuntBlink_Engage in cWildHuntBlink
 
 	latent function one_hand_sword_back_dodge()
 	{
-		ticket = movementAdjustor.GetRequest( 'one_hand_sword_back_dodge');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'one_hand_sword_back_dodge' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'one_hand_sword_back_dodge' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.25 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.25 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -1522,15 +1702,15 @@ state WildHuntBlink_Engage in cWildHuntBlink
 
 		GetACSWatcher().dodge_timer_attack_actual();
 
-		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraForward() * 1.1 ) );
+		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + GetACSWatcher().GetWorldForward() * 1.1 ) );
 
-		movementAdjustor.SlideTo( ticket, ACSPlayerFixZAxis(( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * -1.1 ) + theCamera.GetCameraDirection() + theCamera.GetCameraForward() * -1.1) );
+		if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ACSFixZAxis(( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * -1.1 ) + theCamera.GetCameraDirection() + GetACSWatcher().GetWorldForward() * -1.1) );
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 
 		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
 		{	
@@ -1574,17 +1754,17 @@ state WildHuntBlink_Engage in cWildHuntBlink
 
 	latent function one_hand_sword_back_dodge_alt_1()
 	{
-		ticket = movementAdjustor.GetRequest( 'one_hand_sword_back_dodge_alt_1');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'one_hand_sword_back_dodge_alt_1' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'one_hand_sword_back_dodge_alt_1' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.25 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.25 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -1592,15 +1772,15 @@ state WildHuntBlink_Engage in cWildHuntBlink
 
 		GetACSWatcher().dodge_timer_attack_actual();
 
-		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraForward() * 1.1 ) );
+		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + GetACSWatcher().GetWorldForward() * 1.1 ) );
 
-		movementAdjustor.SlideTo( ticket, ACSPlayerFixZAxis(( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * -1.1 ) + theCamera.GetCameraDirection() + theCamera.GetCameraForward() * -1.1) );
+		if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ACSFixZAxis(( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * -1.1 ) + theCamera.GetCameraDirection() + GetACSWatcher().GetWorldForward() * -1.1) );
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 
 		if( RandF() < 0.5 ) 
 		{
@@ -1616,17 +1796,17 @@ state WildHuntBlink_Engage in cWildHuntBlink
 
 	latent function one_hand_sword_back_dodge_alt_2()
 	{	
-		ticket = movementAdjustor.GetRequest( 'one_hand_sword_back_dodge_alt_2');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'one_hand_sword_back_dodge_alt_2' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'one_hand_sword_back_dodge_alt_2' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.25 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.25 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -1634,15 +1814,15 @@ state WildHuntBlink_Engage in cWildHuntBlink
 
 		GetACSWatcher().dodge_timer_attack_actual();
 
-		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraForward() * 1.1 ) );
+		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + GetACSWatcher().GetWorldForward() * 1.1 ) );
 
-		movementAdjustor.SlideTo( ticket, ACSPlayerFixZAxis(( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * -1.1 ) + theCamera.GetCameraDirection() + theCamera.GetCameraForward() * -1.1 ));
+		if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ACSFixZAxis(( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * -1.1 ) + theCamera.GetCameraDirection() + GetACSWatcher().GetWorldForward() * -1.1 ));
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 
 		if( RandF() < 0.5 ) 
 		{
@@ -1658,17 +1838,17 @@ state WildHuntBlink_Engage in cWildHuntBlink
 
 	latent function one_hand_sword_back_dodge_alt_3()
 	{	
-		ticket = movementAdjustor.GetRequest( 'one_hand_sword_back_dodge_alt_3');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'one_hand_sword_back_dodge_alt_3' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'one_hand_sword_back_dodge_alt_3' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.25 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.25 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -1676,15 +1856,15 @@ state WildHuntBlink_Engage in cWildHuntBlink
 
 		GetACSWatcher().dodge_timer_attack_actual();
 
-		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraForward() * 1.1 ) );
+		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + GetACSWatcher().GetWorldForward() * 1.1 ) );
 
-		movementAdjustor.SlideTo( ticket, ACSPlayerFixZAxis(( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * -1.1 ) + theCamera.GetCameraDirection() + theCamera.GetCameraForward() * -1.1 ));
+		if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ACSFixZAxis(( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * -1.1 ) + theCamera.GetCameraDirection() + GetACSWatcher().GetWorldForward() * -1.1 ));
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 
 		if( RandF() < 0.5 ) 
 		{
@@ -1701,24 +1881,6 @@ state WildHuntBlink_Engage in cWildHuntBlink
 	event OnLeaveState( nextStateName : name ) 
 	{
 		super.OnLeaveState(nextStateName);
-	}
-}
-
-function ACS_RollInit()
-{
-	var vACS_RollInit : cACS_RollInit;
-	vACS_RollInit = new cACS_RollInit in theGame;
-	
-	if ( ACS_Enabled()
-	&& !GetWitcherPlayer().IsCiri()
-	&& !GetWitcherPlayer().IsPerformingFinisher()
-	&& !GetWitcherPlayer().HasTag('acs_in_wraith')
-	&& !GetWitcherPlayer().HasTag('acs_blood_sucking')
-	&& ACS_BuffCheck()
-	&& GetWitcherPlayer().IsActionAllowed(EIAB_Roll)
-	)
-	{
-		vACS_RollInit.ACS_RollInit_Engage();
 	}
 }
 
@@ -1755,12 +1917,16 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		movementAdjustorWitcher = thePlayer.GetMovingAgentComponent().GetMovementAdjustor();
 
-		ticketWitcher = movementAdjustorWitcher.GetRequest( 'ACS_Witcher_Dodge_Rotate');
-		movementAdjustorWitcher.CancelByName( 'ACS_Witcher_Dodge_Rotate' );
+		ticketWitcher = movementAdjustorWitcher.GetRequest( 'ACSMovAdj' );
+		movementAdjustorWitcher.CancelByName( 'ACSMovAdj' );
 		movementAdjustorWitcher.CancelAll();
-		ticketWitcher = movementAdjustorWitcher.CreateNewRequest( 'ACS_Witcher_Dodge_Rotate' );
+		ticketWitcher = movementAdjustorWitcher.CreateNewRequest( 'ACSMovAdj' ); 
 		movementAdjustorWitcher.AdjustmentDuration( ticketWitcher, 0.125 );
 		movementAdjustorWitcher.MaxRotationAdjustmentSpeed( ticketWitcher, 500000 );
+
+		movementAdjustorWitcher.BlendIn(ticketWitcher, 0.1f);
+
+		movementAdjustorWitcher.ShouldStartFacing(ticketWitcher, theCamera.GetCameraHeading());
 
 		switch ( direction )
 		{
@@ -1789,6 +1955,55 @@ state ACS_RollInit_Engage in cACS_RollInit
 	
 	entry function RollInit()
 	{	
+		if (ACSGetCEntity('ACS_Aim_Impact_Entity'))
+		{
+			ACSGetCEntity('ACS_Aim_Impact_Entity').Destroy();
+		}
+		
+		if ( ACS_Settings_Main_Bool('acs_stamina_settings','acs_stamina_block_action', false) 
+		&& GetACSWatcher().StaminaCheck('default')
+		)
+		{
+			if (thePlayer.HasTag('ACS_IsSwordWalking')){thePlayer.RemoveTag('ACS_IsSwordWalking');}
+			GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
+			GetWitcherPlayer().SoundEvent("gui_no_stamina");
+
+			return;
+		}
+
+		if (ACSGetCActor('ACS_Enemy_Attacking_From_Behind')
+		&& ACS_Settings_Main_Float('acs_dodge_settings','acs_flip_dodge_cooldown', 4) > 0
+		)
+		{
+			GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
+			
+			thePlayer.PlayEffectSingle('acs_fast_sprint_trail');
+			thePlayer.StopEffect('acs_fast_sprint_trail');
+
+			thePlayer.RaiseEvent('ACS_FrontTwistFlip');
+
+			if (RandF() < 0.5)
+			{
+				thePlayer.RaiseEvent( 'ACS_CastAardLocomotion' );
+			}
+			else
+			{
+				thePlayer.RaiseEvent( 'ACS_CastIgniLocomotion' );
+			}
+
+			ACSGetCActorRemoveTag('ACS_Enemy_Attacking_From_Behind');
+		}
+
+		if (ACS_Settings_Main_Bool('acs_movement_main_settings','acs_walking_by_default_enabled', true))
+		{
+			thePlayer.SetWalkToggle( true );	
+		}
+
+		if(ACSGetCEntity('ACS_Viper_Dagger_L'))
+		{
+			thePlayer.RaiseEvent('ACS_LHandAttack01');
+		}
+
 		targetDistance = VecDistanceSquared2D( GetWitcherPlayer().GetWorldPosition(), actor.GetWorldPosition() ) ;
 				
 		dist = ((CMovingPhysicalAgentComponent)actor.GetMovingAgentComponent()).GetCapsuleRadius() 
@@ -1810,15 +2025,170 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetWitcherPlayer().RemoveTag('ACS_Bruxa_Jump_End');
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 
-		ACS_ThingsThatShouldBeRemoved(true);
+		ACS_ThingsThatShouldBeRemoved();
 		
-		ACS_ExplorationDelayHack();
+		ACS_ExplorationDelayHack(false, 3);
 
-		DodgePunishment();
+		GetWitcherPlayer().StopEffect('dive_shape');
 
-		ACS_Geralt_Phantom_Destroy();
+		GetWitcherPlayer().RemoveTag('ACS_Bruxa_Jump_End');
+
+		if (GetWitcherPlayer().HasTag('ACS_Vampire_Claws_Roll') && ACSGetCEntity('ACS_Vampire_Roll_FX'))
+		{
+			ACSGetCEntity('ACS_Vampire_Roll_FX').Destroy();
+
+			thePlayer.SoundEvent("monster_dettlaff_monster_combat_construct_dash_vfx");
+
+			thePlayer.DestroyEffect('avatar_death_swollen_no_decal_construct');
+
+			thePlayer.DestroyEffect('shadowdash_body_blood_construct');
+
+			thePlayer.DestroyEffect('shadowdash_ground_blood_construct');
+
+			thePlayer.PlayEffect('avatar_death_swollen_no_decal_construct');
+			thePlayer.StopEffect('avatar_death_swollen_no_decal_construct');
+
+			thePlayer.PlayEffect('shadowdash_body_blood_construct');
+			thePlayer.StopEffect('shadowdash_body_blood_construct');
+
+			thePlayer.PlayEffect('shadowdash_ground_blood_construct');
+			thePlayer.StopEffect('shadowdash_ground_blood_construct');
+
+			thePlayer.SetVisibility(true);
+
+			thePlayer.SetCanPlayHitAnim(true); 
+
+			thePlayer.EnableCharacterCollisions(true); 
+
+			GetWitcherPlayer().RemoveTag('ACS_Vampire_Claws_Roll');
+		}
+
+		if (((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'wood_hollow'
+		|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'wood_debris'
+		|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'dirt_hard'
+		|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'dirt_soil'
+		|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'hay'
+		|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'stone_debris'
+		|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'stone_solid'
+		|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'clay_tile'
+		|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'gravel_large'
+		|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'gravel_small'
+		|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'sand'
+		|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'water_shallow'
+		|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'water_deep'
+		|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'grass_short'
+		|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'grass_long'
+		|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'carpet'
+		)
+		{
+
+			thePlayer.StopEffect('jump_ground_fx1');
+			thePlayer.PlayEffect('jump_ground_fx1');
+
+			if (((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'dirt_hard'
+			|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'dirt_soil'
+			|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'hay'
+			|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'stone_debris'
+			|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'clay_tile'
+			|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'gravel_large'
+			|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'gravel_small'
+			|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'sand'
+			|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'grass_short'
+			|| ((CMovingPhysicalAgentComponent)thePlayer.GetMovingAgentComponent() ).GetMaterialName() == 'grass_long'
+			)
+			{
+				//thePlayer.StopEffect('covered_dirt_ACS');
+				//thePlayer.PlayEffect('covered_dirt_ACS');
+
+				if( GetRainStrength() > 0 
+				&& !thePlayer.IsInInterior()
+				&& !GetACSWatcher().RoofCheck()
+				) 
+				{
+
+				}
+				else if (ACS_Settings_Main_Bool('acs_player_misc_settings','acs_dirt_vfx_enabled', true))
+				{
+					switch(GetACSWatcher().dirt_counter)
+					{
+						case 5:
+							thePlayer.StopEffect('covered_dirt_small_ACS');
+							thePlayer.PlayEffect('covered_dirt_small_ACS');
+							
+							GetACSWatcher().ManageDirtCounter(false);
+						break;
+
+						case 4:
+
+							GetACSWatcher().ManageDirtCounter(true);
+						break;
+
+						case 3:
+
+							thePlayer.StopEffect('covered_dirt_big_ACS');
+							thePlayer.PlayEffect('covered_dirt_big_ACS');
+
+							GetACSWatcher().ManageDirtCounter(true);
+						break;
+
+						case 2:
+
+							GetACSWatcher().ManageDirtCounter(true);
+						break;
+
+						case 1:
+
+							GetACSWatcher().ManageDirtCounter(true);
+							
+						break;
+
+						default:
+							GetACSWatcher().ManageDirtCounter(true);
+
+						break;
+					}
+				}
+			}
+		}
+
+		thePlayer.ACS_DealPlayerPostureDamage(5, false);
+
+		thePlayer.SetSprintActionPressed( false );
+		thePlayer.SetSprintToggle( false );
+		
+		if (ACS_Settings_Main_Bool('acs_movement_main_settings','acs_walking_by_default_enabled', true))
+		{
+			thePlayer.SetWalkToggle( true );	
+		}
+
+		if (RandF() < 0.25)
+		{
+			if (thePlayer.IsAnyWeaponHeld() 
+			&& !thePlayer.IsWeaponHeld('fist')
+			&& !thePlayer.HasTag('acs_vampire_claws_equipped')
+			&& !thePlayer.HasTag('acs_aard_sword_equipped')
+			)
+			{
+				GetACSWatcher().RemoveTimer('SwordTauntSwitch'); 
+				GetACSWatcher().RemoveTimer('SwordTauntRunningSwitch'); 
+				 
+				 
+				GetACSWatcher().RemoveTimer('CombatTauntDelay');GetACSWatcher().RemoveTimer('SwordTauntRunningSwitchSecondary'); 
+				GetACSWatcher().RemoveTimer('SwordTauntRunningSwitchSecondaryWeaponBlood'); 
+				GetACSWatcher().AddTimer('SwordTauntRunningSwitchSecondary', 0.01 / theGame.GetTimeScale(), false ); 
+
+				if (thePlayer.HasTag('ACS_Sword_Hit_Blood_Trigger'))
+				{
+					GetACSWatcher().AddTimer('SwordTauntRunningSwitchSecondaryWeaponBlood', 1.01 / theGame.GetTimeScale(), false ); 
+
+					thePlayer.RemoveTag('ACS_Sword_Hit_Blood_Trigger');
+				}
+			}
+		}
+
+		ACSGetCActorDestroyAll('ACS_Geralt_Phantom');
 
 		if ( thePlayer.inv.IsItemCrossbow( thePlayer.inv.GetItemFromSlot( 'l_weapon' ) ) )
 		{
@@ -1827,25 +2197,23 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetWitcherPlayer().ResetUninterruptedHitsCount();
 
-		GetWitcherPlayer().SendAttackReactionEvent();
+		//GetWitcherPlayer().SendAttackReactionEvent();
 
-		//GetACSWatcher().ACS_Combo_Mode_Reset_Hard();
-
-		if (ACS_Armor_Equipped_Check()
-		|| ACS_WH_Armor_Equipped_Check()
-		|| ACS_Eredin_Armor_Equipped_Check()
-		|| ACS_Imlerith_Armor_Equipped_Check()
-		|| ACS_Caranthir_Armor_Equipped_Check()
-		|| ACS_VGX_Eredin_Armor_Equipped_Check()
+		if (ACS_Armor_Set_Check('acs_armor', false)
+		|| ACS_Armor_Set_Check('wh_armor', false)
+		|| ACS_Armor_Set_Check('eredin_armor', false)
+		|| ACS_Armor_Set_Check('imlerith_armor', false)
+		|| ACS_Armor_Set_Check('caranthir_armor', false)
+		|| ACS_Armor_Set_Check('vgx_eredin_armor', false)
 		)
 		{
 			thePlayer.SoundEvent( "monster_caretaker_mv_cloth_hard" );
 
 			thePlayer.SoundEvent( "monster_caretaker_mv_footstep" );
 		}
-
+		
 		if (
-		GetWitcherPlayer().HasTag('acs_crossbow_active')
+		FactsQuerySum("ACS_Slayer_Active") > 0
 		|| FactsQuerySum("ACS_Azkar_Active") > 0
 		)
 		{
@@ -1856,6 +2224,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 			if (GetWitcherPlayer().HasTag('acs_vampire_claws_equipped')
 			|| GetWitcherPlayer().HasTag('acs_aard_sword_equipped')
 			|| GetWitcherPlayer().HasTag('acs_sorc_fists_equipped')
+			|| ACS_Vampire_Claws_Access()
 			)
 			{
 				vampire_claws_rolls();
@@ -1898,227 +2267,43 @@ state ACS_RollInit_Engage in cACS_RollInit
 			}
 			else
 			{
-				if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
+				if (GetWitcherPlayer().HasTag('ACS_HideWeaponOnDodge') 
+				&& !GetWitcherPlayer().HasTag('ACS_Bruxa_Bite_Process')
+				)
 				{
-					if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') == 0)
-					{
-						if (ACS_can_dodge())
-						{
-							if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-							&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-							)
-							{
-								GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-								GetWitcherPlayer().SoundEvent("gui_no_stamina");
-							}
-							else
-							{
-								ACS_refresh_dodge_cooldown();
+					ACS_Weapon_Respawn();
 
-								if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
-								{
-									GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
-									GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
+					GetWitcherPlayer().RemoveTag('ACS_HideWeaponOnDodge');
 
-									GetWitcherPlayer().PlayEffectSingle( 'magic_step_r_new' );
-									GetWitcherPlayer().StopEffect( 'magic_step_r_new' );	
-
-									GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails' );
-									GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
-								}
-
-								front_dodge_skate();
-								
-								GetACSWatcher().ACS_StaminaDrain(4);
-							}
-						}
-					}
-					else if (theInput.GetActionValue('GI_AxisLeftX') > 0.1 && theInput.GetActionValue('GI_AxisLeftY') == 0)
-					{
-						if (ACS_can_dodge())
-						{
-							if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-							&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-							)
-							{
-								GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-								GetWitcherPlayer().SoundEvent("gui_no_stamina");
-							}
-							else
-							{
-								ACS_refresh_dodge_cooldown();
-
-								if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
-								{
-									GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
-									GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
-
-									GetWitcherPlayer().PlayEffectSingle( 'magic_step_r_new' );
-									GetWitcherPlayer().StopEffect( 'magic_step_r_new' );	
-
-									GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails' );
-									GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
-								}
-
-								right_dodge_skate();
-		
-								GetACSWatcher().ACS_StaminaDrain(4);
-							}
-						}
-					}
-					else if (theInput.GetActionValue('GI_AxisLeftX') < -0.1 && theInput.GetActionValue('GI_AxisLeftY') == 0) 
-					{
-						if (ACS_can_dodge())
-						{
-							if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-							&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-							)
-							{
-								GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-								GetWitcherPlayer().SoundEvent("gui_no_stamina");
-							}
-							else
-							{
-								ACS_refresh_dodge_cooldown();
-
-								if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
-								{
-									GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
-									GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
-
-									GetWitcherPlayer().PlayEffectSingle( 'magic_step_r_new' );
-									GetWitcherPlayer().StopEffect( 'magic_step_r_new' );	
-
-									GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails' );
-									GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
-								}
-
-								left_dodge_skate();
-
-								GetACSWatcher().ACS_StaminaDrain(4);
-							}
-						}
-					}
-					else
-					{
-						if (GetWitcherPlayer().HasTag('ACS_HideWeaponOnDodge') 
-						&& !GetWitcherPlayer().HasTag('acs_blood_sucking')
-						)
-						{
-							ACS_Weapon_Respawn();
-
-							GetWitcherPlayer().RemoveTag('ACS_HideWeaponOnDodge');
-
-							GetWitcherPlayer().RemoveTag('ACS_HideWeaponOnDodge_Claw_Effect');
-						}
-
-						GetACSWatcher().dodge_timer_attack_actual();
-
-						if (ACS_DefaultGeraltMovesetOverrideModeRoll_Enabled() && !thePlayer.IsWeaponHeld('fist'))
-						{
-							geralt_moveset_roll_override_mode();
-						}
-						else
-						{
-							GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync( '', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0, 0) );
-
-							Sleep(0.0625);
-							
-							GetWitcherPlayer().EvadePressed(EBAT_Roll);
-
-							GetACSWatcher().ACS_StaminaDrain(4);
-						}
-					}
+					GetWitcherPlayer().RemoveTag('ACS_HideWeaponOnDodge_Claw_Effect');
 				}
-				else
+
+				GetACSWatcher().dodge_timer_attack_actual();
+
+				if (ACS_DefaultGeraltMovesetOverrideModeRoll_Enabled())
 				{
-					if (GetWitcherPlayer().HasTag('ACS_HideWeaponOnDodge') 
-					&& !GetWitcherPlayer().HasTag('acs_blood_sucking')
+					if ((thePlayer.IsWeaponHeld('fist') 
+					|| !thePlayer.IsAnyWeaponHeld())
+					&& !GetACSWatcher().ACS_IS_SNEAKING 
+					&& !thePlayer.HasTag('ACS_Is_Sneaking')
 					)
 					{
-						ACS_Weapon_Respawn();
-
-						GetWitcherPlayer().RemoveTag('ACS_HideWeaponOnDodge');
-
-						GetWitcherPlayer().RemoveTag('ACS_HideWeaponOnDodge_Claw_Effect');
+						geralt_moveset_fist_roll_override_mode();
 					}
-
-					GetACSWatcher().dodge_timer_attack_actual();
-
-					if (ACS_DefaultGeraltMovesetOverrideModeRoll_Enabled() && !thePlayer.IsWeaponHeld('fist'))
+					else
 					{
 						geralt_moveset_roll_override_mode();
 					}
-					else
-					{
-						GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync( '', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0, 0) );
-
-						Sleep(0.0625);
-						
-						GetWitcherPlayer().EvadePressed(EBAT_Roll);
-
-						GetACSWatcher().ACS_StaminaDrain(4);	
-					}
-				}
-			}
-		}
-	}
-
-	latent function DodgePunishment()
-	{
-		actors.Clear();
-		
-		actors = GetWitcherPlayer().GetNPCsAndPlayersInRange( 3.5, 50, , FLAG_ExcludePlayer + FLAG_Attitude_Hostile + FLAG_OnlyAliveActors);
-
-		if( actors.Size() == 1 )
-		{
-			for( i = 0; i < actors.Size(); i += 1 )
-			{
-				npc = (CNewNPC)actors[i];
-
-				actor = actors[i];
-
-				if (npc.IsHuman())
-				{
-					npc.GainStat( BCS_Morale, npc.GetStatMax( BCS_Morale ) * 0.5 );  
-
-					npc.GainStat( BCS_Focus, npc.GetStatMax( BCS_Focus ) * 0.5 );  
-						
-					npc.GainStat( BCS_Stamina, npc.GetStatMax( BCS_Stamina ) * 0.5 );
 				}
 				else
 				{
-					npc.GainStat( BCS_Morale, npc.GetStatMax( BCS_Morale ) );  
+					GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync( '', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0, 0) );
 
-					npc.GainStat( BCS_Focus, npc.GetStatMax( BCS_Focus ) );  
-						
-					npc.GainStat( BCS_Stamina, npc.GetStatMax( BCS_Stamina ) );
-				}
-			}
-		}
-		else if( actors.Size() > 1 )
-		{
-			for( i = 0; i < actors.Size(); i += 1 )
-			{
-				npc = (CNewNPC)actors[i];
+					Sleep(0.0625);
+					
+					GetWitcherPlayer().EvadePressed(EBAT_Roll);
 
-				actor = actors[i];
-
-				if (npc.IsHuman())
-				{
-					npc.GainStat( BCS_Morale, npc.GetStatMax( BCS_Morale ) * 0.05 );  
-
-					npc.GainStat( BCS_Focus, npc.GetStatMax( BCS_Focus ) * 0.05 );  
-						
-					npc.GainStat( BCS_Stamina, npc.GetStatMax( BCS_Stamina ) * 0.05 );
-				}
-				else
-				{
-					npc.GainStat( BCS_Morale, npc.GetStatMax( BCS_Morale ) );  
-
-					npc.GainStat( BCS_Focus, npc.GetStatMax( BCS_Focus ) );  
-						
-					npc.GainStat( BCS_Stamina, npc.GetStatMax( BCS_Stamina ) * 0.5 );
+					GetACSWatcher().ACS_StaminaDrain(4);	
 				}
 			}
 		}
@@ -2132,20 +2317,12 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 					
 					//ACS_Dodge();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -2160,32 +2337,22 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'shadowdash_short' );
 					}
 
-					GetACSWatcher().dodge_timer_actual();
-
 					bruxa_regular_dodge();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') == 0 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 					
 					//ACS_Dodge();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -2203,27 +2370,19 @@ state ACS_RollInit_Engage in cACS_RollInit
 					bruxa_front_dodge();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftX') > 0.1 && theInput.GetActionValue('GI_AxisLeftY') == 0 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 					
 					//ACS_Dodge();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -2241,27 +2400,19 @@ state ACS_RollInit_Engage in cACS_RollInit
 					bruxa_right_dodge();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftX') < -0.1 && theInput.GetActionValue('GI_AxisLeftY') == 0 ) 
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 					
 					//ACS_Dodge();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -2279,27 +2430,19 @@ state ACS_RollInit_Engage in cACS_RollInit
 					bruxa_left_dodge();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') > 0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 					
 					//ACS_Dodge();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -2319,27 +2462,19 @@ state ACS_RollInit_Engage in cACS_RollInit
 					ACSDodgeMovementAdjust('forwardleft');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') < -0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 					
 					//ACS_Dodge();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -2359,27 +2494,19 @@ state ACS_RollInit_Engage in cACS_RollInit
 					ACSDodgeMovementAdjust('forwardright');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') < -0.1 && theInput.GetActionValue('GI_AxisLeftX') > 0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 					
 					//ACS_Dodge();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -2399,27 +2526,19 @@ state ACS_RollInit_Engage in cACS_RollInit
 					ACSDodgeMovementAdjust('backleft');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftX') < -0.1 && theInput.GetActionValue('GI_AxisLeftY') < -0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 					
 					//ACS_Dodge();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -2439,27 +2558,19 @@ state ACS_RollInit_Engage in cACS_RollInit
 					ACSDodgeMovementAdjust('backright');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 					
 					//ACS_Dodge();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -2479,7 +2590,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 					bruxa_regular_dodge();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 	}
@@ -2487,7 +2598,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 	latent function yrden_sword_rolls()
 	{
 		if (GetWitcherPlayer().HasTag('ACS_HideWeaponOnDodge') 
-		&& !GetWitcherPlayer().HasTag('acs_blood_sucking')
+		&& !GetWitcherPlayer().HasTag('ACS_Bruxa_Bite_Process')
 		)
 		{
 			ACS_Weapon_Respawn();
@@ -2501,18 +2612,10 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -2527,25 +2630,17 @@ state ACS_RollInit_Engage in cACS_RollInit
 					two_hand_back_dodge();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}	
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') == 0)
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -2557,42 +2652,27 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
+					if (RandF() < 0.5)
 					{
-						front_dodge_skate();
+						one_hand_sword_front_dodge_alt_1();
 					}
 					else
 					{
-						if (RandF() < 0.5)
-						{
-							one_hand_sword_front_dodge_alt_1();
-						}
-						else
-						{
-							one_hand_sword_front_dodge();
-						}
+						one_hand_sword_front_dodge();
 					}
-		
+	
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftX') > 0.1 && theInput.GetActionValue('GI_AxisLeftY') == 0)
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -2604,35 +2684,20 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						right_dodge_skate();
-					}
-					else
-					{
-						two_hand_right_dodge_alt();
-					}
+					two_hand_right_dodge_alt();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftX') < -0.1 && theInput.GetActionValue('GI_AxisLeftY') == 0) 
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -2644,35 +2709,20 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 					
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						left_dodge_skate();
-					}
-					else
-					{
-						two_hand_left_dodge_alt();
-					}
+					two_hand_left_dodge_alt();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') > 0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -2684,44 +2734,29 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
+					if (RandF() < 0.5)
 					{
-						front_dodge_skate();
+						one_hand_sword_front_dodge_alt_1();
 					}
 					else
 					{
-						if (RandF() < 0.5)
-						{
-							one_hand_sword_front_dodge_alt_1();
-						}
-						else
-						{
-							one_hand_sword_front_dodge();
-						}
+						one_hand_sword_front_dodge();
 					}
 
 					ACSDodgeMovementAdjust('forwardleft');
 		
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') < -0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -2733,44 +2768,29 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
+					if (RandF() < 0.5)
 					{
-						front_dodge_skate();
+						one_hand_sword_front_dodge_alt_1();
 					}
 					else
 					{
-						if (RandF() < 0.5)
-						{
-							one_hand_sword_front_dodge_alt_1();
-						}
-						else
-						{
-							one_hand_sword_front_dodge();
-						}
+						one_hand_sword_front_dodge();
 					}
 
 					ACSDodgeMovementAdjust('forwardright');
 		
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') < -0.1 && theInput.GetActionValue('GI_AxisLeftX') > 0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -2782,37 +2802,22 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						right_dodge_skate();
-					}
-					else
-					{
-						two_hand_right_dodge_alt();
-					}
+					two_hand_right_dodge_alt();
 
 					ACSDodgeMovementAdjust('backleft');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftX') < -0.1 && theInput.GetActionValue('GI_AxisLeftY') < -0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -2824,37 +2829,22 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 					
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						left_dodge_skate();
-					}
-					else
-					{
-						two_hand_left_dodge_alt();
-					}
+					two_hand_left_dodge_alt();
 
 					ACSDodgeMovementAdjust('backright');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -2869,7 +2859,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 					two_hand_back_dodge();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 	}
@@ -2877,7 +2867,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 	latent function yrden_secondary_sword_rolls()
 	{
 		if (GetWitcherPlayer().HasTag('ACS_HideWeaponOnDodge') 
-		&& !GetWitcherPlayer().HasTag('acs_blood_sucking')
+		&& !GetWitcherPlayer().HasTag('ACS_Bruxa_Bite_Process')
 		)
 		{
 			ACS_Weapon_Respawn();
@@ -2891,18 +2881,10 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -2917,25 +2899,17 @@ state ACS_RollInit_Engage in cACS_RollInit
 					two_hand_back_dodge();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}	
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') == 0)
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -2947,35 +2921,20 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						front_dodge_skate();
-					}
-					else
-					{
-						two_hand_front_dodge();
-					}
+					two_hand_front_dodge();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftX') > 0.1 && theInput.GetActionValue('GI_AxisLeftY') == 0)
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -2987,35 +2946,20 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						right_dodge_skate();
-					}
-					else
-					{
-						two_hand_right_dodge();
-					}
+					two_hand_right_dodge();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftX') < -0.1 && theInput.GetActionValue('GI_AxisLeftY') == 0) 
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3027,35 +2971,20 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						left_dodge_skate();
-					}
-					else
-					{
-						two_hand_left_dodge();
-					}
+					two_hand_left_dodge();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') > 0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3067,37 +2996,22 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						front_dodge_skate();
-					}
-					else
-					{
-						two_hand_front_dodge();
-					}
+					two_hand_front_dodge();
 
 					ACSDodgeMovementAdjust('forwardleft');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') < -0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3109,37 +3023,22 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						front_dodge_skate();
-					}
-					else
-					{
-						two_hand_front_dodge();
-					}
+					two_hand_front_dodge();
 
 					ACSDodgeMovementAdjust('forwardright');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') < -0.1 && theInput.GetActionValue('GI_AxisLeftX') > 0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3151,37 +3050,22 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						right_dodge_skate();
-					}
-					else
-					{
-						two_hand_right_dodge();
-					}
+					two_hand_right_dodge();
 
 					ACSDodgeMovementAdjust('backleft');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftX') < -0.1 && theInput.GetActionValue('GI_AxisLeftY') < -0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3193,37 +3077,22 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						left_dodge_skate();
-					}
-					else
-					{
-						two_hand_left_dodge();
-					}
+					two_hand_left_dodge();
 
 					ACSDodgeMovementAdjust('backright');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3238,7 +3107,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 					two_hand_back_dodge();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 	}
@@ -3246,7 +3115,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 	latent function axii_secondary_sword_rolls()
 	{
 		if (GetWitcherPlayer().HasTag('ACS_HideWeaponOnDodge') 
-		&& !GetWitcherPlayer().HasTag('acs_blood_sucking')
+		&& !GetWitcherPlayer().HasTag('ACS_Bruxa_Bite_Process')
 		)
 		{
 			ACS_Weapon_Respawn();
@@ -3260,18 +3129,10 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3286,25 +3147,17 @@ state ACS_RollInit_Engage in cACS_RollInit
 					two_hand_sword_back_dodge();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}	
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') == 0)
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3316,42 +3169,27 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
+					if (RandF() < 0.5)
 					{
-						front_dodge_skate();
+						one_hand_sword_front_dodge_alt_1();
 					}
 					else
 					{
-						if (RandF() < 0.5)
-						{
-							one_hand_sword_front_dodge_alt_1();
-						}
-						else
-						{
-							one_hand_sword_front_dodge();
-						}
+						one_hand_sword_front_dodge();
 					}
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftX') > 0.1 && theInput.GetActionValue('GI_AxisLeftY') == 0)
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3363,35 +3201,20 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						right_dodge_skate();
-					}
-					else
-					{
-						two_hand_sword_right_dodge();
-					}
+					two_hand_sword_right_dodge();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftX') < -0.1 && theInput.GetActionValue('GI_AxisLeftY') == 0) 
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3403,35 +3226,20 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						left_dodge_skate();
-					}
-					else
-					{
-						two_hand_sword_left_dodge();
-					}
+					two_hand_sword_left_dodge();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') > 0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3443,37 +3251,22 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						right_dodge_skate();
-					}
-					else
-					{
-						two_hand_sword_right_dodge();
-					}
+					two_hand_sword_right_dodge();
 
 					ACSDodgeMovementAdjust('forwardright');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') < -0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3485,37 +3278,22 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						left_dodge_skate();
-					}
-					else
-					{
-						two_hand_sword_left_dodge();
-					}
+					two_hand_sword_left_dodge();
 
 					ACSDodgeMovementAdjust('forwardleft');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') < -0.1 && theInput.GetActionValue('GI_AxisLeftX') > 0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3527,37 +3305,22 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						right_dodge_skate();
-					}
-					else
-					{
-						two_hand_sword_right_dodge();
-					}
+					two_hand_sword_right_dodge();
 
 					ACSDodgeMovementAdjust('backright');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftX') < -0.1 && theInput.GetActionValue('GI_AxisLeftY') < -0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3569,37 +3332,22 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						left_dodge_skate();
-					}
-					else
-					{
-						two_hand_sword_left_dodge();
-					}
+					two_hand_sword_left_dodge();
 
 					ACSDodgeMovementAdjust('backleft');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3614,7 +3362,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 					two_hand_sword_back_dodge();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 	}
@@ -3622,7 +3370,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 	latent function quen_secondary_sword_rolls()
 	{
 		if (GetWitcherPlayer().HasTag('ACS_HideWeaponOnDodge') 
-		&& !GetWitcherPlayer().HasTag('acs_blood_sucking')
+		&& !GetWitcherPlayer().HasTag('ACS_Bruxa_Bite_Process')
 		)
 		{
 			ACS_Weapon_Respawn();
@@ -3636,18 +3384,10 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3662,25 +3402,17 @@ state ACS_RollInit_Engage in cACS_RollInit
 					one_hand_sword_back_dodge_alt_1();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}	
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') == 0)
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3692,42 +3424,27 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
+					if (RandF() < 0.5)
 					{
-						front_dodge_skate();
+						one_hand_sword_front_dodge_alt_1();
 					}
 					else
 					{
-						if (RandF() < 0.5)
-						{
-							one_hand_sword_front_dodge_alt_1();
-						}
-						else
-						{
-							one_hand_sword_front_dodge();
-						}
+						one_hand_sword_front_dodge();
 					}
-					
+				
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftX') > 0.1 && theInput.GetActionValue('GI_AxisLeftY') == 0)
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3739,35 +3456,20 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						right_dodge_skate();
-					}
-					else
-					{
-						one_hand_sword_right_dodge_alt_2();
-					}
+					one_hand_sword_right_dodge_alt_2();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftX') < -0.1 && theInput.GetActionValue('GI_AxisLeftY') == 0) 
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3779,35 +3481,20 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						left_dodge_skate();
-					}
-					else
-					{
-						one_hand_sword_left_dodge_alt_2();
-					}
+					one_hand_sword_left_dodge_alt_2();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') > 0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3819,37 +3506,22 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						right_dodge_skate();
-					}
-					else
-					{
-						one_hand_sword_right_dodge_alt_2();
-					}
+					one_hand_sword_right_dodge_alt_2();
 
 					ACSDodgeMovementAdjust('forwardright');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') < -0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3861,37 +3533,22 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						left_dodge_skate();
-					}
-					else
-					{
-						one_hand_sword_left_dodge_alt_2();
-					}
+					one_hand_sword_left_dodge_alt_2();
 
 					ACSDodgeMovementAdjust('forwardleft');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') < -0.1 && theInput.GetActionValue('GI_AxisLeftX') > 0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3903,37 +3560,22 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						right_dodge_skate();
-					}
-					else
-					{
-						one_hand_sword_right_dodge_alt_2();
-					}
+					one_hand_sword_right_dodge_alt_2();
 
 					ACSDodgeMovementAdjust('backright');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftX') < -0.1 && theInput.GetActionValue('GI_AxisLeftY') < -0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3945,37 +3587,22 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						left_dodge_skate();
-					}
-					else
-					{
-						one_hand_sword_left_dodge_alt_2();
-					}
+					one_hand_sword_left_dodge_alt_2();
 
 					ACSDodgeMovementAdjust('backleft');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -3990,7 +3617,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 					one_hand_sword_back_dodge_alt_1();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 	}
@@ -3998,7 +3625,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 	latent function aard_secondary_sword_rolls()
 	{
 		if (GetWitcherPlayer().HasTag('ACS_HideWeaponOnDodge') 
-		&& !GetWitcherPlayer().HasTag('acs_blood_sucking')
+		&& !GetWitcherPlayer().HasTag('ACS_Bruxa_Bite_Process')
 		)
 		{
 			ACS_Weapon_Respawn();
@@ -4012,18 +3639,10 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -4038,25 +3657,17 @@ state ACS_RollInit_Engage in cACS_RollInit
 					one_hand_sword_back_dodge_alt_2();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}		
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') == 0)
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -4068,35 +3679,20 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						front_dodge_skate();
-					}
-					else
-					{
-						one_hand_sword_front_dodge_alt_2();
-					}
+					one_hand_sword_front_dodge_alt_2();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftX') > 0.1 && theInput.GetActionValue('GI_AxisLeftY') == 0)
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -4108,35 +3704,20 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						right_dodge_skate();
-					}
-					else
-					{
-						one_hand_sword_right_dodge_alt_2();
-					}
+					one_hand_sword_right_dodge_alt_2();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftX') < -0.1 && theInput.GetActionValue('GI_AxisLeftY') == 0) 
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -4148,35 +3729,20 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						left_dodge_skate();
-					}
-					else
-					{
-						one_hand_sword_left_dodge_alt_2();
-					}
+					one_hand_sword_left_dodge_alt_2();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') > 0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -4188,37 +3754,22 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						right_dodge_skate();
-					}
-					else
-					{
-						one_hand_sword_right_dodge_alt_2();
-					}
+					one_hand_sword_right_dodge_alt_2();
 
 					ACSDodgeMovementAdjust('forwardright');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') < -0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -4230,37 +3781,22 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						left_dodge_skate();
-					}
-					else
-					{
-						one_hand_sword_left_dodge_alt_2();
-					}
+					one_hand_sword_left_dodge_alt_2();
 
 					ACSDodgeMovementAdjust('forwardleft');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') < -0.1 && theInput.GetActionValue('GI_AxisLeftX') > 0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -4272,37 +3808,22 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						right_dodge_skate();
-					}
-					else
-					{
-						one_hand_sword_right_dodge_alt_2();
-					}
+					one_hand_sword_right_dodge_alt_2();
 
 					ACSDodgeMovementAdjust('backright');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftX') < -0.1 && theInput.GetActionValue('GI_AxisLeftY') < -0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -4314,37 +3835,22 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						left_dodge_skate();
-					}
-					else
-					{
-						one_hand_sword_left_dodge_alt_2();
-					}
+					one_hand_sword_left_dodge_alt_2();
 
 					ACSDodgeMovementAdjust('backleft');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -4359,7 +3865,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 					one_hand_sword_back_dodge_alt_2();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 	}
@@ -4367,7 +3873,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 	latent function igni_sword_rolls()
 	{
 		if (GetWitcherPlayer().HasTag('ACS_HideWeaponOnDodge') 
-		&& !GetWitcherPlayer().HasTag('acs_blood_sucking')
+		&& !GetWitcherPlayer().HasTag('ACS_Bruxa_Bite_Process')
 		)
 		{
 			ACS_Weapon_Respawn();
@@ -4377,212 +3883,86 @@ state ACS_RollInit_Engage in cACS_RollInit
 			GetWitcherPlayer().RemoveTag('ACS_HideWeaponOnDodge_Claw_Effect');
 		}
 
-		if (ACS_Zireael_Check())
+		if (ACS_GetItem_Sword_IsEquipped('zireal_steel_held', 'steel') || ACS_GetItem_Sword_IsEquipped('zireal_silver_held', 'silver') || ACS_Armor_Set_Check('acs_armor_omega', false) || ACS_Armor_Set_Check('acs_armor_alpha', false))
 		{
-			ciri_rolls();
+			if (ACS_GetItem_Sword_IsEquipped('zireal_steel_held', 'steel') || ACS_GetItem_Sword_IsEquipped('zireal_silver_held', 'silver'))
+			{
+				ciri_rolls();
+			}
+			else
+			{
+				acs_armor_rolls();
+			}
 		}
 		else
 		{
-			if (ACS_Wolf_School_Check() || ACS_Armor_Omega_Equipped_Check() || ACS_Armor_Alpha_Equipped_Check() )
+			if (ACS_Armor_Set_Check('wolf', true))
 			{
 				wolf_school_rolls();
 			}
-			else if (ACS_Bear_School_Check())
+			else if (ACS_Armor_Set_Check('bear', true))
 			{
 				bear_school_rolls();
 			}
-			else if (ACS_Cat_School_Check() )
+			else if (ACS_Armor_Set_Check('cat', true) || thePlayer.HasTag('ACS_Dual_Wield_Active'))
 			{
 				cat_school_rolls();
 			}
-			else if (ACS_Griffin_School_Check())
+			else if (ACS_Armor_Set_Check('griffin', true))
 			{
 				griffin_school_rolls();
 			}
-			else if (ACS_Manticore_School_Check())
+			else if (ACS_Armor_Set_Check('manticore', true))
 			{
 				manticore_school_rolls();
 			}
-			else if (ACS_Forgotten_Wolf_Check())
+			else if (ACS_Armor_Set_Check('forgotten_wolf', true) )
 			{
 				forgotten_wolf_school_rolls();
 			}
-			else if (ACS_Viper_School_Check())
+			else if (ACS_Armor_Set_Check('viper', true))
 			{
 				viper_school_rolls();
 			}
 			else
 			{
-				if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
+				if (GetWitcherPlayer().HasTag('ACS_HideWeaponOnDodge') 
+				&& !GetWitcherPlayer().HasTag('ACS_Bruxa_Bite_Process')
+				)
 				{
-					if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') == 0)
+					ACS_Weapon_Respawn();
+
+					GetWitcherPlayer().RemoveTag('ACS_HideWeaponOnDodge');
+
+					GetWitcherPlayer().RemoveTag('ACS_HideWeaponOnDodge_Claw_Effect');
+				}
+
+				GetACSWatcher().dodge_timer_attack_actual();
+
+				if (ACS_DefaultGeraltMovesetOverrideModeRoll_Enabled())
+				{
+					if ((thePlayer.IsWeaponHeld('fist') 
+					|| !thePlayer.IsAnyWeaponHeld())
+					&& !GetACSWatcher().ACS_IS_SNEAKING 
+					&& !thePlayer.HasTag('ACS_Is_Sneaking')
+					)
 					{
-						if (ACS_can_dodge())
-						{
-							if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-							&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-							)
-							{
-								GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-								GetWitcherPlayer().SoundEvent("gui_no_stamina");
-							}
-							else
-							{
-								ACS_refresh_dodge_cooldown();
-
-								if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
-								{
-									GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
-									GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
-
-									GetWitcherPlayer().PlayEffectSingle( 'magic_step_r_new' );
-									GetWitcherPlayer().StopEffect( 'magic_step_r_new' );	
-
-									GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails' );
-									GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
-								}
-
-								front_dodge_skate();
-								
-								GetACSWatcher().ACS_StaminaDrain(4);
-							}
-						}
-					}
-					else if (theInput.GetActionValue('GI_AxisLeftX') > 0.1 && theInput.GetActionValue('GI_AxisLeftY') == 0)
-					{
-						if (ACS_can_dodge())
-						{
-							if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-							&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-							)
-							{
-								GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-								GetWitcherPlayer().SoundEvent("gui_no_stamina");
-							}
-							else
-							{
-								ACS_refresh_dodge_cooldown();
-
-								if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
-								{
-									GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
-									GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
-
-									GetWitcherPlayer().PlayEffectSingle( 'magic_step_r_new' );
-									GetWitcherPlayer().StopEffect( 'magic_step_r_new' );	
-
-									GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails' );
-									GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
-								}
-
-								right_dodge_skate();
-
-								GetACSWatcher().ACS_StaminaDrain(4);
-							}
-						}
-					}
-					else if (theInput.GetActionValue('GI_AxisLeftX') < -0.1 && theInput.GetActionValue('GI_AxisLeftY') == 0) 
-					{
-						if (ACS_can_dodge())
-						{
-							if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-							&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-							)
-							{
-								GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-								GetWitcherPlayer().SoundEvent("gui_no_stamina");
-							}
-							else
-							{
-								ACS_refresh_dodge_cooldown();
-
-								if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
-								{
-									GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
-									GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
-
-									GetWitcherPlayer().PlayEffectSingle( 'magic_step_r_new' );
-									GetWitcherPlayer().StopEffect( 'magic_step_r_new' );	
-
-									GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails' );
-									GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
-								}
-
-								left_dodge_skate();
-
-								GetACSWatcher().ACS_StaminaDrain(4);
-							}
-						}
+						geralt_moveset_fist_roll_override_mode();
 					}
 					else
 					{
-						if (GetWitcherPlayer().HasTag('ACS_HideWeaponOnDodge') 
-						&& !GetWitcherPlayer().HasTag('acs_blood_sucking')
-						)
-						{
-							ACS_Weapon_Respawn();
-
-							GetWitcherPlayer().RemoveTag('ACS_HideWeaponOnDodge');
-
-							GetWitcherPlayer().RemoveTag('ACS_HideWeaponOnDodge_Claw_Effect');
-						}
-
-						GetACSWatcher().dodge_timer_attack_actual();
-
-						if (ACS_DefaultGeraltMovesetOverrideModeRoll_Enabled() && !thePlayer.IsWeaponHeld('fist'))
-						{
-							geralt_moveset_roll_override_mode();
-						}
-						else
-						{
-							GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync( '', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0, 0) );
-
-							Sleep(0.0625);
-							
-							GetWitcherPlayer().EvadePressed(EBAT_Roll);
-
-							GetACSWatcher().ACS_StaminaDrain(4);	
-						}
+						geralt_moveset_roll_override_mode();
 					}
 				}
 				else
 				{
-					if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-					&& GetACSWatcher().StaminaCheck()
-					)
-					{							 
-						if(thePlayer.IsInCombat()){thePlayer.RaiseEvent( 'CombatTaunt' );} thePlayer.SoundEvent("gui_no_stamina");
-					}
-					else
-					{
-						if (GetWitcherPlayer().HasTag('ACS_HideWeaponOnDodge') 
-						&& !GetWitcherPlayer().HasTag('acs_blood_sucking')
-						)
-						{
-							ACS_Weapon_Respawn();
+					GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync( '', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0, 0) );
 
-							GetWitcherPlayer().RemoveTag('ACS_HideWeaponOnDodge');
+					Sleep(0.0625);
+					
+					GetWitcherPlayer().EvadePressed(EBAT_Roll);
 
-							GetWitcherPlayer().RemoveTag('ACS_HideWeaponOnDodge_Claw_Effect');
-						}
-
-						GetACSWatcher().dodge_timer_attack_actual();
-
-						if (ACS_DefaultGeraltMovesetOverrideModeRoll_Enabled() && !thePlayer.IsWeaponHeld('fist'))
-						{
-							geralt_moveset_roll_override_mode();
-						}
-						else
-						{
-							GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync( '', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0, 0) );
-
-							Sleep(0.0625);
-							
-							GetWitcherPlayer().EvadePressed(EBAT_Roll);
-
-							GetACSWatcher().ACS_StaminaDrain(4);	
-						}
-					}
+					GetACSWatcher().ACS_StaminaDrain(4);	
 				}
 			}
 		}
@@ -4592,610 +3972,1960 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 	latent function geralt_moveset_roll_override_mode()
 	{
-		if (theInput.GetActionValue('GI_AxisLeftY') < -0.1 && theInput.GetActionValue('GI_AxisLeftX') == 0 )
+		if (theInput.GetActionValue('GI_AxisLeftY') < -0.1 && theInput.GetActionValue('GI_AxisLeftX') == 0 ) // back
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
+				ACS_refresh_dodge_cooldown();
+
+				if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
+					GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
+					GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
+
+					GetWitcherPlayer().PlayEffectSingle( 'magic_step_r_new' );
+					GetWitcherPlayer().StopEffect( 'magic_step_r_new' );	
+
+					GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails' );
+					GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 				}
-				else
+
+				GetACSWatcher().ACS_StaminaDrain(4);
+
+				if (GetACSWatcher().silver_fast_stance)
 				{
-					ACS_refresh_dodge_cooldown();
+					override_mode_back_dodge_extras('tw1_silver_fast_dodge_back_long_ACS');
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
-					{
-						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
-						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
+					return;
+				}
 
-						GetWitcherPlayer().PlayEffectSingle( 'magic_step_r_new' );
-						GetWitcherPlayer().StopEffect( 'magic_step_r_new' );	
+				if (GetACSWatcher().silver_group_stance)
+				{
+					override_mode_back_dodge_extras('tw1_silver_group_dodge_back_long_ACS');
 
-						GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails' );
-						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
+					return;
+				}
+
+				if (GetACSWatcher().silver_strong_stance)
+				{
+					override_mode_back_dodge_extras('tw1_silver_strong_dodge_back_long_ACS');
+
+					return;
+				}
+
+				if (GetACSWatcher().steel_fast_stance)
+				{
+					override_mode_back_dodge_extras('tw1_steel_fast_dodge_back_long_ACS');
+
+					return;
+				}
+
+				if (GetACSWatcher().steel_group_stance)
+				{
+					override_mode_back_dodge_extras('tw1_steel_group_dodge_back_long_ACS');
+
+					return;
+				}
+
+				if (GetACSWatcher().steel_strong_stance)
+				{
+					override_mode_back_dodge_extras('tw1_steel_strong_dodge_back_long_ACS');
+
+					return;
+				}
+
+
+				if (ACS_Settings_Main_Bool('acs_default_geralt_moveset_dodge_and_roll_override_settings','acs_default_moveset_override_roll_randomized_enabled', false))
+				{
+					switch( GetACSWatcher().GetRandomizedDodgeVariation() )
+					{
+						case 13:
+							override_mode_orient_back_dodge_extras('tw2_dodge_02_ACS');
+						break;
+
+						case 12:
+							override_mode_orient_back_dodge_extras('tw2_dodge_01_ACS');
+						break;
+
+						case 11:
+							override_mode_back_dodge_6();
+						break;
+
+						case 10:
+							override_mode_back_dodge_2();
+						break;
+
+						case 9:
+							override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_03');
+						break;
+
+						case 8:
+							override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_02');
+						break;
+
+						case 7:
+							override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_02');
+						break;
+
+						case 6:
+							override_mode_back_dodge_4();
+						break;
+
+						case 5:
+							override_mode_back_dodge_3();
+						break;
+
+						case 4:
+							override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_03');
+						break;
+
+						case 3:
+							override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_01');
+						break;
+
+						case 2:
+							override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_01');
+						break;
+
+						case 1:
+							override_mode_back_dodge_5();
+						break;
+
+						case 0:
+							override_mode_back_dodge_1();
+						break;
+
+						default:
+							override_mode_back_dodge_1();
+						break;
 					}
 
-					if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeBackwardRollOptions', 5) == 0)
-					{
-						override_mode_back_dodge_1();
-					}
-					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeBackwardRollOptions', 5) == 1)
-					{
-						override_mode_back_dodge_2();
-					}
-					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeBackwardRollOptions', 5) == 2)
-					{
-						override_mode_back_dodge_3();
-					}
-					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeBackwardRollOptions', 5) == 3)
-					{
-						override_mode_back_dodge_4();
-					}
-					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeBackwardRollOptions', 5) == 4)
-					{
-						override_mode_back_dodge_5();
-					}
-					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeBackwardRollOptions', 5) == 5)
-					{
+					return;
+				}
+
+				switch( ACS_Settings_Main_Int('acs_default_geralt_moveset_dodge_and_roll_override_settings','acs_default_moveset_override_mode_backward_roll_options', 11) )
+				{
+					case 13:
+						override_mode_orient_back_dodge_extras('tw2_dodge_02_ACS');
+					break;
+
+					case 12:
+						override_mode_orient_back_dodge_extras('tw2_dodge_01_ACS');
+					break;
+
+					case 11:
 						override_mode_back_dodge_6();
-					}
-					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeBackwardRollOptions', 5) == 6)
-					{
-						override_mode_back_dodge_7();
-					}
-					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeBackwardRollOptions', 5) == 7)
-					{
-						override_mode_back_dodge_8();
-					}
-					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeBackwardRollOptions', 5) == 8)
-					{
-						override_mode_back_dodge_9();
-					}
-					
-					GetACSWatcher().ACS_StaminaDrain(4);
+					break;
+
+					case 10:
+						override_mode_back_dodge_2();
+					break;
+
+					case 9:
+						override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_03');
+					break;
+
+					case 8:
+						override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_02');
+					break;
+
+					case 7:
+						override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_02');
+					break;
+
+					case 6:
+						override_mode_back_dodge_4();
+					break;
+
+					case 5:
+						override_mode_back_dodge_3();
+					break;
+
+					case 4:
+						override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_03');
+					break;
+
+					case 3:
+						override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_01');
+					break;
+
+					case 2:
+						override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_01');
+					break;
+
+					case 1:
+						override_mode_back_dodge_5();
+					break;
+
+					case 0:
+						override_mode_back_dodge_1();
+					break;
+
+					default:
+						override_mode_back_dodge_1();
+					break;
 				}
 			}	
 		}
-		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') == 0)
+		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') == 0) // forward
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
+				ACS_refresh_dodge_cooldown();
+
+				if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
+					GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
+					GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
+
+					GetWitcherPlayer().PlayEffectSingle( 'magic_step_r_new' );
+					GetWitcherPlayer().StopEffect( 'magic_step_r_new' );	
+
+					GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails' );
+					GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 				}
-				else
+
+				GetACSWatcher().ACS_StaminaDrain(4);
+
+				if (GetACSWatcher().silver_fast_stance)
 				{
-					ACS_refresh_dodge_cooldown();
+					override_mode_back_dodge_extras('tw1_silver_fast_dodge_forward_long_ACS');
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					return;
+				}
+
+				if (GetACSWatcher().silver_group_stance)
+				{
+					override_mode_back_dodge_extras('tw1_silver_group_dodge_forward_long_ACS');
+
+					return;
+				}
+
+				if (GetACSWatcher().silver_strong_stance)
+				{
+					override_mode_back_dodge_extras('tw1_silver_strong_dodge_forward_long_ACS');
+
+					return;
+				}
+
+				if (GetACSWatcher().steel_fast_stance)
+				{
+					override_mode_back_dodge_extras('tw1_steel_fast_dodge_forward_long_ACS');
+
+					return;
+				}
+
+				if (GetACSWatcher().steel_group_stance)
+				{
+					override_mode_back_dodge_extras('tw1_steel_group_dodge_forward_long_ACS');
+
+					return;
+				}
+
+				if (GetACSWatcher().steel_strong_stance)
+				{
+					override_mode_back_dodge_extras('tw1_steel_strong_dodge_forward_long_ACS');
+
+					return;
+				}
+
+				if (ACS_Settings_Main_Bool('acs_default_geralt_moveset_dodge_and_roll_override_settings','acs_default_moveset_override_roll_randomized_enabled', false))
+				{
+					switch( GetACSWatcher().GetRandomizedDodgeVariation() )
 					{
-						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
-						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
+						case 13:
+							override_mode_back_dodge_extras('tw2_dodge_02_ACS');
+						break;
 
-						GetWitcherPlayer().PlayEffectSingle( 'magic_step_r_new' );
-						GetWitcherPlayer().StopEffect( 'magic_step_r_new' );	
+						case 12:
+							override_mode_back_dodge_extras('tw2_dodge_01_ACS');
+						break;
 
-						GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails' );
-						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
-					}
-
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						front_dodge_skate();
-					}
-					else
-					{
-						if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardRollOptions', 5) == 0)
-						{
-							override_mode_front_dodge_1();
-						}
-						else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardRollOptions', 5) == 1)
-						{
-							override_mode_front_dodge_2();
-						}
-						else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardRollOptions', 5) == 2)
-						{
-							override_mode_front_dodge_3();
-						}
-						else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardRollOptions', 5) == 3)
-						{
-							override_mode_front_dodge_4();
-						}
-						else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardRollOptions', 5) == 4)
-						{
-							override_mode_front_dodge_5();
-						}
-						else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardRollOptions', 5) == 5)
-						{
+						case 11:
 							override_mode_front_dodge_6();
-						}
+						break;
+
+						case 10:
+							override_mode_front_dodge_2();
+						break;
+
+						case 9:
+							override_mode_front_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_03');
+						break;
+
+						case 8:
+							override_mode_front_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_02');
+						break;
+
+						case 7:
+							override_mode_front_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_02');
+						break;
+
+						case 6:
+							override_mode_front_dodge_4();
+						break;
+
+						case 5:
+							override_mode_front_dodge_3();
+						break;
+
+						case 4:
+							override_mode_front_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_03');
+						break;
+
+						case 3:
+							override_mode_front_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_01');
+						break;
+
+						case 2:
+							override_mode_front_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_01');
+						break;
+
+						case 1:
+							override_mode_front_dodge_5();
+						break;
+
+						case 0:
+							override_mode_front_dodge_1();
+						break;
+
+						default:
+							override_mode_front_dodge_1();
+						break;
 					}
-					
-					GetACSWatcher().ACS_StaminaDrain(4);
+
+					return;
+				}
+
+				switch( ACS_Settings_Main_Int('acs_default_geralt_moveset_dodge_and_roll_override_settings','acs_default_moveset_override_mode_foward_roll_options', 11) )
+				{
+					case 13:
+						override_mode_back_dodge_extras('tw2_dodge_02_ACS');
+					break;
+
+					case 12:
+						override_mode_back_dodge_extras('tw2_dodge_01_ACS');
+					break;
+
+					case 11:
+						override_mode_front_dodge_6();
+					break;
+
+					case 10:
+						override_mode_front_dodge_2();
+					break;
+
+					case 9:
+						override_mode_front_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_03');
+					break;
+
+					case 8:
+						override_mode_front_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_02');
+					break;
+
+					case 7:
+						override_mode_front_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_02');
+					break;
+
+					case 6:
+						override_mode_front_dodge_4();
+					break;
+
+					case 5:
+						override_mode_front_dodge_3();
+					break;
+
+					case 4:
+						override_mode_front_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_03');
+					break;
+
+					case 3:
+						override_mode_front_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_01');
+					break;
+
+					case 2:
+						override_mode_front_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_01');
+					break;
+
+					case 1:
+						override_mode_front_dodge_5();
+					break;
+
+					case 0:
+						override_mode_front_dodge_1();
+					break;
+
+					default:
+						override_mode_front_dodge_1();
+					break;
 				}
 			}
 		}
-		else if (theInput.GetActionValue('GI_AxisLeftX') > 0.1 && theInput.GetActionValue('GI_AxisLeftY') == 0)
+		else if (theInput.GetActionValue('GI_AxisLeftX') > 0.1 && theInput.GetActionValue('GI_AxisLeftY') == 0) // right
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
+				ACS_refresh_dodge_cooldown();
+
+				if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
+					GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
+					GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
+
+					GetWitcherPlayer().PlayEffectSingle( 'magic_step_r_new' );
+					GetWitcherPlayer().StopEffect( 'magic_step_r_new' );	
+
+					GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails' );
+					GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 				}
-				else
+
+				GetACSWatcher().ACS_StaminaDrain(4);
+
+				if (GetACSWatcher().silver_fast_stance)
 				{
-					ACS_refresh_dodge_cooldown();
+					override_mode_back_dodge_extras('tw1_silver_fast_dodge_right_long_ACS');
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					return;
+				}
+
+				if (GetACSWatcher().silver_group_stance)
+				{
+					override_mode_back_dodge_extras('tw1_silver_group_dodge_right_long_ACS');
+
+					return;
+				}
+
+				if (GetACSWatcher().silver_strong_stance)
+				{
+					override_mode_back_dodge_extras('tw1_silver_strong_dodge_right_long_ACS');
+
+					return;
+				}
+
+				if (GetACSWatcher().steel_fast_stance)
+				{
+					override_mode_back_dodge_extras('tw1_steel_fast_dodge_right_long_ACS');
+
+					return;
+				}
+
+				if (GetACSWatcher().steel_group_stance)
+				{
+					override_mode_back_dodge_extras('tw1_steel_group_dodge_right_long_ACS');
+
+					return;
+				}
+
+				if (GetACSWatcher().steel_strong_stance)
+				{
+					override_mode_back_dodge_extras('tw1_steel_strong_dodge_right_long_ACS');
+
+					return;
+				}
+
+				if (ACS_Settings_Main_Bool('acs_default_geralt_moveset_dodge_and_roll_override_settings','acs_default_moveset_override_roll_randomized_enabled', false))
+				{
+					switch( GetACSWatcher().GetRandomizedDodgeVariation() )
 					{
-						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
-						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
+						case 13:
+							override_mode_left_dodge_extras('tw2_dodge_02_ACS');
+						break;
 
-						GetWitcherPlayer().PlayEffectSingle( 'magic_step_r_new' );
-						GetWitcherPlayer().StopEffect( 'magic_step_r_new' );	
+						case 12:
+							override_mode_left_dodge_extras('tw2_dodge_01_ACS');
+						break;
 
-						GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails' );
-						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
-					}
+						case 11:
+							override_mode_right_dodge_6();
+						break;
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						right_dodge_skate();
-					}
-					else
-					{
-						if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeRightRollOptions', 2) == 0)
-						{
-							override_mode_right_dodge_1();
-						}
-						else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeRightRollOptions', 2) == 1)
-						{
+						case 10:
 							override_mode_right_dodge_2();
-						}
-						else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeRightRollOptions', 2) == 2)
-						{
-							override_mode_right_dodge_3();
-						}
-						else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeRightRollOptions', 2) == 3)
-						{
+						break;
+
+						case 9:
+							override_mode_right_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_03');
+						break;
+
+						case 8:
+							override_mode_right_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_02');
+						break;
+
+						case 7:
+							override_mode_right_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_02');
+						break;
+
+						case 6:
 							override_mode_right_dodge_4();
-						}
-					}
-					
-					GetACSWatcher().ACS_StaminaDrain(4);
-				}
-			}
-		}
-		else if (theInput.GetActionValue('GI_AxisLeftX') < -0.1 && theInput.GetActionValue('GI_AxisLeftY') == 0) 
-		{
-			if (ACS_can_dodge())
-			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
-					ACS_refresh_dodge_cooldown();
+						break;
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
-					{
-						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
-						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
+						case 5:
+							override_mode_right_dodge_3();
+						break;
 
-						GetWitcherPlayer().PlayEffectSingle( 'magic_step_r_new' );
-						GetWitcherPlayer().StopEffect( 'magic_step_r_new' );	
+						case 4:
+							override_mode_right_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_03');
+						break;
 
-						GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails' );
-						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
-					}
+						case 3:
+							override_mode_right_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_01');
+						break;
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						left_dodge_skate();
-					}
-					else
-					{
-						if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeLeftRollOptions', 2) == 0)
-						{
-							override_mode_left_dodge_1();
-						}
-						else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeLeftRollOptions', 2) == 1)
-						{
-							override_mode_left_dodge_2();
-						}
-						else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeLeftRollOptions', 2) == 2)
-						{
-							override_mode_left_dodge_3();
-						}
-						else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeLeftRollOptions', 2) == 3)
-						{
-							override_mode_left_dodge_4();
-						}
-					}
-					
-					GetACSWatcher().ACS_StaminaDrain(4);
-				}
-			}
-		}
-		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') > 0.1 )
-		{
-			if (ACS_can_dodge())
-			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
-					ACS_refresh_dodge_cooldown();
+						case 2:
+							override_mode_right_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_01');
+						break;
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
-					{
-						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
-						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
+						case 1:
+							override_mode_right_dodge_5();
+						break;
 
-						GetWitcherPlayer().PlayEffectSingle( 'magic_step_r_new' );
-						GetWitcherPlayer().StopEffect( 'magic_step_r_new' );	
-
-						GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails' );
-						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
-					}
-
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						right_dodge_skate();
-					}
-					else
-					{
-						if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeRightRollOptions', 2) == 0)
-						{
+						case 0:
 							override_mode_right_dodge_1();
+						break;
 
-							ACSDodgeMovementAdjust('forwardright');
-						}
-						else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeRightRollOptions', 2) == 1)
-						{
+						default:
+							override_mode_right_dodge_1();
+						break;
+					}
+
+					return;
+				}
+
+				switch( ACS_Settings_Main_Int('acs_default_geralt_moveset_dodge_and_roll_override_settings','acs_default_moveset_override_mode_right_roll_options', 11) )
+				{
+					case 13:
+						override_mode_left_dodge_extras('tw2_dodge_02_ACS');
+					break;
+
+					case 12:
+						override_mode_left_dodge_extras('tw2_dodge_01_ACS');
+					break;
+
+					case 11:
+						override_mode_right_dodge_6();
+					break;
+
+					case 10:
+						override_mode_right_dodge_2();
+					break;
+
+					case 9:
+						override_mode_right_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_03');
+					break;
+
+					case 8:
+						override_mode_right_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_02');
+					break;
+
+					case 7:
+						override_mode_right_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_02');
+					break;
+
+					case 6:
+						override_mode_right_dodge_4();
+					break;
+
+					case 5:
+						override_mode_right_dodge_3();
+					break;
+
+					case 4:
+						override_mode_right_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_03');
+					break;
+
+					case 3:
+						override_mode_right_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_01');
+					break;
+
+					case 2:
+						override_mode_right_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_01');
+					break;
+
+					case 1:
+						override_mode_right_dodge_5();
+					break;
+
+					case 0:
+						override_mode_right_dodge_1();
+					break;
+
+					default:
+						override_mode_right_dodge_1();
+					break;
+				}
+			}
+		}
+		else if (theInput.GetActionValue('GI_AxisLeftX') < -0.1 && theInput.GetActionValue('GI_AxisLeftY') == 0) // left
+		{
+			if (ACS_can_dodge())
+			{
+				ACS_refresh_dodge_cooldown();
+
+				if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
+				{
+					GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
+					GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
+
+					GetWitcherPlayer().PlayEffectSingle( 'magic_step_r_new' );
+					GetWitcherPlayer().StopEffect( 'magic_step_r_new' );	
+
+					GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails' );
+					GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
+				}
+
+				GetACSWatcher().ACS_StaminaDrain(4);
+
+				if (GetACSWatcher().silver_fast_stance)
+				{
+					override_mode_back_dodge_extras('tw1_silver_fast_dodge_left_long_ACS');
+
+					return;
+				}
+
+				if (GetACSWatcher().silver_group_stance)
+				{
+					override_mode_back_dodge_extras('tw1_silver_group_dodge_left_long_ACS');
+
+					return;
+				}
+
+				if (GetACSWatcher().silver_strong_stance)
+				{
+					override_mode_back_dodge_extras('tw1_silver_strong_dodge_left_long_ACS');
+
+					return;
+				}
+
+				if (GetACSWatcher().steel_fast_stance)
+				{
+					override_mode_back_dodge_extras('tw1_steel_fast_dodge_left_long_ACS');
+
+					return;
+				}
+
+				if (GetACSWatcher().steel_group_stance)
+				{
+					override_mode_back_dodge_extras('tw1_steel_group_dodge_left_long_ACS');
+
+					return;
+				}
+
+				if (GetACSWatcher().steel_strong_stance)
+				{
+					override_mode_back_dodge_extras('tw1_steel_strong_dodge_left_long_ACS');
+
+					return;
+				}
+
+				if (ACS_Settings_Main_Bool('acs_default_geralt_moveset_dodge_and_roll_override_settings','acs_default_moveset_override_roll_randomized_enabled', false))
+				{
+					switch( GetACSWatcher().GetRandomizedDodgeVariation() )
+					{
+						case 13:
+							override_mode_right_dodge_extras('tw2_dodge_02_ACS');
+						break;
+
+						case 12:
+							override_mode_right_dodge_extras('tw2_dodge_01_ACS');
+						break;
+
+						case 11:
+							override_mode_left_dodge_6();
+						break;
+
+						case 10:
+							override_mode_left_dodge_2();
+						break;
+
+						case 9:
+							override_mode_left_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_03');
+						break;
+
+						case 8:
+							override_mode_left_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_02');
+						break;
+
+						case 7:
+							override_mode_left_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_02');
+						break;
+
+						case 6:
+							override_mode_left_dodge_4();
+						break;
+
+						case 5:
+							override_mode_left_dodge_3();
+						break;
+
+						case 4:
+							override_mode_left_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_03');
+						break;
+
+						case 3:
+							override_mode_left_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_01');
+						break;
+
+						case 2:
+							override_mode_left_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_01');
+						break;
+
+						case 1:
+							override_mode_left_dodge_5();
+						break;
+
+						case 0:
+							override_mode_left_dodge_1();
+						break;
+
+						default:
+							override_mode_left_dodge_1();
+						break;
+					}
+
+					return;
+				}
+
+				switch( ACS_Settings_Main_Int('acs_default_geralt_moveset_dodge_and_roll_override_settings','acs_default_moveset_override_mode_left_roll_options', 11) )
+				{
+					case 13:
+						override_mode_right_dodge_extras('tw2_dodge_02_ACS');
+					break;
+
+					case 12:
+						override_mode_right_dodge_extras('tw2_dodge_01_ACS');
+					break;
+
+					case 11:
+						override_mode_left_dodge_6();
+					break;
+
+					case 10:
+						override_mode_left_dodge_2();
+					break;
+
+					case 9:
+						override_mode_left_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_03');
+					break;
+
+					case 8:
+						override_mode_left_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_02');
+					break;
+
+					case 7:
+						override_mode_left_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_02');
+					break;
+
+					case 6:
+						override_mode_left_dodge_4();
+					break;
+
+					case 5:
+						override_mode_left_dodge_3();
+					break;
+
+					case 4:
+						override_mode_left_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_03');
+					break;
+
+					case 3:
+						override_mode_left_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_01');
+					break;
+
+					case 2:
+						override_mode_left_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_01');
+					break;
+
+					case 1:
+						override_mode_left_dodge_5();
+					break;
+
+					case 0:
+						override_mode_left_dodge_1();
+					break;
+
+					default:
+						override_mode_left_dodge_1();
+					break;
+				}
+			}
+		}
+		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') > 0.1 ) // front right
+		{
+			if (ACS_can_dodge())
+			{
+				ACS_refresh_dodge_cooldown();
+
+				if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
+				{
+					GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
+					GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
+
+					GetWitcherPlayer().PlayEffectSingle( 'magic_step_r_new' );
+					GetWitcherPlayer().StopEffect( 'magic_step_r_new' );	
+
+					GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails' );
+					GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
+				}
+
+				GetACSWatcher().ACS_StaminaDrain(4);
+
+				if (GetACSWatcher().silver_fast_stance)
+				{
+					override_mode_right_dodge_extras('tw1_silver_fast_dodge_forward_long_ACS');
+
+					ACSDodgeMovementAdjust('forwardleft');
+
+					return;
+				}
+
+				if (GetACSWatcher().silver_group_stance)
+				{
+					override_mode_right_dodge_extras('tw1_silver_group_dodge_forward_long_ACS');
+
+					ACSDodgeMovementAdjust('forwardleft');
+
+					return;
+				}
+
+				if (GetACSWatcher().silver_strong_stance)
+				{
+					override_mode_right_dodge_extras('tw1_silver_strong_dodge_forward_long_ACS');
+
+					ACSDodgeMovementAdjust('forwardleft');
+
+					return;
+				}
+
+				if (GetACSWatcher().steel_fast_stance)
+				{
+					override_mode_right_dodge_extras('tw1_steel_fast_dodge_forward_long_ACS');
+
+					ACSDodgeMovementAdjust('forwardleft');
+
+					return;
+				}
+
+				if (GetACSWatcher().steel_group_stance)
+				{
+					override_mode_right_dodge_extras('tw1_steel_group_dodge_forward_long_ACS');
+
+					ACSDodgeMovementAdjust('forwardleft');
+
+					return;
+				}
+
+				if (GetACSWatcher().steel_strong_stance)
+				{
+					override_mode_right_dodge_extras('tw1_steel_strong_dodge_forward_long_ACS');
+
+					ACSDodgeMovementAdjust('forwardleft');
+
+					return;
+				}
+
+				if (ACS_Settings_Main_Bool('acs_default_geralt_moveset_dodge_and_roll_override_settings','acs_default_moveset_override_roll_randomized_enabled', false))
+				{
+					switch( GetACSWatcher().GetRandomizedDodgeVariation() )
+					{
+						case 13:
+							override_mode_back_right_dodge_extras('tw2_dodge_02_ACS');
+						break;
+
+						case 12:
+							override_mode_back_right_dodge_extras('tw2_dodge_01_ACS');
+						break;
+
+						case 11:
+							override_mode_right_dodge_6();
+
+							ACSDodgeMovementAdjust('forwardleft');
+						break;
+
+						case 10:
 							override_mode_right_dodge_2();
 
-							ACSDodgeMovementAdjust('forwardright');
-						}
-						else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeRightRollOptions', 2) == 2)
-						{
+							ACSDodgeMovementAdjust('forwardleft');
+						break;
+
+						case 9:
+							override_mode_front_right_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_03');
+						break;
+
+						case 8:
+							override_mode_front_right_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_02');
+						break;
+
+						case 7:
+							override_mode_front_right_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_02');
+						break;
+
+						case 6:
+							override_mode_front_dodge_4();
+
+							ACSDodgeMovementAdjust('forwardleft');
+						break;
+
+						case 5:
 							override_mode_right_dodge_3();
 
 							ACSDodgeMovementAdjust('forwardright');
-						}
-						else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeRightRollOptions', 2) == 3)
-						{
-							if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardRollOptions', 5) == 0)
-							{
-								override_mode_front_dodge_1();
-							}
-							else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardRollOptions', 5) == 1)
-							{
-								override_mode_front_dodge_2();
-							}
-							else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardRollOptions', 5) == 2)
-							{
-								override_mode_front_dodge_3();
-							}
-							else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardRollOptions', 5) == 3)
-							{
-								override_mode_front_dodge_4();
-							}
-							else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardRollOptions', 5) == 4)
-							{
-								override_mode_front_dodge_5();
-							}
-							else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardRollOptions', 5) == 5)
-							{
-								override_mode_front_dodge_6();
-							}
+						break;
+
+						case 4:
+							override_mode_front_right_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_03');
+						break;
+
+						case 3:
+							override_mode_front_right_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_01');
+						break;
+
+						case 2:
+							override_mode_front_right_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_01');
+						break;
+
+						case 1:
+							override_mode_right_dodge_5();
 
 							ACSDodgeMovementAdjust('forwardleft');
-						}
+						break;
+
+						case 0:
+							override_mode_right_dodge_1();
+
+							ACSDodgeMovementAdjust('forwardright');
+						break;
+
+						default:
+							override_mode_right_dodge_1();
+
+							ACSDodgeMovementAdjust('forwardright');
+						break;
 					}
-					
-					GetACSWatcher().ACS_StaminaDrain(4);
+
+					return;
+				}
+
+				switch( ACS_Settings_Main_Int('acs_default_geralt_moveset_dodge_and_roll_override_settings','acs_default_moveset_override_mode_right_roll_options', 11) )
+				{
+					case 13:
+						override_mode_back_right_dodge_extras('tw2_dodge_02_ACS');
+					break;
+
+					case 12:
+						override_mode_back_right_dodge_extras('tw2_dodge_01_ACS');
+					break;
+
+					case 11:
+						override_mode_right_dodge_6();
+
+						ACSDodgeMovementAdjust('forwardleft');
+					break;
+
+					case 10:
+						override_mode_right_dodge_2();
+
+						ACSDodgeMovementAdjust('forwardleft');
+					break;
+
+					case 9:
+						override_mode_front_right_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_03');
+					break;
+
+					case 8:
+						override_mode_front_right_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_02');
+					break;
+
+					case 7:
+						override_mode_front_right_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_02');
+					break;
+
+					case 6:
+						override_mode_front_dodge_4();
+
+						ACSDodgeMovementAdjust('forwardleft');
+					break;
+
+					case 5:
+						override_mode_right_dodge_3();
+
+						ACSDodgeMovementAdjust('forwardright');
+					break;
+
+					case 4:
+						override_mode_front_right_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_03');
+					break;
+
+					case 3:
+						override_mode_front_right_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_01');
+					break;
+
+					case 2:
+						override_mode_front_right_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_01');
+					break;
+
+					case 1:
+						override_mode_right_dodge_5();
+
+						ACSDodgeMovementAdjust('forwardleft');
+					break;
+
+					case 0:
+						override_mode_right_dodge_1();
+
+						ACSDodgeMovementAdjust('forwardright');
+					break;
+
+					default:
+						override_mode_right_dodge_1();
+
+						ACSDodgeMovementAdjust('forwardright');
+					break;
 				}
 			}
 		}
-		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') < -0.1 )
+		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') < -0.1 ) // front left
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
+				ACS_refresh_dodge_cooldown();
+
+				if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
+					GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
+					GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
+
+					GetWitcherPlayer().PlayEffectSingle( 'magic_step_r_new' );
+					GetWitcherPlayer().StopEffect( 'magic_step_r_new' );	
+
+					GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails' );
+					GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 				}
-				else
+
+				GetACSWatcher().ACS_StaminaDrain(4);
+
+				if (GetACSWatcher().silver_fast_stance)
 				{
-					ACS_refresh_dodge_cooldown();
+					override_mode_left_dodge_extras('tw1_silver_fast_dodge_forward_long_ACS');
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					ACSDodgeMovementAdjust('forwardright');
+
+					return;
+				}
+
+				if (GetACSWatcher().silver_group_stance)
+				{
+					override_mode_left_dodge_extras('tw1_silver_group_dodge_forward_long_ACS');
+
+					ACSDodgeMovementAdjust('forwardright');
+
+					return;
+				}
+
+				if (GetACSWatcher().silver_strong_stance)
+				{
+					override_mode_left_dodge_extras('tw1_silver_strong_dodge_forward_long_ACS');
+
+					ACSDodgeMovementAdjust('forwardright');
+
+					return;
+				}
+
+				if (GetACSWatcher().steel_fast_stance)
+				{
+					override_mode_left_dodge_extras('tw1_steel_fast_dodge_forward_long_ACS');
+
+					ACSDodgeMovementAdjust('forwardright');
+
+					return;
+				}
+
+				if (GetACSWatcher().steel_group_stance)
+				{
+					override_mode_left_dodge_extras('tw1_steel_group_dodge_forward_long_ACS');
+
+					ACSDodgeMovementAdjust('forwardright');
+
+					return;
+				}
+
+				if (GetACSWatcher().steel_strong_stance)
+				{
+					override_mode_left_dodge_extras('tw1_steel_strong_dodge_forward_long_ACS');
+
+					ACSDodgeMovementAdjust('forwardright');
+
+					return;
+				}
+
+				if (ACS_Settings_Main_Bool('acs_default_geralt_moveset_dodge_and_roll_override_settings','acs_default_moveset_override_roll_randomized_enabled', false))
+				{
+					switch( GetACSWatcher().GetRandomizedDodgeVariation() )
 					{
-						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
-						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
+						case 13:
+							override_mode_back_left_dodge_extras('tw2_dodge_02_ACS');
+						break;
 
-						GetWitcherPlayer().PlayEffectSingle( 'magic_step_r_new' );
-						GetWitcherPlayer().StopEffect( 'magic_step_r_new' );	
+						case 12:
+							override_mode_back_left_dodge_extras('tw2_dodge_01_ACS');
+						break;
 
-						GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails' );
-						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
-					}
+						case 11:
+							override_mode_left_dodge_6();
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						left_dodge_skate();
-					}
-					else
-					{
-						if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeLeftRollOptions', 2) == 0)
-						{
-							override_mode_left_dodge_1();
+							ACSDodgeMovementAdjust('forwardright');
+						break;
 
-							ACSDodgeMovementAdjust('forwardleft');
-						}
-						else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeLeftRollOptions', 2) == 1)
-						{
+						case 10:
 							override_mode_left_dodge_2();
 
-							ACSDodgeMovementAdjust('forwardleft');
-						}
-						else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeLeftRollOptions', 2) == 2)
-						{
+							ACSDodgeMovementAdjust('forwardright');
+						break;
+
+						case 9:
+							override_mode_front_left_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_03');
+						break;
+
+						case 8:
+							override_mode_front_left_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_02');
+						break;
+
+						case 7:
+							override_mode_front_left_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_02');
+						break;
+
+						case 6:
+							override_mode_front_dodge_4();
+
+							ACSDodgeMovementAdjust('forwardright');
+						break;
+
+						case 5:
 							override_mode_left_dodge_3();
 
 							ACSDodgeMovementAdjust('forwardleft');
-						}
-						else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeLeftRollOptions', 2) == 3)
-						{
-							if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardRollOptions', 5) == 0)
-							{
-								override_mode_front_dodge_1();
-							}
-							else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardRollOptions', 5) == 1)
-							{
-								override_mode_front_dodge_2();
-							}
-							else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardRollOptions', 5) == 2)
-							{
-								override_mode_front_dodge_3();
-							}
-							else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardRollOptions', 5) == 3)
-							{
-								override_mode_front_dodge_4();
-							}
-							else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardRollOptions', 5) == 4)
-							{
-								override_mode_front_dodge_5();
-							}
-							else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeForwardRollOptions', 5) == 5)
-							{
-								override_mode_front_dodge_6();
-							}
+						break;
+
+						case 4:
+							override_mode_front_left_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_03');
+						break;
+
+						case 3:
+							override_mode_front_left_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_01');
+						break;
+
+						case 2:
+							override_mode_front_left_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_01');
+						break;
+
+						case 1:
+							override_mode_left_dodge_5();
 
 							ACSDodgeMovementAdjust('forwardright');
-						}
+						break;
+
+						case 0:
+							override_mode_left_dodge_1();
+
+							ACSDodgeMovementAdjust('forwardleft');
+						break;
+
+						default:
+							override_mode_left_dodge_1();
+
+							ACSDodgeMovementAdjust('forwardleft');
+						break;
 					}
-					
-					GetACSWatcher().ACS_StaminaDrain(4);
+
+					return;
+				}
+
+				switch( ACS_Settings_Main_Int('acs_default_geralt_moveset_dodge_and_roll_override_settings','acs_default_moveset_override_mode_left_roll_options', 2) )
+				{
+					case 13:
+						override_mode_back_left_dodge_extras('tw2_dodge_02_ACS');
+					break;
+
+					case 12:
+						override_mode_back_left_dodge_extras('tw2_dodge_01_ACS');
+					break;
+
+					case 11:
+						override_mode_left_dodge_6();
+
+						ACSDodgeMovementAdjust('forwardright');
+					break;
+
+					case 10:
+						override_mode_left_dodge_2();
+
+						ACSDodgeMovementAdjust('forwardright');
+					break;
+
+					case 9:
+						override_mode_front_left_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_03');
+					break;
+
+					case 8:
+						override_mode_front_left_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_02');
+					break;
+
+					case 7:
+						override_mode_front_left_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_02');
+					break;
+
+					case 6:
+						override_mode_front_dodge_4();
+
+						ACSDodgeMovementAdjust('forwardright');
+					break;
+
+					case 5:
+						override_mode_left_dodge_3();
+
+						ACSDodgeMovementAdjust('forwardleft');
+					break;
+
+					case 4:
+						override_mode_front_left_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_03');
+					break;
+
+					case 3:
+						override_mode_front_left_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_01');
+					break;
+
+					case 2:
+						override_mode_front_left_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_01');
+					break;
+
+					case 1:
+						override_mode_left_dodge_5();
+
+						ACSDodgeMovementAdjust('forwardright');
+					break;
+
+					case 0:
+						override_mode_left_dodge_1();
+
+						ACSDodgeMovementAdjust('forwardleft');
+					break;
+
+					default:
+						override_mode_left_dodge_1();
+
+						ACSDodgeMovementAdjust('forwardleft');
+					break;
 				}
 			}
 		}
-		else if (theInput.GetActionValue('GI_AxisLeftY') < -0.1 && theInput.GetActionValue('GI_AxisLeftX') > 0.1 )
+		else if (theInput.GetActionValue('GI_AxisLeftY') < -0.1 && theInput.GetActionValue('GI_AxisLeftX') > 0.1 ) // back right
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
+				ACS_refresh_dodge_cooldown();
+
+				if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
+					GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
+					GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
+
+					GetWitcherPlayer().PlayEffectSingle( 'magic_step_r_new' );
+					GetWitcherPlayer().StopEffect( 'magic_step_r_new' );	
+
+					GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails' );
+					GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 				}
-				else
+
+				GetACSWatcher().ACS_StaminaDrain(4);
+
+				if (GetACSWatcher().silver_fast_stance)
 				{
-					ACS_refresh_dodge_cooldown();
+					override_mode_right_dodge_extras('tw1_silver_fast_dodge_back_long_ACS');
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					ACSDodgeMovementAdjust('backleft');
+
+					return;
+				}
+
+				if (GetACSWatcher().silver_group_stance)
+				{
+					override_mode_right_dodge_extras('tw1_silver_group_dodge_back_long_ACS');
+
+					ACSDodgeMovementAdjust('backleft');
+
+					return;
+				}
+
+				if (GetACSWatcher().silver_strong_stance)
+				{
+					override_mode_right_dodge_extras('tw1_silver_strong_dodge_back_long_ACS');
+
+					ACSDodgeMovementAdjust('backleft');
+
+					return;
+				}
+
+				if (GetACSWatcher().steel_fast_stance)
+				{
+					override_mode_right_dodge_extras('tw1_steel_fast_dodge_back_long_ACS');
+
+					ACSDodgeMovementAdjust('backleft');
+
+					return;
+				}
+
+				if (GetACSWatcher().steel_group_stance)
+				{
+					override_mode_right_dodge_extras('tw1_steel_group_dodge_back_long_ACS');
+
+					ACSDodgeMovementAdjust('backleft');
+
+					return;
+				}
+
+				if (GetACSWatcher().steel_strong_stance)
+				{
+					override_mode_right_dodge_extras('tw1_steel_strong_dodge_back_long_ACS');
+
+					ACSDodgeMovementAdjust('backleft');
+
+					return;
+				}
+
+				if (ACS_Settings_Main_Bool('acs_default_geralt_moveset_dodge_and_roll_override_settings','acs_default_moveset_override_roll_randomized_enabled', false))
+				{
+					switch( GetACSWatcher().GetRandomizedDodgeVariation() )
 					{
-						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
-						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
+						case 13:
+							override_mode_front_left_dodge_extras('tw2_dodge_02_ACS');
+						break;
 
-						GetWitcherPlayer().PlayEffectSingle( 'magic_step_r_new' );
-						GetWitcherPlayer().StopEffect( 'magic_step_r_new' );	
+						case 12:
+							override_mode_front_left_dodge_extras('tw2_dodge_01_ACS');
+						break;
 
-						GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails' );
-						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
-					}
+						case 11:
+							override_mode_back_dodge_6();
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						right_dodge_skate();
-					}
-					else
-					{
-						if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeRightRollOptions', 2) == 0)
-						{
+							ACSDodgeMovementAdjust('backleft');
+						break;
+
+						case 10:
+							override_mode_back_dodge_2();
+
+							ACSDodgeMovementAdjust('backleft');
+						break;
+
+						case 9:
+							override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_03');
+
+							ACSDodgeMovementAdjust('backleft');
+						break;
+
+						case 8:
+							override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_02');
+
+							ACSDodgeMovementAdjust('backleft');
+						break;
+
+						case 7:
+							override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_02');
+
+							ACSDodgeMovementAdjust('backleft');
+						break;
+
+						case 6:
+							override_mode_back_dodge_4();
+
+							ACSDodgeMovementAdjust('backleft');
+						break;
+
+						case 5:
+							override_mode_back_dodge_3();
+
+							ACSDodgeMovementAdjust('backleft');
+						break;
+
+						case 4:
+							override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_03');
+
+							ACSDodgeMovementAdjust('backleft');
+						break;
+
+						case 3:
+							override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_01');
+
+							ACSDodgeMovementAdjust('backleft');
+						break;
+
+						case 2:
+							override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_01');
+
+							ACSDodgeMovementAdjust('backleft');
+						break;
+
+						case 1:
+							override_mode_back_dodge_5();
+
+							ACSDodgeMovementAdjust('backleft');
+						break;
+
+						case 0:
 							override_mode_right_dodge_1();
 
 							ACSDodgeMovementAdjust('backright');
-						}
-						else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeRightRollOptions', 2) == 1)
-						{
-							override_mode_right_dodge_2();
+						break;
+
+						default:
+							override_mode_right_dodge_1();
 
 							ACSDodgeMovementAdjust('backright');
-						}
-						else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeRightRollOptions', 2) == 2)
-						{
-							override_mode_right_dodge_3();
-
-							ACSDodgeMovementAdjust('backright');
-						}
-						else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeRightRollOptions', 2) == 3)
-						{
-							override_mode_right_dodge_4();
-
-							ACSDodgeMovementAdjust('backleft');
-						}
+						break;
 					}
-					
-					GetACSWatcher().ACS_StaminaDrain(4);
+
+					return;
 				}
-			}
-		}
-		else if (theInput.GetActionValue('GI_AxisLeftX') < -0.1 && theInput.GetActionValue('GI_AxisLeftY') < -0.1 )
-		{
-			if (ACS_can_dodge())
-			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
+
+				switch( ACS_Settings_Main_Int('acs_default_geralt_moveset_dodge_and_roll_override_settings','acs_default_moveset_override_mode_right_roll_options', 11) )
 				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
-					ACS_refresh_dodge_cooldown();
+					case 13:
+						override_mode_front_left_dodge_extras('tw2_dodge_02_ACS');
+					break;
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
-					{
-						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
-						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
+					case 12:
+						override_mode_front_left_dodge_extras('tw2_dodge_01_ACS');
+					break;
 
-						GetWitcherPlayer().PlayEffectSingle( 'magic_step_r_new' );
-						GetWitcherPlayer().StopEffect( 'magic_step_r_new' );	
-
-						GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails' );
-						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
-					}
-
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						left_dodge_skate();
-					}
-					else
-					{
-						if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeLeftRollOptions', 2) == 0)
-						{
-							override_mode_left_dodge_1();
-
-							ACSDodgeMovementAdjust('backleft');
-						}
-						else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeLeftRollOptions', 2) == 1)
-						{
-							override_mode_left_dodge_2();
-
-							ACSDodgeMovementAdjust('backleft');
-						}
-						else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeLeftRollOptions', 2) == 2)
-						{
-							override_mode_left_dodge_3();
-
-							ACSDodgeMovementAdjust('backleft');
-						}
-						else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeLeftRollOptions', 2) == 3)
-						{
-							override_mode_left_dodge_4();
-
-							ACSDodgeMovementAdjust('backright');
-						}
-					}
-					
-					GetACSWatcher().ACS_StaminaDrain(4);
-				}
-			}
-		}
-		else
-		{
-			if (ACS_can_dodge())
-			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
-					ACS_refresh_dodge_cooldown();
-
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
-					{
-						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
-						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
-
-						GetWitcherPlayer().PlayEffectSingle( 'magic_step_r_new' );
-						GetWitcherPlayer().StopEffect( 'magic_step_r_new' );	
-
-						GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails' );
-						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
-					}
-
-					if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeNeutralRollOptions', 5) == 0)
-					{
-						override_mode_back_dodge_1();
-					}
-					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeNeutralRollOptions', 5) == 1)
-					{
-						override_mode_back_dodge_2();
-					}
-					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeNeutralRollOptions', 5) == 2)
-					{
-						override_mode_back_dodge_3();
-					}
-					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeNeutralRollOptions', 5) == 3)
-					{
-						override_mode_back_dodge_4();
-					}
-					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeNeutralRollOptions', 5) == 4)
-					{
-						override_mode_back_dodge_5();
-					}
-					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeNeutralRollOptions', 5) == 5)
-					{
+					case 11:
 						override_mode_back_dodge_6();
-					}
-					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeNeutralRollOptions', 5) == 6)
+
+						ACSDodgeMovementAdjust('backleft');
+					break;
+
+					case 10:
+						override_mode_back_dodge_2();
+
+						ACSDodgeMovementAdjust('backleft');
+					break;
+
+					case 9:
+						override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_03');
+
+						ACSDodgeMovementAdjust('backleft');
+					break;
+
+					case 8:
+						override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_02');
+
+						ACSDodgeMovementAdjust('backleft');
+					break;
+
+					case 7:
+						override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_02');
+
+						ACSDodgeMovementAdjust('backleft');
+					break;
+
+					case 6:
+						override_mode_back_dodge_4();
+
+						ACSDodgeMovementAdjust('backleft');
+					break;
+
+					case 5:
+						override_mode_back_dodge_3();
+
+						ACSDodgeMovementAdjust('backleft');
+					break;
+
+					case 4:
+						override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_03');
+
+						ACSDodgeMovementAdjust('backleft');
+					break;
+
+					case 3:
+						override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_01');
+
+						ACSDodgeMovementAdjust('backleft');
+					break;
+
+					case 2:
+						override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_01');
+
+						ACSDodgeMovementAdjust('backleft');
+					break;
+
+					case 1:
+						override_mode_back_dodge_5();
+
+						ACSDodgeMovementAdjust('backleft');
+					break;
+
+					case 0:
+						override_mode_right_dodge_1();
+
+						ACSDodgeMovementAdjust('backright');
+					break;
+
+					default:
+						override_mode_right_dodge_1();
+
+						ACSDodgeMovementAdjust('backright');
+					break;
+				}
+			}
+		}
+		else if (theInput.GetActionValue('GI_AxisLeftX') < -0.1 && theInput.GetActionValue('GI_AxisLeftY') < -0.1 ) // back left
+		{
+			if (ACS_can_dodge())
+			{
+				ACS_refresh_dodge_cooldown();
+
+				if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
+				{
+					GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
+					GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
+
+					GetWitcherPlayer().PlayEffectSingle( 'magic_step_r_new' );
+					GetWitcherPlayer().StopEffect( 'magic_step_r_new' );	
+
+					GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails' );
+					GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
+				}
+
+				GetACSWatcher().ACS_StaminaDrain(4);
+
+				if (GetACSWatcher().silver_fast_stance)
+				{
+					override_mode_left_dodge_extras('tw1_silver_fast_dodge_back_long_ACS');
+
+					ACSDodgeMovementAdjust('backright');
+
+					return;
+				}
+
+				if (GetACSWatcher().silver_group_stance)
+				{
+					override_mode_left_dodge_extras('tw1_silver_group_dodge_back_long_ACS');
+
+					ACSDodgeMovementAdjust('backright');
+
+					return;
+				}
+
+				if (GetACSWatcher().silver_strong_stance)
+				{
+					override_mode_left_dodge_extras('tw1_silver_strong_dodge_back_long_ACS');
+
+					ACSDodgeMovementAdjust('backright');
+
+					return;
+				}
+
+				if (GetACSWatcher().steel_fast_stance)
+				{
+					override_mode_left_dodge_extras('tw1_steel_fast_dodge_back_long_ACS');
+
+					ACSDodgeMovementAdjust('backright');
+
+					return;
+				}
+
+				if (GetACSWatcher().steel_group_stance)
+				{
+					override_mode_left_dodge_extras('tw1_steel_group_dodge_back_long_ACS');
+
+					ACSDodgeMovementAdjust('backright');
+
+					return;
+				}
+
+				if (GetACSWatcher().steel_strong_stance)
+				{
+					override_mode_left_dodge_extras('tw1_steel_strong_dodge_back_long_ACS');
+
+					ACSDodgeMovementAdjust('backright');
+
+					return;
+				}
+
+				if (ACS_Settings_Main_Bool('acs_default_geralt_moveset_dodge_and_roll_override_settings','acs_default_moveset_override_roll_randomized_enabled', false))
+				{
+					switch( GetACSWatcher().GetRandomizedDodgeVariation() )
 					{
-						override_mode_back_dodge_7();
+						case 13:
+							override_mode_front_right_dodge_extras('tw2_dodge_02_ACS');
+						break;
+
+						case 12:
+							override_mode_front_right_dodge_extras('tw2_dodge_01_ACS');
+						break;
+
+						case 11:
+							override_mode_back_dodge_6();
+
+							ACSDodgeMovementAdjust('backright');
+						break;
+
+						case 10:
+							override_mode_back_dodge_2();
+
+							ACSDodgeMovementAdjust('backright');
+						break;
+
+						case 9:
+							override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_03');
+
+							ACSDodgeMovementAdjust('backright');
+						break;
+
+						case 8:
+							override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_02');
+
+							ACSDodgeMovementAdjust('backright');
+						break;
+
+						case 7:
+							override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_02');
+
+							ACSDodgeMovementAdjust('backright');
+
+						break;
+
+						case 6:
+							override_mode_back_dodge_4();
+
+							ACSDodgeMovementAdjust('backright');
+						break;
+
+						case 5:
+							override_mode_back_dodge_3();
+
+							ACSDodgeMovementAdjust('backright');
+						break;
+
+						case 4:
+							override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_03');
+
+							ACSDodgeMovementAdjust('backright');
+						break;
+
+						case 3:
+							override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_01');
+
+							ACSDodgeMovementAdjust('backright');
+						break;
+
+						case 2:
+							override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_01');
+
+							ACSDodgeMovementAdjust('backright');
+						break;
+
+						case 1:
+							override_mode_back_dodge_5();
+
+							ACSDodgeMovementAdjust('backright');
+						break;
+
+						case 0:
+							override_mode_left_dodge_1();
+
+							ACSDodgeMovementAdjust('backleft');
+						break;
+
+						default:
+							override_mode_left_dodge_1();
+
+							ACSDodgeMovementAdjust('backleft');
+						break;
 					}
-					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeNeutralRollOptions', 5) == 7)
+
+					return;
+				}
+
+				switch( ACS_Settings_Main_Int('acs_default_geralt_moveset_dodge_and_roll_override_settings','acs_default_moveset_override_mode_left_roll_options', 11) )
+				{
+					case 13:
+						override_mode_front_right_dodge_extras('tw2_dodge_02_ACS');
+					break;
+
+					case 12:
+						override_mode_front_right_dodge_extras('tw2_dodge_01_ACS');
+					break;
+
+					case 11:
+						override_mode_back_dodge_6();
+
+						ACSDodgeMovementAdjust('backright');
+					break;
+
+					case 10:
+						override_mode_back_dodge_2();
+
+						ACSDodgeMovementAdjust('backright');
+					break;
+
+					case 9:
+						override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_03');
+
+						ACSDodgeMovementAdjust('backright');
+					break;
+
+					case 8:
+						override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_02');
+
+						ACSDodgeMovementAdjust('backright');
+					break;
+
+					case 7:
+						override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_02');
+
+						ACSDodgeMovementAdjust('backright');
+
+					break;
+
+					case 6:
+						override_mode_back_dodge_4();
+
+						ACSDodgeMovementAdjust('backright');
+					break;
+
+					case 5:
+						override_mode_back_dodge_3();
+
+						ACSDodgeMovementAdjust('backright');
+					break;
+
+					case 4:
+						override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_03');
+
+						ACSDodgeMovementAdjust('backright');
+					break;
+
+					case 3:
+						override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_01');
+
+						ACSDodgeMovementAdjust('backright');
+					break;
+
+					case 2:
+						override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_01');
+
+						ACSDodgeMovementAdjust('backright');
+					break;
+
+					case 1:
+						override_mode_back_dodge_5();
+
+						ACSDodgeMovementAdjust('backright');
+					break;
+
+					case 0:
+						override_mode_left_dodge_1();
+
+						ACSDodgeMovementAdjust('backleft');
+					break;
+
+					default:
+						override_mode_left_dodge_1();
+
+						ACSDodgeMovementAdjust('backleft');
+					break;
+				}
+			}
+		}
+		else // neutral
+		{
+			if (ACS_can_dodge())
+			{
+				ACS_refresh_dodge_cooldown();
+
+				if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
+				{
+					GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
+					GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
+
+					GetWitcherPlayer().PlayEffectSingle( 'magic_step_r_new' );
+					GetWitcherPlayer().StopEffect( 'magic_step_r_new' );	
+
+					GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails' );
+					GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
+				}
+
+				GetACSWatcher().ACS_StaminaDrain(4);
+
+				if (GetACSWatcher().silver_fast_stance)
+				{
+					override_mode_back_dodge_extras('tw1_silver_fast_dodge_back_long_ACS');
+
+					return;
+				}
+
+				if (GetACSWatcher().silver_group_stance)
+				{
+					override_mode_back_dodge_extras('tw1_silver_group_dodge_back_long_ACS');
+
+					return;
+				}
+
+				if (GetACSWatcher().silver_strong_stance)
+				{
+					override_mode_back_dodge_extras('tw1_silver_strong_dodge_back_long_ACS');
+
+					return;
+				}
+
+				if (GetACSWatcher().steel_fast_stance)
+				{
+					override_mode_back_dodge_extras('tw1_steel_fast_dodge_back_long_ACS');
+
+					return;
+				}
+
+				if (GetACSWatcher().steel_group_stance)
+				{
+					override_mode_back_dodge_extras('tw1_steel_group_dodge_back_long_ACS');
+
+					return;
+				}
+
+				if (GetACSWatcher().steel_strong_stance)
+				{
+					override_mode_back_dodge_extras('tw1_steel_strong_dodge_back_long_ACS');
+
+					return;
+				}
+
+				if (ACS_Settings_Main_Bool('acs_default_geralt_moveset_dodge_and_roll_override_settings','acs_default_moveset_override_roll_randomized_enabled', false))
+				{
+					switch( GetACSWatcher().GetRandomizedDodgeVariation() )
 					{
-						override_mode_back_dodge_8();
+						case 13:
+							override_mode_orient_back_dodge_extras('tw2_dodge_02_ACS');
+						break;
+
+						case 12:
+							override_mode_orient_back_dodge_extras('tw2_dodge_01_ACS');
+						break;
+
+						case 11:
+							override_mode_back_dodge_6();
+						break;
+
+						case 10:
+							override_mode_back_dodge_2();
+						break;
+
+						case 9:
+							override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_03');
+						break;
+
+						case 8:
+							override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_02');
+						break;
+
+						case 7:
+							override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_02');
+						break;
+
+						case 6:
+							override_mode_back_dodge_4();
+						break;
+
+						case 5:
+							override_mode_back_dodge_3();
+						break;
+
+						case 4:
+							override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_03');
+						break;
+
+						case 3:
+							override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_01');
+						break;
+
+						case 2:
+							override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_01');
+						break;
+
+						case 1:
+							override_mode_back_dodge_5();
+						break;
+
+						case 0:
+							override_mode_back_dodge_1();
+						break;
+
+						default:
+							override_mode_back_dodge_1();
+						break;
 					}
-					else if (ACS_Settings_Main_Int('EHmodDefaultGeraltMovesetDodgeAndRollOverrideSettings','EHmodDefaultMovesetOverrideModeNeutralRollOptions', 5) == 8)
-					{
-						override_mode_back_dodge_9();
-					}
-					
-					GetACSWatcher().ACS_StaminaDrain(4);
+
+					return;
+				}
+
+				switch( ACS_Settings_Main_Int('acs_default_geralt_moveset_dodge_and_roll_override_settings','acs_default_moveset_override_mode_neutral_roll_options', 11) )
+				{
+					case 13:
+						override_mode_orient_back_dodge_extras('tw2_dodge_02_ACS');
+					break;
+
+					case 12:
+						override_mode_orient_back_dodge_extras('tw2_dodge_01_ACS');
+					break;
+
+					case 11:
+						override_mode_back_dodge_6();
+					break;
+
+					case 10:
+						override_mode_back_dodge_2();
+					break;
+
+					case 9:
+						override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_03');
+					break;
+
+					case 8:
+						override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_02');
+					break;
+
+					case 7:
+						override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_02');
+					break;
+
+					case 6:
+						override_mode_back_dodge_4();
+					break;
+
+					case 5:
+						override_mode_back_dodge_3();
+					break;
+
+					case 4:
+						override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_03');
+					break;
+
+					case 3:
+						override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_lp_01');
+					break;
+
+					case 2:
+						override_mode_back_dodge_extras('man_geralt_sword_dodge_back_337cm_rp_01');
+					break;
+
+					case 1:
+						override_mode_back_dodge_5();
+					break;
+
+					case 0:
+						override_mode_back_dodge_1();
+					break;
+
+					default:
+						override_mode_back_dodge_1();
+					break;
 				}
 			}
 		}
@@ -5203,19 +5933,320 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	latent function override_mode_back_dodge_1()
-	{	
-		ticket = movementAdjustor.GetRequest( 'override_mode_back_dodge_1');
+	latent function geralt_moveset_fist_roll_override_mode()
+	{
+		if (theInput.GetActionValue('GI_AxisLeftY') < -0.1 && theInput.GetActionValue('GI_AxisLeftX') == 0  )
+		{
+			if (ACS_can_dodge())
+			{
+				ACS_refresh_dodge_cooldown();
+
+				if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
+				{
+					GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
+					GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
+
+					GetWitcherPlayer().PlayEffectSingle( 'magic_step_r_new' );
+					GetWitcherPlayer().StopEffect( 'magic_step_r_new' );	
+
+					GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails' );
+					GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
+				}
+
+				override_mode_fist_regular_dodge();
+				
+				GetACSWatcher().ACS_StaminaDrain(4);
+				
+			}	
+		}
+		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') == 0)
+		{
+			if (ACS_can_dodge())
+			{
+				ACS_refresh_dodge_cooldown();
+
+				if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
+				{
+					GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
+					GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
+
+					GetWitcherPlayer().PlayEffectSingle( 'magic_step_r_new' );
+					GetWitcherPlayer().StopEffect( 'magic_step_r_new' );	
+
+					GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails' );
+					GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
+				}
+
+
+				override_mode_fist_front_dodge();
+				
+				GetACSWatcher().ACS_StaminaDrain(4);
+			}
+		}
+		else if (theInput.GetActionValue('GI_AxisLeftX') > 0.1 && theInput.GetActionValue('GI_AxisLeftY') == 0 )
+		{
+			if (ACS_can_dodge())
+			{
+				ACS_refresh_dodge_cooldown();
+
+				if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
+				{
+					GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
+					GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
+
+					GetWitcherPlayer().PlayEffectSingle( 'magic_step_r_new' );
+					GetWitcherPlayer().StopEffect( 'magic_step_r_new' );	
+
+					GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails' );
+					GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
+				}
+
+
+				override_mode_fist_right_dodge();
+				
+				GetACSWatcher().ACS_StaminaDrain(4);
+			}
+		}
+		else if (theInput.GetActionValue('GI_AxisLeftX') < -0.1 && theInput.GetActionValue('GI_AxisLeftY') == 0) 
+		{
+			if (ACS_can_dodge())
+			{
+				ACS_refresh_dodge_cooldown();
+
+				if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
+				{
+					GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
+					GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
+
+					GetWitcherPlayer().PlayEffectSingle( 'magic_step_r_new' );
+					GetWitcherPlayer().StopEffect( 'magic_step_r_new' );	
+
+					GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails' );
+					GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
+				}
+
+
+				override_mode_fist_left_dodge();
+				
+				GetACSWatcher().ACS_StaminaDrain(4);
+			}
+		}
+		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') > 0.1 )
+		{
+			if (ACS_can_dodge())
+			{
+				ACS_refresh_dodge_cooldown();
+
+				if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
+				{
+					GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
+					GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
+
+					GetWitcherPlayer().PlayEffectSingle( 'magic_step_r_new' );
+					GetWitcherPlayer().StopEffect( 'magic_step_r_new' );	
+
+					GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails' );
+					GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
+				}
+
+
+				override_mode_fist_right_dodge();
+
+				ACSDodgeMovementAdjust('forwardright');
+				
+				GetACSWatcher().ACS_StaminaDrain(4);
+			}
+		}
+		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') < -0.1 )
+		{
+			if (ACS_can_dodge())
+			{
+				ACS_refresh_dodge_cooldown();
+
+				if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
+				{
+					GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
+					GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
+
+					GetWitcherPlayer().PlayEffectSingle( 'magic_step_r_new' );
+					GetWitcherPlayer().StopEffect( 'magic_step_r_new' );	
+
+					GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails' );
+					GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
+				}
+
+
+				override_mode_fist_left_dodge();
+
+				ACSDodgeMovementAdjust('forwardleft');
+
+				GetACSWatcher().ACS_StaminaDrain(4);
+			}
+		}
+		else if (theInput.GetActionValue('GI_AxisLeftY') < -0.1 && theInput.GetActionValue('GI_AxisLeftX') > 0.1 )
+		{
+			if (ACS_can_dodge())
+			{
+				ACS_refresh_dodge_cooldown();
+
+				if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
+				{
+					GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
+					GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
+
+					GetWitcherPlayer().PlayEffectSingle( 'magic_step_r_new' );
+					GetWitcherPlayer().StopEffect( 'magic_step_r_new' );	
+
+					GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails' );
+					GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
+				}
+
+
+				override_mode_fist_right_dodge();
+
+				ACSDodgeMovementAdjust('backright');
+				
+				GetACSWatcher().ACS_StaminaDrain(4);
+			}
+		}
+		else if (theInput.GetActionValue('GI_AxisLeftX') < -0.1 && theInput.GetActionValue('GI_AxisLeftY') < -0.1 )
+		{
+			if (ACS_can_dodge())
+			{
+				ACS_refresh_dodge_cooldown();
+
+				if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
+				{
+					GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
+					GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
+
+					GetWitcherPlayer().PlayEffectSingle( 'magic_step_r_new' );
+					GetWitcherPlayer().StopEffect( 'magic_step_r_new' );	
+
+					GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails' );
+					GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
+				}
+
+
+				override_mode_fist_left_dodge();
+
+				ACSDodgeMovementAdjust('backleft');
+				
+				GetACSWatcher().ACS_StaminaDrain(4);
+			}
+		}
+		else
+		{
+			if (ACS_can_dodge())
+			{
+				ACS_refresh_dodge_cooldown();
+
+				if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
+				{
+					GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
+					GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
+
+					GetWitcherPlayer().PlayEffectSingle( 'magic_step_r_new' );
+					GetWitcherPlayer().StopEffect( 'magic_step_r_new' );	
+
+					GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails' );
+					GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
+				}
+
+
+				override_mode_fist_regular_dodge();
+				
+				GetACSWatcher().ACS_StaminaDrain(4);
+			}
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	latent function override_mode_fist_regular_dodge()
+	{
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'override_mode_back_dodge_1' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'override_mode_back_dodge_1' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.1 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.25 / theGame.GetTimeScale());
+		
+		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
+		
+		movementAdjustor.MaxLocationAdjustmentSpeed( ticket, 50000000 );
+
+		GetACSWatcher().dodge_timer_actual();
+		
+		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
+		{	
+			movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) );
+					
+			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_fistfight_dodge1_back_425cm', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
+			
+			if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * -2.5 ) + theCamera.GetCameraDirection() * -2.5 );		
+		}
+		else
+		{			
+			movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) );
+				
+			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_fistfight_dodge1_back_425cm', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
+			
+			if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * -2.5 ) + theCamera.GetCameraDirection() * -2.5 );		
+		}
+	}
+
+	latent function override_mode_fist_front_dodge()
+	{	
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
+		
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
+		
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
+
+		GetWitcherPlayer().ResetRawPlayerHeading();
+		
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
+		
+		movementAdjustor.AdjustmentDuration( ticket, 0.25 / theGame.GetTimeScale());
+		
+		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
+		
+		movementAdjustor.MaxLocationAdjustmentSpeed( ticket, 50000000 );
+
+		GetACSWatcher().dodge_timer_attack_actual();
+
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
+								
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
+				
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
+
+		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) );
+			
+		GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_fistfight_dodge1_forward_425cm', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
+
+		if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * 2.5 ) + theCamera.GetCameraDirection() * 2.5 );	
+	}
+
+	latent function override_mode_fist_left_dodge()
+	{	
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
+		
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
+		
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
+
+		GetWitcherPlayer().ResetRawPlayerHeading();
+		
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
+		
+		movementAdjustor.AdjustmentDuration( ticket, 0.25 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -5225,11 +6256,79 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) );
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
+
+		GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_fistfight_dodge1_left_425cm', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
+
+		if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ( ACSFixZAxis(GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * -2.25 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -2.25) );
+	}
+
+	latent function override_mode_fist_right_dodge()
+	{	
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
+		
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
+		
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
+
+		GetWitcherPlayer().ResetRawPlayerHeading();
+		
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
+		
+		movementAdjustor.AdjustmentDuration( ticket, 0.25 / theGame.GetTimeScale());
+		
+		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
+		
+		movementAdjustor.MaxLocationAdjustmentSpeed( ticket, 50000000 );
+
+		GetACSWatcher().dodge_timer_attack_actual();
+
+		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) );
+
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
+								
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
+				
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
+
+		GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_fistfight_dodge1_right_425cm', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
+
+		if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ( ACSFixZAxis(GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * 2.25 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * 2.25) );
+	}
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	latent function override_mode_back_dodge_1()
+	{	
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
+		
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
+		
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
+
+		GetWitcherPlayer().ResetRawPlayerHeading();
+		
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
+		
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
+		
+		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
+		
+		movementAdjustor.MaxLocationAdjustmentSpeed( ticket, 50000000 );
+
+		GetACSWatcher().dodge_timer_attack_actual();
+
+		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) );
+
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
+								
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
+				
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 
 		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
 		{	
@@ -5264,17 +6363,17 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 	latent function override_mode_back_dodge_2()
 	{	
-		ticket = movementAdjustor.GetRequest( 'override_mode_back_dodge_2');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'override_mode_back_dodge_2' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'override_mode_back_dodge_2' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.1 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -5284,11 +6383,11 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) );
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 
 		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
 		{	
@@ -5300,19 +6399,19 @@ state ACS_RollInit_Engage in cACS_RollInit
 		}
 	}
 
-	latent function override_mode_back_dodge_3()
+	latent function override_mode_back_dodge_5()
 	{	
-		ticket = movementAdjustor.GetRequest( 'override_mode_back_dodge_3');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'override_mode_back_dodge_3' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'override_mode_back_dodge_3' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.1 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -5322,11 +6421,11 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) );
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 
 		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
 		{	
@@ -5361,17 +6460,17 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 	latent function override_mode_back_dodge_4()
 	{	
-		ticket = movementAdjustor.GetRequest( 'override_mode_back_dodge_4');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'override_mode_back_dodge_4' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'override_mode_back_dodge_4' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.1 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -5381,56 +6480,28 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) );
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 
-		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
-		{	
-			if( targetDistance <= 3*3 ) 
-			{
-				GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_back_337m', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
-			}
-			else
-			{
-				if( RandF() < 0.5 ) 
-				{
-					GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_dodge_back_lp_337m', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
-				}
-				else
-				{
-					GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_dodge_back_rp_337m', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
-				}
-			}
-		}
-		else
-		{				
-			if( RandF() < 0.5 ) 
-			{
-				GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_dodge_back_lp_337m', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
-			}
-			else
-			{
-				GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_dodge_back_rp_337m', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
-			}
-		}
+		GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_back_337m', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
 	}
 
-	latent function override_mode_back_dodge_5()
+	latent function override_mode_back_dodge_3()
 	{	
-		ticket = movementAdjustor.GetRequest( 'override_mode_back_dodge_5');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'override_mode_back_dodge_5' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'override_mode_back_dodge_5' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.1 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -5440,11 +6511,11 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) );
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 
 		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
 		{	
@@ -5458,17 +6529,17 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 	latent function override_mode_back_dodge_6()
 	{	
-		ticket = movementAdjustor.GetRequest( 'override_mode_back_dodge_6');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'override_mode_back_dodge_6' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'override_mode_back_dodge_6' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.1 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -5478,11 +6549,11 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) );
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 
 		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
 		{	
@@ -5508,133 +6579,19 @@ state ACS_RollInit_Engage in cACS_RollInit
 		}
 	}
 
-	latent function override_mode_back_dodge_7()
-	{	
-		ticket = movementAdjustor.GetRequest( 'override_mode_back_dodge_7');
-		
-		movementAdjustor.CancelByName( 'override_mode_back_dodge_7' );
-		
-		movementAdjustor.CancelAll();
-
-		GetWitcherPlayer().ResetRawPlayerHeading();
-		
-		ticket = movementAdjustor.CreateNewRequest( 'override_mode_back_dodge_7' );
-		
-		movementAdjustor.AdjustmentDuration( ticket, 0.1 );
-		
-		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
-		
-		movementAdjustor.MaxLocationAdjustmentSpeed( ticket, 50000000 );
-
-		GetACSWatcher().dodge_timer_attack_actual();
-
-		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) );
-
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
-								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
-				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
-
-		if( RandF() < 0.5 ) 
-		{
-			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_back_337cm_lp_01', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
-		}
-		else
-		{
-			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_back_337cm_rp_01', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
-		}
-	}
-
-	latent function override_mode_back_dodge_8()
-	{	
-		ticket = movementAdjustor.GetRequest( 'override_mode_back_dodge_8');
-		
-		movementAdjustor.CancelByName( 'override_mode_back_dodge_8' );
-		
-		movementAdjustor.CancelAll();
-
-		GetWitcherPlayer().ResetRawPlayerHeading();
-		
-		ticket = movementAdjustor.CreateNewRequest( 'override_mode_back_dodge_8' );
-		
-		movementAdjustor.AdjustmentDuration( ticket, 0.1 );
-		
-		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
-		
-		movementAdjustor.MaxLocationAdjustmentSpeed( ticket, 50000000 );
-
-		GetACSWatcher().dodge_timer_attack_actual();
-
-		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) );
-
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
-								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
-				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
-
-		if( RandF() < 0.5 ) 
-		{
-			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_back_337cm_lp_02', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
-		}
-		else
-		{
-			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_back_337cm_rp_02', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
-		}
-	}
-
-	latent function override_mode_back_dodge_9()
-	{	
-		ticket = movementAdjustor.GetRequest( 'override_mode_back_dodge_9');
-		
-		movementAdjustor.CancelByName( 'override_mode_back_dodge_9' );
-		
-		movementAdjustor.CancelAll();
-
-		GetWitcherPlayer().ResetRawPlayerHeading();
-		
-		ticket = movementAdjustor.CreateNewRequest( 'override_mode_back_dodge_9' );
-		
-		movementAdjustor.AdjustmentDuration( ticket, 0.1 );
-		
-		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
-		
-		movementAdjustor.MaxLocationAdjustmentSpeed( ticket, 50000000 );
-
-		GetACSWatcher().dodge_timer_attack_actual();
-
-		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) );
-
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
-								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
-				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
-
-		if( RandF() < 0.5 ) 
-		{
-			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_back_337cm_lp_03', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
-		}
-		else
-		{
-			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_back_337cm_rp_03', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
-		}
-	}
-
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	latent function override_mode_front_dodge_1()
 	{
-		ticket = movementAdjustor.GetRequest( 'override_mode_front_dodge_1');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'override_mode_front_dodge_1' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
-		ticket = movementAdjustor.CreateNewRequest( 'override_mode_front_dodge_1' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.1 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000 );
 		
@@ -5642,11 +6599,11 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetACSWatcher().dodge_timer_attack_actual();
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 		
 		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
 		{	
@@ -5654,11 +6611,11 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 			if( RandF() < 0.5 ) 
 			{
-				GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_forward_350m', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
+				GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_forward_300m_lp', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
 			}
 			else
 			{
-				GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_forward_350m_lp', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
+				GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_forward_300m', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
 			}
 		}
 		else
@@ -5667,26 +6624,26 @@ state ACS_RollInit_Engage in cACS_RollInit
 				
 			if( RandF() < 0.5 ) 
 			{
-				GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_forward_350m', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
+				GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_forward_300m_lp', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
 			}
 			else
 			{
-				GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_forward_350m_lp', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
+				GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_forward_300m', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
 			}
 		}
 	}
 
 	latent function override_mode_front_dodge_2()
 	{
-		ticket = movementAdjustor.GetRequest( 'override_mode_front_dodge_2');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'override_mode_front_dodge_2' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
-		ticket = movementAdjustor.CreateNewRequest( 'override_mode_front_dodge_2' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.1 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000 );
 		
@@ -5694,11 +6651,11 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetACSWatcher().dodge_timer_attack_actual();
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 		
 		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
 		{	
@@ -5714,17 +6671,17 @@ state ACS_RollInit_Engage in cACS_RollInit
 		}
 	}
 
-	latent function override_mode_front_dodge_3()
+	latent function override_mode_front_dodge_5()
 	{
-		ticket = movementAdjustor.GetRequest( 'override_mode_front_dodge_3');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'override_mode_front_dodge_3' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
-		ticket = movementAdjustor.CreateNewRequest( 'override_mode_front_dodge_3' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.1 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000 );
 		
@@ -5732,11 +6689,11 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetACSWatcher().dodge_timer_attack_actual();
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 		
 		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
 		{	
@@ -5768,15 +6725,15 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 	latent function override_mode_front_dodge_4()
 	{
-		ticket = movementAdjustor.GetRequest( 'override_mode_front_dodge_4');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'override_mode_front_dodge_4' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
-		ticket = movementAdjustor.CreateNewRequest( 'override_mode_front_dodge_4' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.1 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000 );
 		
@@ -5784,23 +6741,23 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetACSWatcher().dodge_timer_attack_actual();
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
-		
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
+
 		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
 		{	
 			movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) );
 
 			if( RandF() < 0.5 ) 
 			{
-				GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_forward_300m_lp', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
+				GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_forward_350m', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
 			}
 			else
 			{
-				GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_forward_300m', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
+				GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_forward_350m_lp', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
 			}
 		}
 		else
@@ -5809,26 +6766,26 @@ state ACS_RollInit_Engage in cACS_RollInit
 				
 			if( RandF() < 0.5 ) 
 			{
-				GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_forward_300m_lp', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
+				GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_forward_350m', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
 			}
 			else
 			{
-				GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_forward_300m', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
+				GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_forward_350m_lp', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
 			}
 		}
 	}
 
-	latent function override_mode_front_dodge_5()
+	latent function override_mode_front_dodge_3()
 	{
-		ticket = movementAdjustor.GetRequest( 'override_mode_front_dodge_5');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'override_mode_front_dodge_5' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
-		ticket = movementAdjustor.CreateNewRequest( 'override_mode_front_dodge_5' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.1 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000 );
 		
@@ -5836,11 +6793,11 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetACSWatcher().dodge_timer_attack_actual();
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 		
 		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
 		{	
@@ -5872,15 +6829,15 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 	latent function override_mode_front_dodge_6()
 	{
-		ticket = movementAdjustor.GetRequest( 'override_mode_front_dodge_6');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'override_mode_front_dodge_6' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
-		ticket = movementAdjustor.CreateNewRequest( 'override_mode_front_dodge_6' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.1 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000 );
 		
@@ -5888,11 +6845,11 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetACSWatcher().dodge_timer_attack_actual();
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 		
 		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
 		{	
@@ -5910,19 +6867,19 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	latent function override_mode_right_dodge_1()
-	{
-		ticket = movementAdjustor.GetRequest( 'override_mode_right_dodge_1');
+	latent function override_mode_front_dodge_extras( anim_name : name )
+	{	
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'override_mode_right_dodge_1' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'override_mode_right_dodge_1' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.25 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -5930,32 +6887,583 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetACSWatcher().dodge_timer_attack_actual();
 
-		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraForward() * 1.1 ) );
+		if (RandF() < 0.5)
+		{
+			movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) + 180 );
+		}
+		else
+		{
+			movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) - 180 );
+		}
+		
 
-		movementAdjustor.SlideTo( ticket, ( ACSPlayerFixZAxis(GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * 1.25 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * 1.25) );
-
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
+
+		GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( anim_name, 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
+	}
+
+	latent function override_mode_front_right_dodge_extras( anim_name : name )
+	{	
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
+		
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
+		
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
+
+		GetWitcherPlayer().ResetRawPlayerHeading();
+		
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
+		
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
+		
+		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
+		
+		movementAdjustor.MaxLocationAdjustmentSpeed( ticket, 50000000 );
+
+		GetACSWatcher().dodge_timer_attack_actual();
+
+		if (RandF() < 0.5)
+		{
+			movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) + 135 );
+		}
+		else
+		{
+			movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) - 225 );
+		}
+		
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
+								
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
+				
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
+
+		GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( anim_name, 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
+	}
+
+	latent function override_mode_front_left_dodge_extras( anim_name : name )
+	{	
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
+		
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
+		
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
+
+		GetWitcherPlayer().ResetRawPlayerHeading();
+		
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
+		
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
+		
+		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
+		
+		movementAdjustor.MaxLocationAdjustmentSpeed( ticket, 50000000 );
+
+		GetACSWatcher().dodge_timer_attack_actual();
+
+		if (RandF() < 0.5)
+		{
+			movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) + 225 );
+		}
+		else
+		{
+			movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) - 135 );
+		}
+		
+
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
+								
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
+				
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
+
+		GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( anim_name, 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
+	}
+
+	latent function override_mode_back_right_dodge_extras( anim_name : name )
+	{	
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
+		
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
+		
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
+
+		GetWitcherPlayer().ResetRawPlayerHeading();
+		
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
+		
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
+		
+		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
+		
+		movementAdjustor.MaxLocationAdjustmentSpeed( ticket, 50000000 );
+
+		GetACSWatcher().dodge_timer_attack_actual();
+
+		if (RandF() < 0.5)
+		{
+			movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) + 315 );
+		}
+		else
+		{
+			movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) - 45 );
+		}
+		
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
+								
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
+				
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
+
+		GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( anim_name, 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
+	}
+
+	latent function override_mode_back_left_dodge_extras( anim_name : name )
+	{	
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
+		
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
+		
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
+
+		GetWitcherPlayer().ResetRawPlayerHeading();
+		
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
+		
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
+		
+		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
+		
+		movementAdjustor.MaxLocationAdjustmentSpeed( ticket, 50000000 );
+
+		GetACSWatcher().dodge_timer_attack_actual();
+
+		if (RandF() < 0.5)
+		{
+			movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) + 45 );
+		}
+		else
+		{
+			movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) - 315 );
+		}
+		
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
+								
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
+				
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
+
+		GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( anim_name, 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
+	}
+
+	latent function override_mode_right_dodge_extras( anim_name : name )
+	{	
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
+		
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
+		
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
+
+		GetWitcherPlayer().ResetRawPlayerHeading();
+		
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
+		
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
+		
+		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
+		
+		movementAdjustor.MaxLocationAdjustmentSpeed( ticket, 50000000 );
+
+		GetACSWatcher().dodge_timer_attack_actual();
+
+		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) + 90 );
+		
+
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
+								
+		if (GetACSWatcher().silver_group_stance
+		|| GetACSWatcher().silver_strong_stance
+		|| GetACSWatcher().silver_fast_stance
+		|| GetACSWatcher().steel_group_stance
+		|| GetACSWatcher().steel_strong_stance
+		|| GetACSWatcher().steel_fast_stance
+		)
+		{					
+			if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.5  ); }	
+				
+			GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
+
+			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( anim_name, 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.5f));	
+		}
+		else
+		{
+			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( anim_name, 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
+		}
+	}
+
+	latent function override_mode_left_dodge_extras( anim_name : name )
+	{	
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
+		
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
+		
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
+
+		GetWitcherPlayer().ResetRawPlayerHeading();
+		
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
+		
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
+		
+		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
+		
+		movementAdjustor.MaxLocationAdjustmentSpeed( ticket, 50000000 );
+
+		GetACSWatcher().dodge_timer_attack_actual();
+
+		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) - 90 );
+		
+
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
+								
+		if (GetACSWatcher().silver_group_stance
+		|| GetACSWatcher().silver_strong_stance
+		|| GetACSWatcher().silver_fast_stance
+		|| GetACSWatcher().steel_group_stance
+		|| GetACSWatcher().steel_strong_stance
+		|| GetACSWatcher().steel_fast_stance
+		)
+		{					
+			if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.5  ); }	
+				
+			GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
+
+			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( anim_name, 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.5f));	
+		}
+		else
+		{
+			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( anim_name, 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
+		}
+	}
+
+	latent function override_mode_back_dodge_extras( anim_name : name )
+	{	
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
+		
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
+		
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
+
+		GetWitcherPlayer().ResetRawPlayerHeading();
+		
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
+		
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
+		
+		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
+		
+		movementAdjustor.MaxLocationAdjustmentSpeed( ticket, 50000000 );
+
+		GetACSWatcher().dodge_timer_attack_actual();
+
+		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) );
+
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
+								
+		if (GetACSWatcher().silver_group_stance
+		|| GetACSWatcher().silver_strong_stance
+		|| GetACSWatcher().silver_fast_stance
+		|| GetACSWatcher().steel_group_stance
+		|| GetACSWatcher().steel_strong_stance
+		|| GetACSWatcher().steel_fast_stance
+		)
+		{					
+			if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.5  ); }	
+				
+			GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
+
+			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( anim_name, 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.5f));	
+		}
+		else
+		{
+			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( anim_name, 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
+		}
+	}
+
+	latent function override_mode_orient_back_dodge_extras( anim_name : name )
+	{	
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
+		
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
+		
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
+
+		GetWitcherPlayer().ResetRawPlayerHeading();
+		
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
+		
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
+		
+		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
+		
+		movementAdjustor.MaxLocationAdjustmentSpeed( ticket, 50000000 );
+
+		GetACSWatcher().dodge_timer_attack_actual();
+
+		if (RandF() < 0.5)
+		{
+			movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) + 180 );
+		}
+		else
+		{
+			movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) - 180 );
+		}
+		
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
+								
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
+				
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
+
+		GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( anim_name, 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
+	}
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	latent function override_mode_right_dodge_1()
+	{
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
+		
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
+		
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
+
+		GetWitcherPlayer().ResetRawPlayerHeading();
+		
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
+		
+		movementAdjustor.AdjustmentDuration( ticket, 0.25 / theGame.GetTimeScale());
+		
+		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
+		
+		movementAdjustor.MaxLocationAdjustmentSpeed( ticket, 50000000 );
+
+		GetACSWatcher().dodge_timer_attack_actual();
+
+		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + GetACSWatcher().GetWorldForward() * 1.1 ) );
+
+		if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ( ACSFixZAxis(GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * 1.25 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * 1.25) );
+
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
+								
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
+				
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 
 		GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_right_350m', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
 	}
 
 	latent function override_mode_right_dodge_2()
 	{
-		ticket = movementAdjustor.GetRequest( 'override_mode_right_dodge_2');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'override_mode_right_dodge_2' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
+
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
+		
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
+		
+		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000 );
+		
+		movementAdjustor.MaxLocationAdjustmentSpeed( ticket, 50000 );
+
+		GetACSWatcher().dodge_timer_attack_actual();
+
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
+								
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
+				
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
+		
+		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
+		{	
+			movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) - 90 );
+
+			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_pirouette_rp_f_01', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
+		}
+		else
+		{			
+			movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) - 90 );
+				
+			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_pirouette_rp_f_01', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
+		}
+	}
+
+	latent function override_mode_right_dodge_3()
+	{
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
+		
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
+		
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'override_mode_right_dodge_2' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.25 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.25 / theGame.GetTimeScale());
+		
+		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
+		
+		movementAdjustor.MaxLocationAdjustmentSpeed( ticket, 50000000 );
+
+		GetACSWatcher().dodge_timer_attack_actual();
+
+		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + GetACSWatcher().GetWorldForward() * 1.1 ) );
+
+		//if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * 1.1 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * 1.1 );
+
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
+								
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
+				
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
+
+		GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge1_right_4m', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
+	}
+
+	latent function override_mode_right_dodge_4()
+	{	
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
+		
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
+		
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
+
+		GetWitcherPlayer().ResetRawPlayerHeading();
+		
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
+		
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
+		
+		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
+		
+		movementAdjustor.MaxLocationAdjustmentSpeed( ticket, 50000000 );
+
+		GetACSWatcher().dodge_timer_attack_actual();
+
+		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) - 90 );
+
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
+								
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
+				
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
+
+		if( RandF() < 0.5 ) 
+		{
+			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_forward_350m', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
+		}
+		else
+		{
+			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_forward_350m_lp', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
+		}
+	}
+
+	latent function override_mode_right_dodge_5()
+	{	
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
+		
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
+		
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
+
+		GetWitcherPlayer().ResetRawPlayerHeading();
+		
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
+		
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
+		
+		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
+		
+		movementAdjustor.MaxLocationAdjustmentSpeed( ticket, 50000000 );
+
+		GetACSWatcher().dodge_timer_attack_actual();
+
+		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) - 90 );
+
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
+								
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
+				
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
+
+		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
+		{	
+			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_jump_rp_f_01', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
+		}
+		else
+		{				
+			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_jump_rp_f_01', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
+		}
+	}
+
+	latent function override_mode_right_dodge_6()
+	{
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
+		
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
+		
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
+
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
+		
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
+		
+		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000 );
+		
+		movementAdjustor.MaxLocationAdjustmentSpeed( ticket, 50000 );
+
+		GetACSWatcher().dodge_timer_attack_actual();
+
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
+								
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
+				
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
+		
+		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
+		{	
+			movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) - 90 );
+
+			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_roll_rp_f_01', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
+		}
+		else
+		{			
+			movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) - 90 );
+				
+			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_roll_rp_f_01', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
+		}
+	}
+
+	latent function override_mode_right_dodge_7()
+	{
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
+		
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
+		
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
+
+		GetWitcherPlayer().ResetRawPlayerHeading();
+		
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
+		
+		movementAdjustor.AdjustmentDuration( ticket, 0.25 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -5965,135 +7473,36 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		//movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -5 ) );
 
-		//movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * 1.1 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * 1.1 );
+		//if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * 1.1 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * 1.1 );
 
-		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraForward() * 1.1 ) );
+		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + GetACSWatcher().GetWorldForward() * 1.1 ) );
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 
-		GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_right_350m_90deg', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
-	}
+		if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ( ACSFixZAxis(GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * 1.5 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * 1.5) );
 
-	latent function override_mode_right_dodge_3()
-	{
-		ticket = movementAdjustor.GetRequest( 'override_mode_right_dodge_3');
-		
-		movementAdjustor.CancelByName( 'override_mode_right_dodge_3' );
-		
-		movementAdjustor.CancelAll();
-
-		GetWitcherPlayer().ResetRawPlayerHeading();
-		
-		ticket = movementAdjustor.CreateNewRequest( 'override_mode_right_dodge_3' );
-		
-		movementAdjustor.AdjustmentDuration( ticket, 0.25 );
-		
-		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
-		
-		movementAdjustor.MaxLocationAdjustmentSpeed( ticket, 50000000 );
-
-		GetACSWatcher().dodge_timer_attack_actual();
-
-		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraForward() * 1.1 ) );
-
-		//movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * 1.1 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * 1.1 );
-
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
-								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
-				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
-
-		GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge1_right_4m', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
-	}
-
-	latent function override_mode_right_dodge_4()
-	{
-		ticket = movementAdjustor.GetRequest( 'override_mode_right_dodge_4');
-		
-		movementAdjustor.CancelByName( 'override_mode_right_dodge_4' );
-		
-		movementAdjustor.CancelAll();
-
-		GetWitcherPlayer().ResetRawPlayerHeading();
-		
-		ticket = movementAdjustor.CreateNewRequest( 'override_mode_right_dodge_4' );
-		
-		movementAdjustor.AdjustmentDuration( ticket, 0.25 );
-		
-		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
-		
-		movementAdjustor.MaxLocationAdjustmentSpeed( ticket, 50000000 );
-
-		GetACSWatcher().dodge_timer_attack_actual();
-
-		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -5 ) );
-
-		//movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * 1.1 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * 1.1 );
-
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
-								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
-				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
-
-		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
-		{	
-			if( targetDistance <= 1.5*1.5 ) 
-			{
-				if( RandF() < 0.5 ) 
-				{
-					GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_npc_sword_1hand_dodge_b_left_far_ACS', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
-				}
-				else
-				{
-					GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_npc_sword_1hand_dodge_b_right_far_ACS', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
-				}
-			}
-			else
-			{
-				if( RandF() < 0.5 ) 
-				{
-					GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_back_337cm_lp_02', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
-				}
-				else
-				{
-					GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_back_337cm_rp_02', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
-				}
-			}
-		}
-		else
-		{				
-			if( RandF() < 0.5 ) 
-			{
-				GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_back_337cm_lp_02', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
-			}
-			else
-			{
-				GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_back_337cm_rp_02', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
-			}
-		}
+		GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_right_350m_90deg_ACS', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	latent function override_mode_left_dodge_1()
 	{
-		ticket = movementAdjustor.GetRequest( 'override_mode_left_dodge_1');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'override_mode_left_dodge_1' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'override_mode_left_dodge_1' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.25 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.25 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -6101,32 +7510,217 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetACSWatcher().dodge_timer_attack_actual();
 
-		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraForward() * 1.1 ) );
+		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + GetACSWatcher().GetWorldForward() * 1.1 ) );
 
-		movementAdjustor.SlideTo( ticket, ( ACSPlayerFixZAxis(GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * -1.25 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -1.25) );
+		if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ( ACSFixZAxis(GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * -1.25 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -1.25) );
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 
 		GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_left_350m', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
 	}
 
 	latent function override_mode_left_dodge_2()
 	{
-		ticket = movementAdjustor.GetRequest( 'override_mode_left_dodge_2');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'override_mode_left_dodge_2' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
+
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
+		
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
+		
+		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000 );
+		
+		movementAdjustor.MaxLocationAdjustmentSpeed( ticket, 50000 );
+
+		GetACSWatcher().dodge_timer_attack_actual();
+
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
+								
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
+				
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
+		
+		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
+		{	
+			movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) + 90 );
+
+			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_pirouette_rp_f_01', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
+		}
+		else
+		{			
+			movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) + 90 );
+				
+			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_pirouette_rp_f_01', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
+		}
+	}
+
+	latent function override_mode_left_dodge_3()
+	{
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
+		
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
+		
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'override_mode_left_dodge_2' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.25 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.25 / theGame.GetTimeScale());
+		
+		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
+		
+		movementAdjustor.MaxLocationAdjustmentSpeed( ticket, 50000000 );
+
+		GetACSWatcher().dodge_timer_attack_actual();
+
+		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + GetACSWatcher().GetWorldForward() * 1.1 ) );
+
+		//if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * -1.1 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -1.1 );
+
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
+								
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
+				
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
+
+		GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge1_left_4m', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
+	}
+
+	latent function override_mode_left_dodge_4()
+	{	
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
+		
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
+		
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
+
+		GetWitcherPlayer().ResetRawPlayerHeading();
+		
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
+		
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
+		
+		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
+		
+		movementAdjustor.MaxLocationAdjustmentSpeed( ticket, 50000000 );
+
+		GetACSWatcher().dodge_timer_attack_actual();
+
+		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) + 90 );
+
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
+								
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
+				
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
+
+		if( RandF() < 0.5 ) 
+		{
+			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_forward_350m', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
+		}
+		else
+		{
+			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_forward_350m_lp', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
+		}
+	}
+
+	latent function override_mode_left_dodge_5()
+	{	
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
+		
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
+		
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
+
+		GetWitcherPlayer().ResetRawPlayerHeading();
+		
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
+		
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
+		
+		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
+		
+		movementAdjustor.MaxLocationAdjustmentSpeed( ticket, 50000000 );
+
+		GetACSWatcher().dodge_timer_attack_actual();
+
+		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) + 90 );
+
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
+								
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
+				
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
+
+		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
+		{	
+			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_jump_rp_f_02', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
+		}
+		else
+		{				
+			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_jump_rp_f_02', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
+		}
+	}
+
+	latent function override_mode_left_dodge_6()
+	{
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
+		
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
+		
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
+
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
+		
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
+		
+		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000 );
+		
+		movementAdjustor.MaxLocationAdjustmentSpeed( ticket, 50000 );
+
+		GetACSWatcher().dodge_timer_attack_actual();
+
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
+								
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
+				
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
+		
+		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
+		{	
+			movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) + 90 );
+
+			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_roll_rp_f_01', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
+		}
+		else
+		{			
+			movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) + 90 );
+				
+			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_roll_rp_f_01', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
+		}
+	}
+
+	latent function override_mode_left_dodge_7()
+	{
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
+		
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
+		
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
+
+		GetWitcherPlayer().ResetRawPlayerHeading();
+		
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
+		
+		movementAdjustor.AdjustmentDuration( ticket, 0.25 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -6136,118 +7730,19 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		//movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraRight() * 5 ) );
 
-		//movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * -1.1 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -1.1 );
+		//if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * -1.1 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -1.1 );
 
-		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraForward() * 1.1 ) );
+		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + GetACSWatcher().GetWorldForward() * 1.1 ) );
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 
-		GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_left_350m_90deg', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
-	}
+		if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ( ACSFixZAxis(GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * -1.5 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -1.5) );
 
-	latent function override_mode_left_dodge_3()
-	{
-		ticket = movementAdjustor.GetRequest( 'override_mode_left_dodge_3');
-		
-		movementAdjustor.CancelByName( 'override_mode_left_dodge_3' );
-		
-		movementAdjustor.CancelAll();
-
-		GetWitcherPlayer().ResetRawPlayerHeading();
-		
-		ticket = movementAdjustor.CreateNewRequest( 'override_mode_left_dodge_3' );
-		
-		movementAdjustor.AdjustmentDuration( ticket, 0.25 );
-		
-		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
-		
-		movementAdjustor.MaxLocationAdjustmentSpeed( ticket, 50000000 );
-
-		GetACSWatcher().dodge_timer_attack_actual();
-
-		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraForward() * 1.1 ) );
-
-		//movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * -1.1 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -1.1 );
-
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
-								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
-				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
-
-		GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge1_left_4m', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
-	}
-
-	latent function override_mode_left_dodge_4()
-	{
-		ticket = movementAdjustor.GetRequest( 'override_mode_left_dodge_4');
-		
-		movementAdjustor.CancelByName( 'override_mode_left_dodge_4' );
-		
-		movementAdjustor.CancelAll();
-
-		GetWitcherPlayer().ResetRawPlayerHeading();
-		
-		ticket = movementAdjustor.CreateNewRequest( 'override_mode_left_dodge_4' );
-		
-		movementAdjustor.AdjustmentDuration( ticket, 0.25 );
-		
-		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
-		
-		movementAdjustor.MaxLocationAdjustmentSpeed( ticket, 50000000 );
-
-		GetACSWatcher().dodge_timer_attack_actual();
-
-		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraRight() * 5 ) );
-
-		//movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * -1.1 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -1.1 );
-
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
-								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
-				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
-
-		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
-		{	
-			if( targetDistance <= 1.5*1.5 ) 
-			{
-				if( RandF() < 0.5 ) 
-				{
-					GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_npc_sword_1hand_dodge_b_left_far_ACS', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
-				}
-				else
-				{
-					GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_npc_sword_1hand_dodge_b_right_far_ACS', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
-				}
-			}
-			else
-			{
-				if( RandF() < 0.5 ) 
-				{
-					GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_back_337cm_lp_02', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
-				}
-				else
-				{
-					GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_back_337cm_rp_02', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
-				}
-			}
-		}
-		else
-		{				
-			if( RandF() < 0.5 ) 
-			{
-				GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_back_337cm_lp_02', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
-			}
-			else
-			{
-				GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_back_337cm_rp_02', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
-			}
-		}
+		GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_left_350m_90deg_ACS', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -6258,18 +7753,10 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -6284,25 +7771,17 @@ state ACS_RollInit_Engage in cACS_RollInit
 					one_hand_sword_back_dodge_alt_3();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}	
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') == 0)
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -6314,42 +7793,28 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
+					
+					if (RandF() < 0.5)
 					{
-						front_dodge_skate();
+						one_hand_sword_front_dodge_alt_1();
 					}
 					else
 					{
-						if (RandF() < 0.5)
-						{
-							one_hand_sword_front_dodge_alt_1();
-						}
-						else
-						{
-							one_hand_sword_front_dodge();
-						}
+						one_hand_sword_front_dodge();
 					}
-					
+
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftX') > 0.1 && theInput.GetActionValue('GI_AxisLeftY') == 0)
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -6361,35 +7826,20 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						right_dodge_skate();
-					}
-					else
-					{
-						one_hand_sword_right_dodge_alt_4();
-					}
+					one_hand_sword_right_dodge_alt_4();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftX') < -0.1 && theInput.GetActionValue('GI_AxisLeftY') == 0) 
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -6401,35 +7851,22 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						left_dodge_skate();
-					}
-					else
-					{
-						one_hand_sword_left_dodge_alt_4();
-					}
+					
+					one_hand_sword_left_dodge_alt_4();
+					
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') > 0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -6441,37 +7878,23 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						right_dodge_skate();
-					}
-					else
-					{
-						one_hand_sword_right_dodge_alt_4();
-					}
+					
+					one_hand_sword_right_dodge_alt_4();
 
 					ACSDodgeMovementAdjust('forwardright');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') < -0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -6483,37 +7906,23 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						left_dodge_skate();
-					}
-					else
-					{
-						one_hand_sword_left_dodge_alt_4();
-					}
+					
+					one_hand_sword_left_dodge_alt_4();
 
 					ACSDodgeMovementAdjust('forwardleft');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') < -0.1 && theInput.GetActionValue('GI_AxisLeftX') > 0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -6525,37 +7934,23 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						right_dodge_skate();
-					}
-					else
-					{
-						one_hand_sword_right_dodge_alt_4();
-					}
+					
+					one_hand_sword_right_dodge_alt_4();
 
 					ACSDodgeMovementAdjust('backright');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftX') < -0.1 && theInput.GetActionValue('GI_AxisLeftY') < -0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -6566,38 +7961,23 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails' );
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
-
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						left_dodge_skate();
-					}
-					else
-					{
-						one_hand_sword_left_dodge_alt_4();
-					}
+					
+					one_hand_sword_left_dodge_alt_4();
 
 					ACSDodgeMovementAdjust('backleft');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -6612,7 +7992,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 					one_hand_sword_back_dodge_alt_3();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 	}
@@ -6623,18 +8003,10 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -6649,25 +8021,17 @@ state ACS_RollInit_Engage in cACS_RollInit
 					two_hand_sword_back_dodge();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}	
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') == 0)
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -6679,42 +8043,27 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
+					if (RandF() < 0.5)
 					{
-						front_dodge_skate();
+						one_hand_sword_front_dodge_alt_1();
 					}
 					else
 					{
-						if (RandF() < 0.5)
-						{
-							one_hand_sword_front_dodge_alt_1();
-						}
-						else
-						{
-							one_hand_sword_front_dodge();
-						}
+						one_hand_sword_front_dodge();
 					}
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftX') > 0.1 && theInput.GetActionValue('GI_AxisLeftY') == 0)
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -6726,35 +8075,20 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						right_dodge_skate();
-					}
-					else
-					{
-						two_hand_sword_right_dodge();
-					}
+					two_hand_sword_right_dodge();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftX') < -0.1 && theInput.GetActionValue('GI_AxisLeftY') == 0) 
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -6766,35 +8100,20 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						left_dodge_skate();
-					}
-					else
-					{
-						two_hand_sword_left_dodge();
-					}
+					two_hand_sword_left_dodge();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') > 0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -6806,37 +8125,22 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						right_dodge_skate();
-					}
-					else
-					{
-						two_hand_sword_right_dodge();
-					}
+					two_hand_sword_right_dodge();
 
 					ACSDodgeMovementAdjust('forwardright');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') < -0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -6848,37 +8152,22 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						left_dodge_skate();
-					}
-					else
-					{
-						two_hand_sword_left_dodge();
-					}
+					two_hand_sword_left_dodge();
 
 					ACSDodgeMovementAdjust('forwardleft');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') < -0.1 && theInput.GetActionValue('GI_AxisLeftX') > 0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -6890,37 +8179,22 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						right_dodge_skate();
-					}
-					else
-					{
-						two_hand_sword_right_dodge();
-					}
+					two_hand_sword_right_dodge();
 
 					ACSDodgeMovementAdjust('backright');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftX') < -0.1 && theInput.GetActionValue('GI_AxisLeftY') < -0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -6932,37 +8206,22 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						left_dodge_skate();
-					}
-					else
-					{
-						two_hand_sword_left_dodge();
-					}
+					two_hand_sword_left_dodge();
 
 					ACSDodgeMovementAdjust('backleft');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -6977,7 +8236,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 					two_hand_sword_back_dodge();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 	}
@@ -6988,18 +8247,10 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7014,25 +8265,17 @@ state ACS_RollInit_Engage in cACS_RollInit
 					one_hand_sword_back_dodge_alt_3();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}	
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') == 0)
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7044,35 +8287,20 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						front_dodge_skate();
-					}
-					else
-					{
-						cat_one_hand_sword_front_dodge_alt_3();
-					}
+					cat_one_hand_sword_front_dodge_alt_3();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftX') > 0.1 && theInput.GetActionValue('GI_AxisLeftY') == 0)
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7084,35 +8312,20 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						right_dodge_skate();
-					}
-					else
-					{
-						cat_one_hand_sword_right_dodge_alt_3();
-					}
+					cat_one_hand_sword_right_dodge_alt_3();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftX') < -0.1 && theInput.GetActionValue('GI_AxisLeftY') == 0) 
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7124,35 +8337,20 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						left_dodge_skate();
-					}
-					else
-					{
-						cat_one_hand_sword_left_dodge_alt_3();
-					}
+					cat_one_hand_sword_left_dodge_alt_3();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') > 0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7164,37 +8362,22 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						right_dodge_skate();
-					}
-					else
-					{
-						cat_one_hand_sword_right_dodge_alt_3();
-					}
+					cat_one_hand_sword_right_dodge_alt_3();
 					
 					ACSDodgeMovementAdjust('forwardright');
 
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') < -0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7206,37 +8389,22 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						left_dodge_skate();
-					}
-					else
-					{
-						cat_one_hand_sword_left_dodge_alt_3();
-					}
+					cat_one_hand_sword_left_dodge_alt_3();
 
 					ACSDodgeMovementAdjust('forwardleft');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') < -0.1 && theInput.GetActionValue('GI_AxisLeftX') > 0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7248,37 +8416,22 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						right_dodge_skate();
-					}
-					else
-					{
-						cat_one_hand_sword_right_dodge_alt_3();
-					}
+					cat_one_hand_sword_right_dodge_alt_3();
 
 					ACSDodgeMovementAdjust('backright');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftX') < -0.1 && theInput.GetActionValue('GI_AxisLeftY') < -0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7290,37 +8443,22 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						left_dodge_skate();
-					}
-					else
-					{
-						cat_one_hand_sword_left_dodge_alt_3();
-					}
+					cat_one_hand_sword_left_dodge_alt_3();
 
 					ACSDodgeMovementAdjust('backleft');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7335,7 +8473,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 					one_hand_sword_back_dodge_alt_3();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 	}
@@ -7346,18 +8484,10 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7372,25 +8502,17 @@ state ACS_RollInit_Engage in cACS_RollInit
 					one_hand_sword_back_dodge_alt_1();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}	
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') == 0)
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7402,42 +8524,27 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
+					if (RandF() < 0.5)
 					{
-						front_dodge_skate();
+						one_hand_sword_front_dodge_alt_1();
 					}
 					else
 					{
-						if (RandF() < 0.5)
-						{
-							one_hand_sword_front_dodge_alt_1();
-						}
-						else
-						{
-							one_hand_sword_front_dodge();
-						}
+						one_hand_sword_front_dodge();
 					}
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftX') > 0.1 && theInput.GetActionValue('GI_AxisLeftY') == 0)
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7449,35 +8556,20 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						right_dodge_skate();
-					}
-					else
-					{
-						one_hand_sword_right_dodge_alt_2();
-					}
+					one_hand_sword_right_dodge_alt_2();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftX') < -0.1 && theInput.GetActionValue('GI_AxisLeftY') == 0) 
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7489,35 +8581,20 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						left_dodge_skate();
-					}
-					else
-					{
-						one_hand_sword_left_dodge_alt_2();
-					}
+					one_hand_sword_left_dodge_alt_2();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') > 0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7529,37 +8606,22 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						right_dodge_skate();
-					}
-					else
-					{
-						one_hand_sword_right_dodge_alt_2();
-					}
+					one_hand_sword_right_dodge_alt_2();
 
 					ACSDodgeMovementAdjust('forwardright');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') < -0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7571,37 +8633,22 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						left_dodge_skate();
-					}
-					else
-					{
-						one_hand_sword_left_dodge_alt_2();
-					}
+					one_hand_sword_left_dodge_alt_2();
 
 					ACSDodgeMovementAdjust('forwardleft');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') < -0.1 && theInput.GetActionValue('GI_AxisLeftX') > 0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7613,37 +8660,22 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						right_dodge_skate();
-					}
-					else
-					{
-						one_hand_sword_right_dodge_alt_2();
-					}
+					one_hand_sword_right_dodge_alt_2();
 
 					ACSDodgeMovementAdjust('backright');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftX') < -0.1 && theInput.GetActionValue('GI_AxisLeftY') < -0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7655,37 +8687,22 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						left_dodge_skate();
-					}
-					else
-					{
-						one_hand_sword_left_dodge_alt_2();
-					}
+					one_hand_sword_left_dodge_alt_2();
 
 					ACSDodgeMovementAdjust('backleft');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7700,7 +8717,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 					one_hand_sword_back_dodge();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 	}
@@ -7711,18 +8728,10 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7737,25 +8746,17 @@ state ACS_RollInit_Engage in cACS_RollInit
 					one_hand_sword_back_dodge_alt_1();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}	
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') == 0)
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7767,42 +8768,27 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
+					if (RandF() < 0.5)
 					{
-						front_dodge_skate();
+						one_hand_sword_front_dodge_alt_1();
 					}
 					else
 					{
-						if (RandF() < 0.5)
-						{
-							one_hand_sword_front_dodge_alt_1();
-						}
-						else
-						{
-							one_hand_sword_front_dodge();
-						}
+						one_hand_sword_front_dodge();
 					}
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftX') > 0.1 && theInput.GetActionValue('GI_AxisLeftY') == 0)
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7814,35 +8800,20 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						right_dodge_skate();
-					}
-					else
-					{
-						one_hand_sword_right_dodge_alt_2();
-					}
+					one_hand_sword_right_dodge_alt_2();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftX') < -0.1 && theInput.GetActionValue('GI_AxisLeftY') == 0) 
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7854,35 +8825,20 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						left_dodge_skate();
-					}
-					else
-					{
-						one_hand_sword_left_dodge_alt_2();
-					}
+					one_hand_sword_left_dodge_alt_2();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') > 0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7894,37 +8850,21 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						right_dodge_skate();
-					}
-					else
-					{
-						one_hand_sword_right_dodge_alt_2();
-					}
+					one_hand_sword_right_dodge_alt_2();
 
 					ACSDodgeMovementAdjust('forwardright');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') < -0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7936,37 +8876,22 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						left_dodge_skate();
-					}
-					else
-					{
-						one_hand_sword_left_dodge_alt_2();
-					}
+					one_hand_sword_left_dodge_alt_2();
 
 					ACSDodgeMovementAdjust('forwardleft');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') < -0.1 && theInput.GetActionValue('GI_AxisLeftX') > 0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -7978,37 +8903,22 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						right_dodge_skate();
-					}
-					else
-					{
-						one_hand_sword_right_dodge_alt_2();
-					}
+					one_hand_sword_right_dodge_alt_2();
 
 					ACSDodgeMovementAdjust('backright');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftX') < -0.1 && theInput.GetActionValue('GI_AxisLeftY') < -0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -8020,37 +8930,22 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						left_dodge_skate();
-					}
-					else
-					{
-						one_hand_sword_left_dodge_alt_2();
-					}
+					one_hand_sword_left_dodge_alt_2();
 
 					ACSDodgeMovementAdjust('backleft');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -8065,7 +8960,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 					one_hand_sword_back_dodge();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 	}
@@ -8076,18 +8971,10 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -8102,25 +8989,17 @@ state ACS_RollInit_Engage in cACS_RollInit
 					one_hand_sword_back_dodge_alt_3();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}	
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') == 0)
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -8132,42 +9011,27 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
+					if (RandF() < 0.5)
 					{
-						front_dodge_skate();
+						one_hand_sword_front_dodge_alt_1();
 					}
 					else
 					{
-						if (RandF() < 0.5)
-						{
-							one_hand_sword_front_dodge_alt_1();
-						}
-						else
-						{
-							one_hand_sword_front_dodge();
-						}
+						one_hand_sword_front_dodge();
 					}
-					
+				
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftX') > 0.1 && theInput.GetActionValue('GI_AxisLeftY') == 0)
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -8179,35 +9043,20 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						right_dodge_skate();
-					}
-					else
-					{
-						one_hand_sword_right_dodge_alt_2();
-					}
+					one_hand_sword_right_dodge_alt_2();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftX') < -0.1 && theInput.GetActionValue('GI_AxisLeftY') == 0) 
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -8219,35 +9068,20 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						left_dodge_skate();
-					}
-					else
-					{
-						one_hand_sword_left_dodge_alt_2();
-					}
+					one_hand_sword_left_dodge_alt_2();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') > 0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -8259,37 +9093,22 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						right_dodge_skate();
-					}
-					else
-					{
-						one_hand_sword_right_dodge_alt_2();
-					}
+					one_hand_sword_right_dodge_alt_2();
 
 					ACSDodgeMovementAdjust('forwardright');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') < -0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -8301,37 +9120,22 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						left_dodge_skate();
-					}
-					else
-					{
-						one_hand_sword_left_dodge_alt_2();
-					}
+					one_hand_sword_left_dodge_alt_2();
 
 					ACSDodgeMovementAdjust('forwardleft');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') < -0.1 && theInput.GetActionValue('GI_AxisLeftX') > 0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -8343,37 +9147,22 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						right_dodge_skate();
-					}
-					else
-					{
-						one_hand_sword_right_dodge_alt_2();
-					}
+					one_hand_sword_right_dodge_alt_2();
 
 					ACSDodgeMovementAdjust('backright');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftX') < -0.1 && theInput.GetActionValue('GI_AxisLeftY') < -0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -8385,37 +9174,22 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						left_dodge_skate();
-					}
-					else
-					{
-						one_hand_sword_left_dodge_alt_2();
-					}
+					one_hand_sword_left_dodge_alt_2();
 
 					ACSDodgeMovementAdjust('backleft');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -8430,7 +9204,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 					one_hand_sword_back_dodge_alt_3();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 	}
@@ -8441,18 +9215,10 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -8467,25 +9233,17 @@ state ACS_RollInit_Engage in cACS_RollInit
 					one_hand_sword_back_dodge_alt_3();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}	
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') == 0)
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -8497,35 +9255,20 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						front_dodge_skate();
-					}
-					else
-					{
-						cat_one_hand_sword_front_dodge_alt_3();
-					}
+					cat_one_hand_sword_front_dodge_alt_3();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftX') > 0.1 && theInput.GetActionValue('GI_AxisLeftY') == 0)
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -8537,35 +9280,20 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						right_dodge_skate();
-					}
-					else
-					{
-						cat_one_hand_sword_right_dodge_alt_3();
-					}
+					cat_one_hand_sword_right_dodge_alt_3();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftX') < -0.1 && theInput.GetActionValue('GI_AxisLeftY') == 0) 
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -8577,35 +9305,20 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						left_dodge_skate();
-					}
-					else
-					{
-						cat_one_hand_sword_left_dodge_alt_3();
-					}
+					cat_one_hand_sword_left_dodge_alt_3();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') > 0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -8617,37 +9330,22 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						right_dodge_skate();
-					}
-					else
-					{
-						cat_one_hand_sword_right_dodge_alt_3();
-					}
+					cat_one_hand_sword_right_dodge_alt_3();
 
 					ACSDodgeMovementAdjust('forwardright');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') < -0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -8659,37 +9357,22 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						left_dodge_skate();
-					}
-					else
-					{
-						cat_one_hand_sword_left_dodge_alt_3();
-					}
+					cat_one_hand_sword_left_dodge_alt_3();
 
 					ACSDodgeMovementAdjust('forwardleft');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') < -0.1 && theInput.GetActionValue('GI_AxisLeftX') > 0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -8701,37 +9384,22 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						right_dodge_skate();
-					}
-					else
-					{
-						cat_one_hand_sword_right_dodge_alt_3();
-					}
+					cat_one_hand_sword_right_dodge_alt_3();
 
 					ACSDodgeMovementAdjust('backright');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftX') < -0.1 && theInput.GetActionValue('GI_AxisLeftY') < -0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -8743,37 +9411,22 @@ state ACS_RollInit_Engage in cACS_RollInit
 						GetWitcherPlayer().StopEffect( 'bruxa_dash_trails' );
 					}
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						left_dodge_skate();
-					}
-					else
-					{
-						cat_one_hand_sword_left_dodge_alt_3();
-					}
+					cat_one_hand_sword_left_dodge_alt_3();
 
 					ACSDodgeMovementAdjust('backleft');
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
-					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false) )
+					if (!GetWitcherPlayer().HasTag('ACS_Camo_Active') && ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false) )
 					{
 						GetWitcherPlayer().PlayEffectSingle( 'magic_step_l_new' );
 						GetWitcherPlayer().StopEffect( 'magic_step_l_new' );	
@@ -8788,7 +9441,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 					one_hand_sword_back_dodge_alt_3();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 	}
@@ -8814,298 +9467,364 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
 					GetWitcherPlayer().DestroyEffect('dodge_ciri');
 					GetWitcherPlayer().PlayEffectSingle('dodge_ciri');
 
-					GetACSWatcher().CiriSpectreDodgeBack();
+					GetACSWatcher().CiriSpectreDodge('back');
 
-					one_hand_sword_back_dodge_alt_3_long();
+					ciri_back_dodge();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}	
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') == 0)
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
 					GetWitcherPlayer().DestroyEffect('dodge_ciri');
 					GetWitcherPlayer().PlayEffectSingle('dodge_ciri');
 
-					GetACSWatcher().CiriSpectreDodgeFront();
+					GetACSWatcher().CiriSpectreDodge('front');
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						front_dodge_skate();
-					}
-					else
-					{
-						if (RandF() < 0.5)
-						{
-							one_hand_sword_front_dodge_alt_1_long();
-						}
-						else
-						{
-							one_hand_sword_front_dodge_long();
-						}
-					}
+					ciri_front_dodge();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftX') > 0.1 && theInput.GetActionValue('GI_AxisLeftY') == 0)
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
 					GetWitcherPlayer().DestroyEffect('dodge_ciri');
 					GetWitcherPlayer().PlayEffectSingle('dodge_ciri');
 
-					GetACSWatcher().CiriSpectreDodgeRight();
+					GetACSWatcher().CiriSpectreDodge('right');
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						right_dodge_skate();
-					}
-					else
-					{
-						one_hand_sword_right_dodge_alt_4_long();
-					}
+					ciri_right_dodge();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftX') < -0.1 && theInput.GetActionValue('GI_AxisLeftY') == 0) 
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
 					GetWitcherPlayer().DestroyEffect('dodge_ciri');
 					GetWitcherPlayer().PlayEffectSingle('dodge_ciri');
 
-					GetACSWatcher().CiriSpectreDodgeLeft();
+					GetACSWatcher().CiriSpectreDodge('left');
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat()) 
-					{
-						left_dodge_skate();
-					}
-					else
-					{
-						one_hand_sword_left_dodge_alt_4_long();
-					}
+					ciri_left_dodge();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') > 0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
 					GetWitcherPlayer().DestroyEffect('dodge_ciri');
 					GetWitcherPlayer().PlayEffectSingle('dodge_ciri');
 
-					GetACSWatcher().CiriSpectreDodgeRight();
+					GetACSWatcher().CiriSpectreDodge('right');
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						right_dodge_skate();
-					}
-					else
-					{
-						one_hand_sword_right_dodge_alt_4_long();
-					}
+					ciri_right_dodge();
 
-					ACSDodgeMovementAdjust('forwardright');
-					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') < -0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
 					GetWitcherPlayer().DestroyEffect('dodge_ciri');
 					GetWitcherPlayer().PlayEffectSingle('dodge_ciri');
 
-					GetACSWatcher().CiriSpectreDodgeLeft();
+					GetACSWatcher().CiriSpectreDodge('left');
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat()) 
-					{
-						left_dodge_skate();
-					}
-					else
-					{
-						one_hand_sword_left_dodge_alt_4_long();
-					}
+					ciri_left_dodge();
 
-					ACSDodgeMovementAdjust('forwardleft');
-					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftY') < -0.1 && theInput.GetActionValue('GI_AxisLeftX') > 0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
 					GetWitcherPlayer().DestroyEffect('dodge_ciri');
 					GetWitcherPlayer().PlayEffectSingle('dodge_ciri');
 
-					GetACSWatcher().CiriSpectreDodgeRight();
+					GetACSWatcher().CiriSpectreDodge('right');
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat() && ACS_Skate_Enabled()) 
-					{
-						right_dodge_skate();
-					}
-					else
-					{
-						one_hand_sword_right_dodge_alt_4_long();
-					}
+					ciri_right_dodge();
 
-					ACSDodgeMovementAdjust('backright');
-					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else if (theInput.GetActionValue('GI_AxisLeftX') < -0.1 && theInput.GetActionValue('GI_AxisLeftY') < -0.1 )
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
 					GetWitcherPlayer().DestroyEffect('dodge_ciri');
 					GetWitcherPlayer().PlayEffectSingle('dodge_ciri');
 
-					GetACSWatcher().CiriSpectreDodgeLeft();
+					GetACSWatcher().CiriSpectreDodge('left');
 
-					if ( GetWitcherPlayer().IsGuarded() && !GetWitcherPlayer().IsInCombat()) 
-					{
-						left_dodge_skate();
-					}
-					else
-					{
-						one_hand_sword_left_dodge_alt_4_long();
-					}
+					ciri_left_dodge();
 
-					ACSDodgeMovementAdjust('backleft');
-					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
 			}
 		}
 		else
 		{
 			if (ACS_can_dodge())
 			{
-				if ( ACS_Settings_Main_Bool('EHmodStaminaSettings','EHmodStaminaBlockAction', true) 
-				&& GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15
-				)
-				{
-					GetWitcherPlayer().RaiseEvent( 'CombatTaunt' );
-					GetWitcherPlayer().SoundEvent("gui_no_stamina");
-				}
-				else
-				{
+				
 					ACS_refresh_dodge_cooldown();
 
 					GetWitcherPlayer().DestroyEffect('dodge_ciri');
 					GetWitcherPlayer().PlayEffectSingle('dodge_ciri');
 
-					GetACSWatcher().CiriSpectreDodgeBack();
+					GetACSWatcher().CiriSpectreDodge('back');
 
-					one_hand_sword_back_dodge_alt_3_long();
+					ciri_back_dodge();
 					
 					GetACSWatcher().ACS_StaminaDrain(4);
-				}
+				
+			}
+		}
+	}
+
+	latent function acs_armor_rolls()
+	{
+		if (theInput.GetActionValue('GI_AxisLeftY') < -0.1 && theInput.GetActionValue('GI_AxisLeftX') == 0 )
+		{
+			if (ACS_can_dodge())
+			{
+				
+					ACS_refresh_dodge_cooldown();
+
+					GetWitcherPlayer().DestroyEffect('dodge_acs_armor');
+					GetWitcherPlayer().PlayEffectSingle('dodge_acs_armor');
+
+					GetWitcherPlayer().DestroyEffect('bruxa_dash_trails');
+					GetWitcherPlayer().PlayEffectSingle('bruxa_dash_trails');
+
+					GetWitcherPlayer().PlayEffectSingle('special_attack_only_black_fx');
+					GetWitcherPlayer().StopEffect('special_attack_only_black_fx');
+
+					acs_armor_back_dodge();
+					
+					GetACSWatcher().ACS_StaminaDrain(4);
+				
+			}	
+		}
+		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') == 0)
+		{
+			if (ACS_can_dodge())
+			{
+				
+					ACS_refresh_dodge_cooldown();
+
+					GetWitcherPlayer().DestroyEffect('dodge_acs_armor');
+					GetWitcherPlayer().PlayEffectSingle('dodge_acs_armor');
+
+					GetWitcherPlayer().DestroyEffect('bruxa_dash_trails');
+					GetWitcherPlayer().PlayEffectSingle('bruxa_dash_trails');
+
+					GetWitcherPlayer().PlayEffectSingle('special_attack_only_black_fx');
+					GetWitcherPlayer().StopEffect('special_attack_only_black_fx');
+
+					acs_armor_front_dodge();
+					
+					GetACSWatcher().ACS_StaminaDrain(4);
+				
+			}
+		}
+		else if (theInput.GetActionValue('GI_AxisLeftX') > 0.1 && theInput.GetActionValue('GI_AxisLeftY') == 0)
+		{
+			if (ACS_can_dodge())
+			{
+				
+					ACS_refresh_dodge_cooldown();
+
+					GetWitcherPlayer().DestroyEffect('dodge_acs_armor');
+					GetWitcherPlayer().PlayEffectSingle('dodge_acs_armor');
+
+					GetWitcherPlayer().DestroyEffect('bruxa_dash_trails');
+					GetWitcherPlayer().PlayEffectSingle('bruxa_dash_trails');
+
+					GetWitcherPlayer().PlayEffectSingle('special_attack_only_black_fx');
+					GetWitcherPlayer().StopEffect('special_attack_only_black_fx');
+
+					acs_armor_right_dodge();
+					
+					GetACSWatcher().ACS_StaminaDrain(4);
+				
+			}
+		}
+		else if (theInput.GetActionValue('GI_AxisLeftX') < -0.1 && theInput.GetActionValue('GI_AxisLeftY') == 0) 
+		{
+			if (ACS_can_dodge())
+			{
+				
+					ACS_refresh_dodge_cooldown();
+
+					GetWitcherPlayer().DestroyEffect('dodge_acs_armor');
+					GetWitcherPlayer().PlayEffectSingle('dodge_acs_armor');
+
+					GetWitcherPlayer().DestroyEffect('bruxa_dash_trails');
+					GetWitcherPlayer().PlayEffectSingle('bruxa_dash_trails');
+
+					GetWitcherPlayer().PlayEffectSingle('special_attack_only_black_fx');
+					GetWitcherPlayer().StopEffect('special_attack_only_black_fx');
+
+					acs_armor_left_dodge();
+					
+					GetACSWatcher().ACS_StaminaDrain(4);
+				
+			}
+		}
+		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') > 0.1 )
+		{
+			if (ACS_can_dodge())
+			{
+				
+					ACS_refresh_dodge_cooldown();
+
+					GetWitcherPlayer().DestroyEffect('dodge_acs_armor');
+					GetWitcherPlayer().PlayEffectSingle('dodge_acs_armor');
+
+					GetWitcherPlayer().DestroyEffect('bruxa_dash_trails');
+					GetWitcherPlayer().PlayEffectSingle('bruxa_dash_trails');
+
+					GetWitcherPlayer().PlayEffectSingle('special_attack_only_black_fx');
+					GetWitcherPlayer().StopEffect('special_attack_only_black_fx');
+
+					acs_armor_right_dodge();
+
+					GetACSWatcher().ACS_StaminaDrain(4);
+				
+			}
+		}
+		else if (theInput.GetActionValue('GI_AxisLeftY') > 0.1 && theInput.GetActionValue('GI_AxisLeftX') < -0.1 )
+		{
+			if (ACS_can_dodge())
+			{
+				
+					ACS_refresh_dodge_cooldown();
+
+					GetWitcherPlayer().DestroyEffect('dodge_acs_armor');
+					GetWitcherPlayer().PlayEffectSingle('dodge_acs_armor');
+
+					GetWitcherPlayer().DestroyEffect('bruxa_dash_trails');
+					GetWitcherPlayer().PlayEffectSingle('bruxa_dash_trails');
+
+					GetWitcherPlayer().PlayEffectSingle('special_attack_only_black_fx');
+					GetWitcherPlayer().StopEffect('special_attack_only_black_fx');
+
+					acs_armor_left_dodge();
+
+					GetACSWatcher().ACS_StaminaDrain(4);
+				
+			}
+		}
+		else if (theInput.GetActionValue('GI_AxisLeftY') < -0.1 && theInput.GetActionValue('GI_AxisLeftX') > 0.1 )
+		{
+			if (ACS_can_dodge())
+			{
+				
+					ACS_refresh_dodge_cooldown();
+
+					GetWitcherPlayer().DestroyEffect('dodge_acs_armor');
+					GetWitcherPlayer().PlayEffectSingle('dodge_acs_armor');
+
+					GetWitcherPlayer().DestroyEffect('bruxa_dash_trails');
+					GetWitcherPlayer().PlayEffectSingle('bruxa_dash_trails');
+
+					GetWitcherPlayer().PlayEffectSingle('special_attack_only_black_fx');
+					GetWitcherPlayer().StopEffect('special_attack_only_black_fx');
+
+					acs_armor_right_dodge();
+
+					GetACSWatcher().ACS_StaminaDrain(4);
+				
+			}
+		}
+		else if (theInput.GetActionValue('GI_AxisLeftX') < -0.1 && theInput.GetActionValue('GI_AxisLeftY') < -0.1 )
+		{
+			if (ACS_can_dodge())
+			{
+				
+					ACS_refresh_dodge_cooldown();
+
+					GetWitcherPlayer().DestroyEffect('dodge_acs_armor');
+					GetWitcherPlayer().PlayEffectSingle('dodge_acs_armor');
+
+					GetWitcherPlayer().DestroyEffect('bruxa_dash_trails');
+					GetWitcherPlayer().PlayEffectSingle('bruxa_dash_trails');
+
+					GetWitcherPlayer().PlayEffectSingle('special_attack_only_black_fx');
+					GetWitcherPlayer().StopEffect('special_attack_only_black_fx');
+
+					acs_armor_left_dodge();
+
+					GetACSWatcher().ACS_StaminaDrain(4);
+				
+			}
+		}
+		else
+		{
+			if (ACS_can_dodge())
+			{
+				
+					ACS_refresh_dodge_cooldown();
+
+					GetWitcherPlayer().DestroyEffect('dodge_acs_armor');
+					GetWitcherPlayer().PlayEffectSingle('dodge_acs_armor');
+
+					GetWitcherPlayer().DestroyEffect('bruxa_dash_trails');
+					GetWitcherPlayer().PlayEffectSingle('bruxa_dash_trails');
+
+					GetWitcherPlayer().PlayEffectSingle('special_attack_only_black_fx');
+					GetWitcherPlayer().StopEffect('special_attack_only_black_fx');
+
+					acs_armor_back_dodge();
+					
+					GetACSWatcher().ACS_StaminaDrain(4);
+				
 			}
 		}
 	}
@@ -9114,187 +9833,159 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 	latent function bruxa_front_dodge()
 	{
-		ticket = movementAdjustor.GetRequest( 'bruxa_front_dodge');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'bruxa_front_dodge' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		
-		ticket = movementAdjustor.CreateNewRequest( 'bruxa_front_dodge' );
-		
-		movementAdjustor.AdjustmentDuration( ticket, 0.1 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.5 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000 );
 		
 		movementAdjustor.MaxLocationAdjustmentSpeed( ticket, 50000 );
+
+		thePlayer.DrainVitality(thePlayer.GetStat(BCS_Vitality) * 0.125);
+
+		GetWitcherPlayer().AddTag('ACS_Vampire_Claws_Roll');
+
+		GetACSWatcher().dodge_timer_actual();
 		
 		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
 		{	
-			//movementAdjustor.RotateTowards( ticket, actor );
-					
-			GetACSWatcher().dodge_timer_actual();
-
 			movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) );
 		
-			//GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'bruxa_jump_up_stop_ACS', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
-				
-			//GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'bruxa_move_run_f_ACS', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
-
 			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'bruxa_move_run_to_walk_ACS', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
 			
-			//movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * 2 ) + theCamera.GetCameraDirection() * 2 );			
+			if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * 4.5 ) + theCamera.GetCameraDirection() * 4.5 );	
 		}
 		else
 		{			
-			GetACSWatcher().dodge_timer_actual();
-
 			movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) );
-
-			//GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'bruxa_jump_up_stop_ACS', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
-				
-			//GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'bruxa_move_run_f_ACS', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
 
 			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'bruxa_move_run_to_walk_ACS', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
 			
-			//movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * 2 ) + theCamera.GetCameraDirection() * 2 );		
+			if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * 4.5 ) + theCamera.GetCameraDirection() * 4.5 );		
 		}
 	}
 
 	latent function bruxa_right_dodge()
 	{
-		ticket = movementAdjustor.GetRequest( 'bruxa_right_dodge');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'bruxa_right_dodge' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
-
-		
-
-		
-
-		
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'bruxa_right_dodge' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.1 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.5 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
 		movementAdjustor.MaxLocationAdjustmentSpeed( ticket, 50000000 );
+
+		thePlayer.DrainVitality(thePlayer.GetStat(BCS_Vitality) * 0.125);
+
+		GetWitcherPlayer().AddTag('ACS_Vampire_Claws_Roll');
+
+		GetACSWatcher().dodge_timer_actual();
 		
 		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
-		{	
-			movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -5 ) );
-					
-			GetACSWatcher().dodge_timer_actual();
-		
+		{		
 			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'utility_dodge_attack_ACS', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
+
+			if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ( ACSFixZAxis(GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * 4.5 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * 4.5) );	
 		}
 		else
 		{			
-			GetACSWatcher().dodge_timer_actual();
-
-			movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -5 ) );
-				
 			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'utility_dodge_attack_ACS', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
+
+			if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ( ACSFixZAxis(GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * 4.5 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * 4.5) );
 		}
 	}
 
 	latent function bruxa_left_dodge()
 	{
-		ticket = movementAdjustor.GetRequest( 'bruxa_left_dodge');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'bruxa_left_dodge' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
-
-		
-
-		
-
-		
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'bruxa_left_dodge' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.1 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.5 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
 		movementAdjustor.MaxLocationAdjustmentSpeed( ticket, 50000000 );
+
+		thePlayer.DrainVitality(thePlayer.GetStat(BCS_Vitality) * 0.125);
+
+		GetWitcherPlayer().AddTag('ACS_Vampire_Claws_Roll');
+
+		GetACSWatcher().dodge_timer_actual();
 		
 		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
-		{	
-			movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraRight() * 5 ) );
-					
-			GetACSWatcher().dodge_timer_actual();
-		
+		{		
 			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'utility_dodge_attack_ACS', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
-			
-			//movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * 1.25 ) + theCamera.GetCameraDirection() * 1.25 );		
 
-			//movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * -1.25 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -1.5 );
+			if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ( ACSFixZAxis(GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * -4.5 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -4.5) );
 		}
 		else
 		{			
-			GetACSWatcher().dodge_timer_actual();
-
-			movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraRight() * 5 ) );
-				
 			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'utility_dodge_attack_ACS', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
-			
-			//movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * 1.25 ) + theCamera.GetCameraDirection() * 1.25 );		
 
-			//movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * -1.25 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -1.5 );
+			if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ( ACSFixZAxis(GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * -4.5 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -4.5) );
 		}
 	}
 
 	latent function bruxa_regular_dodge()
 	{
-		ticket = movementAdjustor.GetRequest( 'bruxa_regular_dodge');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'bruxa_regular_dodge' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'bruxa_regular_dodge' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.1 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.5 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
 		movementAdjustor.MaxLocationAdjustmentSpeed( ticket, 50000000 );
+
+		thePlayer.DrainVitality(thePlayer.GetStat(BCS_Vitality) * 0.125);
+
+		GetWitcherPlayer().AddTag('ACS_Vampire_Claws_Roll');
+
+		GetACSWatcher().dodge_timer_actual();
 		
 		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
 		{	
 			movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) );
 					
-			GetACSWatcher().dodge_timer_actual();
-		
 			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'utility_dodge_attack_ACS', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
 			
-			//movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * 1.25 ) + theCamera.GetCameraDirection() * 1.25 );		
-
-			//movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * -1.25 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -1.5 );
+			if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * -4.5 ) + theCamera.GetCameraDirection() * -4.5 );		
 		}
 		else
 		{			
-			GetACSWatcher().dodge_timer_actual();
-
 			movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) );
 				
 			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'utility_dodge_attack_ACS', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
 			
-			//movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * 1.25 ) + theCamera.GetCameraDirection() * 1.25 );		
-
-			//movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * -1.25 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -1.5 );
+			if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * -4.5 ) + theCamera.GetCameraDirection() * -4.5 );		
 		}
 	}
 
@@ -9302,11 +9993,11 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 	latent function two_hand_back_dodge()
 	{
-		ticket = movementAdjustor.GetRequest( 'two_hand_back_dodge');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'two_hand_back_dodge' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		
 
@@ -9316,9 +10007,9 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'two_hand_back_dodge' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.1 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -9328,11 +10019,11 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) );
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 
 		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
 		{	
@@ -9367,17 +10058,17 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 	latent function two_hand_front_dodge()
 	{
-		ticket = movementAdjustor.GetRequest( 'two_hand_front_dodge');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'two_hand_front_dodge' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		
 		
-		ticket = movementAdjustor.CreateNewRequest( 'two_hand_front_dodge' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.1 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000 );
 		
@@ -9385,11 +10076,11 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetACSWatcher().dodge_timer_attack_actual();
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 		
 		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
 		{	
@@ -9421,11 +10112,11 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 	latent function two_hand_right_dodge()
 	{
-		ticket = movementAdjustor.GetRequest( 'two_hand_right_dodge');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'two_hand_right_dodge' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		
 
@@ -9435,9 +10126,9 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'two_hand_right_dodge' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.1 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -9445,11 +10136,11 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetACSWatcher().dodge_timer_attack_actual();
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 
 		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -5 ) );
 			
@@ -9461,41 +10152,15 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{				
 			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'dialogue_man_geralt_sword_dodge_back_350', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
 		}
-
-		/*
-		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
-		{	
-			if (GetWitcherPlayer().IsEnemyInCone( actor, GetWitcherPlayer().GetHeadingVector(), 50, 60, actor ))
-			{
-				movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -5 ) );
-			
-				GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_pirouette_rp_b_01', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
-			}
-			else
-			{
-				movementAdjustor.RotateTowards( ticket, actor );
-
-				GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_pirouette_flip_right_rp_b_01', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
-			}
-		}
-		else
-		{			
-			movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -5 ) );
-				
-			//GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_pirouette_flip_right_rp_b_01', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
-
-			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_pirouette_rp_b_01', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
-		}
-		*/
 	}
 
 	latent function two_hand_left_dodge()
 	{
-		ticket = movementAdjustor.GetRequest( 'two_hand_left_dodge');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'two_hand_left_dodge' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		
 
@@ -9505,9 +10170,9 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'two_hand_left_dodge' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.1 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -9515,11 +10180,11 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetACSWatcher().dodge_timer_attack_actual();
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 
 		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraRight() * 5 ) );
 			
@@ -9533,41 +10198,15 @@ state ACS_RollInit_Engage in cACS_RollInit
 		{				
 			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'dialogue_man_geralt_sword_dodge_back_350', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
 		}
-
-		/*
-		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
-		{	
-			if (GetWitcherPlayer().IsEnemyInCone( actor, GetWitcherPlayer().GetHeadingVector(), 50, 60, actor ))
-			{
-				movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraRight() * 5 ) );
-			
-				GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_pirouette_rp_b_01', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
-			}
-			else
-			{
-				movementAdjustor.RotateTowards( ticket, actor );
-
-				GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_pirouette_flip_left_rp_b_01', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
-			}
-		}
-		else
-		{			
-			movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraRight() * 5 ) );
-		
-			//GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_pirouette_flip_left_rp_b_01', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
-
-			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_pirouette_rp_b_01', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
-		}
-		*/
 	}
 
 	latent function two_hand_right_dodge_alt()
 	{
-		ticket = movementAdjustor.GetRequest( 'two_hand_right_dodge');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'two_hand_right_dodge' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		
 
@@ -9577,9 +10216,9 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'two_hand_right_dodge' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.1 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -9587,11 +10226,11 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetACSWatcher().dodge_timer_attack_actual();
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 
 		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -5 ) );
 			
@@ -9624,41 +10263,15 @@ state ACS_RollInit_Engage in cACS_RollInit
 				GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_pirouette_rp_b_01', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
 			}
 		}
-
-		/*
-		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
-		{	
-			if (GetWitcherPlayer().IsEnemyInCone( actor, GetWitcherPlayer().GetHeadingVector(), 50, 60, actor ))
-			{
-				movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -5 ) );
-			
-				GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_pirouette_rp_b_01', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
-			}
-			else
-			{
-				movementAdjustor.RotateTowards( ticket, actor );
-
-				GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_pirouette_flip_right_rp_b_01', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
-			}
-		}
-		else
-		{			
-			movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -5 ) );
-				
-			//GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_pirouette_flip_right_rp_b_01', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
-
-			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_pirouette_rp_b_01', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
-		}
-		*/
 	}
 
 	latent function two_hand_left_dodge_alt()
 	{
-		ticket = movementAdjustor.GetRequest( 'two_hand_left_dodge');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'two_hand_left_dodge' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		
 
@@ -9668,9 +10281,9 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'two_hand_left_dodge' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.1 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -9678,11 +10291,11 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetACSWatcher().dodge_timer_attack_actual();
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 
 		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraRight() * 5 ) );
 			
@@ -9717,43 +10330,17 @@ state ACS_RollInit_Engage in cACS_RollInit
 				GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_pirouette_rp_b_01', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
 			}
 		}
-
-		/*
-		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
-		{	
-			if (GetWitcherPlayer().IsEnemyInCone( actor, GetWitcherPlayer().GetHeadingVector(), 50, 60, actor ))
-			{
-				movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraRight() * 5 ) );
-			
-				GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_pirouette_rp_b_01', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
-			}
-			else
-			{
-				movementAdjustor.RotateTowards( ticket, actor );
-
-				GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_pirouette_flip_left_rp_b_01', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
-			}
-		}
-		else
-		{			
-			movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraRight() * 5 ) );
-		
-			//GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_pirouette_flip_left_rp_b_01', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
-
-			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_pirouette_rp_b_01', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
-		}
-		*/
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	latent function two_hand_sword_back_dodge()
 	{
-		ticket = movementAdjustor.GetRequest( 'two_hand_sword_back_dodge');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'two_hand_sword_back_dodge' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		
 
@@ -9763,9 +10350,9 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'two_hand_sword_back_dodge' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.1 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -9775,11 +10362,11 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) );
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 
 		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
 		{	
@@ -9822,11 +10409,11 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 	latent function two_hand_sword_front_dodge()
 	{
-		ticket = movementAdjustor.GetRequest( 'two_hand_sword_front_dodge');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'two_hand_sword_front_dodge' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		
 
@@ -9836,9 +10423,9 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'two_hand_sword_front_dodge' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.1 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -9846,11 +10433,11 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetACSWatcher().dodge_timer_attack_actual();
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 
 		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
 		{	
@@ -9868,11 +10455,11 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 	latent function two_hand_sword_left_dodge()
 	{
-		ticket = movementAdjustor.GetRequest( 'two_hand_sword_left_dodge');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'two_hand_sword_left_dodge' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		
 
@@ -9882,9 +10469,9 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'two_hand_sword_left_dodge' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.1 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -9894,22 +10481,22 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) );
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 
 		GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_npc_sword_2hand_dodge_l_ACS', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
 	}
 
 	latent function two_hand_sword_right_dodge()
 	{
-		ticket = movementAdjustor.GetRequest( 'two_hand_sword_right_dodge');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'two_hand_sword_right_dodge' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		
 
@@ -9919,9 +10506,9 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'two_hand_sword_right_dodge' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.1 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -9931,11 +10518,11 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) );
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 
 		GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_npc_sword_2hand_dodge_r_ACS', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
 	}
@@ -9944,11 +10531,11 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 	latent function one_hand_sword_back_dodge()
 	{
-		ticket = movementAdjustor.GetRequest( 'one_hand_sword_back_dodge');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'one_hand_sword_back_dodge' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		
 
@@ -9958,9 +10545,9 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'one_hand_sword_back_dodge' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.25 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.25 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -9968,15 +10555,15 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetACSWatcher().dodge_timer_attack_actual();
 
-		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraForward() * 1.1 ) );
+		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + GetACSWatcher().GetWorldForward() * 1.1 ) );
 
-		movementAdjustor.SlideTo( ticket, ACSPlayerFixZAxis(( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * -1.1 ) + theCamera.GetCameraDirection() + theCamera.GetCameraForward() * -1.1) );
+		if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ACSFixZAxis(( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * -1.1 ) + theCamera.GetCameraDirection() + GetACSWatcher().GetWorldForward() * -1.1) );
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 
 		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
 		{	
@@ -10018,17 +10605,17 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 	latent function one_hand_sword_front_dodge()
 	{
-		ticket = movementAdjustor.GetRequest( 'one_hand_sword_front_dodge');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'one_hand_sword_front_dodge' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'one_hand_sword_front_dodge' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.1 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -10036,11 +10623,11 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetACSWatcher().dodge_timer_attack_actual();
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 
 		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
 		{	
@@ -10069,17 +10656,17 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 	latent function one_hand_sword_front_dodge_long()
 	{	
-		ticket = movementAdjustor.GetRequest( 'one_hand_sword_front_dodge_long');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'one_hand_sword_front_dodge_long' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'one_hand_sword_front_dodge_long' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.25 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.25 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -10087,13 +10674,13 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetACSWatcher().dodge_timer_attack_ciri_actual();
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 
-		movementAdjustor.SlideTo( ticket, ( ACSPlayerFixZAxis(GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * 4 ) + theCamera.GetCameraDirection() + theCamera.GetCameraForward() * 4) );
+		if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ( ACSFixZAxis(GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * 4 ) + theCamera.GetCameraDirection() + GetACSWatcher().GetWorldForward() * 4) );
 
 		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
 		{	
@@ -10122,17 +10709,17 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 	latent function one_hand_sword_left_dodge()
 	{
-		ticket = movementAdjustor.GetRequest( 'one_hand_sword_left_dodge');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'one_hand_sword_left_dodge' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'one_hand_sword_left_dodge' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.25 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.25 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -10142,13 +10729,13 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraRight() * 5 ) );
 
-		//movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * -2 ) );
+		//if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * -2 ) );
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 
 		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
 		{	
@@ -10190,17 +10777,17 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 	latent function one_hand_sword_right_dodge()
 	{
-		ticket = movementAdjustor.GetRequest( 'one_hand_sword_right_dodge');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'one_hand_sword_right_dodge' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'one_hand_sword_right_dodge' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.25 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.25 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -10210,13 +10797,13 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -5 ) );
 
-		//movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * -2 ) );
+		//if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * -2 ) );
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 
 		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
 		{	
@@ -10260,17 +10847,17 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 	latent function one_hand_sword_back_dodge_alt_1()
 	{
-		ticket = movementAdjustor.GetRequest( 'one_hand_sword_back_dodge_alt_1');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'one_hand_sword_back_dodge_alt_1' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'one_hand_sword_back_dodge_alt_1' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.25 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.25 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -10278,15 +10865,15 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetACSWatcher().dodge_timer_attack_actual();
 
-		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraForward() * 1.1 ) );
+		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + GetACSWatcher().GetWorldForward() * 1.1 ) );
 
-		movementAdjustor.SlideTo( ticket, ACSPlayerFixZAxis(( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * -1.1 ) + theCamera.GetCameraDirection() + theCamera.GetCameraForward() * -1.1) );
+		if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ACSFixZAxis(( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * -1.1 ) + theCamera.GetCameraDirection() + GetACSWatcher().GetWorldForward() * -1.1) );
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 
 		if( RandF() < 0.5 ) 
 		{
@@ -10300,17 +10887,17 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 	latent function one_hand_sword_front_dodge_alt_1()
 	{
-		ticket = movementAdjustor.GetRequest( 'one_hand_sword_front_dodge_alt_1');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'one_hand_sword_front_dodge_alt_1' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		
 		
-		ticket = movementAdjustor.CreateNewRequest( 'one_hand_sword_front_dodge_alt_1' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.1 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000 );
 		
@@ -10318,11 +10905,11 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetACSWatcher().dodge_timer_attack_actual();
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 		
 		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
 		{	
@@ -10338,17 +10925,17 @@ state ACS_RollInit_Engage in cACS_RollInit
 		}
 	}
 
-	latent function one_hand_sword_front_dodge_alt_1_long()
+	latent function ciri_front_dodge()
 	{
-		ticket = movementAdjustor.GetRequest( 'one_hand_sword_front_dodge_alt_1_long');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'one_hand_sword_front_dodge_alt_1_long' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
-		ticket = movementAdjustor.CreateNewRequest( 'one_hand_sword_front_dodge_alt_1_long' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.25 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.375 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000 );
 		
@@ -10356,35 +10943,103 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetACSWatcher().dodge_timer_attack_ciri_actual();
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 
-		movementAdjustor.SlideTo( ticket, ( ACSPlayerFixZAxis(GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * 4 ) + theCamera.GetCameraDirection() + theCamera.GetCameraForward() * 4) );
+		if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ( ACSFixZAxis(GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * 8 ) + theCamera.GetCameraDirection() + GetACSWatcher().GetWorldForward() * 8) );
 		
 		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
 		{	
 			movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) );
 
-			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_forward_300m_lp', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
+			if (RandF() < 0.5)
+			{
+				GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'woman_ciri_sword_dodge_start_front_lp_extended_ACS', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));	
+			}
+			else
+			{
+				GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'woman_ciri_sword_dodge_start_front_rp_extended_ACS', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));	
+			}
 		}
 		else
 		{			
 			movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) );
 				
-			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_forward_300m_lp', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
+			if (RandF() < 0.5)
+			{
+				GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'woman_ciri_sword_dodge_start_front_lp_extended_ACS', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));	
+			}
+			else
+			{
+				GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'woman_ciri_sword_dodge_start_front_rp_extended_ACS', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));	
+			}
+		}
+	}
+
+	latent function acs_armor_front_dodge()
+	{
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
+		
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
+		
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
+
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
+		
+		movementAdjustor.AdjustmentDuration( ticket, 0.375 / theGame.GetTimeScale());
+		
+		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000 );
+		
+		movementAdjustor.MaxLocationAdjustmentSpeed( ticket, 50000 );
+
+		GetACSWatcher().dodge_timer_attack_actual();
+
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
+								
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
+				
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
+
+		if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ( ACSFixZAxis(GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * 8 ) + theCamera.GetCameraDirection() + GetACSWatcher().GetWorldForward() * 8) );
+		
+		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
+		{	
+			movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) );
+
+			if (RandF() < 0.5)
+			{
+				GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'woman_ciri_sword_dodge_start_front_lp_extended_ACS', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));	
+			}
+			else
+			{
+				GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'woman_ciri_sword_dodge_start_front_rp_extended_ACS', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));	
+			}
+		}
+		else
+		{			
+			movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) );
+				
+			if (RandF() < 0.5)
+			{
+				GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'woman_ciri_sword_dodge_start_front_lp_extended_ACS', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));	
+			}
+			else
+			{
+				GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'woman_ciri_sword_dodge_start_front_rp_extended_ACS', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));	
+			}
 		}
 	}
 
 	latent function one_hand_sword_left_dodge_alt_1()
 	{
-		ticket = movementAdjustor.GetRequest( 'one_hand_sword_left_dodge_alt_1');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'one_hand_sword_left_dodge_alt_1' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		
 
@@ -10394,9 +11049,9 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'one_hand_sword_left_dodge_alt_1' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.25 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.25 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -10406,13 +11061,13 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraRight() * 5 ) );
 
-		//movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * -1.1 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -1.1 );
+		//if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * -1.1 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -1.1 );
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 
 		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
 		{	
@@ -10454,11 +11109,11 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 	latent function one_hand_sword_right_dodge_alt_1()
 	{
-		ticket = movementAdjustor.GetRequest( 'one_hand_sword_right_dodge_alt_1');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'one_hand_sword_right_dodge_alt_1' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		
 
@@ -10468,9 +11123,9 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'one_hand_sword_right_dodge_alt_1' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.25 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.25 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -10480,13 +11135,13 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -5 ) );
 
-		//movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * 1.1 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * 1.1 );
+		//if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * 1.1 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * 1.1 );
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 
 		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
 		{	
@@ -10530,11 +11185,11 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 	latent function one_hand_sword_back_dodge_alt_2()
 	{
-		ticket = movementAdjustor.GetRequest( 'one_hand_sword_back_dodge_alt_2');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'one_hand_sword_back_dodge_alt_2' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		
 
@@ -10544,9 +11199,9 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'one_hand_sword_back_dodge_alt_2' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.25 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.25 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -10554,15 +11209,15 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetACSWatcher().dodge_timer_attack_actual();
 
-		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraForward() * 1.1 ) );
+		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + GetACSWatcher().GetWorldForward() * 1.1 ) );
 
-		movementAdjustor.SlideTo( ticket, ACSPlayerFixZAxis(( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * -1.1 ) + theCamera.GetCameraDirection() + theCamera.GetCameraForward() * -1.1) );
+		if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ACSFixZAxis(( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * -1.1 ) + theCamera.GetCameraDirection() + GetACSWatcher().GetWorldForward() * -1.1) );
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 
 		if( RandF() < 0.5 ) 
 		{
@@ -10576,15 +11231,15 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 	latent function one_hand_sword_front_dodge_alt_2()
 	{	
-		ticket = movementAdjustor.GetRequest( 'one_hand_sword_front_dodge_alt_2');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'one_hand_sword_front_dodge_alt_2' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
-		ticket = movementAdjustor.CreateNewRequest( 'one_hand_sword_front_dodge_alt_2' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.25 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.25 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000 );
 		
@@ -10592,11 +11247,11 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetACSWatcher().dodge_timer_attack_actual();
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 		
 		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
 		{	
@@ -10619,17 +11274,17 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 	latent function one_hand_sword_left_dodge_alt_2()
 	{	
-		ticket = movementAdjustor.GetRequest( 'one_hand_sword_left_dodge_alt_2');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'one_hand_sword_left_dodge_alt_2' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'one_hand_sword_left_dodge_alt_2' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.25 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.25 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -10639,33 +11294,35 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		//movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraRight() * 5 ) );
 
-		//movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * -1.1 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -1.1 );
+		//if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * -1.1 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -1.1 );
 
-		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraForward() * 1.1 ) );
+		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + GetACSWatcher().GetWorldForward() * 1.1 ) );
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 
-		GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_left_350m_90deg', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
+		if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ( ACSFixZAxis(GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * -1.5 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -1.5) );
+
+		GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_left_350m_90deg_ACS', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
 	}
 
 	latent function one_hand_sword_right_dodge_alt_2()
 	{	
-		ticket = movementAdjustor.GetRequest( 'one_hand_sword_right_dodge_alt_2');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'one_hand_sword_right_dodge_alt_2' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'one_hand_sword_right_dodge_alt_2' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.25 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.25 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -10675,34 +11332,36 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		//movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -5 ) );
 
-		//movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * 1.1 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * 1.1 );
+		//if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * 1.1 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * 1.1 );
 
-		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraForward() * 1.1 ) );
+		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + GetACSWatcher().GetWorldForward() * 1.1 ) );
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 
-		GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_right_350m_90deg', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
+		if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ( ACSFixZAxis(GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * 1.5 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * 1.5) );
+
+		GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_right_350m_90deg_ACS', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	latent function one_hand_sword_back_dodge_alt_3()
 	{	
-		ticket = movementAdjustor.GetRequest( 'one_hand_sword_back_dodge_alt_3');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'one_hand_sword_back_dodge_alt_3' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'one_hand_sword_back_dodge_alt_3' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.25 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.25 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -10710,32 +11369,32 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetACSWatcher().dodge_timer_attack_actual();
 
-		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraForward() * 1.1 ) );
+		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + GetACSWatcher().GetWorldForward() * 1.1 ) );
 
-		movementAdjustor.SlideTo( ticket, ACSPlayerFixZAxis(( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * -1.1 ) + theCamera.GetCameraDirection() + theCamera.GetCameraForward() * -1.1) );
+		if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ACSFixZAxis(( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * -1.1 ) + theCamera.GetCameraDirection() + GetACSWatcher().GetWorldForward() * -1.1) );
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 
 		GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_ger_sword_dodge_b_02', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
 	}
 
-	latent function one_hand_sword_back_dodge_alt_3_long()
+	latent function ciri_back_dodge()
 	{	
-		ticket = movementAdjustor.GetRequest( 'one_hand_sword_back_dodge_alt_3_long');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'one_hand_sword_back_dodge_alt_3_long' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'one_hand_sword_back_dodge_alt_3_long' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.25 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.375 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -10743,30 +11402,63 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetACSWatcher().dodge_timer_attack_ciri_actual();
 
-		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraForward() * 1.1 ) );
+		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + GetACSWatcher().GetWorldForward() * 1.1 ) );
 
-		movementAdjustor.SlideTo( ticket, ACSPlayerFixZAxis(( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * -4 ) + theCamera.GetCameraDirection() + theCamera.GetCameraForward() * -4) );
+		if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ACSFixZAxis(( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * -8 ) + theCamera.GetCameraDirection() + GetACSWatcher().GetWorldForward() * -8) );
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 
-		GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_back_350m_lp', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
+		GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'woman_ciri_sword_special_blink_attack_disappear_ACS', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.125f, 0.125f));
+	}
+
+	latent function acs_armor_back_dodge()
+	{	
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
+		
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
+		
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
+
+		GetWitcherPlayer().ResetRawPlayerHeading();
+		
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
+		
+		movementAdjustor.AdjustmentDuration( ticket, 0.375 / theGame.GetTimeScale());
+		
+		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
+		
+		movementAdjustor.MaxLocationAdjustmentSpeed( ticket, 50000000 );
+
+		GetACSWatcher().dodge_timer_attack_actual();
+
+		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + GetACSWatcher().GetWorldForward() * 1.1 ) );
+
+		if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ACSFixZAxis(( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * -8 ) + theCamera.GetCameraDirection() + GetACSWatcher().GetWorldForward() * -8) );
+
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
+								
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
+				
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
+
+		GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_ger_sword_dodge_b_02', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
 	}
 
 	latent function one_hand_sword_front_dodge_alt_3()
 	{
-		ticket = movementAdjustor.GetRequest( 'one_hand_sword_front_dodge_alt_3');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'one_hand_sword_front_dodge_alt_3' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'one_hand_sword_front_dodge_alt_3' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.25 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.25 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000 );
 		
@@ -10774,23 +11466,23 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetACSWatcher().dodge_timer_attack_actual();
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 		
 		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) );
 
 		if (!GetWitcherPlayer().HasTag('ACS_Camo_Active')
-		&& !GetWitcherPlayer().HasTag('acs_blood_sucking')
-		&& ACS_Settings_Main_Bool('EHmodDodgeSettings','EHmodDodgeEffects', false))
+		&& !GetWitcherPlayer().HasTag('ACS_Bruxa_Bite_Process')
+		&& ACS_Settings_Main_Bool('acs_dodge_settings','acs_dodge_effects', false))
 		{
 			GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails_backup' );
 			GetWitcherPlayer().StopEffect( 'bruxa_dash_trails_backup' );
 		}
 
-		theGame.GetSurfacePostFX().AddSurfacePostFXGroup( ACSPlayerFixZAxis( GetWitcherPlayer().GetWorldPosition() ), 0.5f, 1.0f, 0.5f, 50.f, 0);
+		theGame.GetSurfacePostFX().AddSurfacePostFXGroup( ACSFixZAxis( GetWitcherPlayer().GetWorldPosition() ), 0.5f, 1.0f, 0.5f, 50.f, 0);
 
 		if( RandF() < 0.5 ) 
 		{
@@ -10804,17 +11496,17 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 	latent function one_hand_sword_left_dodge_alt_3()
 	{	
-		ticket = movementAdjustor.GetRequest( 'one_hand_sword_left_dodge_alt_3');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'one_hand_sword_left_dodge_alt_3' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'one_hand_sword_left_dodge_alt_3' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.25 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.25 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -10822,32 +11514,32 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetACSWatcher().dodge_timer_attack_actual();
 
-		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraForward() * 1.1 ) );
+		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + GetACSWatcher().GetWorldForward() * 1.1 ) );
 
-		//movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * -1.1 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -1.1 );
+		//if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * -1.1 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -1.1 );
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 
 		GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge1_left_4m', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
 	}
 
 	latent function one_hand_sword_right_dodge_alt_3()
 	{
-		ticket = movementAdjustor.GetRequest( 'one_hand_sword_right_dodge_alt_3');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'one_hand_sword_right_dodge_alt_3' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'one_hand_sword_right_dodge_alt_3' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.25 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.25 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -10855,15 +11547,15 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetACSWatcher().dodge_timer_attack_actual();
 
-		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraForward() * 1.1 ) );
+		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + GetACSWatcher().GetWorldForward() * 1.1 ) );
 
-		//movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * 1.1 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * 1.1 );
+		//if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * 1.1 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * 1.1 );
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 
 		GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge1_right_4m', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
 	}
@@ -10872,17 +11564,17 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 	latent function one_hand_sword_left_dodge_alt_4()
 	{
-		ticket = movementAdjustor.GetRequest( 'one_hand_sword_left_dodge_alt_4');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'one_hand_sword_left_dodge_alt_4' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'one_hand_sword_left_dodge_alt_4' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.25 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.25 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -10890,32 +11582,32 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetACSWatcher().dodge_timer_attack_actual();
 
-		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraForward() * 1.1 ) );
+		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + GetACSWatcher().GetWorldForward() * 1.1 ) );
 
-		movementAdjustor.SlideTo( ticket, ( ACSPlayerFixZAxis(GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * -1.5 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -1.5) );
+		if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ( ACSFixZAxis(GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * -1.5 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -1.5) );
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 
 		GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_left_350m', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
 	}
 
 	latent function one_hand_sword_right_dodge_alt_4()
 	{
-		ticket = movementAdjustor.GetRequest( 'one_hand_sword_right_dodge_alt_4');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'one_hand_sword_right_dodge_alt_4' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'one_hand_sword_right_dodge_alt_4' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.25 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.25 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -10923,32 +11615,32 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetACSWatcher().dodge_timer_attack_actual();
 
-		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraForward() * 1.1 ) );
+		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + GetACSWatcher().GetWorldForward() * 1.1 ) );
 
-		movementAdjustor.SlideTo( ticket, ( ACSPlayerFixZAxis(GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * 1.5 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * 1.5) );
+		if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ( ACSFixZAxis(GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * 1.5 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * 1.5) );
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 
 		GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_right_350m', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
 	}
 
-	latent function one_hand_sword_left_dodge_alt_4_long()
+	latent function ciri_left_dodge()
 	{
-		ticket = movementAdjustor.GetRequest( 'one_hand_sword_left_dodge_alt_4_long');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'one_hand_sword_left_dodge_alt_4_long' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'one_hand_sword_left_dodge_alt_4_long' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.25 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.375 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -10956,32 +11648,39 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetACSWatcher().dodge_timer_attack_ciri_actual();
 
-		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraForward() * 1.1 ) );
+		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + GetACSWatcher().GetWorldForward() * 1.1 ) );
 
-		movementAdjustor.SlideTo( ticket, ( ACSPlayerFixZAxis(GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * -4 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -4) );
+		if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ( ACSFixZAxis(GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * -8 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -8) );
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 
-		GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_left_350m', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
+		if (RandF() < 0.5)
+		{
+			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'woman_ciri_sword_dodge_start_left_lp_extended_ACS', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));	
+		}
+		else
+		{
+			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'woman_ciri_sword_dodge_start_left_rp_extended_ACS', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));	
+		}
 	}
 
-	latent function one_hand_sword_right_dodge_alt_4_long()
+	latent function ciri_right_dodge()
 	{
-		ticket = movementAdjustor.GetRequest( 'one_hand_sword_right_dodge_alt_4_long');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'one_hand_sword_right_dodge_alt_4_long' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'one_hand_sword_right_dodge_alt_4_long' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.25 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.375 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -10989,34 +11688,121 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetACSWatcher().dodge_timer_attack_ciri_actual();
 
-		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraForward() * 1.1 ) );
+		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + GetACSWatcher().GetWorldForward() * 1.1 ) );
 
-		movementAdjustor.SlideTo( ticket, ( ACSPlayerFixZAxis(GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * 4 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * 4) );
+		if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ( ACSFixZAxis(GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * 8 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * 8) );
 
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
 								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
 				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
 
-		GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge_right_350m', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
+		if (RandF() < 0.5)
+		{
+			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'woman_ciri_sword_dodge_start_right_lp_extended_ACS', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));	
+		}
+		else
+		{
+			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'woman_ciri_sword_dodge_start_right_rp_extended_ACS', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));	
+		}
+	}
+
+	latent function acs_armor_left_dodge()
+	{
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
+		
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
+		
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
+
+		GetWitcherPlayer().ResetRawPlayerHeading();
+		
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
+		
+		movementAdjustor.AdjustmentDuration( ticket, 0.375 / theGame.GetTimeScale());
+		
+		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
+		
+		movementAdjustor.MaxLocationAdjustmentSpeed( ticket, 50000000 );
+
+		GetACSWatcher().dodge_timer_attack_actual();
+
+		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + GetACSWatcher().GetWorldForward() * 1.1 ) );
+
+		if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ( ACSFixZAxis(GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * -8 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -8) );
+
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
+								
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
+				
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
+
+		if (RandF() < 0.5)
+		{
+			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'woman_ciri_sword_dodge_start_left_lp_extended_ACS', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));	
+		}
+		else
+		{
+			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'woman_ciri_sword_dodge_start_left_rp_extended_ACS', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));	
+		}
+	}
+
+	latent function acs_armor_right_dodge()
+	{
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
+		
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
+		
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
+
+		GetWitcherPlayer().ResetRawPlayerHeading();
+		
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
+		
+		movementAdjustor.AdjustmentDuration( ticket, 0.375 / theGame.GetTimeScale());
+		
+		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
+		
+		movementAdjustor.MaxLocationAdjustmentSpeed( ticket, 50000000 );
+
+		GetACSWatcher().dodge_timer_attack_actual();
+
+		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + GetACSWatcher().GetWorldForward() * 1.1 ) );
+
+		if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ( ACSFixZAxis(GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * 8 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * 8) );
+
+		GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();	
+								
+		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }	
+				
+		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5  / theGame.GetTimeScale(), false );
+
+		if (RandF() < 0.5)
+		{
+			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'woman_ciri_sword_dodge_start_right_lp_extended_ACS', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));	
+		}
+		else
+		{
+			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'woman_ciri_sword_dodge_start_right_rp_extended_ACS', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.25f));	
+		}
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	latent function cat_one_hand_sword_back_dodge_alt_3()
 	{
-		ticket = movementAdjustor.GetRequest( 'cat_one_hand_sword_back_dodge_alt_3');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'cat_one_hand_sword_back_dodge_alt_3' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'cat_one_hand_sword_back_dodge_alt_3' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.25 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.25 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -11024,11 +11810,11 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetACSWatcher().dodge_timer_attack_actual();
 
-		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraForward() * 1.1 ) );
+		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + GetACSWatcher().GetWorldForward() * 1.1 ) );
 
-		movementAdjustor.SlideTo( ticket, ACSPlayerFixZAxis(( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * -1.1 ) + theCamera.GetCameraDirection() + theCamera.GetCameraForward() * -1.1) );
+		if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ACSFixZAxis(( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * -1.1 ) + theCamera.GetCameraDirection() + GetACSWatcher().GetWorldForward() * -1.1) );
 
-		if( GetWitcherPlayer().IsAlive()) {GetWitcherPlayer().ClearAnimationSpeedMultipliers();}	
+		if( GetWitcherPlayer().IsAlive()) {GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();}	
 
 		/*
 		if( RandF() < 0.5 ) 
@@ -11046,15 +11832,15 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 	latent function cat_one_hand_sword_front_dodge_alt_3()
 	{
-		ticket = movementAdjustor.GetRequest( 'cat_one_hand_sword_front_dodge_alt_3');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'cat_one_hand_sword_front_dodge_alt_3' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
-		ticket = movementAdjustor.CreateNewRequest( 'cat_one_hand_sword_front_dodge_alt_3' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.1 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.1 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000 );
 		
@@ -11062,11 +11848,11 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetACSWatcher().dodge_timer_attack_actual();
 
-		if( GetWitcherPlayer().IsAlive()) {GetWitcherPlayer().ClearAnimationSpeedMultipliers();}	
+		if( GetWitcherPlayer().IsAlive()) {GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();}	
 
-		if (GetWitcherPlayer().IsGuarded()||GetWitcherPlayer().HasBuff(EET_SlowdownFrost)||GetWitcherPlayer().HasBuff(EET_Slowdown)||GetWitcherPlayer().HasBuff(EET_Blizzard)){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.5 ); }
+		if (GetWitcherPlayer().IsGuarded()||GetWitcherPlayer().HasBuff(EET_SlowdownFrost)||GetWitcherPlayer().HasBuff(EET_Slowdown)||GetWitcherPlayer().HasBuff(EET_Blizzard)){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.5 ); }
 
-		GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.25  , false);
+		GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.25   / theGame.GetTimeScale(), false );
 		
 		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
 		{	
@@ -11098,17 +11884,17 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 	latent function cat_one_hand_sword_left_dodge_alt_3()
 	{
-		ticket = movementAdjustor.GetRequest( 'cat_one_hand_sword_left_dodge_alt_3');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'cat_one_hand_sword_left_dodge_alt_3' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'cat_one_hand_sword_left_dodge_alt_3' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.25 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.25 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -11116,32 +11902,32 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetACSWatcher().dodge_timer_attack_actual();
 
-		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraForward() * 1.1 ) );
+		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + GetACSWatcher().GetWorldForward() * 1.1 ) );
 
-		//movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * -1.1 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -1.1 );
+		//if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * -1.1 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -1.1 );
 
-		if( GetWitcherPlayer().IsAlive()) {GetWitcherPlayer().ClearAnimationSpeedMultipliers();}	
+		if( GetWitcherPlayer().IsAlive()) {GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();}	
 
-		if (GetWitcherPlayer().IsGuarded()||GetWitcherPlayer().HasBuff(EET_SlowdownFrost)||GetWitcherPlayer().HasBuff(EET_Slowdown)||GetWitcherPlayer().HasBuff(EET_Blizzard)){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.5 ); }
+		if (GetWitcherPlayer().IsGuarded()||GetWitcherPlayer().HasBuff(EET_SlowdownFrost)||GetWitcherPlayer().HasBuff(EET_Slowdown)||GetWitcherPlayer().HasBuff(EET_Blizzard)){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.5 ); }
 
-		GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.25  , false);
+		GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.25   / theGame.GetTimeScale(), false );
 
 		GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge1_left_4m', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
 	}
 
 	latent function cat_one_hand_sword_right_dodge_alt_3()
 	{
-		ticket = movementAdjustor.GetRequest( 'cat_one_hand_sword_right_dodge_alt_3');
+		ticket = movementAdjustor.GetRequest( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelByName( 'cat_one_hand_sword_right_dodge_alt_3' );
+		movementAdjustor.CancelByName( 'ACSMovAdj' );
 		
-		movementAdjustor.CancelAll();
+		thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 		GetWitcherPlayer().ResetRawPlayerHeading();
 		
-		ticket = movementAdjustor.CreateNewRequest( 'cat_one_hand_sword_right_dodge_alt_3' );
+		ticket = movementAdjustor.CreateNewRequest( 'ACSMovAdj' ); movementAdjustor.BlendIn(ticket, 0.1f); movementAdjustor.ShouldStartFacing(ticket, theCamera.GetCameraHeading());
 		
-		movementAdjustor.AdjustmentDuration( ticket, 0.25 );
+		movementAdjustor.AdjustmentDuration( ticket, 0.25 / theGame.GetTimeScale());
 		
 		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
 		
@@ -11149,183 +11935,17 @@ state ACS_RollInit_Engage in cACS_RollInit
 
 		GetACSWatcher().dodge_timer_attack_actual();
 
-		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraForward() * 1.1 ) );
+		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + GetACSWatcher().GetWorldForward() * 1.1 ) );
 
-		//movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * 1.1 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * 1.1 );
+		//if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * 1.1 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * 1.1 );
 
-		if( GetWitcherPlayer().IsAlive()) {GetWitcherPlayer().ClearAnimationSpeedMultipliers();}	
+		if( GetWitcherPlayer().IsAlive()) {GetWitcherPlayer().ACS_ClearAnimationSpeedMultipliers();}	
 
-		if (GetWitcherPlayer().IsGuarded()||GetWitcherPlayer().HasBuff(EET_SlowdownFrost)||GetWitcherPlayer().HasBuff(EET_Slowdown)||GetWitcherPlayer().HasBuff(EET_Blizzard)){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.5 ); }		
+		if (GetWitcherPlayer().IsGuarded()||GetWitcherPlayer().HasBuff(EET_SlowdownFrost)||GetWitcherPlayer().HasBuff(EET_Slowdown)||GetWitcherPlayer().HasBuff(EET_Blizzard)){GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.25  ); }else{GetWitcherPlayer().ACS_SetAnimationSpeedMultiplier( 1.5 ); }		
 
-		GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.25  , false);
+		GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.25   / theGame.GetTimeScale(), false );
 
 		GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_sword_dodge1_right_4m', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));
-	}
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	latent function front_dodge_skate()
-	{
-		ticket = movementAdjustor.GetRequest( 'one_hand_sword_front_dodge_alt_2');
-		
-		movementAdjustor.CancelByName( 'one_hand_sword_front_dodge_alt_2' );
-		
-		movementAdjustor.CancelAll();
-
-		ticket = movementAdjustor.CreateNewRequest( 'one_hand_sword_front_dodge_alt_2' );
-		
-		movementAdjustor.AdjustmentDuration( ticket, 0.25 );
-		
-		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000 );
-		
-		movementAdjustor.MaxLocationAdjustmentSpeed( ticket, 50000 );
-
-		GetACSWatcher().dodge_timer_attack_actual();
-
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
-								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
-				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
-		
-		if( ACS_AttitudeCheck ( actor ) && GetWitcherPlayer().IsInCombat() && actor.IsAlive() )
-		{	
-			movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) );
-
-			movementAdjustor.SlideTo( ticket, ACSPlayerFixZAxis(( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * 2.5 ) + theCamera.GetCameraDirection() + theCamera.GetCameraForward() * 2.5) );
-		}
-		else
-		{			
-			movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() ) );
-
-			movementAdjustor.SlideTo( ticket, ACSPlayerFixZAxis(( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * 2.5 ) + theCamera.GetCameraDirection() + theCamera.GetCameraForward() * 2.5) );
-		}
-		
-		GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails_backup' );
-		GetWitcherPlayer().StopEffect( 'bruxa_dash_trails_backup' );
-
-		theGame.GetSurfacePostFX().AddSurfacePostFXGroup( ACSPlayerFixZAxis( GetWitcherPlayer().GetWorldPosition() ), 0.5f, 1.0f, 0.5f, 50.f, 0);
-
-		if( RandF() < 0.5 ) 
-		{
-			if( RandF() < 0.75 ) 
-			{
-				GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'ice_skating_attack_loop_l', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
-			}
-			else
-			{
-				GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'ice_skating_attack_loop_r', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
-			}
-		}
-		else
-		{
-			if( RandF() < 0.75 ) 
-			{
-				GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'ice_skating_attack_02_loop_l', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
-			}
-			else
-			{
-				GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'ice_skating_attack_02_loop_r', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
-			}
-		}
-	}
-
-	latent function left_dodge_skate()
-	{	
-		ticket = movementAdjustor.GetRequest( 'one_hand_sword_left_dodge_alt_2');
-		
-		movementAdjustor.CancelByName( 'one_hand_sword_left_dodge_alt_2' );
-		
-		movementAdjustor.CancelAll();
-
-		GetWitcherPlayer().ResetRawPlayerHeading();
-		
-		ticket = movementAdjustor.CreateNewRequest( 'one_hand_sword_left_dodge_alt_2' );
-		
-		movementAdjustor.AdjustmentDuration( ticket, 0.25 );
-		
-		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
-		
-		movementAdjustor.MaxLocationAdjustmentSpeed( ticket, 50000000 );
-
-		GetACSWatcher().dodge_timer_attack_actual();
-
-		//movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraRight() * 5 ) );
-
-		//movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * -1.1 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -1.1 );
-
-		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraForward() * 1.1 ) );
-
-		//movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * -1.5 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -1.5 );
-
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
-								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
-				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
-
-		GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails_backup' );
-		GetWitcherPlayer().StopEffect( 'bruxa_dash_trails_backup' );
-
-		theGame.GetSurfacePostFX().AddSurfacePostFXGroup( ACSPlayerFixZAxis( GetWitcherPlayer().GetWorldPosition() ), 0.5f, 1.0f, 0.5f, 50.f, 0);
-
-		if( RandF() < 0.75 ) 
-		{
-			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'ice_skating_attack_loop_l_turn_l', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
-		}
-		else
-		{
-			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'ice_skating_attack_loop_r_turn_l', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
-		}
-	}
-
-	latent function right_dodge_skate()
-	{	
-		ticket = movementAdjustor.GetRequest( 'one_hand_sword_right_dodge_alt_2');
-		
-		movementAdjustor.CancelByName( 'one_hand_sword_right_dodge_alt_2' );
-		
-		movementAdjustor.CancelAll();
-
-		GetWitcherPlayer().ResetRawPlayerHeading();
-		
-		ticket = movementAdjustor.CreateNewRequest( 'one_hand_sword_right_dodge_alt_2' );
-		
-		movementAdjustor.AdjustmentDuration( ticket, 0.25 );
-		
-		movementAdjustor.MaxRotationAdjustmentSpeed( ticket, 50000000 );
-		
-		movementAdjustor.MaxLocationAdjustmentSpeed( ticket, 50000000 );
-
-		GetACSWatcher().dodge_timer_attack_actual();
-
-		//movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraRight() * -5 ) );
-
-		//movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * 1.1 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * 1.1 );
-
-		movementAdjustor.RotateTo( ticket, VecHeading( theCamera.GetCameraDirection() + theCamera.GetCameraForward() * 1.1 ) );
-
-		//movementAdjustor.SlideTo( ticket, ( GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldRight() * 1.5 ) + theCamera.GetCameraDirection() + theCamera.GetCameraRight() * 1.5 );
-
-		GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
-								
-		//if (GetWitcherPlayer().IsGuarded() || GetWitcherPlayer().GetStat( BCS_Stamina ) <= GetWitcherPlayer().GetStatMax( BCS_Stamina ) * 0.15){GetWitcherPlayer().SetAnimationSpeedMultiplier( 1  ); }else{GetWitcherPlayer().SetAnimationSpeedMultiplier( 1.25  ); }	
-				
-		//GetACSWatcher().AddTimer('ACS_ResetAnimation', 0.5 , false);
-
-		GetWitcherPlayer().PlayEffectSingle( 'bruxa_dash_trails_backup' );
-		GetWitcherPlayer().StopEffect( 'bruxa_dash_trails_backup' );
-
-		theGame.GetSurfacePostFX().AddSurfacePostFXGroup( ACSPlayerFixZAxis( GetWitcherPlayer().GetWorldPosition() ), 0.5f, 1.0f, 0.5f, 50.f, 0);
-
-		if( RandF() < 0.75 ) 
-		{
-			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'ice_skating_attack_loop_l_turn_r', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
-		}
-		else
-		{
-			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'ice_skating_attack_loop_r_turn_r', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0.25f, 0.875f));	
-		}
 	}
 
 	event OnLeaveState( nextStateName : name ) 
@@ -11334,6 +11954,7 @@ state ACS_RollInit_Engage in cACS_RollInit
 	}
 }
 
+/*
 function ACS_Blink_Hit_Reaction()
 {
 	var vACS_BlinkHitReaction : cACS_BlinkHitReaction;
@@ -11372,7 +11993,7 @@ state BlinkHitReaction_Engage in cACS_BlinkHitReaction
 		if (!GetWitcherPlayer().IsCiri()
 		&& !GetWitcherPlayer().IsPerformingFinisher()
 		&& !GetWitcherPlayer().HasTag('acs_in_wraith')
-		&& !GetWitcherPlayer().HasTag('acs_blood_sucking')
+		&& !GetWitcherPlayer().HasTag('ACS_Bruxa_Bite_Process')
 		)
 		{
 			BlinkHitReaction_Latent();
@@ -11435,11 +12056,11 @@ state BlinkHitReaction_Engage in cACS_BlinkHitReaction
 			
 			//Sleep ( 0.45 / GetWitcherPlayer().GetAnimationTimeMultiplier() );
 			
-			GetACSWatcher().AddTimer('ACS_dodge_timer_wildhunt', 0.45 / GetWitcherPlayer().GetAnimationTimeMultiplier() , false);
+			GetACSWatcher().AddTimer('ACS_dodge_timer_wildhunt', 0.45 / GetWitcherPlayer().GetAnimationTimeMultiplier()  / theGame.GetTimeScale(), false );
 			
-			/*
+			
 			movementAdjustor = GetWitcherPlayer().GetMovingAgentComponent().GetMovementAdjustor();
-			movementAdjustor.CancelAll();
+			thePlayer.RaiseEvent('ACS_CombatExtraReset');movementAdjustor.CancelAll();
 
 			
 
@@ -11450,10 +12071,11 @@ state BlinkHitReaction_Engage in cACS_BlinkHitReaction
 			GetWitcherPlayer().ResetRawPlayerHeading();
 
 			ticket = movementAdjustor.CreateNewRequest( 'wh_blink' );
-			movementAdjustor.AdjustmentDuration( ticket, 0.25 );
+			movementAdjustor.AdjustmentDuration( ticket, 0.25 / theGame.GetTimeScale());
 			movementAdjustor.RotateTowards( ticket, actor );
-			movementAdjustor.SlideTo(ticket, pos);
-			*/
+			if (GetACSWatcher().playerContactWithNpc){movementAdjustor.MaxLocationAdjustmentDistance( ticket, 0 );} movementAdjustor.SlideTo(ticket, pos);
+			
 		}
 	}
 }
+*/

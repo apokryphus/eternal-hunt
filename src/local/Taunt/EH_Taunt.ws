@@ -6,16 +6,17 @@ function ACS_TauntInit()
 	if (!thePlayer.IsPerformingFinisher() 
 	&& !thePlayer.IsCrossbowHeld() 
 	&& !thePlayer.IsInHitAnim() 
-	&& !thePlayer.HasTag('acs_blood_sucking') 
+	&& !thePlayer.HasTag('ACS_Bruxa_Bite_Process') 
 	&& !thePlayer.HasTag('acs_in_wraith')
 	&& !thePlayer.IsInAir()
 	&& thePlayer.IsActionAllowed(EIAB_Movement)
 	&& thePlayer.IsActionAllowed(EIAB_LightAttacks)
 	&& ACS_BuffCheck()
-	&& !ACS_Transformation_Activated_Check()
+	&& FactsQuerySum("acs_transformation_activated") <= 0
+	&& ACS_Settings_Main_Bool('acs_taunt_settings','acs_taunt_system_enabled', true)
 	)		
 	{
-		ACS_ThingsThatShouldBeRemoved(false);
+		ACS_ThingsThatShouldBeRemoved();
 		vTaunt.Engage();
 	}
 }
@@ -64,115 +65,115 @@ state acsTauntEngage in cTaunt
 				{
 					if ( thePlayer.GetEquippedSign() == ST_Quen)
 					{
-						if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerQuenSignWeapon', 1) == 0)
+						if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_quen_sign_weapon', 1) == 0)
 						{
 							normal_combat_taunt();
 						}
-						else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerQuenSignWeapon', 1) == 1)
+						else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_quen_sign_weapon', 1) == 1)
 						{
 							olgierd_combat_taunt();
 						}
-						else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerQuenSignWeapon', 1) == 2)
+						else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_quen_sign_weapon', 1) == 2)
 						{
 							eredin_combat_taunt();
 						}
-						else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerQuenSignWeapon', 1) == 3)
+						else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_quen_sign_weapon', 1) == 3)
 						{
 							claw_taunt();
 						}
-						else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerQuenSignWeapon', 1) == 4)
+						else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_quen_sign_weapon', 1) == 4)
 						{
 							imlerith_combat_taunt();
 						}
 					}
 					else if ( thePlayer.GetEquippedSign() == ST_Aard)
 					{
-						if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAardSignWeapon', 3) == 0)
+						if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_aard_sign_weapon', 3) == 0)
 						{
 							normal_combat_taunt();
 						}
-						else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAardSignWeapon', 3) == 1)
+						else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_aard_sign_weapon', 3) == 1)
 						{
 							olgierd_combat_taunt();
 						}
-						else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAardSignWeapon', 3) == 2)
+						else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_aard_sign_weapon', 3) == 2)
 						{
 							eredin_combat_taunt();
 						}
-						else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAardSignWeapon', 3) == 3)
+						else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_aard_sign_weapon', 3) == 3)
 						{
 							claw_taunt();
 						}
-						else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAardSignWeapon', 3) == 4)
+						else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_aard_sign_weapon', 3) == 4)
 						{
 							imlerith_combat_taunt();
 						}
 					}
 					else if ( thePlayer.GetEquippedSign() == ST_Axii)
 					{
-						if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAxiiSignWeapon', 2) == 0)
+						if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_axii_sign_weapon', 2) == 0)
 						{
 							normal_combat_taunt();
 						}
-						else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAxiiSignWeapon', 2) == 1)
+						else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_axii_sign_weapon', 2) == 1)
 						{
 							olgierd_combat_taunt();
 						}
-						else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAxiiSignWeapon', 2) == 2)
+						else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_axii_sign_weapon', 2) == 2)
 						{
 							eredin_combat_taunt();
 						}
-						else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAxiiSignWeapon', 2) == 3)
+						else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_axii_sign_weapon', 2) == 3)
 						{
 							claw_taunt();
 						}
-						else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAxiiSignWeapon', 2) == 4)
+						else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_axii_sign_weapon', 2) == 4)
 						{
 							imlerith_combat_taunt();
 						}
 					}
 					else if ( thePlayer.GetEquippedSign() == ST_Yrden)
 					{
-						if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerYrdenSignWeapon', 4) == 0)
+						if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_yrden_sign_weapon', 4) == 0)
 						{
 							normal_combat_taunt();
 						}
-						else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerYrdenSignWeapon', 4) == 1)
+						else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_yrden_sign_weapon', 4) == 1)
 						{
 							olgierd_combat_taunt();
 						}
-						else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerYrdenSignWeapon', 4) == 2)
+						else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_yrden_sign_weapon', 4) == 2)
 						{
 							eredin_combat_taunt();
 						}
-						else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerYrdenSignWeapon', 4) == 3)
+						else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_yrden_sign_weapon', 4) == 3)
 						{
 							claw_taunt();
 						}
-						else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerYrdenSignWeapon', 4) == 4)
+						else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_yrden_sign_weapon', 4) == 4)
 						{
 							imlerith_combat_taunt();
 						}	
 					}	
 					else if ( thePlayer.GetEquippedSign() == ST_Igni)
 					{
-						if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerIgniSignWeapon', 0) == 0)
+						if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_igni_sign_weapon', 0) == 0)
 						{
 							normal_combat_taunt();
 						}
-						else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerIgniSignWeapon', 0) == 1)
+						else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_igni_sign_weapon', 0) == 1)
 						{
 							olgierd_combat_taunt();
 						}
-						else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerIgniSignWeapon', 0) == 2)
+						else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_igni_sign_weapon', 0) == 2)
 						{
 							eredin_combat_taunt();
 						}
-						else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerIgniSignWeapon', 0) == 3)
+						else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_igni_sign_weapon', 0) == 3)
 						{
 							claw_taunt();
 						}
-						else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerIgniSignWeapon', 0) == 4)
+						else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_igni_sign_weapon', 0) == 4)
 						{
 							imlerith_combat_taunt();
 						}
@@ -181,65 +182,65 @@ state acsTauntEngage in cTaunt
 				else if ( ACS_GetWeaponMode() == 1 )
 				{
 					if ( 
-					ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 1 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_sword_equipped') 
-					|| ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 1 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_sword_equipped') 
+					ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 1 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_sword_equipped') 
+					|| ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 1 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_sword_equipped') 
 					)
 					{
 						olgierd_combat_taunt();
 					}
 					else if ( 
-					ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 7 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_sword_equipped') 
-					|| ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 7 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_sword_equipped') 
+					ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 7 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_sword_equipped') 
+					|| ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 7 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_sword_equipped') 
 					)
 					{
 						claw_taunt();
 					}
 					else if ( 
-					 ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 3 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_sword_equipped') 
-					|| ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 3 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_sword_equipped')
+					 ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 3 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_sword_equipped') 
+					|| ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 3 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_sword_equipped')
 					)
 					{
 						eredin_combat_taunt();	
 					}
-					else if ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 5 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') 
-					|| ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 5 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') 
+					else if ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 5 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') 
+					|| ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 5 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') 
 					)
 					{
 						imlerith_combat_taunt();	
 					}	
 					else if ( 
-					ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_sword_equipped') 
-					|| ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_sword_equipped')
-					|| ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') 
-					|| ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped')
+					ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_sword_equipped') 
+					|| ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_sword_equipped')
+					|| ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') 
+					|| ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped')
 					)
 					{
 						normal_combat_taunt();	
 					}
 					else if ( 
-					ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 2 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped') 
-					|| ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 2 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped') 
+					ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 2 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped') 
+					|| ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 2 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped') 
 					)
 					{
 						imlerith_combat_taunt();	
 					}
 					else if ( 
-					ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 4 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') 
-					|| ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 4 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') 
+					ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 4 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') 
+					|| ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 4 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') 
 					)
 					{
 						eredin_combat_taunt();	
 					}
 					else if ( 
-					ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 6  && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') 
-					|| ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 6 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') 
+					ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 6  && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') 
+					|| ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 6 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') 
 					)
 					{
 						imlerith_combat_taunt();	
 					}
 					else if ( 
-					ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 8  && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') 
-					|| ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 8 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') 
+					ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 8  && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') 
+					|| ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 8 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') 
 					)
 					{
 						normal_combat_taunt();	
@@ -305,57 +306,60 @@ state acsTauntEngage in cTaunt
 				else if ( ACS_GetWeaponMode() == 3 )
 				{
 					if ( 
-					ACS_GetItem_Olgierd_Silver() && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_sword_equipped') 
-					|| ACS_GetItem_Olgierd_Steel() && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_sword_equipped')
+					ACS_GetItem_Sword_IsEquipped('olgierd_silver', 'silver') && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_sword_equipped') 
+					|| ACS_GetItem_Sword_IsEquipped('olgierd_steel', 'steel') && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_sword_equipped')
 					)
 					{
 						olgierd_combat_taunt();
 					}
 					else if ( 
-					ACS_GetItem_Claws_Silver() && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_sword_equipped') 
-					|| ACS_GetItem_Claws_Steel() && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_sword_equipped')
+					ACS_GetItem_Sword_IsEquipped('claws_silver', 'silver') && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_sword_equipped') 
+					|| ACS_GetItem_Sword_IsEquipped('claws_steel', 'steel') && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_sword_equipped')
 					)
 					{
 						claw_taunt();
 					}
 					else if ( 
-					ACS_GetItem_Eredin_Silver() && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_sword_equipped') 
-					|| ACS_GetItem_Eredin_Steel() && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_sword_equipped')
+					ACS_GetItem_Sword_IsEquipped('shield_sword_silver', 'silver') && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_sword_equipped') 
+					|| ACS_GetItem_Sword_IsEquipped('shield_sword_steel', 'steel') && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_sword_equipped')
 					)
 					{
 						eredin_combat_taunt();	
 					}
 					else if ( 
-					ACS_GetItem_Imlerith_Silver() && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') 
-					|| ACS_GetItem_Imlerith_Steel() && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_sword_equipped')
+					ACS_GetItem_Sword_IsEquipped('imlerith_moveset_silver', 'silver') && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') 
+					|| ACS_GetItem_Sword_IsEquipped('imlerith_moveset_steel', 'steel') && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_sword_equipped')
+					|| ACS_GetItem_Sword_IsEquipped('caretaker_shovel_steel', 'steel') && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_sword_equipped')
+					|| ACS_GetItem_Sword_IsEquipped('imlerith_steel', 'steel') && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_sword_equipped')
+					
 					)
 					{
 						imlerith_combat_taunt();	
 					}	
 					else if ( 
-					ACS_GetItem_Spear_Silver() && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped') 
-					|| ACS_GetItem_Spear_Steel() && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped')
+					ACS_GetItem_Sword_IsEquipped('spear_silver', 'silver') && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped') 
+					|| ACS_GetItem_Sword_IsEquipped('spear_steel', 'steel') && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 					)
 					{
 						imlerith_combat_taunt();	
 					}
 					else if ( 
-					ACS_GetItem_Greg_Silver() && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') 
-					|| ACS_GetItem_Greg_Steel() && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
+					ACS_GetItem_Sword_IsEquipped('greg_silver', 'silver') && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') 
+					|| ACS_GetItem_Sword_IsEquipped('greg_steel', 'steel') && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						eredin_combat_taunt();	
 					}
 					else if ( 
-					ACS_GetItem_Hammer_Silver() && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') 
-					|| ACS_GetItem_Hammer_Steel() && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
+					ACS_GetItem_Sword_IsEquipped('hammer_silver', 'silver') && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') 
+					|| ACS_GetItem_Sword_IsEquipped('hammer_steel', 'steel') && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 					)
 					{
 						imlerith_combat_taunt();	
 					}
 					else if ( 
-					ACS_GetItem_Axe_Silver() && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') 
-					|| ACS_GetItem_Axe_Steel() && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped')
+					ACS_GetItem_Sword_IsEquipped('axe_silver', 'silver') && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') 
+					|| ACS_GetItem_Sword_IsEquipped('axe_steel', 'steel') && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped')
 					)
 					{
 						normal_combat_taunt();	
@@ -371,7 +375,7 @@ state acsTauntEngage in cTaunt
 				claw_taunt();	
 			}
 			
-			if (ACS_Settings_Main_Bool('EHmodTauntSettings','EHmodTauntSystemEnabled', false))
+			if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_combat_taunt_enabled', false))
 			{
 				playerTaunt();
 				NPC_Taunt_EnemyBoost();
@@ -381,7 +385,7 @@ state acsTauntEngage in cTaunt
 
 	latent function playerTaunt()
 	{
-		if ( !thePlayer.IsInCombat() && ACS_Settings_Main_Bool('EHmodTauntSettings','EHmodIWannaPlayGwentEnabled', false) )
+		if ( !thePlayer.IsInCombat() && ACS_Settings_Main_Bool('acs_taunt_settings','acs_i_wanna_play_gwent_enabled', false) )
 		{
 			thePlayer.RaiseEvent('ACS_GoPloughYourself');
 
@@ -424,7 +428,7 @@ state acsTauntEngage in cTaunt
 				&& !thePlayer.HasTag('ACS_passive_taunt_21')
 			)
 			{
-				thePlayer.PlayLine( 587823, true);
+				thePlayer.PlayLine( 587823, false);
 
 				thePlayer.AddTag('ACS_passive_taunt_begin');
 				thePlayer.AddTag('ACS_passive_taunt_1');
@@ -434,7 +438,7 @@ state acsTauntEngage in cTaunt
 				thePlayer.HasTag('ACS_passive_taunt_begin') 
 				&& thePlayer.HasTag('ACS_passive_taunt_1'))
 			{
-				thePlayer.PlayLine( 1188473, true);
+				thePlayer.PlayLine( 1188473, false);
 
 				thePlayer.RemoveTag('ACS_passive_taunt_1');
 				thePlayer.AddTag('ACS_passive_taunt_2');
@@ -444,7 +448,7 @@ state acsTauntEngage in cTaunt
 				thePlayer.HasTag('ACS_passive_taunt_begin') 
 				&& thePlayer.HasTag('ACS_passive_taunt_2'))
 			{
-				thePlayer.PlayLine( 1188488, true);
+				thePlayer.PlayLine( 1188488, false);
 
 				thePlayer.RemoveTag('ACS_passive_taunt_2');
 				thePlayer.AddTag('ACS_passive_taunt_3');
@@ -454,7 +458,7 @@ state acsTauntEngage in cTaunt
 				thePlayer.HasTag('ACS_passive_taunt_begin') 
 				&& thePlayer.HasTag('ACS_passive_taunt_3'))
 			{
-				thePlayer.PlayLine( 1188495, true);
+				thePlayer.PlayLine( 1188495, false);
 
 				thePlayer.RemoveTag('ACS_passive_taunt_3');
 				thePlayer.AddTag('ACS_passive_taunt_4');
@@ -464,7 +468,7 @@ state acsTauntEngage in cTaunt
 				thePlayer.HasTag('ACS_passive_taunt_begin') 
 				&& thePlayer.HasTag('ACS_passive_taunt_4'))
 			{
-				thePlayer.PlayLine( 1188498, true);
+				thePlayer.PlayLine( 1188498, false);
 
 				thePlayer.RemoveTag('ACS_passive_taunt_4');
 				thePlayer.AddTag('ACS_passive_taunt_5');
@@ -474,7 +478,7 @@ state acsTauntEngage in cTaunt
 				thePlayer.HasTag('ACS_passive_taunt_begin') 
 				&& thePlayer.HasTag('ACS_passive_taunt_5'))
 			{
-				thePlayer.PlayLine( 1188504, true);
+				thePlayer.PlayLine( 1188504, false);
 
 				thePlayer.RemoveTag('ACS_passive_taunt_5');
 				thePlayer.AddTag('ACS_passive_taunt_6');
@@ -484,7 +488,7 @@ state acsTauntEngage in cTaunt
 				thePlayer.HasTag('ACS_passive_taunt_begin') 
 				&& thePlayer.HasTag('ACS_passive_taunt_6'))
 			{
-				thePlayer.PlayLine( 1188506, true);
+				thePlayer.PlayLine( 1188506, false);
 
 				thePlayer.RemoveTag('ACS_passive_taunt_6');
 				thePlayer.AddTag('ACS_passive_taunt_7');
@@ -494,7 +498,7 @@ state acsTauntEngage in cTaunt
 				thePlayer.HasTag('ACS_passive_taunt_begin') 
 				&& thePlayer.HasTag('ACS_passive_taunt_7'))
 			{
-				thePlayer.PlayLine( 1136548, true);
+				thePlayer.PlayLine( 1136548, false);
 
 				thePlayer.RemoveTag('ACS_passive_taunt_7');
 				thePlayer.AddTag('ACS_passive_taunt_8');
@@ -504,7 +508,7 @@ state acsTauntEngage in cTaunt
 				thePlayer.HasTag('ACS_passive_taunt_begin') 
 				&& thePlayer.HasTag('ACS_passive_taunt_8'))
 			{
-				thePlayer.PlayLine( 1137383, true);
+				thePlayer.PlayLine( 1137383, false);
 
 				thePlayer.RemoveTag('ACS_passive_taunt_8');
 				thePlayer.AddTag('ACS_passive_taunt_9');
@@ -514,7 +518,7 @@ state acsTauntEngage in cTaunt
 				thePlayer.HasTag('ACS_passive_taunt_begin') 
 				&& thePlayer.HasTag('ACS_passive_taunt_9'))
 			{
-				thePlayer.PlayLine( 1136707, true);
+				thePlayer.PlayLine( 1136707, false);
 
 				thePlayer.RemoveTag('ACS_passive_taunt_9');
 				thePlayer.AddTag('ACS_passive_taunt_10');
@@ -524,7 +528,7 @@ state acsTauntEngage in cTaunt
 				thePlayer.HasTag('ACS_passive_taunt_begin') 
 				&& thePlayer.HasTag('ACS_passive_taunt_10'))
 			{
-				thePlayer.PlayLine( 1136514, true);
+				thePlayer.PlayLine( 1136514, false);
 
 				thePlayer.RemoveTag('ACS_passive_taunt_10');
 				thePlayer.AddTag('ACS_passive_taunt_11');
@@ -534,7 +538,7 @@ state acsTauntEngage in cTaunt
 				thePlayer.HasTag('ACS_passive_taunt_begin') 
 				&& thePlayer.HasTag('ACS_passive_taunt_11'))
 			{
-				thePlayer.PlayLine( 1028773, true);
+				thePlayer.PlayLine( 1028773, false);
 
 				thePlayer.RemoveTag('ACS_passive_taunt_11');
 				thePlayer.AddTag('ACS_passive_taunt_12');
@@ -544,7 +548,7 @@ state acsTauntEngage in cTaunt
 				thePlayer.HasTag('ACS_passive_taunt_begin') 
 				&& thePlayer.HasTag('ACS_passive_taunt_12'))
 			{
-				thePlayer.PlayLine( 1028746, true);
+				thePlayer.PlayLine( 1028746, false);
 
 				thePlayer.RemoveTag('ACS_passive_taunt_12');
 				thePlayer.AddTag('ACS_passive_taunt_13');
@@ -554,7 +558,7 @@ state acsTauntEngage in cTaunt
 				thePlayer.HasTag('ACS_passive_taunt_begin') 
 				&& thePlayer.HasTag('ACS_passive_taunt_13'))
 			{
-				thePlayer.PlayLine( 520912, true);
+				thePlayer.PlayLine( 520912, false);
 
 				thePlayer.RemoveTag('ACS_passive_taunt_13');
 				thePlayer.AddTag('ACS_passive_taunt_14');
@@ -564,7 +568,7 @@ state acsTauntEngage in cTaunt
 				thePlayer.HasTag('ACS_passive_taunt_begin') 
 				&& thePlayer.HasTag('ACS_passive_taunt_14'))
 			{
-				thePlayer.PlayLine( 522382, true);
+				thePlayer.PlayLine( 522382, false);
 
 				thePlayer.RemoveTag('ACS_passive_taunt_14');
 				thePlayer.AddTag('ACS_passive_taunt_15');
@@ -574,7 +578,7 @@ state acsTauntEngage in cTaunt
 				thePlayer.HasTag('ACS_passive_taunt_begin') 
 				&& thePlayer.HasTag('ACS_passive_taunt_15'))
 			{
-				thePlayer.PlayLine( 522516, true);
+				thePlayer.PlayLine( 522516, false);
 
 				thePlayer.RemoveTag('ACS_passive_taunt_15');
 				thePlayer.AddTag('ACS_passive_taunt_16');
@@ -584,7 +588,7 @@ state acsTauntEngage in cTaunt
 				thePlayer.HasTag('ACS_passive_taunt_begin') 
 				&& thePlayer.HasTag('ACS_passive_taunt_16'))
 			{
-				thePlayer.PlayLine( 578330, true);
+				thePlayer.PlayLine( 578330, false);
 
 				thePlayer.RemoveTag('ACS_passive_taunt_16');
 				thePlayer.AddTag('ACS_passive_taunt_17');
@@ -594,7 +598,7 @@ state acsTauntEngage in cTaunt
 				thePlayer.HasTag('ACS_passive_taunt_begin') 
 				&& thePlayer.HasTag('ACS_passive_taunt_17'))
 			{
-				thePlayer.PlayLine( 578469, true);
+				thePlayer.PlayLine( 578469, false);
 
 				thePlayer.RemoveTag('ACS_passive_taunt_17');
 				thePlayer.AddTag('ACS_passive_taunt_18');
@@ -604,7 +608,7 @@ state acsTauntEngage in cTaunt
 				thePlayer.HasTag('ACS_passive_taunt_begin') 
 				&& thePlayer.HasTag('ACS_passive_taunt_18'))
 			{
-				thePlayer.PlayLine( 578556, true);
+				thePlayer.PlayLine( 578556, false);
 
 				thePlayer.RemoveTag('ACS_passive_taunt_18');
 				thePlayer.AddTag('ACS_passive_taunt_19');
@@ -614,7 +618,7 @@ state acsTauntEngage in cTaunt
 				thePlayer.HasTag('ACS_passive_taunt_begin') 
 				&& thePlayer.HasTag('ACS_passive_taunt_19'))
 			{
-				thePlayer.PlayLine( 578576, true);
+				thePlayer.PlayLine( 578576, false);
 
 				thePlayer.RemoveTag('ACS_passive_taunt_19');
 				thePlayer.AddTag('ACS_passive_taunt_20');
@@ -624,7 +628,7 @@ state acsTauntEngage in cTaunt
 				thePlayer.HasTag('ACS_passive_taunt_begin') 
 				&& thePlayer.HasTag('ACS_passive_taunt_20'))
 			{
-				thePlayer.PlayLine( 578592, true);
+				thePlayer.PlayLine( 578592, false);
 
 				thePlayer.RemoveTag('ACS_passive_taunt_20');
 				thePlayer.AddTag('ACS_passive_taunt_21');
@@ -634,7 +638,7 @@ state acsTauntEngage in cTaunt
 				thePlayer.HasTag('ACS_passive_taunt_begin') 
 				&& thePlayer.HasTag('ACS_passive_taunt_21'))
 			{
-				thePlayer.PlayLine( 578592, true);
+				thePlayer.PlayLine( 578592, false);
 
 				thePlayer.RemoveTag('ACS_passive_taunt_21');
 				thePlayer.AddTag('ACS_passive_taunt_22');
@@ -644,7 +648,7 @@ state acsTauntEngage in cTaunt
 				thePlayer.HasTag('ACS_passive_taunt_begin') 
 				&& thePlayer.HasTag('ACS_passive_taunt_22'))
 			{
-				thePlayer.PlayLine( 1016673, true);
+				thePlayer.PlayLine( 1016673, false);
 
 				thePlayer.RemoveTag('ACS_passive_taunt_begin');
 				thePlayer.RemoveTag('ACS_passive_taunt_1');
@@ -672,7 +676,7 @@ state acsTauntEngage in cTaunt
 			}
 
 		}
-		else if ( thePlayer.IsInCombat() && ACS_Settings_Main_Bool('EHmodTauntSettings','EHmodCombatTauntEnabled', false) && RandF() < 0.5 )
+		else if ( thePlayer.IsInCombat() && ACS_Settings_Main_Bool('acs_taunt_settings','acs_combat_taunt_enabled', false) && RandF() < 0.5 )
 		{
 			thePlayer.RemoveTag('ACS_passive_taunt_begin');
 			thePlayer.RemoveTag('ACS_passive_taunt_1');
@@ -715,7 +719,7 @@ state acsTauntEngage in cTaunt
 				&& !thePlayer.HasTag('ACS_taunt_12')
 			)
 			{
-				thePlayer.PlayLine( 1102138, true);
+				thePlayer.PlayLine( 1102138, false);
 
 				thePlayer.AddTag('ACS_taunt_begin');
 				thePlayer.AddTag('ACS_taunt_1');
@@ -725,7 +729,7 @@ state acsTauntEngage in cTaunt
 				thePlayer.HasTag('ACS_taunt_begin') 
 				&& thePlayer.HasTag('ACS_taunt_1'))
 			{
-				thePlayer.PlayLine( 1095093, true);
+				thePlayer.PlayLine( 1095093, false);
 
 				thePlayer.RemoveTag('ACS_taunt_1');
 				thePlayer.AddTag('ACS_taunt_2');
@@ -735,7 +739,7 @@ state acsTauntEngage in cTaunt
 				thePlayer.HasTag('ACS_taunt_begin') 
 				&& thePlayer.HasTag('ACS_taunt_2'))
 			{
-				thePlayer.PlayLine( 1113584, true);
+				thePlayer.PlayLine( 1113584, false);
 
 				thePlayer.RemoveTag('ACS_taunt_2');
 				thePlayer.AddTag('ACS_taunt_3');
@@ -745,7 +749,7 @@ state acsTauntEngage in cTaunt
 				thePlayer.HasTag('ACS_taunt_begin') 
 				&& thePlayer.HasTag('ACS_taunt_3'))
 			{
-				thePlayer.PlayLine( 1124758, true);
+				thePlayer.PlayLine( 1124758, false);
 
 				thePlayer.RemoveTag('ACS_taunt_3');
 				thePlayer.AddTag('ACS_taunt_4');
@@ -755,7 +759,7 @@ state acsTauntEngage in cTaunt
 				thePlayer.HasTag('ACS_taunt_begin') 
 				&& thePlayer.HasTag('ACS_taunt_4'))
 			{
-				thePlayer.PlayLine( 1172071, true);
+				thePlayer.PlayLine( 1172071, false);
 
 				thePlayer.RemoveTag('ACS_taunt_4');
 				thePlayer.AddTag('ACS_taunt_5');
@@ -765,7 +769,7 @@ state acsTauntEngage in cTaunt
 				thePlayer.HasTag('ACS_taunt_begin') 
 				&& thePlayer.HasTag('ACS_taunt_5'))
 			{
-				thePlayer.PlayLine( 1095180, true);
+				thePlayer.PlayLine( 1095180, false);
 
 				thePlayer.RemoveTag('ACS_taunt_5');
 				thePlayer.AddTag('ACS_taunt_6');
@@ -775,7 +779,7 @@ state acsTauntEngage in cTaunt
 				thePlayer.HasTag('ACS_taunt_begin') 
 				&& thePlayer.HasTag('ACS_taunt_6'))
 			{
-				thePlayer.PlayLine( 1113447, true);
+				thePlayer.PlayLine( 1113447, false);
 
 				thePlayer.RemoveTag('ACS_taunt_6');
 				thePlayer.AddTag('ACS_taunt_7');
@@ -785,7 +789,7 @@ state acsTauntEngage in cTaunt
 				thePlayer.HasTag('ACS_taunt_begin') 
 				&& thePlayer.HasTag('ACS_taunt_7'))
 			{
-				thePlayer.PlayLine( 1124760, true);
+				thePlayer.PlayLine( 1124760, false);
 
 				thePlayer.RemoveTag('ACS_taunt_7');
 				thePlayer.AddTag('ACS_taunt_8');
@@ -795,7 +799,7 @@ state acsTauntEngage in cTaunt
 				thePlayer.HasTag('ACS_taunt_begin') 
 				&& thePlayer.HasTag('ACS_taunt_8'))
 			{
-				thePlayer.PlayLine( 1124772, true);
+				thePlayer.PlayLine( 1124772, false);
 
 				thePlayer.RemoveTag('ACS_taunt_8');
 				thePlayer.AddTag('ACS_taunt_9');
@@ -805,7 +809,7 @@ state acsTauntEngage in cTaunt
 				thePlayer.HasTag('ACS_taunt_begin') 
 				&& thePlayer.HasTag('ACS_taunt_9'))
 			{
-				thePlayer.PlayLine( 1197007, true);
+				thePlayer.PlayLine( 1197007, false);
 
 				thePlayer.RemoveTag('ACS_taunt_9');
 				thePlayer.AddTag('ACS_taunt_10');
@@ -815,7 +819,7 @@ state acsTauntEngage in cTaunt
 				thePlayer.HasTag('ACS_taunt_begin') 
 				&& thePlayer.HasTag('ACS_taunt_10'))
 			{
-				thePlayer.PlayLine( 1124766, true);
+				thePlayer.PlayLine( 1124766, false);
 
 				thePlayer.RemoveTag('ACS_taunt_10');
 				thePlayer.AddTag('ACS_taunt_11');
@@ -825,7 +829,7 @@ state acsTauntEngage in cTaunt
 				thePlayer.HasTag('ACS_taunt_begin') 
 				&& thePlayer.HasTag('ACS_taunt_11'))
 			{
-				thePlayer.PlayLine( 1093530, true);
+				thePlayer.PlayLine( 1093530, false);
 
 				thePlayer.RemoveTag('ACS_taunt_11');
 				thePlayer.AddTag('ACS_taunt_12');
@@ -836,7 +840,7 @@ state acsTauntEngage in cTaunt
 				thePlayer.HasTag('ACS_taunt_begin') 
 				&& thePlayer.HasTag('ACS_taunt_12'))
 			{
-				thePlayer.PlayLine( 1124764, true);
+				thePlayer.PlayLine( 1124764, false);
 
 				thePlayer.RemoveTag('ACS_taunt_begin');
 				thePlayer.RemoveTag('ACS_taunt_1');
@@ -897,7 +901,7 @@ state acsTauntEngage in cTaunt
 				)
 				{	
 					if (thePlayer.IsInCombat() 
-					&& ACS_Settings_Main_Bool('EHmodTauntSettings','EHmodCombatTauntEnabled', false) 
+					&& ACS_Settings_Main_Bool('acs_taunt_settings','acs_combat_taunt_enabled', false) 
 					&& ACS_AttitudeCheck ( npc )
 					&& npc.IsHuman() )
 					{
@@ -1032,9 +1036,9 @@ state acsTauntEngage in cTaunt
 
 							markerNPC_1.PlayEffect('marker');
 
-							markerNPC_1.AddTag('BerserkMark');
+							markerNPC_1.AddTag('ACS_BerserkMark');
 
-							npc.SetAnimationSpeedMultiplier(1+RandRangeF(0.05,0.25));
+							npc.ACS_SetAnimationSpeedMultiplier(1+RandRangeF(0.05,0.25));
 							
 							npc.SetAnimationTimeMultiplier(1+RandRangeF(0.05,0.25));
 
@@ -1043,7 +1047,7 @@ state acsTauntEngage in cTaunt
 							npc.AddTag('ACS_taunted');
 						}
 					}
-					else if ( !thePlayer.IsInCombat() && ACS_Settings_Main_Bool('EHmodTauntSettings','EHmodIWannaPlayGwentEnabled', false) )
+					else if ( !thePlayer.IsInCombat() && ACS_Settings_Main_Bool('acs_taunt_settings','acs_i_wanna_play_gwent_enabled', false) )
 					{
 						if (thePlayer.IsAlive())
 						{ 
@@ -1178,7 +1182,7 @@ state acsTauntEngage in cTaunt
 			thePlayer.AddTag('ACS_Special_Dodge');
 		}
 		
-		if (!ACS_Settings_Main_Bool('EHmodTauntSettings','EHmodTauntSystemEnabled', false))
+		if (!ACS_Settings_Main_Bool('acs_taunt_settings','acs_combat_taunt_enabled', false))
 		{
 			vamp_sound_names.Clear();
 			vamp_sound_names.PushBack("monster_dettlaff_monster_voice_taunt_claws");
@@ -1237,8 +1241,7 @@ state acsTauntEngage in cTaunt
 		watcher.previous_claw_taunt_index = watcher.claw_taunt_index;
 	}
 	
-	
-	latent function olgierd_combat_taunt ()
+	latent function olgierd_combat_taunt()
 	{
 		if (!thePlayer.HasTag('ACS_Special_Dodge'))
 		{
@@ -1421,7 +1424,7 @@ state acsTauntEngage in cTaunt
 		}
 	}
 	
-	latent function eredin_combat_taunt ()
+	latent function eredin_combat_taunt()
 	{
 		if (!thePlayer.HasTag('ACS_Special_Dodge'))
 		{
@@ -1652,7 +1655,7 @@ state acsTauntEngage in cTaunt
 		}
 	}
 	
-	latent function imlerith_combat_taunt ()
+	latent function imlerith_combat_taunt()
 	{
 		if (!thePlayer.HasTag('ACS_Special_Dodge'))
 		{
@@ -1819,7 +1822,7 @@ state acsTauntEngage in cTaunt
 		}
 	}
 	
-	latent function normal_combat_taunt ()
+	latent function normal_combat_taunt()
 	{
 		if (!thePlayer.HasTag('ACS_Special_Dodge'))
 		{

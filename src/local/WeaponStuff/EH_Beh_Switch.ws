@@ -2,11 +2,14 @@ latent function ACS_BehSwitch(prevStateName : name)
 {
 	var stupidArray 	: array< name >;
 
+	GetACSWatcher().RemoveTimer('ForceControlModuleHudUpdate');
+	GetACSWatcher().AddTimer('ForceControlModuleHudUpdate', 0.25f , false);
+
 	stupidArray.Clear();
 	
 	if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 	{
-		if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+		if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 		{
 			stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_passive_taunt' );
 		}
@@ -17,7 +20,7 @@ latent function ACS_BehSwitch(prevStateName : name)
 	}
 	else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 	{
-		if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+		if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 		{
 			stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_passive_taunt' );
 		}
@@ -28,7 +31,7 @@ latent function ACS_BehSwitch(prevStateName : name)
 	}
 	else
 	{
-		if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+		if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 		{
 			stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_passive_taunt' );
 		}
@@ -40,7 +43,7 @@ latent function ACS_BehSwitch(prevStateName : name)
 
 	if ( prevStateName == 'PlayerDialogScene' )
 	{
-		thePlayer.ActivateAndSyncBehaviors(stupidArray);
+		thePlayer.ActivateBehaviors(stupidArray);
 	}
 	else if ( prevStateName == 'TraverseExploration' )
 	{
@@ -67,6 +70,7 @@ latent function ACS_BehSwitch(prevStateName : name)
 		{
 			if( thePlayer.IsPerformingFinisher()
 			|| thePlayer.HasTag('ACS_IsPerformingFinisher')
+			|| thePlayer.HasTag('ACS_IsPerformingCombatDismember')
 			) 
 			{
 				Sleep(0.75f / theGame.GetTimeScale( false ));
@@ -81,26 +85,29 @@ function ACS_ExplorationBehSwitch()
 {
 	GetACSWatcher().RemoveTimer('SwordTauntSwitch'); 
 	GetACSWatcher().RemoveTimer('SwordTauntRunningSwitch'); 
-	GetACSWatcher().RemoveTimer('SwordWalkLongWeaponSwitch'); 
-	GetACSWatcher().RemoveTimer('SwordWalkSwitch'); 
-	
-	if (GetACSWatcher().swordwalkActive())
+	// 
+	// 
+	GetACSWatcher().RemoveTimer('CombatTauntDelay');
+	GetACSWatcher().RemoveTimer('SwordTauntRunningSwitchSecondary'); 
+	GetACSWatcher().RemoveTimer('SwordTauntRunningSwitchSecondaryWeaponBlood'); 
+
+	if (GetACSWatcher().swordWalkActive)
 	{
 		GetACSWatcher().setSwordwalkActive(false);
 	}
 
-	if (thePlayer.IsAnyWeaponHeld()
-	&& !thePlayer.IsWeaponHeld('fist')
-	&& GetACSWatcher().AnimProgressCheck()
-	&& !thePlayer.HasTag('acs_aard_sword_equipped')
-	)
-	{
-		//GetACSWatcher().SwordTauntRunningSwitch_Actual();
-	}
-
 	if (thePlayer.HasTag('ACS_IsSwordWalking'))
 	{
+		thePlayer.RaiseEvent('ACS_SwordWalkAdditiveEnd');thePlayer.RaiseEvent('ACS_CombatTauntEnd');GetACSWatcher().RemoveTimer('CombatTauntDelay');thePlayer.RaiseEvent('ACS_SwordTauntEnd');
+		
 		thePlayer.RemoveTag('ACS_IsSwordWalking');
+	}
+
+	if (GetACSWatcher().idleAdditiveExtraActive)
+	{
+		thePlayer.RaiseEvent('ACS_IdleAdditiveReset');
+
+		GetACSWatcher().SetIdleAdditiveExtraStatus(false);
 	}
 
 	if (!thePlayer.IsCiri() 
@@ -118,28 +125,83 @@ function ACS_ExplorationBehSwitch()
 		GetACSWatcher().register_extra_inputs();
 
 		GetACSWatcher().SetAdrenalineDrain(true);
-		
+
 		if (!thePlayer.IsInCombat() && !thePlayer.IsThreatened())
 		{
+			GetACSStorage().acs_deleteOnelinerByTag("ACS_Posture_Bar_Indicator");
+
+			GetACSStorage().acs_deleteOnelinerByTag("ACS_Posture_Background_Bar_Indicator");
+
+			GetACSWatcher().Ghost_Stance_Kill_Increment(false, 0);
+
+			GetACSWatcher().IdleAdditiveBlockTemp();
+
+			if(ACSGetCEntity('ACS_Viper_Dagger_L'))
+			{
+				thePlayer.RaiseEvent('ACS_LHandAttack01');
+			}
+
+			if(ACS_Settings_Main_Bool('acs_combat_main_settings','acs_enable_sword_auto_sheathe', false))
+			{
+				thePlayer.RemoveTimer('DelayedSheathSword');
+				thePlayer.AddTimer('DelayedSheathSword', 2 / theGame.GetTimeScale(), false );
+			}
+
+			if(!thePlayer.IsAnyWeaponHeld())
+			{
+				GetACSWatcher().VampireClawsHybridLHandDestroy();
+
+				thePlayer.RaiseEvent('ACS_SwordWalkAdditiveEnd');thePlayer.RaiseEvent('ACS_CombatTauntEnd');GetACSWatcher().RemoveTimer('CombatTauntDelay');
+				
+				thePlayer.RaiseEvent('ACS_SwordTauntEnd');
+
+				if (!ACSGetCEntity('acs_swimming_dagger'))
+				{
+					thePlayer.RaiseEvent('ACS_ForceHandClosedREnd');
+				}
+
+				if (!thePlayer.HasTag('ACS_Dual_Wield_Active') && !ACSGetCEntity('ACS_Viper_Dagger_L')){thePlayer.RaiseEvent('ACS_ForceHandClosedLEnd');}
+			}
+
+			GetACSWatcher().RemoveTimer('Air_Time_Trigger_Delay');
+
+			if (thePlayer.HasTag('ACS_Air_Time'))
+			{
+				GetACSWatcher().RemoveTimer('Air_Time_Movement_Adjust_Delay');
+
+				thePlayer.BlockAllActions( 'ACS_Air_Time_Init', false );
+
+				thePlayer.EnableCollisions(true);
+
+				thePlayer.RaiseEvent('ACS_FeetAdditiveEnd');
+
+				thePlayer.UnblockAction( EIAB_CallHorse,			'ACS_Air_Time');
+				thePlayer.UnblockAction( EIAB_DrawWeapon, 		'ACS_Air_Time');
+				thePlayer.UnblockAction( EIAB_FastTravel, 		'ACS_Air_Time');
+				thePlayer.UnblockAction( EIAB_InteractionAction, 	'ACS_Air_Time');
+				thePlayer.UnblockAction( EIAB_UsableItem,			'ACS_Air_Time');
+				thePlayer.UnblockAction( EIAB_MeditationWaiting,	'ACS_Air_Time');
+				thePlayer.UnblockAction( EIAB_OpenMeditation,		'ACS_Air_Time');
+				thePlayer.UnblockAction( EIAB_RadialMenu,			'ACS_Air_Time');
+				thePlayer.UnblockAction( EIAB_Movement,			'ACS_Air_Time');
+				thePlayer.UnblockAction( EIAB_QuickSlots, 		'ACS_Air_Time');
+
+				thePlayer.RemoveTag('ACS_Air_Time');
+			}
+			
 			if (thePlayer.IsAnyWeaponHeld()
 			&& !thePlayer.IsWeaponHeld('fist')
 			&& GetACSWatcher().AnimProgressCheck()
 			&& !thePlayer.HasTag('acs_aard_sword_equipped')
 			)
 			{
-				GetACSWatcher().SwordTauntRunningSwitch_Actual();
-			}
-
-			if (thePlayer.IsAnyWeaponHeld()
-			&& !thePlayer.IsWeaponHeld('fist')
-			&& !thePlayer.HasTag('acs_aard_sword_equipped')
-			)
-			{
-				if (thePlayer.HasTag('ACS_HasPerformedFinisher'))
+				if (thePlayer.HasTag('ACS_Sword_Hit_Blood_Trigger'))
 				{
-					GetACSWatcher().weapon_blood_fx();
+					//GetACSWatcher().AddTimer('SwordTauntRunningSwitchSecondary', 1 / theGame.GetTimeScale(), false ); 
 
-					thePlayer.RemoveTag('ACS_HasPerformedFinisher');
+					GetACSWatcher().AddTimer('SwordTauntRunningSwitchSecondaryWeaponBlood', 2 / theGame.GetTimeScale(), false ); 
+
+					thePlayer.RemoveTag('ACS_Sword_Hit_Blood_Trigger');
 				}
 			}
 
@@ -157,14 +219,11 @@ function ACS_ExplorationBehSwitch()
 
 			thePlayer.StopEffect('special_attack_fx');
 
-			if ( !ACS_Transformation_Activated_Check() )
+			if ( FactsQuerySum("acs_transformation_activated") <= 0 
+			&& !thePlayer.HasTag('ACS_IsPerformingFinisher')
+			)
 			{
 				thePlayer.BreakAttachment();
-			}
-
-			if (FactsQuerySum("ACS_Rage_Sound_Played") > 0)
-			{
-				FactsRemove("ACS_Rage_Sound_Played");
 			}
 
 			if (GetWitcherPlayer().HasTag ('acs_vampire_claws_equipped'))
@@ -173,7 +232,7 @@ function ACS_ExplorationBehSwitch()
 
 				if (thePlayer.HasTag('ACS_HasPerformedFinisher'))
 				{
-					GetACSWatcher().AddTimer('ClawDestroyDelay', 2, false);
+					GetACSWatcher().AddTimer('ClawDestroyDelay', 2 / theGame.GetTimeScale(), false );
 				}
 				else
 				{
@@ -183,71 +242,125 @@ function ACS_ExplorationBehSwitch()
 			
 			ACS_Skele_Destroy();
 
-			ACS_Sword_Array_Fire_Override();
-
 			ACS_Revenant_Destroy();
 
 			thePlayer.StopEffect('drain_energy');
 
 			GetACSWatcher().Remove_On_Hit_Tags();
 
-			GetACSWatcher().BerserkMarkDestroy();
+			ACSGetCEntityDestroyAll('ACS_BerserkMark');
 
 			ACS_HybridTagRemoval();
 
 			ACS_Axii_Shield_Destroy_IMMEDIATE();
 
-			ACS_Shield_Destroy();
+			ACS_Axii_Shield_Destroy();
+			ACS_Axii_Shield_Destroy_DELAY();
+			ACS_Quen_Monsters_Despawn();
+			ACS_Bruxa_Camo_Decoy_Deactivate();
+			ACS_AardPull_Deactivate();
 
-			ACS_ThingsThatShouldBeRemoved(true);
-
-			ACS_RemoveStabbedEntities();
+			ACS_ThingsThatShouldBeRemoved();
 
 			ACS_Bruxa_Camo_Decoy_Deactivate();
 
-			ACSGetCActor('ACS_Tentacle_1').Destroy();
-
-			ACSGetCActor('ACS_Tentacle_2').Destroy();
-
-			ACSGetCActor('ACS_Tentacle_3').Destroy();
-
-			ACSGetCEntity('acs_tentacle_anchor').Destroy();
-
 			GetACSWatcher().SetRageProcess(false);
+
+			thePlayer.RemoveTag('ACS_In_Combat_Art');
+
+			thePlayer.RemoveTag('ACS_ShadowFall');
+
+			thePlayer.RemoveTag('ACS_Wolven_Flash');
+
+			thePlayer.RemoveTag('ACS_Wolven_Cross');
+
+			thePlayer.RemoveTag('ACS_Mortal_Draw');
+
+			thePlayer.RemoveTag('ACS_Spiral_Cloud_Passage');
+
+			thePlayer.RemoveTag('ACS_One_Mind');
+
+			thePlayer.RemoveTag('ACS_Feainnewedd_Dance');
 
 			//thePlayer.RemoveTag('ACS_Has_Summoned_Nekker_Guardian');
 			
-			//GetACSWatcher().AddTimer('ACS_DetachBehaviorTimer', 2, false);
+			//GetACSWatcher().AddTimer('ACS_DetachBehaviorTimer', 2 / theGame.GetTimeScale(), false );
 
-			ACSSignComboIconDestroyAll();
+			ACSGetCEntityDestroyAll('ACS_Sign_Combo_Icon');
 
 			ACSSignComboSystemRemoveTags();
 
-			GetACSWatcher().ACS_DestroyAllShields();
+			ACSGetCEntityDestroyAll('ACS_ShieldSpawnerShield');
 
 			//ACSGetCEntityDestroyAll('ACS_Nekker_Life_Force');
 
-			thePlayer.ClearAnimationSpeedMultipliers();
+			thePlayer.ACS_ClearAnimationSpeedMultipliers();
 
-			GetACSWatcher().RemoveAdditionalSpawnTimers();
+			GetACSWatcher().RemoveTimer('AdditionalSpawnsDelay_add1');
+			GetACSWatcher().RemoveTimer('AdditionalSpawnsDelay_add2');
+			GetACSWatcher().RemoveTimer('AdditionalSpawnsDelay_add3');
 			
 			GetACSWatcher().RemoveTimer('AdditionalSpawnsDelay');
 
-			GetACSWatcher().AddTimer('AdditionalSpawnsDelay', RandRangeF(ACS_Settings_Main_Float('EHmodEventsSettings','EHmodEventDelayMaximumTimeInSeconds', 60), ACS_Settings_Main_Float('EHmodEventsSettings','EHmodEventDelayMinimumTimeInSeconds', 30)), false);
+			GetACSWatcher().AddTimer('AdditionalSpawnsDelay', RandRangeF(ACS_Settings_Main_Float('acs_events_settings','acs_event_delay_maximum_time_in_seconds', 60), ACS_Settings_Main_Float('acs_events_settings','acs_event_delay_minimum_time_in_seconds', 30)) / theGame.GetTimeScale(), false );
+
+			thePlayer.ResumeStaminaRegen( 'SignCast' );
+
+			theGame.RemoveTimeScale( theGame.GetTimescaleSource(ETS_InstantKill) );
+
+			if (theInput.GetActionValue('LockAndGuard') > 0.5)
+			{
+				if (thePlayer.GetPlayerCombatStance() != PCS_Guarded)
+				{
+					thePlayer.SetPlayerCombatStance(PCS_Guarded, true);
+				}
+			}
+			else if (theInput.GetActionValue('LockAndGuard') == 0)
+			{
+				if (thePlayer.GetPlayerCombatStance() != PCS_Normal)
+				{
+					thePlayer.SetPlayerCombatStance(PCS_Normal, true);
+				}
+			}
+
+			
 		}
 		else
 		{
+			thePlayer.RemoveTimer('DelayedSheathSword');
+			
+			thePlayer.ResumeStaminaRegen( 'SignCast' );
+
+			theGame.RemoveTimeScale( theGame.GetTimescaleSource(ETS_InstantKill) );
+
 			if (thePlayer.IsAnyWeaponHeld()
 			&& !thePlayer.IsWeaponHeld('fist')
 			&& GetACSWatcher().AnimProgressCheck()
 			&& !thePlayer.HasTag('acs_aard_sword_equipped')
 			)
 			{
-				GetACSWatcher().RemoveTimer('SwordTauntRunningSwitchSecondary'); 
-				GetACSWatcher().AddTimer('SwordTauntRunningSwitchSecondary', 1, false); 
+				GetACSWatcher().AddTimer('SwordTauntRunningSwitchSecondary', 1 / theGame.GetTimeScale(), false ); 
 			}
 
-			if (ACS_Armor_Equipped_Check())
+			if ( FactsQuerySum("ACS_Dual_Wield_Toggle_Enabled") > 0 
+			&& thePlayer.IsAnyWeaponHeld()
+			&& !thePlayer.IsWeaponHeld('fist')
+			)
+			{
+				GetACSWatcher().RemoveTimer('DualWieldToggleInitDelay'); 
+				GetACSWatcher().AddTimer('DualWieldToggleInitDelay', 0.25f / theGame.GetTimeScale(), false ); 
+			}
+
+			if ( FactsQuerySum("ACS_Spear_Transform_Toggle_Enabled") > 0 
+			&& thePlayer.IsAnyWeaponHeld()
+			&& !thePlayer.IsWeaponHeld('fist')
+			)
+			{
+				GetACSWatcher().RemoveTimer('SpearTransformToggleInitDelay'); 
+				GetACSWatcher().AddTimer('SpearTransformToggleInitDelay', 0.25f / theGame.GetTimeScale(), false ); 
+			}
+
+			if (ACS_Armor_Set_Check('acs_armor', false))
 			{
 				thePlayer.SoundEvent("monster_caretaker_fx_summon");
 				thePlayer.SoundEvent("monster_caretaker_fx_summon");
@@ -261,28 +374,32 @@ function ACS_ExplorationBehSwitch()
 
 function ACS_CombatBehSwitch()
 {
+	GetACSWatcher().RemoveTimer('ForceControlModuleHudUpdate');
+	GetACSWatcher().AddTimer('ForceControlModuleHudUpdate', 0.25f , false);
+
 	GetACSWatcher().RemoveTimer('SwordTauntSwitch'); 
 	GetACSWatcher().RemoveTimer('SwordTauntRunningSwitch'); 
-	GetACSWatcher().RemoveTimer('SwordWalkLongWeaponSwitch'); 
-	GetACSWatcher().RemoveTimer('SwordWalkSwitch'); 
+	// 
+	// 
+	GetACSWatcher().RemoveTimer('CombatTauntDelay');GetACSWatcher().RemoveTimer('SwordTauntRunningSwitchSecondary'); 
 	
-	if (GetACSWatcher().swordwalkActive())
+	if (GetACSWatcher().swordWalkActive)
 	{
 		GetACSWatcher().setSwordwalkActive(false);
 	}
 
-	if (thePlayer.IsAnyWeaponHeld()
-	&& !thePlayer.IsWeaponHeld('fist')
-	&& GetACSWatcher().AnimProgressCheck()
-	&& !thePlayer.HasTag('acs_aard_sword_equipped')
-	)
-	{
-		//GetACSWatcher().SwordTauntRunningSwitch_Actual();
-	}
-
 	if (thePlayer.HasTag('ACS_IsSwordWalking'))
 	{
+		thePlayer.RaiseEvent('ACS_SwordWalkAdditiveEnd');thePlayer.RaiseEvent('ACS_CombatTauntEnd');GetACSWatcher().RemoveTimer('CombatTauntDelay');thePlayer.RaiseEvent('ACS_SwordTauntEnd');
+
 		thePlayer.RemoveTag('ACS_IsSwordWalking');
+	}
+
+	if (GetACSWatcher().idleAdditiveExtraActive)
+	{
+		thePlayer.RaiseEvent('ACS_IdleAdditiveReset');
+
+		GetACSWatcher().SetIdleAdditiveExtraStatus(false);
 	}
 
 	if (!thePlayer.IsCiri() 
@@ -300,29 +417,68 @@ function ACS_CombatBehSwitch()
 		GetACSWatcher().SetAdrenalineDrain(true);
 
 		GetACSWatcher().register_extra_inputs();
-		
+
 		if (!thePlayer.IsInCombat() && !thePlayer.IsThreatened())
 		{
-			if (thePlayer.IsAnyWeaponHeld()
-			&& !thePlayer.IsWeaponHeld('fist')
-			&& GetACSWatcher().AnimProgressCheck()
-			&& !thePlayer.HasTag('acs_aard_sword_equipped')
-			)
+			GetACSStorage().acs_deleteOnelinerByTag("ACS_Posture_Bar_Indicator");
+
+			GetACSStorage().acs_deleteOnelinerByTag("ACS_Posture_Background_Bar_Indicator");
+
+			GetACSWatcher().Ghost_Stance_Kill_Increment(false, 0);
+
+			GetACSWatcher().IdleAdditiveBlockTemp();
+
+			if(ACSGetCEntity('ACS_Viper_Dagger_L'))
 			{
-				GetACSWatcher().SwordTauntRunningSwitch_Actual();
+				thePlayer.RaiseEvent('ACS_LHandAttack01');
 			}
 
-			if (thePlayer.IsAnyWeaponHeld()
-			&& !thePlayer.IsWeaponHeld('fist')
-			&& !thePlayer.HasTag('acs_aard_sword_equipped')
-			)
+			if(ACS_Settings_Main_Bool('acs_combat_main_settings','acs_enable_sword_auto_sheathe', false))
 			{
-				if (thePlayer.HasTag('ACS_HasPerformedFinisher'))
-				{
-					GetACSWatcher().weapon_blood_fx();
+				thePlayer.RemoveTimer('DelayedSheathSword');
+				thePlayer.AddTimer('DelayedSheathSword', 2 / theGame.GetTimeScale(), false );
+			}
 
-					thePlayer.RemoveTag('ACS_HasPerformedFinisher');
+			if(!thePlayer.IsAnyWeaponHeld())
+			{
+				GetACSWatcher().VampireClawsHybridLHandDestroy();
+
+				thePlayer.RaiseEvent('ACS_SwordWalkAdditiveEnd');thePlayer.RaiseEvent('ACS_CombatTauntEnd');GetACSWatcher().RemoveTimer('CombatTauntDelay');
+				
+				thePlayer.RaiseEvent('ACS_SwordTauntEnd');
+
+				if (!ACSGetCEntity('acs_swimming_dagger'))
+				{
+					thePlayer.RaiseEvent('ACS_ForceHandClosedREnd');
 				}
+
+				if (!thePlayer.HasTag('ACS_Dual_Wield_Active') && !ACSGetCEntity('ACS_Viper_Dagger_L')){thePlayer.RaiseEvent('ACS_ForceHandClosedLEnd');}
+			}
+			
+			GetACSWatcher().RemoveTimer('Air_Time_Trigger_Delay');
+
+			if (thePlayer.HasTag('ACS_Air_Time'))
+			{
+				GetACSWatcher().RemoveTimer('Air_Time_Movement_Adjust_Delay');
+
+				thePlayer.BlockAllActions( 'ACS_Air_Time_Init', false );
+
+				thePlayer.EnableCollisions(true);
+
+				thePlayer.RaiseEvent('ACS_FeetAdditiveEnd');
+
+				thePlayer.UnblockAction( EIAB_CallHorse,			'ACS_Air_Time');
+				thePlayer.UnblockAction( EIAB_DrawWeapon, 		'ACS_Air_Time');
+				thePlayer.UnblockAction( EIAB_FastTravel, 		'ACS_Air_Time');
+				thePlayer.UnblockAction( EIAB_InteractionAction, 	'ACS_Air_Time');
+				thePlayer.UnblockAction( EIAB_UsableItem,			'ACS_Air_Time');
+				thePlayer.UnblockAction( EIAB_MeditationWaiting,	'ACS_Air_Time');
+				thePlayer.UnblockAction( EIAB_OpenMeditation,		'ACS_Air_Time');
+				thePlayer.UnblockAction( EIAB_RadialMenu,			'ACS_Air_Time');
+				thePlayer.UnblockAction( EIAB_Movement,			'ACS_Air_Time');
+				thePlayer.UnblockAction( EIAB_QuickSlots, 		'ACS_Air_Time');
+
+				thePlayer.RemoveTag('ACS_Air_Time');
 			}
 
 			if (GetWitcherPlayer().HasTag ('acs_vampire_claws_equipped'))
@@ -331,7 +487,7 @@ function ACS_CombatBehSwitch()
 
 				if (thePlayer.HasTag('ACS_HasPerformedFinisher'))
 				{
-					GetACSWatcher().AddTimer('ClawDestroyDelay', 2, false);
+					GetACSWatcher().AddTimer('ClawDestroyDelay', 2 / theGame.GetTimeScale(), false );
 				}
 				else
 				{
@@ -353,19 +509,30 @@ function ACS_CombatBehSwitch()
 
 			thePlayer.StopEffect('special_attack_fx');
 
-			if ( !ACS_Transformation_Activated_Check() )
+			if ( FactsQuerySum("acs_transformation_activated") <= 0 
+			&& !thePlayer.HasTag('ACS_IsPerformingFinisher')
+			)
 			{
 				thePlayer.BreakAttachment();
 			}
 
-			if (FactsQuerySum("ACS_Rage_Sound_Played") > 0)
-			{
-				FactsRemove("ACS_Rage_Sound_Played");
-			}
+			thePlayer.RemoveTag('ACS_In_Combat_Art');
+
+			thePlayer.RemoveTag('ACS_ShadowFall');
+
+			thePlayer.RemoveTag('ACS_Wolven_Flash');
+
+			thePlayer.RemoveTag('ACS_Wolven_Cross');
+
+			thePlayer.RemoveTag('ACS_Mortal_Draw');
+
+			thePlayer.RemoveTag('ACS_Spiral_Cloud_Passage');
+
+			thePlayer.RemoveTag('ACS_One_Mind');
+
+			thePlayer.RemoveTag('ACS_Feainnewedd_Dance');
 			
 			ACS_Skele_Destroy();
-
-			ACS_Sword_Array_Fire_Override();
 
 			ACS_Revenant_Destroy();
 
@@ -373,63 +540,105 @@ function ACS_CombatBehSwitch()
 
 			GetACSWatcher().Remove_On_Hit_Tags();
 
-			GetACSWatcher().BerserkMarkDestroy();
+			ACSGetCEntityDestroyAll('ACS_BerserkMark');
 
 			ACS_HybridTagRemoval();
 
 			ACS_Axii_Shield_Destroy_IMMEDIATE();
 
-			ACS_Shield_Destroy();
+			ACS_Axii_Shield_Destroy();
+			ACS_Axii_Shield_Destroy_DELAY();
+			ACS_Quen_Monsters_Despawn();
+			ACS_Bruxa_Camo_Decoy_Deactivate();
+			ACS_AardPull_Deactivate();
 
-			ACS_ThingsThatShouldBeRemoved(true);
-
-			ACS_RemoveStabbedEntities();
+			ACS_ThingsThatShouldBeRemoved();
 
 			ACS_Bruxa_Camo_Decoy_Deactivate();
-
-			ACSGetCActor('ACS_Tentacle_1').Destroy();
-
-			ACSGetCActor('ACS_Tentacle_2').Destroy();
-
-			ACSGetCActor('ACS_Tentacle_3').Destroy();
-
-			ACSGetCEntity('acs_tentacle_anchor').Destroy();
 
 			GetACSWatcher().SetRageProcess(false);
 
 			//thePlayer.RemoveTag('ACS_Has_Summoned_Nekker_Guardian');
 			
-			//GetACSWatcher().AddTimer('ACS_DetachBehaviorTimer', 2, false);
+			//GetACSWatcher().AddTimer('ACS_DetachBehaviorTimer', 2 / theGame.GetTimeScale(), false );
 
-			ACSSignComboIconDestroyAll();
+			ACSGetCEntityDestroyAll('ACS_Sign_Combo_Icon');
 
 			ACSSignComboSystemRemoveTags();
 
-			GetACSWatcher().ACS_DestroyAllShields();
+			ACSGetCEntityDestroyAll('ACS_ShieldSpawnerShield');
 
 			//ACSGetCEntityDestroyAll('ACS_Nekker_Life_Force');
 
-			thePlayer.ClearAnimationSpeedMultipliers();
+			thePlayer.ACS_ClearAnimationSpeedMultipliers();
 
-			GetACSWatcher().RemoveAdditionalSpawnTimers();
+			GetACSWatcher().RemoveTimer('AdditionalSpawnsDelay_add1');
+			GetACSWatcher().RemoveTimer('AdditionalSpawnsDelay_add2');
+			GetACSWatcher().RemoveTimer('AdditionalSpawnsDelay_add3');
 			
 			GetACSWatcher().RemoveTimer('AdditionalSpawnsDelay');
 
-			GetACSWatcher().AddTimer('AdditionalSpawnsDelay', RandRangeF(ACS_Settings_Main_Float('EHmodEventsSettings','EHmodEventDelayMaximumTimeInSeconds', 60), ACS_Settings_Main_Float('EHmodEventsSettings','EHmodEventDelayMinimumTimeInSeconds', 30)), false);
+			GetACSWatcher().AddTimer('AdditionalSpawnsDelay', RandRangeF(ACS_Settings_Main_Float('acs_events_settings','acs_event_delay_maximum_time_in_seconds', 60), ACS_Settings_Main_Float('acs_events_settings','acs_event_delay_minimum_time_in_seconds', 30)) / theGame.GetTimeScale(), false );
+
+			thePlayer.ResumeStaminaRegen( 'SignCast' );
+
+			theGame.RemoveTimeScale( theGame.GetTimescaleSource(ETS_InstantKill) );
+
+			theGame.RemoveTimeScale( theGame.GetTimescaleSource(ETS_InstantKill) );
+
+			if (theInput.GetActionValue('LockAndGuard') > 0.5)
+			{
+				if (thePlayer.GetPlayerCombatStance() != PCS_Guarded)
+				{
+					thePlayer.SetPlayerCombatStance(PCS_Guarded, true);
+				}
+			}
+			else if (theInput.GetActionValue('LockAndGuard') == 0)
+			{
+				if (thePlayer.GetPlayerCombatStance() != PCS_Normal)
+				{
+					thePlayer.SetPlayerCombatStance(PCS_Normal, true);
+				}
+			}
+		
+			
 		}
 		else
 		{
+			thePlayer.RemoveTimer('DelayedSheathSword');
+
+			thePlayer.ResumeStaminaRegen( 'SignCast' );
+
+			theGame.RemoveTimeScale( theGame.GetTimescaleSource(ETS_InstantKill) );
+			
 			if (thePlayer.IsAnyWeaponHeld()
 			&& !thePlayer.IsWeaponHeld('fist')
 			&& GetACSWatcher().AnimProgressCheck()
 			&& !thePlayer.HasTag('acs_aard_sword_equipped')
 			)
 			{
-				GetACSWatcher().RemoveTimer('SwordTauntRunningSwitchSecondary'); 
-				GetACSWatcher().AddTimer('SwordTauntRunningSwitchSecondary', 1, false); 
+				GetACSWatcher().AddTimer('SwordTauntRunningSwitchSecondary', 1 / theGame.GetTimeScale(), false ); 
 			}
 
-			if (ACS_Armor_Equipped_Check())
+			if ( FactsQuerySum("ACS_Dual_Wield_Toggle_Enabled") > 0 
+			&& thePlayer.IsAnyWeaponHeld()
+			&& !thePlayer.IsWeaponHeld('fist')
+			)
+			{
+				GetACSWatcher().RemoveTimer('DualWieldToggleInitDelay'); 
+				GetACSWatcher().AddTimer('DualWieldToggleInitDelay', 0.25f / theGame.GetTimeScale(), false ); 
+			}
+
+			if ( FactsQuerySum("ACS_Spear_Transform_Toggle_Enabled") > 0 
+			&& thePlayer.IsAnyWeaponHeld()
+			&& !thePlayer.IsWeaponHeld('fist')
+			)
+			{
+				GetACSWatcher().RemoveTimer('SpearTransformToggleInitDelay'); 
+				GetACSWatcher().AddTimer('SpearTransformToggleInitDelay', 0.25f / theGame.GetTimeScale(), false ); 
+			}
+
+			if (ACS_Armor_Set_Check('acs_armor', false))
 			{
 				thePlayer.SoundEvent("monster_caretaker_fx_summon");
 				thePlayer.SoundEvent("monster_caretaker_fx_summon");
@@ -437,172 +646,6 @@ function ACS_CombatBehSwitch()
 				thePlayer.SoundEvent("monster_caretaker_fx_summon");
 				thePlayer.SoundEvent("monster_caretaker_fx_summon");
 			}
-		}
-	}
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-function ACS_Forest_God_Spawn_Controller()
-{
-	var currentGameTime : GameTime;
-	var hours : int;
-	
-	currentGameTime = theGame.CalculateTimePlayed();
-	hours = GameTimeDays(currentGameTime) * 24 + GameTimeHours(currentGameTime);
-
-	if (ACS_Settings_Main_Float('EHmodEventsSettings','EHmodShadowsSpawnChancesNormal', 0.1) != 0
-	&& !theGame.IsDialogOrCutscenePlaying() 
-	&& !thePlayer.IsInNonGameplayCutscene() 
-	&& !thePlayer.IsInGameplayScene()
-	&& !ACS_PlayerSettlementCheck(50)
-	&& !ACS_GetHostilesCheck()
-	&& !thePlayer.IsInInterior()
-	&& thePlayer.IsOnGround()
-	&& !thePlayer.IsCiri()
-	&& !thePlayer.GetIsHorseRacing()
-	&& !ACS_Player_Near_Quest_Marker()
-	&& hours >= 7
-	)
-	{
-		if (
-		thePlayer.inv.HasItem('mh204_leshy_trophy')
-		|| thePlayer.inv.HasItem('mh302_leshy_trophy')
-		|| thePlayer.inv.HasItem('Leshy resin')
-		|| thePlayer.inv.HasItem('sq204_leshy_talisman')
-		|| thePlayer.inv.HasItem('Ancient Leshy mutagen')
-		|| thePlayer.inv.HasItem('Leshy mutagen')
-		)
-		{
-			if( RandF() < ACS_Settings_Main_Float('EHmodEventsSettings','EHmodShadowsSpawnChancesNormal', 0.1) * ACS_Settings_Main_Float('EHmodEventsSettings','EHmodShadowsSpawnChancesNormal', 0.1) ) 
-			{
-				if( ACS_can_spawn_forest_god_shadows() ) 
-				{
-					ACS_refresh_forest_god_shadows_cooldown();
-
-					if( RandF() < 0.5 ) 
-					{
-						thePlayer.DisplayHudMessage( "LESHEN ITEMS DETECTED IN INVENTORY. YOU SHALL NOT ESCAPE ME." );
-					}
-					else
-					{
-						thePlayer.DisplayHudMessage( "LESHEN ITEMS DETECTED IN INVENTORY. I WILL FIND YOU." );
-					}
-
-					GetACSWatcher().ACS_Forest_God_Shadows_Spawner();
-				}
-			}
-		}
-		else
-		{
-			if( RandF() < ACS_Settings_Main_Float('EHmodEventsSettings','EHmodShadowsSpawnChancesNormal', 0.1) ) 
-			{
-				if( ACS_can_spawn_forest_god_shadows() ) 
-				{
-					ACS_refresh_forest_god_shadows_cooldown();
-
-					if( RandF() < 0.5 ) 
-					{
-						thePlayer.DisplayHudMessage( "I SMELL YOUR FEAR, WITCHER. IT DELIGHTS ME." );
-					}
-					else
-					{
-						thePlayer.DisplayHudMessage( "TELL ME, WITCHER. DO YOU FEAR DEATH?" );
-					}
-
-					GetACSWatcher().ACS_Forest_God_Shadows_Spawner();
-				}
-			}
-		}
-	}
-}
-
-function ACS_Wild_Hunt_Spawn_Controller()
-{
-	if( RandF() < ACS_Settings_Main_Float('EHmodEventsSettings','EHmodWildHuntSpawnChancesNormal', 0.1) 
-	&& !ACS_GetHostilesCheck()
-	&& !theGame.IsDialogOrCutscenePlaying() 
-	&& !thePlayer.IsInNonGameplayCutscene() 
-	&& !thePlayer.IsInGameplayScene()
-	&& !ACS_PlayerSettlementCheck(50)
-	&& !thePlayer.IsInInterior()
-	&& thePlayer.IsOnGround()
-	&& !thePlayer.IsCiri()
-	&& !thePlayer.GetIsHorseRacing()
-	&& !ACS_Player_Near_Quest_Marker()
-	&& FactsQuerySum("q002_met_emhyr") > 0
-	) 
-	{
-		if (ACS_can_spawn_wild_hunt_warriors())
-		{
-			ACS_refresh_wild_hunt_warriors_spawn_cooldown();
-
-			GetACSWatcher().ACS_Wild_Hunt_Riders_Spawner();
-		}
-	}
-}
-
-function ACS_NightStalker_Spawn_Controller()
-{
-	var currentGameTime : GameTime;
-	var hours : int;
-	
-	currentGameTime = theGame.CalculateTimePlayed();
-	hours = GameTimeDays(currentGameTime) * 24 + GameTimeHours(currentGameTime);
-
-	if( RandF() < ACS_Settings_Main_Float('EHmodEventsSettings','EHmodNightStalkerSpawnChancesNormal', 0.1) 
-	&& ACS_IsNight()
-	&& !theGame.IsDialogOrCutscenePlaying() 
-	&& !thePlayer.IsInNonGameplayCutscene() 
-	&& !thePlayer.IsInGameplayScene()
-	&& !ACS_PlayerSettlementCheck(50)
-	&& thePlayer.IsOnGround()
-	&& ACS_NightStalkerAreaCheck()
-	&& !thePlayer.IsInInterior()
-	&& thePlayer.IsOnGround()
-	&& !ACS_GetHostilesCheck()
-	&& !thePlayer.IsCiri()
-	&& !thePlayer.GetIsHorseRacing()
-	&& !ACS_Player_Near_Quest_Marker()
-	&& hours >= 15
-	)
-	{
-		if (ACS_can_spawn_nightstalker())
-		{
-			ACS_refresh_nightstalker_spawn_cooldown();
-
-			GetACSWatcher().ACS_SpawnNightStalker();
-		}
-	}
-}
-
-function ACS_Elderblood_Assassin_Spawn_Controller()
-{
-	var currentGameTime : GameTime;
-	var hours : int;
-	
-	currentGameTime = theGame.CalculateTimePlayed();
-	hours = GameTimeDays(currentGameTime) * 24 + GameTimeHours(currentGameTime);
-
-	if( RandF() < ACS_Settings_Main_Float('EHmodEventsSettings','EHmodElderbloodAssassinSpawnChancesNormal',0.1) 
-	&& !theGame.IsDialogOrCutscenePlaying() 
-	&& !thePlayer.IsInNonGameplayCutscene() 
-	&& !thePlayer.IsInGameplayScene()
-	&& !ACS_PlayerSettlementCheck(50)
-	&& thePlayer.IsOnGround()
-	&& !thePlayer.IsInInterior()
-	&& !ACS_GetHostilesCheck()
-	&& !thePlayer.IsCiri()
-	&& !thePlayer.GetIsHorseRacing()
-	&& !ACS_Player_Near_Quest_Marker()
-	&& hours >= 10
-	)
-	{
-		if (ACS_can_spawn_elderblood_assassin())
-		{
-			ACS_refresh_elderblood_assassin_spawn_cooldown();
-
-			GetACSWatcher().ACS_SpawnElderbloodAssassin();
 		}
 	}
 }
@@ -613,16 +656,22 @@ statemachine class cBehSwitch
 {
     function BehSwitch_Engage()
 	{
+		GetACSWatcher().RemoveTimer('ForceControlModuleHudUpdate');
+		GetACSWatcher().AddTimer('ForceControlModuleHudUpdate', 0.25f , false);
 		this.PushState('BehSwitch_Engage');
 	}
 
 	function BehSwitch_Engage_2()
 	{
+		GetACSWatcher().RemoveTimer('ForceControlModuleHudUpdate');
+		GetACSWatcher().AddTimer('ForceControlModuleHudUpdate', 0.25f , false);
 		this.PushState('BehSwitch_Engage_2');
 	}
 
 	function BehSwitch_Engage_3()
 	{
+		GetACSWatcher().RemoveTimer('ForceControlModuleHudUpdate');
+		GetACSWatcher().AddTimer('ForceControlModuleHudUpdate', 0.25f , false);
 		this.PushState('BehSwitch_Engage_3');
 	}
 }
@@ -651,7 +700,7 @@ state BehSwitch_Engage_3 in cBehSwitch
 	{
 		stupidArray.Clear();
 
-		if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+		if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 		{
 			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
@@ -762,6 +811,127 @@ state BehSwitch_Engage_3 in cBehSwitch
 			}
 		}
 
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
 		|| ACSGetCEntity('ACS_Dual_Wield_L_Sword_Silver')
 		)
@@ -780,11 +950,29 @@ state BehSwitch_Engage_3 in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -795,7 +983,7 @@ state BehSwitch_Engage_3 in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 				}
@@ -806,7 +994,7 @@ state BehSwitch_Engage_3 in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
 				}
@@ -834,7 +1022,7 @@ state BehSwitch_Engage_3 in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -870,7 +1058,7 @@ state BehSwitch_Engage_3 in cBehSwitch
 	{
 		stupidArray.Clear();
 
-		if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+		if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 		{
 			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
@@ -981,6 +1169,127 @@ state BehSwitch_Engage_3 in cBehSwitch
 			}
 		}
 
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
 		|| ACSGetCEntity('ACS_Dual_Wield_L_Sword_Silver')
 		)
@@ -999,11 +1308,29 @@ state BehSwitch_Engage_3 in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -1014,7 +1341,7 @@ state BehSwitch_Engage_3 in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 				}
@@ -1025,7 +1352,7 @@ state BehSwitch_Engage_3 in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
 				}
@@ -1053,7 +1380,7 @@ state BehSwitch_Engage_3 in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -1089,7 +1416,7 @@ state BehSwitch_Engage_3 in cBehSwitch
 	{
 		stupidArray.Clear();
 
-		if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+		if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 		{
 			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
@@ -1200,6 +1527,127 @@ state BehSwitch_Engage_3 in cBehSwitch
 			}
 		}
 
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
 		|| ACSGetCEntity('ACS_Dual_Wield_L_Sword_Silver')
 		)
@@ -1218,11 +1666,29 @@ state BehSwitch_Engage_3 in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -1233,7 +1699,7 @@ state BehSwitch_Engage_3 in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 				}
@@ -1244,7 +1710,7 @@ state BehSwitch_Engage_3 in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
 				}
@@ -1272,7 +1738,7 @@ state BehSwitch_Engage_3 in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -1316,109 +1782,138 @@ state BehSwitch_Engage_2 in cBehSwitch
 	event OnEnterState(prevStateName : name)
 	{
 		defaultBehSwitchEntry();
-		UpdateBehGraph();
-	}
-
-	function GetCurrentMeleeWeapon() : EPlayerWeapon
-	{
-		if (thePlayer.IsWeaponHeld('silversword'))
-		{
-			return PW_Silver;
-		}
-		else if (thePlayer.IsWeaponHeld('steelsword'))
-		{
-			return PW_Steel;
-		}
-		else if (thePlayer.IsWeaponHeld('fist'))
-		{
-			return PW_Fists;
-		}
-		else
-		{
-			return PW_None;
-		}
-	}
-
-	function UpdateBehGraph( optional init : bool )
-	{	
-		weapontype = GetCurrentMeleeWeapon();
-		
-		if ( weapontype == PW_None )
-		{
-			weapontype = PW_Fists;
-		}
-		
-		thePlayer.SetBehaviorVariable( 'WeaponType', 0);
-		
-		if ( thePlayer.HasTag('acs_vampire_claws_equipped') || thePlayer.HasTag('acs_sorc_fists_equipped') )
-		{
-			if (thePlayer.GetBehaviorVariable( 'playerWeapon') != (int) PW_Steel)
-			{
-				thePlayer.SetBehaviorVariable( 'playerWeapon', (int) PW_Steel );
-			}
-			
-			if (thePlayer.GetBehaviorVariable( 'playerWeaponForOverlay') != (int) PW_Steel)
-			{
-				thePlayer.SetBehaviorVariable( 'playerWeaponForOverlay', (int) PW_Steel );
-			}
-		}
-		else
-		{
-			if (thePlayer.GetBehaviorVariable( 'playerWeapon') != (int) weapontype)
-			{
-				thePlayer.SetBehaviorVariable( 'playerWeapon', (int) weapontype );
-			}
-			
-			if (thePlayer.GetBehaviorVariable( 'playerWeaponForOverlay') != (int) weapontype)
-			{
-				thePlayer.SetBehaviorVariable( 'playerWeaponForOverlay', (int) weapontype );
-			}
-		}
-		
-		if ( thePlayer.IsUsingHorse() )
-		{
-			if (thePlayer.GetBehaviorVariable( 'isOnHorse') != 1.0)
-			{
-				thePlayer.SetBehaviorVariable( 'isOnHorse', 1.0 );
-			}
-		}
-		else
-		{
-			if (thePlayer.GetBehaviorVariable( 'isOnHorse') != 0.0)
-			{
-				thePlayer.SetBehaviorVariable( 'isOnHorse', 0.0 );
-			}
-		}
-		
-		switch ( weapontype )
-		{
-			case PW_Steel:
-				thePlayer.SetBehaviorVariable( 'SelectedWeapon', 0, true);
-				thePlayer.SetBehaviorVariable( 'isHoldingWeaponR', 1.0, true );
-				if ( init )
-					res = thePlayer.RaiseEvent('DrawWeaponInstant');
-				break;
-			case PW_Silver:
-				thePlayer.SetBehaviorVariable( 'SelectedWeapon', 1, true);
-				thePlayer.SetBehaviorVariable( 'isHoldingWeaponR', 1.0, true );
-				if ( init )
-					res = thePlayer.RaiseEvent('DrawWeaponInstant');
-				break;
-			default:
-				thePlayer.SetBehaviorVariable( 'isHoldingWeaponR', 0.0, true );
-				break;
-		}
 	}
 
 	entry function defaultBehSwitchEntry()
 	{
-		ACS_WeaponDestroyInit(true);
+		ACS_WeaponDestroyInit();
 
 		ACS_HybridTagRemoval();
 
 		if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh' )
 		{
 			stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh' );
+		}
+
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
 		}
 
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
@@ -1439,11 +1934,29 @@ state BehSwitch_Engage_2 in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -1454,7 +1967,7 @@ state BehSwitch_Engage_2 in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 				}
@@ -1465,7 +1978,7 @@ state BehSwitch_Engage_2 in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
 				}
@@ -1493,7 +2006,7 @@ state BehSwitch_Engage_2 in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -1524,13 +2037,6 @@ state BehSwitch_Engage_2 in cBehSwitch
 			thePlayer.ActivateBehaviors(stupidArray);
 		}
 
-		RestoreStuff();
-	}
-
-	latent function RestoreStuff()
-	{
-		thePlayer.BreakAttachment();
-
 		thePlayer.SetVisibility(true);
 
 		thePlayer.EnableCollisions(true);
@@ -1558,55 +2064,55 @@ state BehSwitch_Engage_2 in cBehSwitch
 		}
 		else if (ACS_GetWeaponMode() == 2 )
 		{
-			if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeLightAttack', 0) == 0 )
+			if ( ACS_Settings_Main_Int('acs_hybrid_mode_settings','acs_hybrid_light_attack', 0) == 0 )
 			{
 				if (!thePlayer.HasTag('ACSHybridDefaultWeaponTicket')){thePlayer.AddTag('ACSHybridDefaultWeaponTicket');}
 
 				GetACSWatcher().PrimaryWeaponSwitch();
 			}
-			else if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeLightAttack', 0) == 1 )
+			else if ( ACS_Settings_Main_Int('acs_hybrid_mode_settings','acs_hybrid_light_attack', 0) == 1 )
 			{
 				if (!thePlayer.HasTag('ACSHybridOlgierdWeaponTicket')){thePlayer.AddTag('ACSHybridOlgierdWeaponTicket');}
 
 				GetACSWatcher().PrimaryWeaponSwitch();
 			}
-			else if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeLightAttack', 0) == 2 )
+			else if ( ACS_Settings_Main_Int('acs_hybrid_mode_settings','acs_hybrid_light_attack', 0) == 2 )
 			{
 				if (!thePlayer.HasTag('ACSHybridEredinWeaponTicket')){thePlayer.AddTag('ACSHybridEredinWeaponTicket');}
 
 				GetACSWatcher().PrimaryWeaponSwitch();
 			}
-			else if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeLightAttack', 0) == 3 )
+			else if ( ACS_Settings_Main_Int('acs_hybrid_mode_settings','acs_hybrid_light_attack', 0) == 3 )
 			{
 				if (!thePlayer.HasTag('ACSHybridClawWeaponTicket')){thePlayer.AddTag('ACSHybridClawWeaponTicket');}
 
 				GetACSWatcher().PrimaryWeaponSwitch();
 			}
-			else if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeLightAttack', 0) == 4 )
+			else if ( ACS_Settings_Main_Int('acs_hybrid_mode_settings','acs_hybrid_light_attack', 0) == 4 )
 			{
 				if (!thePlayer.HasTag('ACSHybridImlerithWeaponTicket')){thePlayer.AddTag('ACSHybridImlerithWeaponTicket');}
 
 				GetACSWatcher().PrimaryWeaponSwitch();
 			}
-			else if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeLightAttack', 0) == 5 )
+			else if ( ACS_Settings_Main_Int('acs_hybrid_mode_settings','acs_hybrid_light_attack', 0) == 5 )
 			{
 				if (!thePlayer.HasTag('ACSHybridSpearWeaponTicket')){thePlayer.AddTag('ACSHybridSpearWeaponTicket');}
 
 				GetACSWatcher().SecondaryWeaponSwitch();
 			}
-			else if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeLightAttack', 0) == 6 )
+			else if ( ACS_Settings_Main_Int('acs_hybrid_mode_settings','acs_hybrid_light_attack', 0) == 6 )
 			{
 				if (!thePlayer.HasTag('ACSHybridGregWeaponTicket')){thePlayer.AddTag('ACSHybridGregWeaponTicket');}
 
 				GetACSWatcher().SecondaryWeaponSwitch();
 			}
-			else if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeLightAttack', 0) == 7 )
+			else if ( ACS_Settings_Main_Int('acs_hybrid_mode_settings','acs_hybrid_light_attack', 0) == 7 )
 			{
 				if (!thePlayer.HasTag('ACSHybridAxeWeaponTicket')){thePlayer.AddTag('ACSHybridAxeWeaponTicket');}
 
 				GetACSWatcher().SecondaryWeaponSwitch();
 			}
-			else if ( ACS_Settings_Main_Int('EHmodHybridModeSettings','EHmodHybridModeLightAttack', 0) == 8 )
+			else if ( ACS_Settings_Main_Int('acs_hybrid_mode_settings','acs_hybrid_light_attack', 0) == 8 )
 			{
 				if (!thePlayer.HasTag('ACSHybridGiantWeaponTicket')){thePlayer.AddTag('ACSHybridGiantWeaponTicket');}
 
@@ -1615,7 +2121,7 @@ state BehSwitch_Engage_2 in cBehSwitch
 		}
 		else if (ACS_GetWeaponMode() == 3 )
 		{
-			GetACSWatcher().PrimaryWeaponSwitch();
+			//GetACSWatcher().PrimaryWeaponSwitch();
 		} 
 
 		if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -1636,7 +2142,7 @@ state BehSwitch_Engage_2 in cBehSwitch
 	{
 		stupidArray.Clear();
 
-		if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+		if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 		{
 			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
@@ -1747,6 +2253,127 @@ state BehSwitch_Engage_2 in cBehSwitch
 			}
 		}
 
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
 		|| ACSGetCEntity('ACS_Dual_Wield_L_Sword_Silver')
 		)
@@ -1765,11 +2392,29 @@ state BehSwitch_Engage_2 in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -1780,7 +2425,7 @@ state BehSwitch_Engage_2 in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 				}
@@ -1791,7 +2436,7 @@ state BehSwitch_Engage_2 in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
 				}
@@ -1819,7 +2464,7 @@ state BehSwitch_Engage_2 in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -1855,7 +2500,7 @@ state BehSwitch_Engage_2 in cBehSwitch
 	{
 		stupidArray.Clear();
 
-		if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+		if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 		{
 			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
@@ -1966,6 +2611,127 @@ state BehSwitch_Engage_2 in cBehSwitch
 			}
 		}
 
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
 		|| ACSGetCEntity('ACS_Dual_Wield_L_Sword_Silver')
 		)
@@ -1984,11 +2750,29 @@ state BehSwitch_Engage_2 in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -1999,7 +2783,7 @@ state BehSwitch_Engage_2 in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 				}
@@ -2010,7 +2794,7 @@ state BehSwitch_Engage_2 in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
 				}
@@ -2038,7 +2822,7 @@ state BehSwitch_Engage_2 in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -2074,7 +2858,7 @@ state BehSwitch_Engage_2 in cBehSwitch
 	{
 		stupidArray.Clear();
 
-		if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+		if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 		{
 			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
@@ -2185,6 +2969,127 @@ state BehSwitch_Engage_2 in cBehSwitch
 			}
 		}
 
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
 		|| ACSGetCEntity('ACS_Dual_Wield_L_Sword_Silver')
 		)
@@ -2203,11 +3108,29 @@ state BehSwitch_Engage_2 in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -2218,7 +3141,7 @@ state BehSwitch_Engage_2 in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 				}
@@ -2229,7 +3152,7 @@ state BehSwitch_Engage_2 in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
 				}
@@ -2257,7 +3180,7 @@ state BehSwitch_Engage_2 in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -2302,106 +3225,13 @@ state BehSwitch_Engage in cBehSwitch
 	event OnEnterState(prevStateName : name)
 	{
 		Beh_Switch_Entry();
-		
-		UpdateBehGraph();
-	}
-
-	function GetCurrentMeleeWeapon() : EPlayerWeapon
-	{
-		if (thePlayer.IsWeaponHeld('silversword'))
-		{
-			return PW_Silver;
-		}
-		else if (thePlayer.IsWeaponHeld('steelsword'))
-		{
-			return PW_Steel;
-		}
-		else if (thePlayer.IsWeaponHeld('fist'))
-		{
-			return PW_Fists;
-		}
-		else
-		{
-			return PW_None;
-		}
-	}
-
-	function UpdateBehGraph( optional init : bool )
-	{	
-		weapontype = GetCurrentMeleeWeapon();
-		
-		if ( weapontype == PW_None )
-		{
-			weapontype = PW_Fists;
-		}
-		
-		thePlayer.SetBehaviorVariable( 'WeaponType', 0);
-		
-		if ( thePlayer.HasTag('acs_vampire_claws_equipped') || thePlayer.HasTag('acs_sorc_fists_equipped') )
-		{
-			if (thePlayer.GetBehaviorVariable( 'playerWeapon') != (int) PW_Steel)
-			{
-				thePlayer.SetBehaviorVariable( 'playerWeapon', (int) PW_Steel );
-			}
-			
-			if (thePlayer.GetBehaviorVariable( 'playerWeaponForOverlay') != (int) PW_Steel)
-			{
-				thePlayer.SetBehaviorVariable( 'playerWeaponForOverlay', (int) PW_Steel );
-			}
-		}
-		else
-		{
-			if (thePlayer.GetBehaviorVariable( 'playerWeapon') != (int) weapontype)
-			{
-				thePlayer.SetBehaviorVariable( 'playerWeapon', (int) weapontype );
-			}
-			
-			if (thePlayer.GetBehaviorVariable( 'playerWeaponForOverlay') != (int) weapontype)
-			{
-				thePlayer.SetBehaviorVariable( 'playerWeaponForOverlay', (int) weapontype );
-			}
-		}
-		
-		if ( thePlayer.IsUsingHorse() )
-		{
-			if (thePlayer.GetBehaviorVariable( 'isOnHorse') != 1.0)
-			{
-				thePlayer.SetBehaviorVariable( 'isOnHorse', 1.0 );
-			}
-		}
-		else
-		{
-			if (thePlayer.GetBehaviorVariable( 'isOnHorse') != 0.0)
-			{
-				thePlayer.SetBehaviorVariable( 'isOnHorse', 0.0 );
-			}
-		}
-		
-		switch ( weapontype )
-		{
-			case PW_Steel:
-				thePlayer.SetBehaviorVariable( 'SelectedWeapon', 0, true);
-				thePlayer.SetBehaviorVariable( 'isHoldingWeaponR', 1.0, true );
-				if ( init )
-					res = thePlayer.RaiseEvent('DrawWeaponInstant');
-				break;
-			case PW_Silver:
-				thePlayer.SetBehaviorVariable( 'SelectedWeapon', 1, true);
-				thePlayer.SetBehaviorVariable( 'isHoldingWeaponR', 1.0, true );
-				if ( init )
-					res = thePlayer.RaiseEvent('DrawWeaponInstant');
-				break;
-			default:
-				thePlayer.SetBehaviorVariable( 'isHoldingWeaponR', 0.0, true );
-				break;
-		}
 	}
 	
 	entry function Beh_Switch_Entry()
 	{
 		if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 		{
-			if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+			if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 			{
 				BehSwitchPrime_SCAAR_Passive_Taunt();
 			}
@@ -2412,7 +3242,7 @@ state BehSwitch_Engage in cBehSwitch
 		}
 		else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 		{
-			if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+			if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 			{
 				BehSwitchPrime_E3ARP_Passive_Taunt();
 			}
@@ -2423,7 +3253,7 @@ state BehSwitch_Engage in cBehSwitch
 		}
 		else
 		{
-			if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+			if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 			{
 				BehSwitchPrime_Passive_Taunt();
 			}
@@ -2505,21 +3335,21 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 0)
+			if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh' )
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh' );
 				}
 			}
-			else if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 1)
+			else if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh' )
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'claw_beh' ); GetACSWatcher().PrimaryWeaponSwitch();
 				}
 			}
-			else if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 2 )
+			else if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 2 )
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
 				{
@@ -2530,6 +3360,127 @@ state BehSwitch_Engage in cBehSwitch
 					stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh' );
 				}
 			}
+		}
+
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
 		}
 
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
@@ -2550,11 +3501,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -2565,7 +3534,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 				}
@@ -2576,7 +3545,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
 				}
@@ -2604,7 +3573,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -2640,7 +3609,7 @@ state BehSwitch_Engage in cBehSwitch
 
 	latent function BehSwitchPrime_ArmigerMode_Igni()
 	{
-		if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerIgniSignWeapon', 0) == 0)
+		if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_igni_sign_weapon', 0) == 0)
 		{
 			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
@@ -2659,7 +3628,7 @@ state BehSwitch_Engage in cBehSwitch
 
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerIgniSignWeapon', 0) == 1)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_igni_sign_weapon', 0) == 1)
 		{
 			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
@@ -2678,7 +3647,7 @@ state BehSwitch_Engage in cBehSwitch
 
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerIgniSignWeapon', 0) == 2)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_igni_sign_weapon', 0) == 2)
 		{
 			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
@@ -2696,7 +3665,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerIgniSignWeapon', 0) == 3)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_igni_sign_weapon', 0) == 3)
 		{
 			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
@@ -2714,7 +3683,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerIgniSignWeapon', 0) == 4)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_igni_sign_weapon', 0) == 4)
 		{
 			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
@@ -2731,6 +3700,127 @@ state BehSwitch_Engage in cBehSwitch
 				}
 			}
 			
+		}
+
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
 		}
 
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
@@ -2751,11 +3841,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -2766,7 +3874,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 				}
@@ -2777,7 +3885,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
 				}
@@ -2805,7 +3913,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -2839,7 +3947,7 @@ state BehSwitch_Engage in cBehSwitch
 
 	latent function BehSwitchPrime_ArmigerMode_Quen()
 	{
-		if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerQuenSignWeapon', 1) == 0)
+		if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_quen_sign_weapon', 1) == 0)
 		{
 			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
@@ -2857,7 +3965,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerQuenSignWeapon', 1) == 1)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_quen_sign_weapon', 1) == 1)
 		{
 			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
@@ -2875,7 +3983,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerQuenSignWeapon', 1) == 2)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_quen_sign_weapon', 1) == 2)
 		{
 			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
@@ -2893,7 +4001,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerQuenSignWeapon', 1) == 3)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_quen_sign_weapon', 1) == 3)
 		{
 			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
@@ -2911,7 +4019,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerQuenSignWeapon', 1) == 4)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_quen_sign_weapon', 1) == 4)
 		{
 			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
@@ -2928,6 +4036,127 @@ state BehSwitch_Engage in cBehSwitch
 				}
 			}
 			
+		}
+
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
 		}
 
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
@@ -2948,11 +4177,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -2963,7 +4210,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 				}
@@ -2974,7 +4221,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
 				}
@@ -3002,7 +4249,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -3036,7 +4283,7 @@ state BehSwitch_Engage in cBehSwitch
 
 	latent function BehSwitchPrime_ArmigerMode_Aard()
 	{
-		if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAardSignWeapon', 3) == 0)
+		if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_aard_sign_weapon', 3) == 0)
 		{
 			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
@@ -3054,7 +4301,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAardSignWeapon', 3) == 1)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_aard_sign_weapon', 3) == 1)
 		{
 			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
@@ -3072,7 +4319,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAardSignWeapon', 3) == 2)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_aard_sign_weapon', 3) == 2)
 		{
 			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
@@ -3090,7 +4337,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAardSignWeapon', 3) == 3)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_aard_sign_weapon', 3) == 3)
 		{
 			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
@@ -3108,7 +4355,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAardSignWeapon', 3) == 4)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_aard_sign_weapon', 3) == 4)
 		{
 			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
@@ -3125,6 +4372,127 @@ state BehSwitch_Engage in cBehSwitch
 				}
 			}
 			
+		}
+
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
 		}
 
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
@@ -3145,11 +4513,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -3160,7 +4546,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 				}
@@ -3171,7 +4557,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
 				}
@@ -3199,7 +4585,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -3233,7 +4619,7 @@ state BehSwitch_Engage in cBehSwitch
 
 	latent function BehSwitchPrime_ArmigerMode_Axii()
 	{
-		if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAxiiSignWeapon', 2) == 0)
+		if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_axii_sign_weapon', 2) == 0)
 		{
 			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
@@ -3251,7 +4637,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAxiiSignWeapon', 2) == 1)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_axii_sign_weapon', 2) == 1)
 		{
 			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
@@ -3269,7 +4655,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAxiiSignWeapon', 2) == 2)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_axii_sign_weapon', 2) == 2)
 		{
 			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
@@ -3287,7 +4673,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAxiiSignWeapon', 2) == 3)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_axii_sign_weapon', 2) == 3)
 		{
 			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
@@ -3305,7 +4691,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAxiiSignWeapon', 2) == 4)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_axii_sign_weapon', 2) == 4)
 		{
 			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
@@ -3322,6 +4708,127 @@ state BehSwitch_Engage in cBehSwitch
 				}
 			}
 			
+		}
+
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
 		}
 
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
@@ -3342,11 +4849,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -3357,7 +4882,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 				}
@@ -3368,7 +4893,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
 				}
@@ -3396,7 +4921,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -3430,7 +4955,7 @@ state BehSwitch_Engage in cBehSwitch
 
 	latent function BehSwitchPrime_ArmigerMode_Yrden()
 	{
-		if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerYrdenSignWeapon', 4) == 0)
+		if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_yrden_sign_weapon', 4) == 0)
 		{
 			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
@@ -3448,7 +4973,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerYrdenSignWeapon', 4) == 1)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_yrden_sign_weapon', 4) == 1)
 		{
 			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
@@ -3466,7 +4991,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerYrdenSignWeapon', 4) == 2)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_yrden_sign_weapon', 4) == 2)
 		{
 			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
@@ -3484,7 +5009,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerYrdenSignWeapon', 4) == 3)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_yrden_sign_weapon', 4) == 3)
 		{
 			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
@@ -3502,7 +5027,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerYrdenSignWeapon', 4) == 4)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_yrden_sign_weapon', 4) == 4)
 		{
 			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
@@ -3519,6 +5044,127 @@ state BehSwitch_Engage in cBehSwitch
 				}
 			}
 			
+		}
+
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
 		}
 
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
@@ -3539,11 +5185,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -3554,7 +5218,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 				}
@@ -3565,7 +5229,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
 				}
@@ -3593,7 +5257,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -3631,8 +5295,8 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh' )
@@ -3643,8 +5307,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 3 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 3 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 3 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 3 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh' )
@@ -3655,8 +5319,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 7 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 7 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 7 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 7 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh' )
@@ -3667,8 +5331,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 5 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 5 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 5 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 5 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh' )
@@ -3679,8 +5343,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 1 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 1 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 1 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 1 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh' )
@@ -3691,8 +5355,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh' )
@@ -3703,8 +5367,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 4 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 4 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 4 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 4 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh' )
@@ -3715,8 +5379,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 8 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 8 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 8 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 8 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh' )
@@ -3727,8 +5391,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 6 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 6 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 6 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 6 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh' )
@@ -3739,8 +5403,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 2 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped')  )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 2 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 2 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped')  )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 2 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh' )
@@ -3753,27 +5417,148 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 0)
+			if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh' )
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh' );
 				}
 			}
-			else if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 1)
+			else if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh' )
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh' ); GetACSWatcher().PrimaryWeaponSwitch();
 				}
 			}
-			else if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 2 )
+			else if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 2 )
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' ); GetACSWatcher().PrimaryWeaponSwitch();
 				}
 			}
+		}
+
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
 		}
 
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
@@ -3794,11 +5579,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -3809,7 +5612,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 				}
@@ -3820,7 +5623,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
 				}
@@ -3848,7 +5651,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -3996,27 +5799,148 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 0)
+			if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh' )
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh' );
 				}
 			}
-			else if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 1)
+			else if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh')
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh' ); GetACSWatcher().PrimaryWeaponSwitch();
 				}
 			}
-			else if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 2 )
+			else if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 2 )
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' ); GetACSWatcher().PrimaryWeaponSwitch();
 				}
 			}
+		}
+
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
 		}
 
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
@@ -4037,11 +5961,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -4052,7 +5994,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 				}
@@ -4063,7 +6005,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
 				}
@@ -4091,7 +6033,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -4133,7 +6075,7 @@ state BehSwitch_Engage in cBehSwitch
 				{
 					if 
 					(
-						ACS_GetItem_Eredin_Silver() && thePlayer.HasTag('acs_axii_sword_equipped') 
+						ACS_GetItem_Sword_IsEquipped('shield_sword_silver', 'silver') && thePlayer.HasTag('acs_axii_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh' )
@@ -4144,7 +6086,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Claws_Silver() && thePlayer.HasTag('acs_aard_sword_equipped') 
+						ACS_GetItem_Sword_IsEquipped('claws_silver', 'silver') && thePlayer.HasTag('acs_aard_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh' )
@@ -4155,7 +6097,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Imlerith_Silver() && thePlayer.HasTag('acs_yrden_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('imlerith_moveset_silver', 'silver') && thePlayer.HasTag('acs_yrden_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh' )
@@ -4166,7 +6108,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Olgierd_Silver() && thePlayer.HasTag('acs_quen_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('olgierd_silver', 'silver') && thePlayer.HasTag('acs_quen_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh' )
@@ -4177,7 +6119,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Greg_Silver() && thePlayer.HasTag('acs_axii_secondary_sword_equipped') 
+						ACS_GetItem_Sword_IsEquipped('greg_silver', 'silver') && thePlayer.HasTag('acs_axii_secondary_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh' )
@@ -4188,7 +6130,7 @@ state BehSwitch_Engage in cBehSwitch
 
 					else if 
 					(
-						ACS_GetItem_Katana_Silver() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('katana_silver', 'silver') && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh' )
@@ -4199,7 +6141,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Axe_Silver() && thePlayer.HasTag('acs_aard_secondary_sword_equipped') 
+						ACS_GetItem_Sword_IsEquipped('axe_silver', 'silver') && thePlayer.HasTag('acs_aard_secondary_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh' )
@@ -4210,7 +6152,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Hammer_Silver() && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('hammer_silver', 'silver') && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh' )
@@ -4221,7 +6163,17 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Spear_Silver() &&  thePlayer.HasTag('acs_quen_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('spear_silver', 'silver') &&  thePlayer.HasTag('acs_quen_secondary_sword_equipped')
+					)
+					{
+						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh' )
+						{
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh' );
+						}
+					}
+					else if 
+					(
+						ACS_GetItem_Sword_IsEquipped('jingubang_steel', 'steel') || ACS_GetItem_Sword_IsEquipped('jingubang_silver', 'silver') &&  thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh' )
@@ -4241,7 +6193,7 @@ state BehSwitch_Engage in cBehSwitch
 				{
 					if 
 					(
-						ACS_GetItem_Eredin_Steel() && thePlayer.HasTag('acs_axii_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('shield_sword_steel', 'steel') && thePlayer.HasTag('acs_axii_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh' )
@@ -4252,7 +6204,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Claws_Steel() && thePlayer.HasTag('acs_aard_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('claws_steel', 'steel') && thePlayer.HasTag('acs_aard_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh' )
@@ -4263,7 +6215,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						(ACS_GetItem_MageStaff_Steel() || ACS_GetItem_Imlerith_Steel()) && thePlayer.HasTag('acs_yrden_sword_equipped')
+						(thePlayer.GetInventory().ItemHasTag( thePlayer.GetInventory().GetCurrentlyHeldSword(), 'acsmagestaff' ) || ACS_GetItem_Sword_IsEquipped('imlerith_moveset_steel', 'steel') || ACS_GetItem_Sword_IsEquipped('imlerith_steel', 'steel') || ACS_GetItem_Sword_IsEquipped('caretaker_shovel_steel', 'steel')) && thePlayer.HasTag('acs_yrden_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh' )
@@ -4274,7 +6226,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Olgierd_Steel() && thePlayer.HasTag('acs_quen_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('olgierd_steel', 'steel') && thePlayer.HasTag('acs_quen_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh' )
@@ -4285,7 +6237,7 @@ state BehSwitch_Engage in cBehSwitch
 
 					else if 
 					(
-						ACS_GetItem_Katana_Steel() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('katana_steel', 'steel') && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh' )
@@ -4296,7 +6248,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Greg_Steel() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('greg_steel', 'steel') && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh' )
@@ -4307,7 +6259,8 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Axe_Steel() && thePlayer.HasTag('acs_aard_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('axe_steel', 'steel') && thePlayer.HasTag('acs_aard_secondary_sword_equipped')
+						|| ACS_GetItem_Sword_IsEquipped('nithral_steel', 'steel') && thePlayer.HasTag('acs_aard_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh' )
@@ -4318,7 +6271,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Hammer_Steel() && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('hammer_steel', 'steel') && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh' )
@@ -4329,7 +6282,17 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Spear_Steel() && thePlayer.HasTag('acs_quen_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('spear_steel', 'steel') && thePlayer.HasTag('acs_quen_secondary_sword_equipped')
+					)
+					{
+						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh' )
+						{
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh' );
+						}
+					}
+					else if 
+					(
+						ACS_GetItem_Sword_IsEquipped('jingubang_steel', 'steel') || ACS_GetItem_Sword_IsEquipped('jingubang_silver', 'silver') &&  thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh' )
@@ -4350,7 +6313,7 @@ state BehSwitch_Engage in cBehSwitch
 			{
 				if 
 				(
-					ACS_GetItem_VampClaw() || ACS_GetItem_VampClaw_Shades()
+					ACS_GetItem_VampClaw('default') || ACS_GetItem_VampClaw('shades')
 				)
 				{
 					if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh' )
@@ -4360,7 +6323,7 @@ state BehSwitch_Engage in cBehSwitch
 				}
 				else if 
 				(
-					ACS_GetItem_SorcFists()
+					GetWitcherPlayer().IsItemEquippedByName( 'ACS_Mage_Gloves')
 				)
 				{
 					if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
@@ -4386,6 +6349,127 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
 		|| ACSGetCEntity('ACS_Dual_Wield_L_Sword_Silver')
 		)
@@ -4404,11 +6488,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -4419,7 +6521,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 				}
@@ -4430,7 +6532,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
 				}
@@ -4458,7 +6560,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -4561,27 +6663,148 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 0)
+			if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_passive_taunt' )
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_passive_taunt' );
 				}
 			}
-			else if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 1)
+			else if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_passive_taunt')
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_passive_taunt' ); GetACSWatcher().PrimaryWeaponSwitch();
 				}
 			}
-			else if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 2 )
+			else if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 2 )
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' ); GetACSWatcher().PrimaryWeaponSwitch();
 				}
 			}
+		}
+
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
 		}
 
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
@@ -4602,11 +6825,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -4617,7 +6858,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 				}
@@ -4628,7 +6869,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
 				}
@@ -4656,7 +6897,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -4692,7 +6933,7 @@ state BehSwitch_Engage in cBehSwitch
 
 	latent function BehSwitchPrime_Passive_Taunt_ArmigerMode_Igni()
 	{
-		if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerIgniSignWeapon', 0) == 0)
+		if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_igni_sign_weapon', 0) == 0)
 		{
 			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
@@ -4710,7 +6951,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerIgniSignWeapon', 0) == 1)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_igni_sign_weapon', 0) == 1)
 		{
 			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
@@ -4728,7 +6969,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerIgniSignWeapon', 0) == 2)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_igni_sign_weapon', 0) == 2)
 		{
 			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
@@ -4746,7 +6987,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerIgniSignWeapon', 0) == 3)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_igni_sign_weapon', 0) == 3)
 		{
 			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
@@ -4764,7 +7005,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerIgniSignWeapon', 0) == 4)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_igni_sign_weapon', 0) == 4)
 		{
 			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
@@ -4781,6 +7022,127 @@ state BehSwitch_Engage in cBehSwitch
 				}
 			}
 			
+		}
+
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
 		}
 
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
@@ -4801,11 +7163,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -4816,7 +7196,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 				}
@@ -4827,7 +7207,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
 				}
@@ -4855,7 +7235,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -4889,7 +7269,7 @@ state BehSwitch_Engage in cBehSwitch
 
 	latent function BehSwitchPrime_Passive_Taunt_ArmigerMode_Quen()
 	{
-		if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerQuenSignWeapon', 1) == 0)
+		if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_quen_sign_weapon', 1) == 0)
 		{
 			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
@@ -4907,7 +7287,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerQuenSignWeapon', 1) == 1)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_quen_sign_weapon', 1) == 1)
 		{
 			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
@@ -4925,7 +7305,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerQuenSignWeapon', 1) == 2)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_quen_sign_weapon', 1) == 2)
 		{
 			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
@@ -4943,7 +7323,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerQuenSignWeapon', 1) == 3)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_quen_sign_weapon', 1) == 3)
 		{
 			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
@@ -4961,7 +7341,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerQuenSignWeapon', 1) == 4)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_quen_sign_weapon', 1) == 4)
 		{
 			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
@@ -4978,6 +7358,127 @@ state BehSwitch_Engage in cBehSwitch
 				}
 			}
 			
+		}
+
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
 		}
 
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
@@ -4998,11 +7499,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -5013,7 +7532,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 				}
@@ -5024,7 +7543,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
 				}
@@ -5052,7 +7571,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -5086,7 +7605,7 @@ state BehSwitch_Engage in cBehSwitch
 
 	latent function BehSwitchPrime_Passive_Taunt_ArmigerMode_Aard()
 	{
-		if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAardSignWeapon', 3) == 0)
+		if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_aard_sign_weapon', 3) == 0)
 		{
 			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
@@ -5104,7 +7623,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAardSignWeapon', 3) == 1)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_aard_sign_weapon', 3) == 1)
 		{
 			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
@@ -5122,7 +7641,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAardSignWeapon', 3) == 2)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_aard_sign_weapon', 3) == 2)
 		{
 			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
@@ -5140,7 +7659,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAardSignWeapon', 3) == 3)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_aard_sign_weapon', 3) == 3)
 		{
 			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
@@ -5158,7 +7677,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAardSignWeapon', 3) == 4)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_aard_sign_weapon', 3) == 4)
 		{
 			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
@@ -5175,6 +7694,127 @@ state BehSwitch_Engage in cBehSwitch
 				}
 			}
 			
+		}
+
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
 		}
 
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
@@ -5195,11 +7835,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -5210,7 +7868,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 				}
@@ -5221,7 +7879,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
 				}
@@ -5249,7 +7907,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -5283,7 +7941,7 @@ state BehSwitch_Engage in cBehSwitch
 
 	latent function BehSwitchPrime_Passive_Taunt_ArmigerMode_Axii()
 	{
-		if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAxiiSignWeapon', 2) == 0)
+		if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_axii_sign_weapon', 2) == 0)
 		{
 			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
@@ -5301,7 +7959,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAxiiSignWeapon', 2) == 1)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_axii_sign_weapon', 2) == 1)
 		{
 			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
@@ -5319,7 +7977,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAxiiSignWeapon', 2) == 2)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_axii_sign_weapon', 2) == 2)
 		{
 			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
@@ -5337,7 +7995,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAxiiSignWeapon', 2) == 3)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_axii_sign_weapon', 2) == 3)
 		{
 			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
@@ -5355,7 +8013,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAxiiSignWeapon', 2) == 4)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_axii_sign_weapon', 2) == 4)
 		{
 			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
@@ -5374,6 +8032,127 @@ state BehSwitch_Engage in cBehSwitch
 			
 		}
 
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
 		|| ACSGetCEntity('ACS_Dual_Wield_L_Sword_Silver')
 		)
@@ -5392,11 +8171,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -5407,7 +8204,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 				}
@@ -5418,7 +8215,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
 				}
@@ -5446,7 +8243,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -5464,6 +8261,127 @@ state BehSwitch_Engage in cBehSwitch
 		}
 
 
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
 		|| ACSGetCEntity('ACS_Dual_Wield_L_Sword_Silver')
 		)
@@ -5482,11 +8400,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -5497,7 +8433,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 				}
@@ -5508,7 +8444,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
 				}
@@ -5536,7 +8472,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -5570,7 +8506,7 @@ state BehSwitch_Engage in cBehSwitch
 
 	latent function BehSwitchPrime_Passive_Taunt_ArmigerMode_Yrden()
 	{
-		if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerYrdenSignWeapon', 4) == 0)
+		if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_yrden_sign_weapon', 4) == 0)
 		{
 			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
@@ -5588,7 +8524,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerYrdenSignWeapon', 4) == 1)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_yrden_sign_weapon', 4) == 1)
 		{
 			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
@@ -5606,7 +8542,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerYrdenSignWeapon', 4) == 2)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_yrden_sign_weapon', 4) == 2)
 		{
 			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
@@ -5624,7 +8560,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerYrdenSignWeapon', 4) == 3)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_yrden_sign_weapon', 4) == 3)
 		{
 			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
@@ -5642,7 +8578,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerYrdenSignWeapon', 4) == 4)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_yrden_sign_weapon', 4) == 4)
 		{
 			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
@@ -5659,6 +8595,127 @@ state BehSwitch_Engage in cBehSwitch
 				}
 			}
 			
+		}
+
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
 		}
 
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
@@ -5679,11 +8736,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -5694,7 +8769,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 				}
@@ -5705,7 +8780,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
 				}
@@ -5733,7 +8808,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -5772,8 +8847,8 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_passive_taunt' )
@@ -5784,8 +8859,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 3 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 3 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 3 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 3 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_passive_taunt' )
@@ -5796,8 +8871,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 7 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 7 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 7 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 7 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_passive_taunt' )
@@ -5808,8 +8883,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 5 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 5 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 5 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 5 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_passive_taunt' )
@@ -5820,8 +8895,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 1 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 1 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 1 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 1 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_passive_taunt' )
@@ -5832,8 +8907,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_passive_taunt' )
@@ -5844,8 +8919,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 4 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 4 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 4 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 4 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_passive_taunt' )
@@ -5856,8 +8931,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 8 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 8 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 8 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 8 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_passive_taunt' )
@@ -5868,8 +8943,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 6 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 6 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 6 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 6 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_passive_taunt' )
@@ -5880,8 +8955,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 2 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped')  )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 2 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 2 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped')  )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 2 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_passive_taunt' )
@@ -5894,27 +8969,148 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 0)
+			if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_passive_taunt' )
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_passive_taunt' );
 				}
 			}
-			else if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 1)
+			else if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_passive_taunt')
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_passive_taunt' ); GetACSWatcher().PrimaryWeaponSwitch();
 				}
 			}
-			else if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 2 )
+			else if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 2 )
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' ); GetACSWatcher().PrimaryWeaponSwitch();
 				}
 			}
+		}
+
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
 		}
 
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
@@ -5935,11 +9131,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -5950,7 +9164,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 				}
@@ -5961,7 +9175,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
 				}
@@ -5989,7 +9203,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -6137,27 +9351,148 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 0)
+			if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_passive_taunt' )
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_passive_taunt' );
 				}
 			}
-			else if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 1)
+			else if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_passive_taunt')
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_passive_taunt' ); GetACSWatcher().PrimaryWeaponSwitch();
 				}
 			}
-			else if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 2 )
+			else if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 2 )
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' ); GetACSWatcher().PrimaryWeaponSwitch();
 				}
 			}
+		}
+
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
 		}
 
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
@@ -6178,11 +9513,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -6193,7 +9546,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 				}
@@ -6204,7 +9557,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
 				}
@@ -6232,7 +9585,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -6274,7 +9627,7 @@ state BehSwitch_Engage in cBehSwitch
 				{
 					if 
 					(
-						ACS_GetItem_Eredin_Silver() && thePlayer.HasTag('acs_axii_sword_equipped') 
+						ACS_GetItem_Sword_IsEquipped('shield_sword_silver', 'silver') && thePlayer.HasTag('acs_axii_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_passive_taunt' )
@@ -6285,7 +9638,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Claws_Silver() && thePlayer.HasTag('acs_aard_sword_equipped') 
+						ACS_GetItem_Sword_IsEquipped('claws_silver', 'silver') && thePlayer.HasTag('acs_aard_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_passive_taunt' )
@@ -6296,7 +9649,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Imlerith_Silver() && thePlayer.HasTag('acs_yrden_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('imlerith_moveset_silver', 'silver') && thePlayer.HasTag('acs_yrden_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_passive_taunt' )
@@ -6307,7 +9660,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Olgierd_Silver() && thePlayer.HasTag('acs_quen_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('olgierd_silver', 'silver') && thePlayer.HasTag('acs_quen_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_passive_taunt' )
@@ -6318,7 +9671,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Greg_Silver() && thePlayer.HasTag('acs_axii_secondary_sword_equipped') 
+						ACS_GetItem_Sword_IsEquipped('greg_silver', 'silver') && thePlayer.HasTag('acs_axii_secondary_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_passive_taunt' )
@@ -6329,7 +9682,7 @@ state BehSwitch_Engage in cBehSwitch
 
 					else if 
 					(
-						ACS_GetItem_Katana_Silver() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('katana_silver', 'silver') && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_passive_taunt' )
@@ -6340,7 +9693,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Axe_Silver() && thePlayer.HasTag('acs_aard_secondary_sword_equipped') 
+						ACS_GetItem_Sword_IsEquipped('axe_silver', 'silver') && thePlayer.HasTag('acs_aard_secondary_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_passive_taunt' )
@@ -6351,7 +9704,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Hammer_Silver() && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('hammer_silver', 'silver') && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_passive_taunt' )
@@ -6362,7 +9715,17 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Spear_Silver() &&  thePlayer.HasTag('acs_quen_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('spear_silver', 'silver') &&  thePlayer.HasTag('acs_quen_secondary_sword_equipped')
+					)
+					{
+						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_passive_taunt' )
+						{
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_passive_taunt' );
+						}
+					}
+					else if 
+					(
+						ACS_GetItem_Sword_IsEquipped('jingubang_steel', 'steel') || ACS_GetItem_Sword_IsEquipped('jingubang_silver', 'silver') &&  thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_passive_taunt' )
@@ -6382,7 +9745,7 @@ state BehSwitch_Engage in cBehSwitch
 				{
 					if 
 					(
-						ACS_GetItem_Eredin_Steel() && thePlayer.HasTag('acs_axii_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('shield_sword_steel', 'steel') && thePlayer.HasTag('acs_axii_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_passive_taunt' )
@@ -6393,7 +9756,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Claws_Steel() && thePlayer.HasTag('acs_aard_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('claws_steel', 'steel') && thePlayer.HasTag('acs_aard_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_passive_taunt' )
@@ -6404,7 +9767,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						(ACS_GetItem_MageStaff_Steel() || ACS_GetItem_Imlerith_Steel()) && thePlayer.HasTag('acs_yrden_sword_equipped')
+						(thePlayer.GetInventory().ItemHasTag( thePlayer.GetInventory().GetCurrentlyHeldSword(), 'acsmagestaff' ) || ACS_GetItem_Sword_IsEquipped('imlerith_moveset_steel', 'steel') || ACS_GetItem_Sword_IsEquipped('imlerith_steel', 'steel') || ACS_GetItem_Sword_IsEquipped('caretaker_shovel_steel', 'steel')) && thePlayer.HasTag('acs_yrden_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_passive_taunt' )
@@ -6415,7 +9778,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Olgierd_Steel() && thePlayer.HasTag('acs_quen_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('olgierd_steel', 'steel') && thePlayer.HasTag('acs_quen_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_passive_taunt' )
@@ -6426,7 +9789,7 @@ state BehSwitch_Engage in cBehSwitch
 
 					else if 
 					(
-						ACS_GetItem_Katana_Steel() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('katana_steel', 'steel') && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_passive_taunt' )
@@ -6437,7 +9800,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Greg_Steel() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('greg_steel', 'steel') && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_passive_taunt' )
@@ -6448,7 +9811,8 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Axe_Steel() && thePlayer.HasTag('acs_aard_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('axe_steel', 'steel') && thePlayer.HasTag('acs_aard_secondary_sword_equipped')
+						|| ACS_GetItem_Sword_IsEquipped('nithral_steel', 'steel') && thePlayer.HasTag('acs_aard_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_passive_taunt' )
@@ -6459,7 +9823,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Hammer_Steel() && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('hammer_steel', 'steel') && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_passive_taunt' )
@@ -6470,7 +9834,17 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Spear_Steel() && thePlayer.HasTag('acs_quen_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('spear_steel', 'steel') && thePlayer.HasTag('acs_quen_secondary_sword_equipped')
+					)
+					{
+						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_passive_taunt' )
+						{
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_passive_taunt' );
+						}
+					}
+					else if 
+					(
+						ACS_GetItem_Sword_IsEquipped('jingubang_steel', 'steel') || ACS_GetItem_Sword_IsEquipped('jingubang_silver', 'silver') &&  thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_passive_taunt' )
@@ -6491,7 +9865,7 @@ state BehSwitch_Engage in cBehSwitch
 			{
 				if 
 				(
-					ACS_GetItem_VampClaw() || ACS_GetItem_VampClaw_Shades()
+					ACS_GetItem_VampClaw('default') || ACS_GetItem_VampClaw('shades')
 				)
 				{
 					if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_passive_taunt' )
@@ -6501,7 +9875,7 @@ state BehSwitch_Engage in cBehSwitch
 				}
 				else if 
 				(
-					ACS_GetItem_SorcFists()
+					GetWitcherPlayer().IsItemEquippedByName( 'ACS_Mage_Gloves')
 				)
 				{
 					if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
@@ -6526,6 +9900,127 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
 		|| ACSGetCEntity('ACS_Dual_Wield_L_Sword_Silver')
 		)
@@ -6544,11 +10039,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -6559,7 +10072,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 				}
@@ -6570,7 +10083,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
 				}
@@ -6598,7 +10111,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -6691,6 +10204,127 @@ state BehSwitch_Engage in cBehSwitch
 
 		
 
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
 		|| ACSGetCEntity('ACS_Dual_Wield_L_Sword_Silver')
 		)
@@ -6709,11 +10343,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -6724,7 +10376,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 					{
 						stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 					}
@@ -6735,7 +10387,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
                 {
                     stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
                 }
@@ -6763,7 +10415,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -6854,6 +10506,127 @@ state BehSwitch_Engage in cBehSwitch
 
 		
 
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
 		|| ACSGetCEntity('ACS_Dual_Wield_L_Sword_Silver')
 		)
@@ -6872,11 +10645,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -6887,7 +10678,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 					{
 						stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 					}
@@ -6898,7 +10689,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
                 {
                     stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
                 }
@@ -6926,7 +10717,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -7021,6 +10812,127 @@ state BehSwitch_Engage in cBehSwitch
 
 		
 
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
 		|| ACSGetCEntity('ACS_Dual_Wield_L_Sword_Silver')
 		)
@@ -7039,11 +10951,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -7054,7 +10984,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 					{
 						stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 					}
@@ -7065,7 +10995,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
                 {
                     stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
                 }
@@ -7093,7 +11023,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -7186,6 +11116,127 @@ state BehSwitch_Engage in cBehSwitch
 
 		
 
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
 		|| ACSGetCEntity('ACS_Dual_Wield_L_Sword_Silver')
 		)
@@ -7204,11 +11255,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -7219,7 +11288,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 					{
 						stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 					}
@@ -7230,7 +11299,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
                 {
                     stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
                 }
@@ -7258,7 +11327,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -7361,27 +11430,148 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 0)
+			if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR' )
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR' );
 				}
 			}
-			else if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 1)
+			else if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh')
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'claw_beh' ); GetACSWatcher().PrimaryWeaponSwitch();
 				}
 			}
-			else if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 2 )
+			else if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 2 )
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' ); GetACSWatcher().PrimaryWeaponSwitch();
 				}
 			}
+		}
+
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
 		}
 
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
@@ -7402,11 +11592,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -7417,7 +11625,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 					{
 						stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 					}
@@ -7428,7 +11636,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
                 {
                     stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
                 }
@@ -7456,7 +11664,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -7492,7 +11700,7 @@ state BehSwitch_Engage in cBehSwitch
 
 	latent function BehSwitchPrime_SCAAR_ArmigerMode_Igni()
 	{
-		if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerIgniSignWeapon', 0) == 0)
+		if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_igni_sign_weapon', 0) == 0)
 		{
 			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
@@ -7510,7 +11718,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerIgniSignWeapon', 0) == 1)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_igni_sign_weapon', 0) == 1)
 		{
 			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
@@ -7528,7 +11736,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerIgniSignWeapon', 0) == 2)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_igni_sign_weapon', 0) == 2)
 		{
 			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
@@ -7546,7 +11754,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerIgniSignWeapon', 0) == 3)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_igni_sign_weapon', 0) == 3)
 		{
 			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
@@ -7564,7 +11772,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerIgniSignWeapon', 0) == 4)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_igni_sign_weapon', 0) == 4)
 		{
 			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
@@ -7581,6 +11789,127 @@ state BehSwitch_Engage in cBehSwitch
 				}
 			}
 			
+		}
+
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
 		}
 
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
@@ -7601,11 +11930,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -7616,7 +11963,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 					{
 						stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 					}
@@ -7627,7 +11974,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
                 {
                     stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
                 }
@@ -7655,7 +12002,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -7689,7 +12036,7 @@ state BehSwitch_Engage in cBehSwitch
 
 	latent function BehSwitchPrime_SCAAR_ArmigerMode_Quen()
 	{
-		if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerQuenSignWeapon', 1) == 0)
+		if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_quen_sign_weapon', 1) == 0)
 		{
 			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
@@ -7707,7 +12054,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerQuenSignWeapon', 1) == 1)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_quen_sign_weapon', 1) == 1)
 		{
 			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
@@ -7725,7 +12072,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerQuenSignWeapon', 1) == 2)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_quen_sign_weapon', 1) == 2)
 		{
 			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
@@ -7743,7 +12090,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerQuenSignWeapon', 1) == 3)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_quen_sign_weapon', 1) == 3)
 		{
 			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
@@ -7761,7 +12108,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerQuenSignWeapon', 1) == 4)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_quen_sign_weapon', 1) == 4)
 		{
 			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
@@ -7778,6 +12125,127 @@ state BehSwitch_Engage in cBehSwitch
 				}
 			}
 			
+		}
+
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
 		}
 
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
@@ -7798,11 +12266,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -7813,7 +12299,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 					{
 						stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 					}
@@ -7824,7 +12310,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
                 {
                     stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
                 }
@@ -7852,7 +12338,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -7886,7 +12372,7 @@ state BehSwitch_Engage in cBehSwitch
 
 	latent function BehSwitchPrime_SCAAR_ArmigerMode_Aard()
 	{
-		if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAardSignWeapon', 3) == 0)
+		if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_aard_sign_weapon', 3) == 0)
 		{
 			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
@@ -7904,7 +12390,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAardSignWeapon', 3) == 1)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_aard_sign_weapon', 3) == 1)
 		{
 			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
@@ -7922,7 +12408,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAardSignWeapon', 3) == 2)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_aard_sign_weapon', 3) == 2)
 		{
 			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
@@ -7940,7 +12426,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAardSignWeapon', 3) == 3)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_aard_sign_weapon', 3) == 3)
 		{
 			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
@@ -7958,7 +12444,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAardSignWeapon', 3) == 4)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_aard_sign_weapon', 3) == 4)
 		{
 			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
@@ -7975,6 +12461,127 @@ state BehSwitch_Engage in cBehSwitch
 				}
 			}
 			
+		}
+
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
 		}
 
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
@@ -7995,11 +12602,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -8010,7 +12635,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 					{
 						stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 					}
@@ -8021,7 +12646,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
                 {
                     stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
                 }
@@ -8049,7 +12674,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -8083,7 +12708,7 @@ state BehSwitch_Engage in cBehSwitch
 
 	latent function BehSwitchPrime_SCAAR_ArmigerMode_Axii()
 	{
-		if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAxiiSignWeapon', 2) == 0)
+		if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_axii_sign_weapon', 2) == 0)
 		{
 			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
@@ -8101,7 +12726,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAxiiSignWeapon', 2) == 1)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_axii_sign_weapon', 2) == 1)
 		{
 			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
@@ -8119,7 +12744,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAxiiSignWeapon', 2) == 2)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_axii_sign_weapon', 2) == 2)
 		{
 			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
@@ -8137,7 +12762,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAxiiSignWeapon', 2) == 3)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_axii_sign_weapon', 2) == 3)
 		{
 			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
@@ -8155,7 +12780,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAxiiSignWeapon', 2) == 4)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_axii_sign_weapon', 2) == 4)
 		{
 			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
@@ -8172,6 +12797,127 @@ state BehSwitch_Engage in cBehSwitch
 				}
 			}
 			
+		}
+
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
 		}
 
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
@@ -8192,11 +12938,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -8207,7 +12971,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 					{
 						stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 					}
@@ -8218,7 +12982,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
                 {
                     stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
                 }
@@ -8246,7 +13010,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -8280,7 +13044,7 @@ state BehSwitch_Engage in cBehSwitch
 
 	latent function BehSwitchPrime_SCAAR_ArmigerMode_Yrden()
 	{
-		if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerYrdenSignWeapon', 4) == 0)
+		if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_yrden_sign_weapon', 4) == 0)
 		{
 			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
@@ -8298,7 +13062,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerYrdenSignWeapon', 4) == 1)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_yrden_sign_weapon', 4) == 1)
 		{
 			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
@@ -8316,7 +13080,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerYrdenSignWeapon', 4) == 2)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_yrden_sign_weapon', 4) == 2)
 		{
 			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
@@ -8334,7 +13098,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerYrdenSignWeapon', 4) == 3)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_yrden_sign_weapon', 4) == 3)
 		{
 			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
@@ -8352,7 +13116,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerYrdenSignWeapon', 4) == 4)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_yrden_sign_weapon', 4) == 4)
 		{
 			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
@@ -8369,6 +13133,127 @@ state BehSwitch_Engage in cBehSwitch
 				}
 			}
 			
+		}
+
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
 		}
 
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
@@ -8389,11 +13274,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -8404,7 +13307,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 					{
 						stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 					}
@@ -8415,7 +13318,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
                 {
                     stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
                 }
@@ -8443,7 +13346,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -8481,8 +13384,8 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR' )
@@ -8493,8 +13396,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 3 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 3 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 3 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 3 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_SCAAR' )
@@ -8505,8 +13408,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 7 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 7 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 7 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 7 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_SCAAR' )
@@ -8517,8 +13420,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 5 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 5 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 5 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 5 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_SCAAR' )
@@ -8529,8 +13432,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 1 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 1 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 1 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 1 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_SCAAR' )
@@ -8541,8 +13444,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_SCAAR' )
@@ -8553,8 +13456,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 4 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 4 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 4 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 4 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR' )
@@ -8565,8 +13468,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 8 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 8 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 8 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 8 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_SCAAR' )
@@ -8577,8 +13480,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 6 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 6 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 6 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 6 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_SCAAR' )
@@ -8589,8 +13492,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 2 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped')  )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 2 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 2 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped')  )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 2 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_SCAAR' )
@@ -8603,27 +13506,148 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 0)
+			if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR' )
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR' );
 				}
 			}
-			else if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 1)
+			else if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh' )
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh' ); GetACSWatcher().PrimaryWeaponSwitch();
 				}
 			}
-			else if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 2 )
+			else if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 2 )
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' ); GetACSWatcher().PrimaryWeaponSwitch();
 				}
 			}
+		}
+
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
 		}
 
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
@@ -8644,11 +13668,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -8659,7 +13701,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 					{
 						stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 					}
@@ -8670,7 +13712,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
                 {
                     stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
                 }
@@ -8698,7 +13740,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -8846,27 +13888,148 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 0)
+			if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR' )
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR' );
 				}
 			}
-			else if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 1)
+			else if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh' )
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh' ); GetACSWatcher().PrimaryWeaponSwitch();
 				}
 			}
-			else if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 2 )
+			else if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 2 )
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' ); GetACSWatcher().PrimaryWeaponSwitch();
 				}
 			}
+		}
+
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
 		}
 
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
@@ -8887,11 +14050,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -8902,7 +14083,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 					{
 						stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 					}
@@ -8913,7 +14094,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
                 {
                     stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
                 }
@@ -8941,7 +14122,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -8983,7 +14164,7 @@ state BehSwitch_Engage in cBehSwitch
 				{
 					if 
 					(
-						ACS_GetItem_Eredin_Silver() && thePlayer.HasTag('acs_axii_sword_equipped') 
+						ACS_GetItem_Sword_IsEquipped('shield_sword_silver', 'silver') && thePlayer.HasTag('acs_axii_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_SCAAR' )
@@ -8994,7 +14175,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Claws_Silver() && thePlayer.HasTag('acs_aard_sword_equipped') 
+						ACS_GetItem_Sword_IsEquipped('claws_silver', 'silver') && thePlayer.HasTag('acs_aard_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_SCAAR' )
@@ -9005,7 +14186,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Imlerith_Silver() && thePlayer.HasTag('acs_yrden_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('imlerith_moveset_silver', 'silver') && thePlayer.HasTag('acs_yrden_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_SCAAR' )
@@ -9016,7 +14197,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Olgierd_Silver() && thePlayer.HasTag('acs_quen_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('olgierd_silver', 'silver') && thePlayer.HasTag('acs_quen_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_SCAAR' )
@@ -9027,7 +14208,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Greg_Silver() && thePlayer.HasTag('acs_axii_secondary_sword_equipped') 
+						ACS_GetItem_Sword_IsEquipped('greg_silver', 'silver') && thePlayer.HasTag('acs_axii_secondary_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR' )
@@ -9038,7 +14219,7 @@ state BehSwitch_Engage in cBehSwitch
 
 					else if 
 					(
-						ACS_GetItem_Katana_Silver() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('katana_silver', 'silver') && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR' )
@@ -9049,7 +14230,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Axe_Silver() && thePlayer.HasTag('acs_aard_secondary_sword_equipped') 
+						ACS_GetItem_Sword_IsEquipped('axe_silver', 'silver') && thePlayer.HasTag('acs_aard_secondary_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_SCAAR' )
@@ -9060,7 +14241,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Hammer_Silver() && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('hammer_silver', 'silver') && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_SCAAR' )
@@ -9071,7 +14252,17 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Spear_Silver() &&  thePlayer.HasTag('acs_quen_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('spear_silver', 'silver') &&  thePlayer.HasTag('acs_quen_secondary_sword_equipped')
+					)
+					{
+						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_SCAAR' )
+						{
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR' );
+						}
+					}
+					else if 
+					(
+						ACS_GetItem_Sword_IsEquipped('jingubang_steel', 'steel') || ACS_GetItem_Sword_IsEquipped('jingubang_silver', 'silver') &&  thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_SCAAR' )
@@ -9091,7 +14282,7 @@ state BehSwitch_Engage in cBehSwitch
 				{
 					if 
 					(
-						ACS_GetItem_Eredin_Steel() && thePlayer.HasTag('acs_axii_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('shield_sword_steel', 'steel') && thePlayer.HasTag('acs_axii_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_SCAAR' )
@@ -9102,7 +14293,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Claws_Steel() && thePlayer.HasTag('acs_aard_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('claws_steel', 'steel') && thePlayer.HasTag('acs_aard_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_SCAAR' )
@@ -9113,7 +14304,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						(ACS_GetItem_MageStaff_Steel() || ACS_GetItem_Imlerith_Steel()) && thePlayer.HasTag('acs_yrden_sword_equipped')
+						(thePlayer.GetInventory().ItemHasTag( thePlayer.GetInventory().GetCurrentlyHeldSword(), 'acsmagestaff' ) || ACS_GetItem_Sword_IsEquipped('imlerith_moveset_steel', 'steel') || ACS_GetItem_Sword_IsEquipped('imlerith_steel', 'steel') || ACS_GetItem_Sword_IsEquipped('caretaker_shovel_steel', 'steel')) && thePlayer.HasTag('acs_yrden_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_SCAAR' )
@@ -9124,7 +14315,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Olgierd_Steel() && thePlayer.HasTag('acs_quen_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('olgierd_steel', 'steel') && thePlayer.HasTag('acs_quen_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_SCAAR' )
@@ -9135,7 +14326,7 @@ state BehSwitch_Engage in cBehSwitch
 
 					else if 
 					(
-						ACS_GetItem_Katana_Steel() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('katana_steel', 'steel') && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR' )
@@ -9146,7 +14337,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Greg_Steel() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('greg_steel', 'steel') && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR' )
@@ -9157,7 +14348,8 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Axe_Steel() && thePlayer.HasTag('acs_aard_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('axe_steel', 'steel') && thePlayer.HasTag('acs_aard_secondary_sword_equipped')
+						|| ACS_GetItem_Sword_IsEquipped('nithral_steel', 'steel') && thePlayer.HasTag('acs_aard_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_SCAAR' )
@@ -9168,7 +14360,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Hammer_Steel() && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('hammer_steel', 'steel') && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_SCAAR' )
@@ -9179,7 +14371,17 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Spear_Steel() && thePlayer.HasTag('acs_quen_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('spear_steel', 'steel') && thePlayer.HasTag('acs_quen_secondary_sword_equipped')
+					)
+					{
+						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_SCAAR' )
+						{
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR' );
+						}
+					}
+					else if 
+					(
+						ACS_GetItem_Sword_IsEquipped('jingubang_steel', 'steel') || ACS_GetItem_Sword_IsEquipped('jingubang_silver', 'silver') &&  thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_SCAAR' )
@@ -9200,7 +14402,7 @@ state BehSwitch_Engage in cBehSwitch
 			{
 				if 
 				(
-					ACS_GetItem_VampClaw() || ACS_GetItem_VampClaw_Shades()
+					ACS_GetItem_VampClaw('default') || ACS_GetItem_VampClaw('shades')
 				)
 				{
 					if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh' )
@@ -9210,7 +14412,7 @@ state BehSwitch_Engage in cBehSwitch
 				}
 				else if 
 				(
-					ACS_GetItem_SorcFists()
+					GetWitcherPlayer().IsItemEquippedByName( 'ACS_Mage_Gloves')
 				)
 				{
 					if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
@@ -9235,6 +14437,127 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
 		|| ACSGetCEntity('ACS_Dual_Wield_L_Sword_Silver')
 		)
@@ -9253,11 +14576,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -9268,7 +14609,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 					{
 						stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 					}
@@ -9279,7 +14620,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
                 {
                     stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
                 }
@@ -9307,7 +14648,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -9410,27 +14751,148 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 0)
+			if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_passive_taunt' )
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_passive_taunt' );
 				}
 			}
-			else if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 1)
+			else if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_passive_taunt' )
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_passive_taunt' ); GetACSWatcher().PrimaryWeaponSwitch();
 				}
 			}
-			else if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 2 )
+			else if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 2 )
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' ); GetACSWatcher().PrimaryWeaponSwitch();
 				}
 			}
+		}
+
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
 		}
 
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
@@ -9451,11 +14913,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -9466,7 +14946,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 					{
 						stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 					}
@@ -9477,7 +14957,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
                 {
                     stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
                 }
@@ -9505,7 +14985,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -9541,7 +15021,7 @@ state BehSwitch_Engage in cBehSwitch
 
 	latent function BehSwitchPrime_SCAAR_Passive_Taunt_ArmigerMode_Igni()
 	{
-		if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerIgniSignWeapon', 0) == 0)
+		if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_igni_sign_weapon', 0) == 0)
 		{
 			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
@@ -9559,7 +15039,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerIgniSignWeapon', 0) == 1)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_igni_sign_weapon', 0) == 1)
 		{
 			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
@@ -9577,7 +15057,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerIgniSignWeapon', 0) == 2)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_igni_sign_weapon', 0) == 2)
 		{
 			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
@@ -9595,7 +15075,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerIgniSignWeapon', 0) == 3)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_igni_sign_weapon', 0) == 3)
 		{
 			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
@@ -9613,7 +15093,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerIgniSignWeapon', 0) == 4)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_igni_sign_weapon', 0) == 4)
 		{
 			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
@@ -9630,6 +15110,127 @@ state BehSwitch_Engage in cBehSwitch
 				}
 			}
 			
+		}
+
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
 		}
 
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
@@ -9650,11 +15251,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -9665,7 +15284,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 					{
 						stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 					}
@@ -9676,7 +15295,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
                 {
                     stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
                 }
@@ -9704,7 +15323,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -9738,7 +15357,7 @@ state BehSwitch_Engage in cBehSwitch
 
 	latent function BehSwitchPrime_SCAAR_Passive_Taunt_ArmigerMode_Quen()
 	{
-		if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerQuenSignWeapon', 1) == 0)
+		if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_quen_sign_weapon', 1) == 0)
 		{
 			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
@@ -9756,7 +15375,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerQuenSignWeapon', 1) == 1)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_quen_sign_weapon', 1) == 1)
 		{
 			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
@@ -9774,7 +15393,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerQuenSignWeapon', 1) == 2)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_quen_sign_weapon', 1) == 2)
 		{
 			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
@@ -9792,7 +15411,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerQuenSignWeapon', 1) == 3)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_quen_sign_weapon', 1) == 3)
 		{
 			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
@@ -9810,7 +15429,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerQuenSignWeapon', 1) == 4)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_quen_sign_weapon', 1) == 4)
 		{
 			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
@@ -9827,6 +15446,127 @@ state BehSwitch_Engage in cBehSwitch
 				}
 			}
 			
+		}
+
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
 		}
 
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
@@ -9847,11 +15587,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -9862,7 +15620,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 					{
 						stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 					}
@@ -9873,7 +15631,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
                 {
                     stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
                 }
@@ -9901,7 +15659,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -9935,7 +15693,7 @@ state BehSwitch_Engage in cBehSwitch
 
 	latent function BehSwitchPrime_SCAAR_Passive_Taunt_ArmigerMode_Aard()
 	{
-		if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAardSignWeapon', 3) == 0)
+		if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_aard_sign_weapon', 3) == 0)
 		{
 			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
@@ -9953,7 +15711,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAardSignWeapon', 3) == 1)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_aard_sign_weapon', 3) == 1)
 		{
 			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
@@ -9971,7 +15729,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAardSignWeapon', 3) == 2)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_aard_sign_weapon', 3) == 2)
 		{
 			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
@@ -9989,7 +15747,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAardSignWeapon', 3) == 3)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_aard_sign_weapon', 3) == 3)
 		{
 			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
@@ -10007,7 +15765,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAardSignWeapon', 3) == 4)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_aard_sign_weapon', 3) == 4)
 		{
 			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
@@ -10024,6 +15782,127 @@ state BehSwitch_Engage in cBehSwitch
 				}
 			}
 			
+		}
+
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
 		}
 
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
@@ -10044,11 +15923,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -10059,7 +15956,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 					{
 						stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 					}
@@ -10070,7 +15967,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
                 {
                     stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
                 }
@@ -10098,7 +15995,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -10132,7 +16029,7 @@ state BehSwitch_Engage in cBehSwitch
 
 	latent function BehSwitchPrime_SCAAR_Passive_Taunt_ArmigerMode_Axii()
 	{
-		if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAxiiSignWeapon', 2) == 0)
+		if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_axii_sign_weapon', 2) == 0)
 		{
 			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
@@ -10150,7 +16047,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAxiiSignWeapon', 2) == 1)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_axii_sign_weapon', 2) == 1)
 		{
 			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
@@ -10168,7 +16065,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAxiiSignWeapon', 2) == 2)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_axii_sign_weapon', 2) == 2)
 		{
 			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
@@ -10186,7 +16083,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAxiiSignWeapon', 2) == 3)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_axii_sign_weapon', 2) == 3)
 		{
 			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
@@ -10204,7 +16101,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAxiiSignWeapon', 2) == 4)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_axii_sign_weapon', 2) == 4)
 		{
 			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
@@ -10221,6 +16118,127 @@ state BehSwitch_Engage in cBehSwitch
 				}
 			}
 			
+		}
+
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
 		}
 
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
@@ -10241,11 +16259,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -10256,7 +16292,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 					{
 						stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 					}
@@ -10267,7 +16303,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
                 {
                     stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
                 }
@@ -10295,7 +16331,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -10329,7 +16365,7 @@ state BehSwitch_Engage in cBehSwitch
 
 	latent function BehSwitchPrime_SCAAR_Passive_Taunt_ArmigerMode_Yrden()
 	{
-		if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerYrdenSignWeapon', 4) == 0)
+		if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_yrden_sign_weapon', 4) == 0)
 		{
 			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
@@ -10347,7 +16383,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerYrdenSignWeapon', 4) == 1)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_yrden_sign_weapon', 4) == 1)
 		{
 			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
@@ -10365,7 +16401,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerYrdenSignWeapon', 4) == 2)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_yrden_sign_weapon', 4) == 2)
 		{
 			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
@@ -10383,7 +16419,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerYrdenSignWeapon', 4) == 3)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_yrden_sign_weapon', 4) == 3)
 		{
 			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
@@ -10401,7 +16437,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerYrdenSignWeapon', 4) == 4)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_yrden_sign_weapon', 4) == 4)
 		{
 			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
@@ -10418,6 +16454,127 @@ state BehSwitch_Engage in cBehSwitch
 				}
 			}
 			
+		}
+
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
 		}
 
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
@@ -10438,11 +16595,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -10453,7 +16628,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 					{
 						stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 					}
@@ -10464,7 +16639,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
                 {
                     stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
                 }
@@ -10492,7 +16667,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -10530,8 +16705,8 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_passive_taunt' )
@@ -10542,8 +16717,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 3 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 3 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 3 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 3 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_SCAAR_passive_taunt' )
@@ -10554,8 +16729,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 7 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 7 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 7 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 7 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_SCAAR_passive_taunt' )
@@ -10566,8 +16741,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 5 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 5 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 5 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 5 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_SCAAR_passive_taunt' )
@@ -10578,8 +16753,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 1 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 1 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 1 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 1 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_SCAAR_passive_taunt' )
@@ -10590,8 +16765,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_SCAAR_passive_taunt' )
@@ -10602,8 +16777,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 4 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 4 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 4 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 4 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR_passive_taunt' )
@@ -10614,8 +16789,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 8 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 8 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 8 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 8 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_SCAAR_passive_taunt' )
@@ -10626,8 +16801,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 6 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 6 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 6 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 6 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_SCAAR_passive_taunt' )
@@ -10638,8 +16813,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 2 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped')  )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 2 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 2 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped')  )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 2 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_SCAAR_passive_taunt' )
@@ -10652,27 +16827,148 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 0)
+			if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_passive_taunt' )
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_passive_taunt' );
 				}
 			}
-			else if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 1)
+			else if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_passive_taunt' )
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_passive_taunt' ); GetACSWatcher().PrimaryWeaponSwitch();
 				}
 			}
-			else if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 2 )
+			else if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 2 )
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' ); GetACSWatcher().PrimaryWeaponSwitch();
 				}
 			}
+		}
+
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
 		}
 
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
@@ -10693,11 +16989,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -10708,7 +17022,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 					{
 						stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 					}
@@ -10719,7 +17033,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
                 {
                     stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
                 }
@@ -10747,7 +17061,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -10895,27 +17209,148 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 0)
+			if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_SCAAR_passive_taunt' )
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_SCAAR_passive_taunt' );
 				}
 			}
-			else if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 1)
+			else if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_passive_taunt' )
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_passive_taunt' ); GetACSWatcher().PrimaryWeaponSwitch();
 				}
 			}
-			else if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 2 )
+			else if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 2 )
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' ); GetACSWatcher().PrimaryWeaponSwitch();
 				}
 			}
+		}
+
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
 		}
 
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
@@ -10936,11 +17371,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -10951,7 +17404,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 					{
 						stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 					}
@@ -10962,7 +17415,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
                 {
                     stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
                 }
@@ -10990,7 +17443,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -11032,7 +17485,7 @@ state BehSwitch_Engage in cBehSwitch
 				{
 					if 
 					(
-						ACS_GetItem_Eredin_Silver() && thePlayer.HasTag('acs_axii_sword_equipped') 
+						ACS_GetItem_Sword_IsEquipped('shield_sword_silver', 'silver') && thePlayer.HasTag('acs_axii_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_SCAAR_passive_taunt' )
@@ -11043,7 +17496,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Claws_Silver() && thePlayer.HasTag('acs_aard_sword_equipped') 
+						ACS_GetItem_Sword_IsEquipped('claws_silver', 'silver') && thePlayer.HasTag('acs_aard_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_SCAAR_passive_taunt' )
@@ -11054,7 +17507,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Imlerith_Silver() && thePlayer.HasTag('acs_yrden_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('imlerith_moveset_silver', 'silver') && thePlayer.HasTag('acs_yrden_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_SCAAR_passive_taunt' )
@@ -11065,7 +17518,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Olgierd_Silver() && thePlayer.HasTag('acs_quen_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('olgierd_silver', 'silver') && thePlayer.HasTag('acs_quen_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_SCAAR_passive_taunt' )
@@ -11076,7 +17529,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Greg_Silver() && thePlayer.HasTag('acs_axii_secondary_sword_equipped') 
+						ACS_GetItem_Sword_IsEquipped('greg_silver', 'silver') && thePlayer.HasTag('acs_axii_secondary_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR_passive_taunt' )
@@ -11087,7 +17540,7 @@ state BehSwitch_Engage in cBehSwitch
 
 					else if 
 					(
-						ACS_GetItem_Katana_Silver() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('katana_silver', 'silver') && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR_passive_taunt' )
@@ -11098,7 +17551,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Axe_Silver() && thePlayer.HasTag('acs_aard_secondary_sword_equipped') 
+						ACS_GetItem_Sword_IsEquipped('axe_silver', 'silver') && thePlayer.HasTag('acs_aard_secondary_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_SCAAR_passive_taunt' )
@@ -11109,7 +17562,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Hammer_Silver() && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('hammer_silver', 'silver') && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_SCAAR_passive_taunt' )
@@ -11120,7 +17573,17 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Spear_Silver() &&  thePlayer.HasTag('acs_quen_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('spear_silver', 'silver') &&  thePlayer.HasTag('acs_quen_secondary_sword_equipped')
+					)
+					{
+						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_SCAAR_passive_taunt' )
+						{
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR_passive_taunt' );
+						}
+					}
+					else if 
+					(
+						ACS_GetItem_Sword_IsEquipped('jingubang_steel', 'steel') || ACS_GetItem_Sword_IsEquipped('jingubang_silver', 'silver') &&  thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_SCAAR_passive_taunt' )
@@ -11140,7 +17603,7 @@ state BehSwitch_Engage in cBehSwitch
 				{
 					if 
 					(
-						ACS_GetItem_Eredin_Steel() && thePlayer.HasTag('acs_axii_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('shield_sword_steel', 'steel') && thePlayer.HasTag('acs_axii_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_SCAAR_passive_taunt' )
@@ -11151,7 +17614,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Claws_Steel() && thePlayer.HasTag('acs_aard_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('claws_steel', 'steel') && thePlayer.HasTag('acs_aard_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_SCAAR_passive_taunt' )
@@ -11162,7 +17625,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						(ACS_GetItem_MageStaff_Steel() || ACS_GetItem_Imlerith_Steel()) && thePlayer.HasTag('acs_yrden_sword_equipped')
+						(thePlayer.GetInventory().ItemHasTag( thePlayer.GetInventory().GetCurrentlyHeldSword(), 'acsmagestaff' ) || ACS_GetItem_Sword_IsEquipped('imlerith_moveset_steel', 'steel') || ACS_GetItem_Sword_IsEquipped('imlerith_steel', 'steel') || ACS_GetItem_Sword_IsEquipped('caretaker_shovel_steel', 'steel')) && thePlayer.HasTag('acs_yrden_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_SCAAR_passive_taunt' )
@@ -11173,7 +17636,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Olgierd_Steel() && thePlayer.HasTag('acs_quen_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('olgierd_steel', 'steel') && thePlayer.HasTag('acs_quen_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_SCAAR_passive_taunt' )
@@ -11184,7 +17647,7 @@ state BehSwitch_Engage in cBehSwitch
 
 					else if 
 					(
-						ACS_GetItem_Katana_Steel() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('katana_steel', 'steel') && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR_passive_taunt' )
@@ -11195,7 +17658,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Greg_Steel() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('greg_steel', 'steel') && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_SCAAR_passive_taunt' )
@@ -11206,7 +17669,8 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Axe_Steel() && thePlayer.HasTag('acs_aard_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('axe_steel', 'steel') && thePlayer.HasTag('acs_aard_secondary_sword_equipped')
+						|| ACS_GetItem_Sword_IsEquipped('nithral_steel', 'steel') && thePlayer.HasTag('acs_aard_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_SCAAR_passive_taunt' )
@@ -11217,7 +17681,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Hammer_Steel() && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('hammer_steel', 'steel') && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_SCAAR_passive_taunt' )
@@ -11228,7 +17692,17 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Spear_Steel() && thePlayer.HasTag('acs_quen_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('spear_steel', 'steel') && thePlayer.HasTag('acs_quen_secondary_sword_equipped')
+					)
+					{
+						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_SCAAR_passive_taunt' )
+						{
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_SCAAR_passive_taunt' );
+						}
+					}
+					else if 
+					(
+						ACS_GetItem_Sword_IsEquipped('jingubang_steel', 'steel') || ACS_GetItem_Sword_IsEquipped('jingubang_silver', 'silver') &&  thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_SCAAR_passive_taunt' )
@@ -11249,7 +17723,7 @@ state BehSwitch_Engage in cBehSwitch
 			{
 				if 
 				(
-					ACS_GetItem_VampClaw() || ACS_GetItem_VampClaw_Shades()
+					ACS_GetItem_VampClaw('default') || ACS_GetItem_VampClaw('shades')
 				)
 				{
 					if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_passive_taunt' )
@@ -11259,7 +17733,7 @@ state BehSwitch_Engage in cBehSwitch
 				}
 				else if 
 				(
-					ACS_GetItem_SorcFists()
+					GetWitcherPlayer().IsItemEquippedByName( 'ACS_Mage_Gloves')
 				)
 				{
 					if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
@@ -11284,6 +17758,127 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
 		|| ACSGetCEntity('ACS_Dual_Wield_L_Sword_Silver')
 		)
@@ -11302,11 +17897,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -11317,7 +17930,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 					{
 						stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 					}
@@ -11328,7 +17941,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
                 {
                     stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
                 }
@@ -11356,7 +17969,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -11451,6 +18064,127 @@ state BehSwitch_Engage in cBehSwitch
 
 		
 
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
 		|| ACSGetCEntity('ACS_Dual_Wield_L_Sword_Silver')
 		)
@@ -11469,11 +18203,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -11484,7 +18236,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 					{
 						stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 					}
@@ -11495,7 +18247,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
                 {
                     stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
                 }
@@ -11523,7 +18275,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -11616,6 +18368,127 @@ state BehSwitch_Engage in cBehSwitch
 
 		
 
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
 		|| ACSGetCEntity('ACS_Dual_Wield_L_Sword_Silver')
 		)
@@ -11634,11 +18507,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -11649,7 +18540,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 					{
 						stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 					}
@@ -11660,7 +18551,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
                 {
                     stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
                 }
@@ -11688,7 +18579,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -11791,21 +18682,21 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 0)
+			if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP' )
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP' );
 				}
 			}
-			else if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 1)
+			else if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh')
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'claw_beh' ); GetACSWatcher().PrimaryWeaponSwitch();
 				}
 			}
-			else if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 2 )
+			else if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 2 )
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh')
 				{
@@ -11813,7 +18704,128 @@ state BehSwitch_Engage in cBehSwitch
 				}
 			}
 
-			if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
+			if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
 		|| ACSGetCEntity('ACS_Dual_Wield_L_Sword_Silver')
 		)
 		{
@@ -11831,11 +18843,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -11846,7 +18876,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 					{
 						stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 					}
@@ -11857,7 +18887,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
                 {
                     stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
                 }
@@ -11885,7 +18915,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -11922,7 +18952,7 @@ state BehSwitch_Engage in cBehSwitch
 
 	latent function BehSwitchPrime_E3ARP_ArmigerMode_Igni()
 	{
-		if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerIgniSignWeapon', 0) == 0)
+		if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_igni_sign_weapon', 0) == 0)
 		{
 			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
@@ -11940,7 +18970,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerIgniSignWeapon', 0) == 1)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_igni_sign_weapon', 0) == 1)
 		{
 			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
@@ -11958,7 +18988,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerIgniSignWeapon', 0) == 2)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_igni_sign_weapon', 0) == 2)
 		{
 			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
@@ -11976,7 +19006,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerIgniSignWeapon', 0) == 3)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_igni_sign_weapon', 0) == 3)
 		{
 			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
@@ -11994,7 +19024,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerIgniSignWeapon', 0) == 4)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_igni_sign_weapon', 0) == 4)
 		{
 			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
@@ -12011,6 +19041,127 @@ state BehSwitch_Engage in cBehSwitch
 				}
 			}
 			
+		}
+
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
 		}
 
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
@@ -12031,11 +19182,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -12046,7 +19215,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 					{
 						stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 					}
@@ -12057,7 +19226,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
                 {
                     stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
                 }
@@ -12085,7 +19254,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -12119,7 +19288,7 @@ state BehSwitch_Engage in cBehSwitch
 
 	latent function BehSwitchPrime_E3ARP_ArmigerMode_Quen()
 	{
-		if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerQuenSignWeapon', 1) == 0)
+		if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_quen_sign_weapon', 1) == 0)
 		{
 			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
@@ -12137,7 +19306,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerQuenSignWeapon', 1) == 1)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_quen_sign_weapon', 1) == 1)
 		{
 			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
@@ -12155,7 +19324,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerQuenSignWeapon', 1) == 2)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_quen_sign_weapon', 1) == 2)
 		{
 			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
@@ -12173,7 +19342,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerQuenSignWeapon', 1) == 3)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_quen_sign_weapon', 1) == 3)
 		{
 			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
@@ -12191,7 +19360,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerQuenSignWeapon', 1) == 4)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_quen_sign_weapon', 1) == 4)
 		{
 			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
@@ -12208,6 +19377,127 @@ state BehSwitch_Engage in cBehSwitch
 				}
 			}
 			
+		}
+
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
 		}
 
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
@@ -12228,11 +19518,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -12243,7 +19551,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 					{
 						stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 					}
@@ -12254,7 +19562,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
                 {
                     stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
                 }
@@ -12282,7 +19590,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -12316,7 +19624,7 @@ state BehSwitch_Engage in cBehSwitch
 
 	latent function BehSwitchPrime_E3ARP_ArmigerMode_Aard()
 	{
-		if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAardSignWeapon', 3) == 0)
+		if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_aard_sign_weapon', 3) == 0)
 		{
 			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
@@ -12334,7 +19642,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAardSignWeapon', 3) == 1)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_aard_sign_weapon', 3) == 1)
 		{
 			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
@@ -12352,7 +19660,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAardSignWeapon', 3) == 2)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_aard_sign_weapon', 3) == 2)
 		{
 			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
@@ -12370,7 +19678,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAardSignWeapon', 3) == 3)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_aard_sign_weapon', 3) == 3)
 		{
 			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
@@ -12388,7 +19696,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAardSignWeapon', 3) == 4)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_aard_sign_weapon', 3) == 4)
 		{
 			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
@@ -12405,6 +19713,127 @@ state BehSwitch_Engage in cBehSwitch
 				}
 			}
 			
+		}
+
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
 		}
 
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
@@ -12425,11 +19854,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -12440,7 +19887,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 					{
 						stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 					}
@@ -12451,7 +19898,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
                 {
                     stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
                 }
@@ -12479,7 +19926,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -12513,7 +19960,7 @@ state BehSwitch_Engage in cBehSwitch
 
 	latent function BehSwitchPrime_E3ARP_ArmigerMode_Axii()
 	{
-		if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAxiiSignWeapon', 2) == 0)
+		if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_axii_sign_weapon', 2) == 0)
 		{
 			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
@@ -12531,7 +19978,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAxiiSignWeapon', 2) == 1)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_axii_sign_weapon', 2) == 1)
 		{
 			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
@@ -12549,7 +19996,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAxiiSignWeapon', 2) == 2)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_axii_sign_weapon', 2) == 2)
 		{
 			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
@@ -12567,7 +20014,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAxiiSignWeapon', 2) == 3)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_axii_sign_weapon', 2) == 3)
 		{
 			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
@@ -12585,7 +20032,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAxiiSignWeapon', 2) == 4)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_axii_sign_weapon', 2) == 4)
 		{
 			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
@@ -12602,6 +20049,127 @@ state BehSwitch_Engage in cBehSwitch
 				}
 			}
 			
+		}
+
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
 		}
 
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
@@ -12622,11 +20190,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -12637,7 +20223,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 					{
 						stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 					}
@@ -12648,7 +20234,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
                 {
                     stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
                 }
@@ -12676,7 +20262,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -12710,7 +20296,7 @@ state BehSwitch_Engage in cBehSwitch
 
 	latent function BehSwitchPrime_E3ARP_ArmigerMode_Yrden()
 	{
-		if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerYrdenSignWeapon', 4) == 0)
+		if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_yrden_sign_weapon', 4) == 0)
 		{
 			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
@@ -12728,7 +20314,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerYrdenSignWeapon', 4) == 1)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_yrden_sign_weapon', 4) == 1)
 		{
 			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
@@ -12746,7 +20332,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerYrdenSignWeapon', 4) == 2)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_yrden_sign_weapon', 4) == 2)
 		{
 			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
@@ -12764,7 +20350,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerYrdenSignWeapon', 4) == 3)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_yrden_sign_weapon', 4) == 3)
 		{
 			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
@@ -12782,7 +20368,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerYrdenSignWeapon', 4) == 4)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_yrden_sign_weapon', 4) == 4)
 		{
 			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
@@ -12799,6 +20385,127 @@ state BehSwitch_Engage in cBehSwitch
 				}
 			}
 			
+		}
+
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
 		}
 
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
@@ -12819,11 +20526,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -12834,7 +20559,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 					{
 						stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 					}
@@ -12845,7 +20570,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
                 {
                     stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
                 }
@@ -12873,7 +20598,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -12911,8 +20636,8 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP' )
@@ -12923,8 +20648,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 3 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 3 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 3 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 3 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_E3ARP' )
@@ -12935,8 +20660,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 7 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 7 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 7 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 7 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_E3ARP' )
@@ -12947,8 +20672,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 5 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 5 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 5 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 5 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_E3ARP' )
@@ -12959,8 +20684,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 1 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 1 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 1 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 1 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_E3ARP' )
@@ -12971,8 +20696,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_E3ARP' )
@@ -12983,8 +20708,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 4 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 4 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 4 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 4 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP' )
@@ -12995,8 +20720,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 8 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 8 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 8 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 8 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_E3ARP' )
@@ -13007,8 +20732,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 6 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 6 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 6 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 6 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_E3ARP' )
@@ -13019,8 +20744,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 2 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped')  )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 2 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 2 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped')  )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 2 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_E3ARP' )
@@ -13033,27 +20758,148 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 0)
+			if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP' )
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP' );
 				}
 			}
-			else if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 1)
+			else if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh' )
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh' ); GetACSWatcher().PrimaryWeaponSwitch();
 				}
 			}
-			else if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 2 )
+			else if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 2 )
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' ); GetACSWatcher().PrimaryWeaponSwitch();
 				}
 			}
+		}
+
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
 		}
 
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
@@ -13074,11 +20920,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -13089,7 +20953,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 					{
 						stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 					}
@@ -13100,7 +20964,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
                 {
                     stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
                 }
@@ -13128,7 +20992,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -13276,27 +21140,148 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 0)
+			if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP' )
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP' );
 				}
 			}
-			else if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 1)
+			else if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh' )
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh' ); GetACSWatcher().PrimaryWeaponSwitch();
 				}
 			}
-			else if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 2 )
+			else if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 2 )
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' ); GetACSWatcher().PrimaryWeaponSwitch();
 				}
 			}
+		}
+
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
 		}
 
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
@@ -13317,11 +21302,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -13332,7 +21335,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 					{
 						stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 					}
@@ -13343,7 +21346,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
                 {
                     stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
                 }
@@ -13371,7 +21374,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -13413,7 +21416,7 @@ state BehSwitch_Engage in cBehSwitch
 				{
 					if 
 					(
-						ACS_GetItem_Eredin_Silver() && thePlayer.HasTag('acs_axii_sword_equipped') 
+						ACS_GetItem_Sword_IsEquipped('shield_sword_silver', 'silver') && thePlayer.HasTag('acs_axii_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_E3ARP' )
@@ -13424,7 +21427,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Claws_Silver() && thePlayer.HasTag('acs_aard_sword_equipped') 
+						ACS_GetItem_Sword_IsEquipped('claws_silver', 'silver') && thePlayer.HasTag('acs_aard_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_E3ARP' )
@@ -13435,7 +21438,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Imlerith_Silver() && thePlayer.HasTag('acs_yrden_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('imlerith_moveset_silver', 'silver') && thePlayer.HasTag('acs_yrden_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_E3ARP' )
@@ -13446,7 +21449,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Olgierd_Silver() && thePlayer.HasTag('acs_quen_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('olgierd_silver', 'silver') && thePlayer.HasTag('acs_quen_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_E3ARP' )
@@ -13457,7 +21460,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Greg_Silver() && thePlayer.HasTag('acs_axii_secondary_sword_equipped') 
+						ACS_GetItem_Sword_IsEquipped('greg_silver', 'silver') && thePlayer.HasTag('acs_axii_secondary_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP' )
@@ -13468,7 +21471,7 @@ state BehSwitch_Engage in cBehSwitch
 
 					else if 
 					(
-						ACS_GetItem_Katana_Silver() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('katana_silver', 'silver') && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP' )
@@ -13479,7 +21482,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Axe_Silver() && thePlayer.HasTag('acs_aard_secondary_sword_equipped') 
+						ACS_GetItem_Sword_IsEquipped('axe_silver', 'silver') && thePlayer.HasTag('acs_aard_secondary_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_E3ARP' )
@@ -13490,7 +21493,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Hammer_Silver() && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('hammer_silver', 'silver') && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_E3ARP' )
@@ -13501,7 +21504,17 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Spear_Silver() &&  thePlayer.HasTag('acs_quen_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('spear_silver', 'silver') &&  thePlayer.HasTag('acs_quen_secondary_sword_equipped')
+					)
+					{
+						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_E3ARP' )
+						{
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP' );
+						}
+					}
+					else if 
+					(
+						ACS_GetItem_Sword_IsEquipped('jingubang_steel', 'steel') || ACS_GetItem_Sword_IsEquipped('jingubang_silver', 'silver') &&  thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_E3ARP' )
@@ -13521,7 +21534,7 @@ state BehSwitch_Engage in cBehSwitch
 				{
 					if 
 					(
-						ACS_GetItem_Eredin_Steel() && thePlayer.HasTag('acs_axii_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('shield_sword_steel', 'steel') && thePlayer.HasTag('acs_axii_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_E3ARP' )
@@ -13532,7 +21545,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Claws_Steel() && thePlayer.HasTag('acs_aard_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('claws_steel', 'steel') && thePlayer.HasTag('acs_aard_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_E3ARP' )
@@ -13543,7 +21556,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						(ACS_GetItem_MageStaff_Steel() || ACS_GetItem_Imlerith_Steel()) && thePlayer.HasTag('acs_yrden_sword_equipped')
+						(thePlayer.GetInventory().ItemHasTag( thePlayer.GetInventory().GetCurrentlyHeldSword(), 'acsmagestaff' ) || ACS_GetItem_Sword_IsEquipped('imlerith_moveset_steel', 'steel') || ACS_GetItem_Sword_IsEquipped('imlerith_steel', 'steel') || ACS_GetItem_Sword_IsEquipped('caretaker_shovel_steel', 'steel')) && thePlayer.HasTag('acs_yrden_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_E3ARP' )
@@ -13554,7 +21567,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Olgierd_Steel() && thePlayer.HasTag('acs_quen_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('olgierd_steel', 'steel') && thePlayer.HasTag('acs_quen_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_E3ARP' )
@@ -13565,7 +21578,7 @@ state BehSwitch_Engage in cBehSwitch
 
 					else if 
 					(
-						ACS_GetItem_Katana_Steel() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('katana_steel', 'steel') && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP' )
@@ -13576,7 +21589,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Greg_Steel() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('greg_steel', 'steel') && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP' )
@@ -13587,7 +21600,8 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Axe_Steel() && thePlayer.HasTag('acs_aard_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('axe_steel', 'steel') && thePlayer.HasTag('acs_aard_secondary_sword_equipped')
+						|| ACS_GetItem_Sword_IsEquipped('nithral_steel', 'steel') && thePlayer.HasTag('acs_aard_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_E3ARP' )
@@ -13598,7 +21612,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Hammer_Steel() && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('hammer_steel', 'steel') && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_E3ARP' )
@@ -13609,7 +21623,17 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Spear_Steel() && thePlayer.HasTag('acs_quen_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('spear_steel', 'steel') && thePlayer.HasTag('acs_quen_secondary_sword_equipped')
+					)
+					{
+						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_E3ARP' )
+						{
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP' );
+						}
+					}
+					else if 
+					(
+						ACS_GetItem_Sword_IsEquipped('jingubang_steel', 'steel') || ACS_GetItem_Sword_IsEquipped('jingubang_silver', 'silver') &&  thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_E3ARP' )
@@ -13630,7 +21654,7 @@ state BehSwitch_Engage in cBehSwitch
 			{
 				if 
 				(
-					ACS_GetItem_VampClaw() || ACS_GetItem_VampClaw_Shades()
+					ACS_GetItem_VampClaw('default') || ACS_GetItem_VampClaw('shades')
 				)
 				{
 					if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh' )
@@ -13640,7 +21664,7 @@ state BehSwitch_Engage in cBehSwitch
 				}
 				else if 
 				(
-					ACS_GetItem_SorcFists()
+					GetWitcherPlayer().IsItemEquippedByName( 'ACS_Mage_Gloves')
 				)
 				{
 					if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
@@ -13665,6 +21689,127 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
 		|| ACSGetCEntity('ACS_Dual_Wield_L_Sword_Silver')
 		)
@@ -13683,11 +21828,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -13698,7 +21861,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 					{
 						stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 					}
@@ -13709,7 +21872,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
                 {
                     stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
                 }
@@ -13737,7 +21900,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -13840,27 +22003,148 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 0)
+			if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_passive_taunt' )
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_passive_taunt' );
 				}
 			}
-			else if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 1)
+			else if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_passive_taunt' )
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_passive_taunt' ); GetACSWatcher().PrimaryWeaponSwitch();
 				}
 			}
-			else if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 2 )
+			else if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 2 )
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' ); GetACSWatcher().PrimaryWeaponSwitch();
 				}
 			}
+		}
+
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
 		}
 
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
@@ -13881,11 +22165,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -13896,7 +22198,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 					{
 						stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 					}
@@ -13907,7 +22209,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
                 {
                     stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
                 }
@@ -13935,7 +22237,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -13971,7 +22273,7 @@ state BehSwitch_Engage in cBehSwitch
 
 	latent function BehSwitchPrime_E3ARP_Passive_Taunt_ArmigerMode_Igni()
 	{
-		if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerIgniSignWeapon', 0) == 0)
+		if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_igni_sign_weapon', 0) == 0)
 		{
 			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
@@ -13989,7 +22291,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerIgniSignWeapon', 0) == 1)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_igni_sign_weapon', 0) == 1)
 		{
 			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
@@ -14007,7 +22309,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerIgniSignWeapon', 0) == 2)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_igni_sign_weapon', 0) == 2)
 		{
 			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
@@ -14025,7 +22327,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerIgniSignWeapon', 0) == 3)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_igni_sign_weapon', 0) == 3)
 		{
 			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
@@ -14043,7 +22345,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerIgniSignWeapon', 0) == 4)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_igni_sign_weapon', 0) == 4)
 		{
 			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
@@ -14060,6 +22362,127 @@ state BehSwitch_Engage in cBehSwitch
 				}
 			}
 			
+		}
+
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
 		}
 
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
@@ -14080,11 +22503,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -14095,7 +22536,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 					{
 						stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 					}
@@ -14106,7 +22547,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
                 {
                     stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
                 }
@@ -14134,7 +22575,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -14168,7 +22609,7 @@ state BehSwitch_Engage in cBehSwitch
 
 	latent function BehSwitchPrime_E3ARP_Passive_Taunt_ArmigerMode_Quen()
 	{
-		if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerQuenSignWeapon', 1) == 0)
+		if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_quen_sign_weapon', 1) == 0)
 		{
 			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
@@ -14186,7 +22627,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerQuenSignWeapon', 1) == 1)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_quen_sign_weapon', 1) == 1)
 		{
 			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
@@ -14204,7 +22645,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerQuenSignWeapon', 1) == 2)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_quen_sign_weapon', 1) == 2)
 		{
 			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
@@ -14222,7 +22663,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerQuenSignWeapon', 1) == 3)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_quen_sign_weapon', 1) == 3)
 		{
 			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
@@ -14240,7 +22681,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerQuenSignWeapon', 1) == 4)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_quen_sign_weapon', 1) == 4)
 		{
 			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
@@ -14257,6 +22698,127 @@ state BehSwitch_Engage in cBehSwitch
 				}
 			}
 			
+		}
+
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
 		}
 
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
@@ -14277,11 +22839,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -14292,7 +22872,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 					{
 						stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 					}
@@ -14303,7 +22883,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
                 {
                     stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
                 }
@@ -14331,7 +22911,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -14365,7 +22945,7 @@ state BehSwitch_Engage in cBehSwitch
 
 	latent function BehSwitchPrime_E3ARP_Passive_Taunt_ArmigerMode_Aard()
 	{
-		if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAardSignWeapon', 3) == 0)
+		if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_aard_sign_weapon', 3) == 0)
 		{
 			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
@@ -14383,7 +22963,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAardSignWeapon', 3) == 1)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_aard_sign_weapon', 3) == 1)
 		{
 			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
@@ -14401,7 +22981,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAardSignWeapon', 3) == 2)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_aard_sign_weapon', 3) == 2)
 		{
 			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
@@ -14419,7 +22999,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAardSignWeapon', 3) == 3)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_aard_sign_weapon', 3) == 3)
 		{
 			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
@@ -14437,7 +23017,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAardSignWeapon', 3) == 4)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_aard_sign_weapon', 3) == 4)
 		{
 			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
@@ -14454,6 +23034,127 @@ state BehSwitch_Engage in cBehSwitch
 				}
 			}
 			
+		}
+
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
 		}
 
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
@@ -14474,11 +23175,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -14489,7 +23208,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 					{
 						stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 					}
@@ -14500,7 +23219,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
                 {
                     stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
                 }
@@ -14528,7 +23247,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -14562,7 +23281,7 @@ state BehSwitch_Engage in cBehSwitch
 
 	latent function BehSwitchPrime_E3ARP_Passive_Taunt_ArmigerMode_Axii()
 	{
-		if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAxiiSignWeapon', 2) == 0)
+		if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_axii_sign_weapon', 2) == 0)
 		{
 			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
@@ -14580,7 +23299,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAxiiSignWeapon', 2) == 1)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_axii_sign_weapon', 2) == 1)
 		{
 			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
@@ -14598,7 +23317,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAxiiSignWeapon', 2) == 2)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_axii_sign_weapon', 2) == 2)
 		{
 			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
@@ -14616,7 +23335,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAxiiSignWeapon', 2) == 3)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_axii_sign_weapon', 2) == 3)
 		{
 			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
@@ -14634,7 +23353,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerAxiiSignWeapon', 2) == 4)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_axii_sign_weapon', 2) == 4)
 		{
 			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
@@ -14651,6 +23370,127 @@ state BehSwitch_Engage in cBehSwitch
 				}
 			}
 			
+		}
+
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
 		}
 
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
@@ -14671,11 +23511,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -14686,7 +23544,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 					{
 						stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 					}
@@ -14697,7 +23555,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
                 {
                     stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
                 }
@@ -14725,7 +23583,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -14759,7 +23617,7 @@ state BehSwitch_Engage in cBehSwitch
 
 	latent function BehSwitchPrime_E3ARP_Passive_Taunt_ArmigerMode_Yrden()
 	{
-		if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerYrdenSignWeapon', 4) == 0)
+		if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_yrden_sign_weapon', 4) == 0)
 		{
 			if (thePlayer.HasTag('acs_igni_sword_equipped'))
 			{
@@ -14777,7 +23635,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerYrdenSignWeapon', 4) == 1)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_yrden_sign_weapon', 4) == 1)
 		{
 			if (thePlayer.HasTag('acs_quen_sword_equipped'))
 			{
@@ -14795,7 +23653,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerYrdenSignWeapon', 4) == 2)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_yrden_sign_weapon', 4) == 2)
 		{
 			if (thePlayer.HasTag('acs_axii_sword_equipped'))
 			{
@@ -14813,7 +23671,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerYrdenSignWeapon', 4) == 3)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_yrden_sign_weapon', 4) == 3)
 		{
 			if (thePlayer.HasTag('acs_aard_sword_equipped'))
 			{
@@ -14831,7 +23689,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			
 		}
-		else if (ACS_Settings_Main_Int('EHmodArmigerModeSettings','EHmodArmigerYrdenSignWeapon', 4) == 4)
+		else if (ACS_Settings_Main_Int('acs_armiger_mode_settings','acs_armiger_yrden_sign_weapon', 4) == 4)
 		{
 			if (thePlayer.HasTag('acs_yrden_sword_equipped'))
 			{
@@ -14848,6 +23706,127 @@ state BehSwitch_Engage in cBehSwitch
 				}
 			}
 			
+		}
+
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
 		}
 
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
@@ -14868,11 +23847,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -14883,7 +23880,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 					{
 						stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 					}
@@ -14894,7 +23891,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
                 {
                     stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
                 }
@@ -14922,7 +23919,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -14960,8 +23957,8 @@ state BehSwitch_Engage in cBehSwitch
 	{
 		if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_passive_taunt' )
@@ -14972,8 +23969,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 3 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 3 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 3 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 3 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_E3ARP_passive_taunt' )
@@ -14984,8 +23981,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 7 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 7 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 7 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 7 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_E3ARP_passive_taunt' )
@@ -14996,8 +23993,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 5 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 5 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 5 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 5 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_E3ARP_passive_taunt' )
@@ -15008,8 +24005,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 1 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 1 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 1 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 1 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_E3ARP_passive_taunt' )
@@ -15020,8 +24017,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 0 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 0 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_igni_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_secondary_beh_E3ARP_passive_taunt' )
@@ -15032,8 +24029,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 4 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 4 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 4 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 4 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_axii_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP_passive_taunt' )
@@ -15044,8 +24041,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 8 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 8 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 8 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 8 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_aard_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_E3ARP_passive_taunt' )
@@ -15056,8 +24053,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 6 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 6 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 6 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 6 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_yrden_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_E3ARP_passive_taunt' )
@@ -15068,8 +24065,8 @@ state BehSwitch_Engage in cBehSwitch
 			
 		else if 
 		(
-			( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSilverWeapon', 0) == 2 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped')  )
-			|| ( ACS_Settings_Main_Int('EHmodFocusModeSettings','EHmodFocusModeSteelWeapon', 0) == 2 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped') )
+			( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_silver_weapon', 0) == 2 && thePlayer.IsWeaponHeld( 'silversword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped')  )
+			|| ( ACS_Settings_Main_Int('acs_focus_mode_settings','acs_focus_mode_steel_weapon', 0) == 2 && thePlayer.IsWeaponHeld( 'steelsword' ) && thePlayer.HasTag('acs_quen_secondary_sword_equipped') )
 		)
 		{
 			if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_E3ARP_passive_taunt' )
@@ -15082,27 +24079,148 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 0)
+			if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_passive_taunt' )
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_passive_taunt' );
 				}
 			}
-			else if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 1)
+			else if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_passive_taunt' )
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_passive_taunt' ); GetACSWatcher().PrimaryWeaponSwitch();
 				}
 			}
-			else if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 2 )
+			else if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 2 )
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' ); GetACSWatcher().PrimaryWeaponSwitch();
 				}
 			}
+		}
+
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
 		}
 
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
@@ -15123,11 +24241,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -15138,7 +24274,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 					{
 						stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 					}
@@ -15149,7 +24285,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
                 {
                     stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
                 }
@@ -15177,7 +24313,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -15325,27 +24461,148 @@ state BehSwitch_Engage in cBehSwitch
 			thePlayer.IsWeaponHeld( 'fist' )
 		)
 		{
-			if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 0)
+			if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 0)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'igni_primary_beh_E3ARP_passive_taunt' )
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'igni_primary_beh_E3ARP_passive_taunt' );
 				}
 			}
-			else if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 1)
+			else if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 1)
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_passive_taunt' )
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'claw_beh_passive_taunt' ); GetACSWatcher().PrimaryWeaponSwitch();
 				}
 			}
-			else if (ACS_Settings_Main_Int('EHmodCombatMainSettings','EHmodFistMode', 0) == 2 )
+			else if (ACS_Settings_Main_Int('acs_combat_main_settings','acs_fist_mode', 0) == 2 )
 			{
 				if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
 				{
 					 stupidArray.Clear(); stupidArray.PushBack( 'acs_sorc_beh' ); GetACSWatcher().PrimaryWeaponSwitch();
 				}
 			}
+		}
+
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
 		}
 
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
@@ -15366,11 +24623,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -15381,7 +24656,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 					{
 						stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 					}
@@ -15392,7 +24667,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
                 {
                     stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
                 }
@@ -15420,7 +24695,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
@@ -15462,7 +24737,7 @@ state BehSwitch_Engage in cBehSwitch
 				{
 					if 
 					(
-						ACS_GetItem_Eredin_Silver() && thePlayer.HasTag('acs_axii_sword_equipped') 
+						ACS_GetItem_Sword_IsEquipped('shield_sword_silver', 'silver') && thePlayer.HasTag('acs_axii_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_E3ARP_passive_taunt' )
@@ -15473,7 +24748,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Claws_Silver() && thePlayer.HasTag('acs_aard_sword_equipped') 
+						ACS_GetItem_Sword_IsEquipped('claws_silver', 'silver') && thePlayer.HasTag('acs_aard_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_E3ARP_passive_taunt' )
@@ -15484,7 +24759,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Imlerith_Silver() && thePlayer.HasTag('acs_yrden_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('imlerith_moveset_silver', 'silver') && thePlayer.HasTag('acs_yrden_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_E3ARP_passive_taunt' )
@@ -15495,7 +24770,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Olgierd_Silver() && thePlayer.HasTag('acs_quen_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('olgierd_silver', 'silver') && thePlayer.HasTag('acs_quen_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_E3ARP_passive_taunt' )
@@ -15506,7 +24781,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Greg_Silver() && thePlayer.HasTag('acs_axii_secondary_sword_equipped') 
+						ACS_GetItem_Sword_IsEquipped('greg_silver', 'silver') && thePlayer.HasTag('acs_axii_secondary_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP_passive_taunt' )
@@ -15517,7 +24792,7 @@ state BehSwitch_Engage in cBehSwitch
 
 					else if 
 					(
-						ACS_GetItem_Katana_Silver() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('katana_silver', 'silver') && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP_passive_taunt' )
@@ -15528,7 +24803,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Axe_Silver() && thePlayer.HasTag('acs_aard_secondary_sword_equipped') 
+						ACS_GetItem_Sword_IsEquipped('axe_silver', 'silver') && thePlayer.HasTag('acs_aard_secondary_sword_equipped') 
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_E3ARP_passive_taunt' )
@@ -15539,7 +24814,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Hammer_Silver() && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('hammer_silver', 'silver') && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_E3ARP_passive_taunt' )
@@ -15550,7 +24825,17 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Spear_Silver() &&  thePlayer.HasTag('acs_quen_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('spear_silver', 'silver') &&  thePlayer.HasTag('acs_quen_secondary_sword_equipped')
+					)
+					{
+						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_E3ARP_passive_taunt' )
+						{
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP_passive_taunt' );
+						}
+					}
+					else if 
+					(
+						ACS_GetItem_Sword_IsEquipped('jingubang_steel', 'steel') || ACS_GetItem_Sword_IsEquipped('jingubang_silver', 'silver') &&  thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_E3ARP_passive_taunt' )
@@ -15570,7 +24855,7 @@ state BehSwitch_Engage in cBehSwitch
 				{
 					if 
 					(
-						ACS_GetItem_Eredin_Steel() && thePlayer.HasTag('acs_axii_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('shield_sword_steel', 'steel') && thePlayer.HasTag('acs_axii_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_primary_beh_E3ARP_passive_taunt' )
@@ -15581,7 +24866,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Claws_Steel() && thePlayer.HasTag('acs_aard_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('claws_steel', 'steel') && thePlayer.HasTag('acs_aard_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_primary_beh_E3ARP_passive_taunt' )
@@ -15592,7 +24877,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						(ACS_GetItem_MageStaff_Steel() || ACS_GetItem_Imlerith_Steel()) && thePlayer.HasTag('acs_yrden_sword_equipped')
+						(thePlayer.GetInventory().ItemHasTag( thePlayer.GetInventory().GetCurrentlyHeldSword(), 'acsmagestaff' ) || ACS_GetItem_Sword_IsEquipped('imlerith_moveset_steel', 'steel') || ACS_GetItem_Sword_IsEquipped('imlerith_steel', 'steel') || ACS_GetItem_Sword_IsEquipped('caretaker_shovel_steel', 'steel')) && thePlayer.HasTag('acs_yrden_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_primary_beh_E3ARP_passive_taunt' )
@@ -15603,7 +24888,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Olgierd_Steel() && thePlayer.HasTag('acs_quen_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('olgierd_steel', 'steel') && thePlayer.HasTag('acs_quen_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_primary_beh_E3ARP_passive_taunt' )
@@ -15614,7 +24899,7 @@ state BehSwitch_Engage in cBehSwitch
 
 					else if 
 					(
-						ACS_GetItem_Katana_Steel() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('katana_steel', 'steel') && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP_passive_taunt' )
@@ -15625,7 +24910,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Greg_Steel() && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('greg_steel', 'steel') && thePlayer.HasTag('acs_axii_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'axii_secondary_beh_E3ARP_passive_taunt' )
@@ -15636,7 +24921,8 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Axe_Steel() && thePlayer.HasTag('acs_aard_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('axe_steel', 'steel') && thePlayer.HasTag('acs_aard_secondary_sword_equipped')
+						|| ACS_GetItem_Sword_IsEquipped('nithral_steel', 'steel') && thePlayer.HasTag('acs_aard_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'aard_secondary_beh_E3ARP_passive_taunt' )
@@ -15647,7 +24933,7 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Hammer_Steel() && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('hammer_steel', 'steel') && thePlayer.HasTag('acs_yrden_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'yrden_secondary_beh_E3ARP_passive_taunt' )
@@ -15658,7 +24944,17 @@ state BehSwitch_Engage in cBehSwitch
 						
 					else if 
 					(
-						ACS_GetItem_Spear_Steel() && thePlayer.HasTag('acs_quen_secondary_sword_equipped')
+						ACS_GetItem_Sword_IsEquipped('spear_steel', 'steel') && thePlayer.HasTag('acs_quen_secondary_sword_equipped')
+					)
+					{
+						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_E3ARP_passive_taunt' )
+						{
+							 stupidArray.Clear(); stupidArray.PushBack( 'quen_secondary_beh_E3ARP_passive_taunt' );
+						}
+					}
+					else if 
+					(
+						ACS_GetItem_Sword_IsEquipped('jingubang_steel', 'steel') || ACS_GetItem_Sword_IsEquipped('jingubang_silver', 'silver') &&  thePlayer.HasTag('acs_quen_secondary_sword_equipped')
 					)
 					{
 						if ( thePlayer.GetBehaviorGraphInstanceName() != 'quen_secondary_beh_E3ARP_passive_taunt' )
@@ -15679,7 +24975,7 @@ state BehSwitch_Engage in cBehSwitch
 			{
 				if 
 				(
-					ACS_GetItem_VampClaw() || ACS_GetItem_VampClaw_Shades()
+					ACS_GetItem_VampClaw('default') || ACS_GetItem_VampClaw('shades')
 				)
 				{
 					if ( thePlayer.GetBehaviorGraphInstanceName() != 'claw_beh_passive_taunt' )
@@ -15689,7 +24985,7 @@ state BehSwitch_Engage in cBehSwitch
 				}
 				else if 
 				(
-					ACS_GetItem_SorcFists()
+					GetWitcherPlayer().IsItemEquippedByName( 'ACS_Mage_Gloves')
 				)
 				{
 					if ( thePlayer.GetBehaviorGraphInstanceName() != 'acs_sorc_beh' )
@@ -15714,6 +25010,127 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (GetACSWatcher().silver_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+
+		if (GetACSWatcher().silver_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().silver_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_silver_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_fast_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_fast_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_group_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_group_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
+		if (GetACSWatcher().steel_strong_stance)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_steel_strong_beh' );
+			}
+
+			thePlayer.ActivateBehaviors(stupidArray);
+
+			return;
+		}
+
 		if (ACSGetCEntity('ACS_Dual_Wield_L_Sword_Steel')
 		|| ACSGetCEntity('ACS_Dual_Wield_L_Sword_Silver')
 		)
@@ -15732,11 +25149,29 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
+		if (ACSGetCEntity('ACS_Spear_Transform_Sword_Steel')
+		|| ACSGetCEntity('ACS_Spear_Transform_Sword_Silver')
+		)
+		{
+			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_SCAAR' );
+			}
+			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh_E3ARP' );
+			}
+			else
+			{
+				stupidArray.Clear(); stupidArray.PushBack( 'acs_spear_transform_beh' );
+			}
+		}
+
 		if (ACSGetCEntity('ACS_Ghost_Sword_Ent'))
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 				{
 					stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_SCAAR_passive_taunt' );
 				}
@@ -15747,7 +25182,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else if (ACS_Is_DLC_Installed('e3arp_dlc') )
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
 					{
 						stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_E3ARP_passive_taunt' );
 					}
@@ -15758,7 +25193,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 			else
 			{
-				if (ACS_Settings_Main_Bool('EHmodMiscSettings','EHmodPassiveTauntEnabled', false))
+				if (ACS_Settings_Main_Bool('acs_taunt_settings','acs_passive_taunt_enabled', false))
                 {
                     stupidArray.Clear(); stupidArray.PushBack( 'axii_secondary_beh_passive_taunt' );
                 }
@@ -15786,7 +25221,7 @@ state BehSwitch_Engage in cBehSwitch
 			}
 		}
 
-		if (thePlayer.HasTag('acs_crossbow_active')
+		if (FactsQuerySum("ACS_Slayer_Active") > 0
 		)
 		{
 			if (ACS_Is_DLC_Installed('scaaraiov_dlc') )

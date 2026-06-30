@@ -10,7 +10,7 @@ function ACS_WeaponHolsterInit()
 	var vWeaponHolster : cWeaponHolster;
 	vWeaponHolster = new cWeaponHolster in theGame;
 	
-	if ( ACS_Enabled() )
+	if ( ACS_Settings_Main_Bool('acs_main_settings','acs_mod_enabled', true) && !thePlayer.IsCiri() )
 	{
 		GetACSWatcher().Weapon_Summon_Effect_Delay();
 		vWeaponHolster.WeaponHolster_Engage();
@@ -19,7 +19,7 @@ function ACS_WeaponHolsterInit()
 
 	GetACSWatcher().register_extra_inputs();
 
-	if (ACS_Armor_Equipped_Check())
+	if (ACS_Armor_Set_Check('acs_armor', false))
 	{
 		thePlayer.SoundEvent("monster_caretaker_fx_black_exhale");
 	}
@@ -62,22 +62,30 @@ function ACS_WeaponHolsterInit()
 		thePlayer.StopEffect('him_smoke_red');
 	}
 
+	if (GetACSWatcher().idleAdditiveExtraActive)
+	{
+		thePlayer.RaiseEvent('ACS_IdleAdditiveReset');
+
+		GetACSWatcher().SetIdleAdditiveExtraStatus(false);
+	}
+
 	if (GetWitcherPlayer().HasTag('acs_igni_sword_equipped')
 	|| GetWitcherPlayer().HasTag('acs_igni_secondary_sword_equipped')
 	|| GetWitcherPlayer().HasTag('acs_igni_sword_equipped_TAG')
 	|| GetWitcherPlayer().HasTag('acs_igni_secondary_sword_equipped_TAG'))
 	{
-		ACS_WeaponDestroyInit(false);
-
 		if ( ACS_GetWeaponMode() == 0 
 		|| ACS_GetWeaponMode() == 1
 		|| ACS_GetWeaponMode() == 2 )
 		{
-			if (ACS_CloakEquippedCheck() || ACS_Settings_Main_Bool('EHmodVisualSettings','EHmodHideSwordsheathes', false))
+			if (
+			(ACS_CloakEquippedCheck() && (ACS_Settings_Main_Int ('acs_player_equipment_visual_settings','acs_swords_positioning_when_cloaked', 0, true) == 1 || FactsQuerySum("ACS_Force_Weapons_On_Hips") > 0)) 
+			|| ACS_Settings_Main_Bool('acs_player_equipment_visual_settings','acs_hide_sword_sheathes', false)
+			)
 			{
 				GetWitcherPlayer().PlayEffectSingle('embers_particles_test');
 				GetWitcherPlayer().StopEffect('embers_particles_test');
-				acs_igni_sword_summon();
+				ACSSwordSummonEffect('igni');
 			}
 		}
 	}
@@ -95,132 +103,85 @@ function ACS_WeaponHolsterInit()
 				{
 					GetWitcherPlayer().PlayEffectSingle('embers_particles_test');
 					GetWitcherPlayer().StopEffect('embers_particles_test');
-					//acs_quen_sword_summon();
-					acs_igni_sword_summon();
+					//ACSSwordSummonEffect('quen');
+					ACSSwordSummonEffect('igni');
 				}
 				else if (GetWitcherPlayer().HasTag('acs_axii_sword_equipped'))
 				{
 					GetWitcherPlayer().PlayEffectSingle('embers_particles_test');
 					GetWitcherPlayer().StopEffect('embers_particles_test');
-					//acs_axii_sword_summon();
-					acs_igni_sword_summon();
+					//ACSSwordSummonEffect('axii');
+					ACSSwordSummonEffect('igni');
 				}
 				else if (GetWitcherPlayer().HasTag('acs_aard_sword_equipped'))
 				{
 					GetWitcherPlayer().PlayEffectSingle('embers_particles_test');
 					GetWitcherPlayer().StopEffect('embers_particles_test');
-					//acs_aard_sword_summon();
-					acs_igni_sword_summon();
+					//ACSSwordSummonEffect('aard');
+					ACSSwordSummonEffect('igni');
 				}
 				else if (GetWitcherPlayer().HasTag('acs_yrden_sword_equipped'))
 				{
 					GetWitcherPlayer().PlayEffectSingle('embers_particles_test');
 					GetWitcherPlayer().StopEffect('embers_particles_test');
-					//acs_yrden_sword_summon();
-					acs_igni_sword_summon();
+					//ACSSwordSummonEffect('yrden');
+					ACSSwordSummonEffect('igni');
 				}
 				else if (GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped'))
 				{
 					GetWitcherPlayer().PlayEffectSingle('embers_particles_test');
 					GetWitcherPlayer().StopEffect('embers_particles_test');
-					//acs_quen_secondary_sword_summon();
-					acs_igni_sword_summon();
+					//ACSSwordSummonEffect('quen_secondary');
+					ACSSwordSummonEffect('igni');
 				}
 				else if (GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped'))
 				{
 					GetWitcherPlayer().PlayEffectSingle('embers_particles_test');
 					GetWitcherPlayer().StopEffect('embers_particles_test');
-					//acs_axii_secondary_sword_summon();
-					acs_igni_sword_summon();
+					//ACSSwordSummonEffect('axii_secondary');
+					ACSSwordSummonEffect('igni');
 				}
 				else if (GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped'))
 				{
 					GetWitcherPlayer().PlayEffectSingle('embers_particles_test');
 					GetWitcherPlayer().StopEffect('embers_particles_test');
-					//acs_aard_secondary_sword_summon();
-					acs_igni_sword_summon();
+					//ACSSwordSummonEffect('aard_secondary');
+					ACSSwordSummonEffect('igni');
 				}
 				else if (GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped'))
 				{
 					GetWitcherPlayer().PlayEffectSingle('embers_particles_test');
 					GetWitcherPlayer().StopEffect('embers_particles_test');
-					//acs_yrden_secondary_sword_summon();
-					acs_igni_sword_summon();
+					//ACSSwordSummonEffect('yrden_secondary');
+					ACSSwordSummonEffect('igni');
 				}
 			}
 
 			//Sword();
 		}
 
-		ACS_Shield_Destroy();
+		ACS_Axii_Shield_Destroy();
+		ACS_Axii_Shield_Destroy_DELAY();
+		ACS_Quen_Monsters_Despawn();
+		ACS_Bruxa_Camo_Decoy_Deactivate();
+		ACS_AardPull_Deactivate();
 	
-		ACS_WeaponDestroyInit(true);
-		
-		/*
-		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SilverSword, silverID);
-		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SteelSword, steelID);
-		
-		steelsword = (CDrawableComponent)((GetWitcherPlayer().GetInventory().GetItemEntityUnsafe(steelID)).GetMeshComponent());
-		silversword = (CDrawableComponent)((GetWitcherPlayer().GetInventory().GetItemEntityUnsafe(silverID)).GetMeshComponent());
-		
-		steelsword.SetVisible(true); 
-		silversword.SetVisible(true); 
+		ACS_WeaponDestroyInit();
 
-		scabbards_steel = GetWitcherPlayer().GetInventory().GetItemsByCategory('steel_scabbards');
+	}
 
-		for ( i=0; i < scabbards_steel.Size() ; i+=1 )
-		{
-			scabbard_steel = (CDrawableComponent)((GetWitcherPlayer().GetInventory().GetItemEntityUnsafe(scabbards_steel[i])).GetMeshComponent());
-			scabbard_steel.SetVisible(true);
-		}
+	GetACSWatcher().RemoveTimer('SwordTauntSwitch'); 
+	GetACSWatcher().RemoveTimer('SwordTauntRunningSwitch'); 
 
-		scabbards_silver = GetWitcherPlayer().GetInventory().GetItemsByCategory('silver_scabbards');
-
-		for ( i=0; i < scabbards_silver.Size() ; i+=1 )
-		{
-			scabbard_silver = (CDrawableComponent)((GetWitcherPlayer().GetInventory().GetItemEntityUnsafe(scabbards_silver[i])).GetMeshComponent());
-			scabbard_silver.SetVisible(true);
-		}
-		*/
+	if (thePlayer.IsDeadlySwordHeld())
+	{
+		GetACSWatcher().AddTimer('SwordTauntRunningSwitch', 0.01 / theGame.GetTimeScale(), false );
 	}
 	
 	GetWitcherPlayer().GetItemEquippedOnSlot(EES_SilverSword, silverID);
 	GetWitcherPlayer().GetItemEquippedOnSlot(EES_SteelSword, steelID);
 	GetWitcherPlayer().GetItemEquippedOnSlot(EES_RangedWeapon, rangedID);
 	
-	steelsword = (CDrawableComponent)((GetWitcherPlayer().GetInventory().GetItemEntityUnsafe(steelID)).GetMeshComponent());
-	silversword = (CDrawableComponent)((GetWitcherPlayer().GetInventory().GetItemEntityUnsafe(silverID)).GetMeshComponent());
-
-	steelsword.SetVisible(true); 
-
-	steelswordentity = GetWitcherPlayer().GetInventory().GetItemEntityUnsafe(steelID);
-	steelswordentity.SetHideInGame(false); 
-
-	silversword.SetVisible(true); 
-	
-	silverswordentity = GetWitcherPlayer().GetInventory().GetItemEntityUnsafe(silverID);
-	silverswordentity.SetHideInGame(false); 
-
-	scabbards_steel = GetWitcherPlayer().GetInventory().GetItemsByCategory('steel_scabbards');
-
-	for ( i=0; i < scabbards_steel.Size() ; i+=1 )
-	{
-		scabbard_steel = (CDrawableComponent)((GetWitcherPlayer().GetInventory().GetItemEntityUnsafe(scabbards_steel[i])).GetMeshComponent());
-		scabbard_steel.SetVisible(true);
-	}
-
-	scabbards_silver = GetWitcherPlayer().GetInventory().GetItemsByCategory('silver_scabbards');
-
-	for ( i=0; i < scabbards_silver.Size() ; i+=1 )
-	{
-		scabbard_silver = (CDrawableComponent)((GetWitcherPlayer().GetInventory().GetItemEntityUnsafe(scabbards_silver[i])).GetMeshComponent());
-		scabbard_silver.SetVisible(true);
-	}
-
-	crossbowentity = GetWitcherPlayer().GetInventory().GetItemEntityUnsafe(rangedID);
-
-	crossbowentity.SetHideInGame(false);
-
 	if (!GetWitcherPlayer().IsInCombat())
 	{
 		if (GetWitcherPlayer().HasTag ('acs_summoned_shades'))
@@ -258,184 +219,14 @@ function ACS_WeaponHolsterInit()
 
 		GetACSWatcher().Remove_On_Hit_Tags();
 
-		GetACSWatcher().BerserkMarkDestroy();
+		ACSGetCEntityDestroyAll('ACS_BerserkMark');
 
 		ACS_HybridTagRemoval();
 
 		ACS_Axii_Shield_Destroy_IMMEDIATE();
 	}
 
-	ACS_ThingsThatShouldBeRemoved(true);
-
-	//GetACSWatcher().UpdateBehGraph();
+	ACS_ThingsThatShouldBeRemoved();
 
 	ACSGetEquippedSword().StopAllEffects();
 }
-
-/*
-statemachine class cWeaponHolster
-{
-    function WeaponHolster_Engage()
-	{
-		this.PushState('WeaponHolster_Engage');
-	}
-}
-
-state WeaponHolster_Engage in cWeaponHolster
-{
-	private var steelID, silverID 				: SItemUniqueId;
-	private var steelsword, silversword			: CDrawableComponent;
-	
-	event OnEnterState(prevStateName : name)
-	{
-		WeaponHolster();
-		ACS_ThingsThatShouldBeRemoved(true);
-	}
-	
-	entry function WeaponHolster()
-	{
-		if (GetWitcherPlayer().HasAbility('ForceFinisher'))
-		{
-			GetWitcherPlayer().RemoveAbility('ForceFinisher');
-		}
-					
-		if (GetWitcherPlayer().HasAbility('ForceDismemberment'))
-		{
-			GetWitcherPlayer().RemoveAbility('ForceDismemberment');
-		}
-
-		if (GetWitcherPlayer().HasTag('acs_igni_sword_equipped')
-		|| GetWitcherPlayer().HasTag('acs_igni_secondary_sword_equipped')
-		|| GetWitcherPlayer().HasTag('acs_igni_sword_equipped_TAG')
-		|| GetWitcherPlayer().HasTag('acs_igni_secondary_sword_equipped_TAG'))
-		{
-			ACS_WeaponDestroyInit(false);
-		}
-		else
-		{
-			if (!GetWitcherPlayer().HasTag('acs_in_wraith'))
-			{
-				ACSGetEquippedSword().StopAllEffects();
-				WeaponSummonEffect();
-				//Sword();
-			}
-
-			ACS_Shield_Destroy();
-		
-			ACS_WeaponDestroyInit(true);
-			
-			Sword();
-		}
-
-		if (!GetWitcherPlayer().IsInCombat())
-		{
-			if (GetWitcherPlayer().HasTag ('acs_summoned_shades'))
-			{
-				GetWitcherPlayer().RemoveTag('acs_summoned_shades');
-			}
-			
-			if (GetWitcherPlayer().HasTag ('acs_ethereal_shout'))
-			{
-				GetWitcherPlayer().RemoveTag('acs_ethereal_shout');
-			}
-			
-			if (GetWitcherPlayer().HasTag ('acs_vampire_claws_equipped'))
-			{
-				ClawDestroy();
-
-				GetWitcherPlayer().PlayEffectSingle('claws_effect');
-				GetWitcherPlayer().StopEffect('claws_effect');
-			}
-			
-			if (GetWitcherPlayer().HasTag('Swords_Ready'))
-			{
-				GetWitcherPlayer().RemoveTag('Swords_Ready');
-			}
-
-			ACS_Skele_Destroy();
-
-			ACS_Revenant_Destroy();
-			
-			theGame.GetGameCamera().StopEffect( 'frost' );
-
-			GetWitcherPlayer().StopEffect('drain_energy');
-
-			GetACSWatcher().Remove_On_Hit_Tags();
-
-			GetACSWatcher().BerserkMarkDestroy();
-
-			ACS_HybridTagRemoval();
-
-			ACS_Axii_Shield_Destroy_IMMEDIATE();
-		}
-	}
-	
-	latent function Sword()
-	{
-		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SilverSword, silverID);
-		GetWitcherPlayer().GetItemEquippedOnSlot(EES_SteelSword, steelID);
-		
-		steelsword = (CDrawableComponent)((GetWitcherPlayer().GetInventory().GetItemEntityUnsafe(steelID)).GetMeshComponent());
-		silversword = (CDrawableComponent)((GetWitcherPlayer().GetInventory().GetItemEntityUnsafe(silverID)).GetMeshComponent());
-		
-		steelsword.SetVisible(true); 
-		silversword.SetVisible(true); 
-	}
-
-	latent function WeaponSummonEffect()
-	{
-		if ( ACS_GetWeaponMode() == 0 
-		|| ACS_GetWeaponMode() == 1
-		|| ACS_GetWeaponMode() == 2 )
-		{
-			if (GetWitcherPlayer().HasTag('acs_quen_sword_equipped'))
-			{
-				//acs_quen_sword_summon();
-				acs_igni_sword_summon();
-			}
-			else if (GetWitcherPlayer().HasTag('acs_axii_sword_equipped'))
-			{
-				//acs_axii_sword_summon();
-				acs_igni_sword_summon();
-			}
-			else if (GetWitcherPlayer().HasTag('acs_aard_sword_equipped'))
-			{
-				//acs_aard_sword_summon();
-				acs_igni_sword_summon();
-			}
-			else if (GetWitcherPlayer().HasTag('acs_yrden_sword_equipped'))
-			{
-				//acs_yrden_sword_summon();
-				acs_igni_sword_summon();
-			}
-			else if (GetWitcherPlayer().HasTag('acs_quen_secondary_sword_equipped'))
-			{
-				//acs_quen_secondary_sword_summon();
-				acs_igni_sword_summon();
-			}
-			else if (GetWitcherPlayer().HasTag('acs_axii_secondary_sword_equipped'))
-			{
-				//acs_axii_secondary_sword_summon();
-				acs_igni_sword_summon();
-			}
-			else if (GetWitcherPlayer().HasTag('acs_aard_secondary_sword_equipped'))
-			{
-				//acs_aard_secondary_sword_summon();
-				acs_igni_sword_summon();
-			}
-			else if (GetWitcherPlayer().HasTag('acs_yrden_secondary_sword_equipped'))
-			{
-				//acs_yrden_secondary_sword_summon();
-				acs_igni_sword_summon();
-			}
-
-			//acs_igni_sword_summon();
-		}
-	}
-	
-	event OnLeaveState( nextStateName : name ) 
-	{
-		super.OnLeaveState(nextStateName);
-	}
-}
-*/

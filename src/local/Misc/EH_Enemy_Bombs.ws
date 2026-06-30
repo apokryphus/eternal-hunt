@@ -70,177 +70,18 @@ class W3ACSPetard extends CThrowable
 	
 	event OnDestroyed()
 	{
-		ProcessPetardDestruction();
+		
 	}
-	event OnProcessThrowEvent( animEventName : name )
-	{
-		var throwPos : Vector;
-		var boneIndex : int;
-		var orientationTarget	: EOrientationTarget;
-		var slideTargetActor : CActor;
-		
-		
-		var dist, x, y, maxThrowRange : float;
-		var playerPos : Vector;
-		
-		if ( animEventName == 'ProjectileThrow' )
-		{
-			slideTargetActor = (CActor)( GetOwner().slideTarget );
-		
-			
-			if( GetOwner().slideTarget && !GetOwner().HasBuff(EET_Hypnotized) &&
-				( !slideTargetActor || ( slideTargetActor && GetAttitudeBetween(GetOwner(), GetOwner().slideTarget) == AIA_Hostile ) ) )
-			{
-				boneIndex = GetOwner().slideTarget.GetBoneIndex( 'pelvis' );
-				if ( boneIndex > -1 )
-					throwPos = MatrixGetTranslation( GetOwner().slideTarget.GetBoneWorldMatrixByIndex( boneIndex ) );
-				else
-					throwPos = GetOwner().slideTarget.GetWorldPosition();
-			}
-			else
-			{
-				orientationTarget = GetWitcherPlayer().GetOrientationTarget();
-				
-				if (!GetOwner().HasBuff(EET_Hypnotized) && (orientationTarget == OT_Camera || orientationTarget == OT_CameraOffset) )
-					throwPos = theCamera.GetCameraDirection() * 8 + GetOwner().GetWorldPosition();
-				else
-					throwPos = GetOwner().GetWorldForward() * 8 + GetOwner().GetWorldPosition();		
-			}
-			
-			
-			playerPos = GetWitcherPlayer().GetWorldPosition();
-			dist = VecDistance(throwPos,playerPos);
-			maxThrowRange = theGame.params.MAX_THROW_RANGE;
-			if(dist > maxThrowRange)
-			{
-				throwPos.X = playerPos.X + maxThrowRange/dist * (throwPos.X - playerPos.X);
-				throwPos.Y = playerPos.Y + maxThrowRange/dist * (throwPos.Y - playerPos.Y);
-			}
-			
-			
-			ThrowProjectile( throwPos );
-		}
-		
-		return super.OnProcessThrowEvent( animEventName );
-	}
-	
-	public function GetAudioImpactName() : name
-	{
-		return audioImpactName;
-	}
-	
-	protected function LoadDataFromItemXMLStats()
-	{
-		var atts, abs : array<name>;
-		var j, i, iSize, jSize : int;
-		var disabledAbility : SBlockedAbility;
-		var dm : CDefinitionsManagerAccessor;
-		var buff : SEffectInfo;
-		var isLoopAbility : bool;
-		var dmgRaw : SRawDamage;
-		var type : EEffectType;
-		var customAbilityName : name;
-		var inv : CInventoryComponent;
-		var abilityDisableDuration : float;
-		var min, max : SAbilityAttributeValue;
-		
-		inv = GetOwner().GetInventory();
-		
-		if(!inv)
-		{
-			LogAssert(false, "W3Petard.LoadDataFromItemXMLStats: owner <<" + GetOwner() + ">> has no InventoryComponent!!!");
-			return;
-		}
-		
-		loopDuration = CalculateAttributeValue(inv.GetItemAttributeValue(itemId, 'duration'));
-		itemName = inv.GetItemName(itemId);
-		
-		inv.GetItemAbilities(itemId, abs);
-		dm = theGame.GetDefinitionsManager();
-		iSize = abs.Size();		
-		for( i = 0; i < iSize; i += 1 )
-		{
-			isLoopAbility = dm.AbilityHasTag(abs[i], 'PetardLoopParams');
-			if(!isLoopAbility)
-				if(!dm.AbilityHasTag(abs[i], 'PetardImpactParams'))
-					continue;
-			
-			dm.GetAbilityAttributeValue(abs[i], 'ability_disable_duration', min, max);
-			abilityDisableDuration = CalculateAttributeValue(GetAttributeRandomizedValue(min, max));
-			dm.GetContainedAbilities(abs[i], atts);
-			jSize = atts.Size();
-			for( j = 0; j < jSize; j += 1 )
-			{
-				
-				if( IsEffectNameValid( atts[j] ) )
-				{
-					EffectNameToType(atts[j], type, customAbilityName);
-					
-					buff.effectType = type;
-					buff.effectAbilityName = customAbilityName;					
-					dm.GetAbilityAttributeValue(abs[i], atts[j], min, max);
-					buff.applyChance = CalculateAttributeValue(GetAttributeRandomizedValue(min, max));
-					
-					if(isLoopAbility)
-						loopParams.buffs.PushBack(buff);
-					else
-						impactParams.buffs.PushBack(buff);
-				}
-				else
-				{
-					disabledAbility.abilityName = atts[j];
-					disabledAbility.timeWhenEnabledd = abilityDisableDuration;
-					
-					
-					if(disabledAbility.timeWhenEnabledd == 0)
-						disabledAbility.timeWhenEnabledd = -1;
-					
-					if(isLoopAbility)
-						loopParams.disabledAbilities.PushBack(disabledAbility);
-					else
-						impactParams.disabledAbilities.PushBack(disabledAbility);
-				}
-			}
-			
-			dm.GetAbilityAttributes(abs[i], atts);
-			jSize = atts.Size();
-			for( j = 0; j < jSize; j += 1 )
-			{
-				
-				if(IsDamageTypeNameValid(atts[j]))
-				{				
-					dmgRaw.dmgVal = CalculateAttributeValue(inv.GetItemAttributeValue(itemId, atts[j]));
-					if(dmgRaw.dmgVal == 0)
-						continue;
-					
-					dmgRaw.dmgType = atts[j];
-					
-					if(isLoopAbility)
-						loopParams.damages.PushBack(dmgRaw);
-					else
-						impactParams.damages.PushBack(dmgRaw);						
-				}
-			}
-			
-			
-			if(isLoopAbility && loopParams.damages.Size() > 0)
-			{
-				loopParams.ignoresArmor = atts.Contains('ignoreArmor');
-			}
-			else if(!isLoopAbility && impactParams.damages.Size() > 0)
-			{
-				impactParams.ignoresArmor = atts.Contains('ignoreArmor');
-			}
-		}
-	}
-	
-	
-	
-	
+
 	public function ThrowProjectile( targetPosIn : Vector )
 	{		
 		var phantom : CPhantomComponent;
 		var inv : CInventoryComponent;
+		var distanceToTarget, projectileFlightTime : float;
+		var target : CActor = GetWitcherPlayer().GetTarget();
+		var actorsInAoE : array<CActor>;
+		var i : int;
+		var collisionGroups : array<name>;
 			
 		
 		phantom = (CPhantomComponent)GetComponent('snappingCollisionGroupNames');
@@ -254,16 +95,22 @@ class W3ACSPetard extends CThrowable
 			snapCollisionGroupNames.PushBack('Static');
 		}
 		
-		
-		LoadDataFromItemXMLStats();		
-	
 		targetPos = targetPosIn;
 		
 		isProximity = false;
 		
 		
-		AddTimer( 'ReleaseProjectile', 0.01, false, , , true );
+		BreakAttachment();
+
+		ShootProjectileAtPosition( 20.0f, 15.0f, targetPos, theGame.params.MAX_THROW_RANGE );
 		
+
+		if ( enableTrailFX )
+		{
+			PlayEffectSingle(FX_TRAIL);
+		}
+
+		wasThrown = true;
 		
 		if ( GetOwner() != GetWitcherPlayer() )
 		{
@@ -271,100 +118,7 @@ class W3ACSPetard extends CThrowable
 			if(inv)
 				inv.RemoveItem( itemId );
 		}
-		else
-		{
-			
-			if(!FactsDoesExist("debug_fact_inf_bombs"))
-				GetWitcherPlayer().inv.SingletonItemRemoveAmmo(itemId, 1);
-				
-			
-			if( GetWitcherPlayer().inv.GetItemQuantity(itemId) < 1 )		
-				GetWitcherPlayer().ClearSelectedItemId();
-			
-			
-			
-			else if( !GetWitcherPlayer().IsSetBonusActive( EISB_RedWolf_1 ) )
-			
-			{
-				GetWitcherPlayer().AddBombThrowDelay(itemId);
-			}
-				
-			if(GetOwner() == GetWitcherPlayer())
-				GetWitcherPlayer().FailFundamentalsFirstAchievementCondition();
-		}
 	}
-	
-	
-	timer function ReleaseProjectile( time : float , id : int)
-	{
-		var distanceToTarget, projectileFlightTime : float;
-		var target : CActor = GetWitcherPlayer().GetTarget();
-		var actorsInAoE : array<CActor>;
-		var i : int;
-		var collisionGroups : array<name>;
-		
-		BreakAttachment();
-		if( target.HasTag('AddRagdollCollision'))
-		{
-			collisionGroups.PushBack('Ragdoll');
-			collisionGroups.PushBack('Terrain');
-			collisionGroups.PushBack('Static');
-			collisionGroups.PushBack('Water');
-			collisionGroups.PushBack('Destructible');			
-			ShootProjectileAtPosition( 20.0f, 15.0f, targetPos, theGame.params.MAX_THROW_RANGE, collisionGroups);
-		}
-		else
-		{
-			ShootProjectileAtPosition( 20.0f, 15.0f, targetPos, theGame.params.MAX_THROW_RANGE );
-		}
-		
-		if(isFromAimThrow && ShouldProcessTutorial('TutorialThrowHold'))
-		{
-			wasInTutorialTrigger = (FactsQuerySum("tut_aim_in_trigger") > 0);				
-		}
-		
-		actorsInAoE = GetWitcherPlayer().playerAiming.GetSweptActors();
-		
-		if ( actorsInAoE.Size() > 0 )
-		{
-			if( dodgeable )
-			{
-				for ( i=0 ; i < actorsInAoE.Size() ; i+=1 )
-				{
-					actorsInAoE[i].SignalGameplayEvent( 'Time2DodgeBombAOE' );
-					((CNewNPC)actorsInAoE[i]).OnIncomingProjectile( true );
-				}
-			}
-		}
-		else if( target )
-		{	
-			if( dodgeable )
-			{
-				distanceToTarget = VecDistance( GetWitcherPlayer().GetWorldPosition(), target.GetWorldPosition() );	
-				
-				
-				projectileFlightTime = distanceToTarget / 15;
-				target.SignalGameplayEventParamFloat( 'Time2DodgeBomb', projectileFlightTime );
-			}
-			
-			((CNewNPC)target).OnIncomingProjectile( true );
-		}
-		
-		if ( enableTrailFX )
-		{
-			PlayEffectSingle(FX_TRAIL);
-		}
-		wasThrown = true;
-		
-		
-		
-	}
-	
-	
-	
-	
-	
-	
 	
 	
 	event OnProjectileCollision( pos, normal : Vector, collidingComponent : CComponent, hitCollisionsGroups : array< name >, actorIndex : int, shapeIndex : int )
@@ -397,24 +151,6 @@ class W3ACSPetard extends CThrowable
 			npc = (CNewNPC)(victim);	
 		}
 
-		if ( npc 
-		&& npc == GetWitcherPlayer() 
-		&& victim == GetWitcherPlayer() 
-		&& 
-		(GetWitcherPlayer().IsCurrentlyDodging() 
-		|| GetWitcherPlayer().HasTag('acs_blood_sucking')
-		|| GetWitcherPlayer().HasTag('ACS_IsPerformingFinisher')
-		|| GetWitcherPlayer().IsCurrentlyDodging()
-		|| GetWitcherPlayer().GetImmortalityMode() == AIM_Invulnerable
-		|| GetWitcherPlayer().IsPerformingFinisher() 
-		)
-		)
-		{
-			return true;
-		}
-
-		OnImpact();
-
 		if(entity == GetOwner())
 		{
 			return true;
@@ -422,43 +158,28 @@ class W3ACSPetard extends CThrowable
 
 		if(stopCollisions)
 			return true;
-			
-		if ( !CanCollideWithVictim( victim ) )
-			return true;
 		
 		impactNormal = normal;
-		
-		/*
-		if ( npc && npc.HasAbility( 'RepulseProjectiles' ) )
+
+		if ( (victim == GetWitcherPlayer() 
+		|| npc == GetWitcherPlayer() )
+		&& 
+		(GetWitcherPlayer().IsGuarded() 
+		|| GetWitcherPlayer().IsInGuardedState()
+		)
+		)
 		{
-			bounceOfVelocityPreserve = 0.8;
+			thePlayer.SetBehaviorVariable( 'parryType', RandRange(9) );
+			thePlayer.RaiseForceEvent( 'PerformParry' );
+
+			bounceOfVelocityPreserve = 1;
+
 			BounceOff( normal, pos );
-			victim.PlayEffectSingle( 'lightning', this );
+
 			this.Init( npc );
+
 			return true;
 		}
-		*/
-		if ( npc && npc != GetWitcherPlayer() && victim != GetWitcherPlayer() )
-		{
-			bounceOfVelocityPreserve = 0.5;
-			BounceOff( normal, pos );
-			//victim.PlayEffectSingle( 'lightning', this );
-			this.Init( npc );
-			return true;
-		}
-		
-		victim.SignalGameplayEvent( 'HitByBomb' );	
-		
-		
-		if( itemName == 'Grapeshot 2' || itemName == 'Grapeshot 3' )
-		{
-			if( npc && npc.IsShielded( GetWitcherPlayer() ) )
-			{
-				npc.ProcessShieldDestruction();
-			}
-		}
-		
-		
 		
 		theGame.VibrateControllerVeryHard();	
 			
@@ -504,19 +225,11 @@ class W3ACSPetard extends CThrowable
 		}
 		
 		
-		StopFlying();		
-			
-		if(isProximity || FactsQuerySum('debug_petards_proximity') > 0)
+		if ( hitCollisionsGroups.Contains( 'Terrain' ) || hitCollisionsGroups.Contains( 'Static' ) )
 		{
-			PlayEffectSingle('sparks');
+			StopFlying();		
 			
-			GetComponent("ProximityActivationArea").SetEnabled(true);
-			AddTimer( 'DetonationTimer', theGame.params.PROXIMITY_PETARD_IDLE_DETONATION_TIME, , , , true );
-			isStuck = true;
-		}
-		else
-		{
-			ProcessEffect( pos, (CGameplayEntity)entity );
+			ProcessEffect( pos );
 		}
 		
 		if( alignToNormal )
@@ -554,39 +267,6 @@ class W3ACSPetard extends CThrowable
 		ProcessEffect();
 	}
 	
-	event OnInteractionActivated(interactionComponentName : string, activator : CEntity)
-	{
-		if((isProximity || FactsQuerySum('debug_petards_proximity') > 0) && interactionComponentName == "ProximityActivationArea" && IsRequiredAttitudeBetween(GetOwner(), activator, true))
-			ProcessEffect();	
-	}
-	
-	
-	timer function DetonationTimer( detlaTime : float , id : int)
-	{
-		ProcessEffect();
-	}
-	
-	
-	function SetVisibility( isVisible : bool )
-	{
-		var comps : array <CComponent>;
-		var dComp : CDrawableComponent;
-		var i : int;
-
-		comps = GetComponentsByClassName( 'CDrawableComponent' );
-		
-		for( i=0; i < comps.Size (); i+=1 )
-		{
-			dComp = (CDrawableComponent)comps[i];
-			
-			if( dComp )
-			{
-				dComp.SetVisible( isVisible );	
-			}	
-		}
-	}
-	
-		
 	
 	public function ProcessEffect( optional explosionPosition : Vector, optional collidedTarget : CGameplayEntity )
 	{
@@ -625,12 +305,6 @@ class W3ACSPetard extends CThrowable
 		}
 		
 		
-		if(!isCluster && !ignoreBombSkills && (W3PlayerWitcher)GetOwner() && GetWitcherPlayer().CanUseSkill(S_Alchemy_s11) && !HasTag('Snowball'))
-		{
-			ProcessClusterBombs();
-			return;
-		}
-		
 		if ( explosionPosition == Vector( 0, 0, 0 ) )
 		{
 			explosionPosition = this.GetWorldPosition();
@@ -646,11 +320,6 @@ class W3ACSPetard extends CThrowable
 			FindGameplayEntitiesInSphere(targets, explosionPosition, impactParams.range, 1000, '', FLAG_TestLineOfSight);	
 		}
 		
-		
-		if ( itemName == 'Silver Dust Bomb 1' || itemName == 'Silver Dust Bomb 2' || itemName == 'Silver Dust Bomb 3' )
-		{
-			FindGameplayEntitiesInSphere(additionalTargets, explosionPosition, impactParams.range * 1.5, 1000, 'vampire', FLAG_TestLineOfSight);	
-		}
 		
 		if ( additionalTargets.Size() > 0 )
 		{
@@ -669,49 +338,6 @@ class W3ACSPetard extends CThrowable
 		if( caster == GetWitcherPlayer() && GetWitcherPlayer().CanUseSkill( S_Perk_16 ) )
 		{
 			isPerk16Active = true;
-		}
-		
-		for( i=targets.Size() - 1; i >= 0; i -= 1)
-		{		
-			if( !targets[ i ].IsAlive() )
-			{
-				npc = (CNewNPC)targets[i];
-				
-				if(npc)
-				{
-					
-					npc.SignalGameplayEvent('AbandonAgony');
-					
-					
-					
-					
-					
-					if( !npc.HasAbility( 'mon_bear_base' )
-						&& !npc.HasAbility( 'mon_golem_base' )
-						&& !npc.HasAbility( 'mon_endriaga_base' )
-						&& !npc.HasAbility( 'mon_gryphon_base' )
-						&& !npc.HasAbility( 'q604_shades' )
-						&& !npc.IsAnimal()	)
-					{
-						npc.SetKinematic(false);
-					}
-				}
-				else
-				{
-					
-					if( !targets[i].HasTag( 'TargetableByBomb' ) )
-					{
-						targets.EraseFast(i);
-					}
-				}
-				
-			}
-			
-			if ( targets[ i ] == this )
-			{
-				targets.EraseFast(i);
-			}
-			
 		}
 		
 		
@@ -741,15 +367,6 @@ class W3ACSPetard extends CThrowable
 		
 		ProcessEffectPlayFXs(true);
 
-		if(loopDuration > 0)
-		{
-			ProcessLoopEffect();
-		}
-		else
-		{
-			OnTimeEndedFunction(0);
-		}
-
 		ApplyAppearance("invisible");
 	}
 
@@ -768,146 +385,7 @@ class W3ACSPetard extends CThrowable
 			SnapComponentByName(params.componentsToSnap[i], 2, 0.25, snapCollisionGroupNames, pos);
 	}
 	
-	protected function ProcessLoopEffect()
-	{
-		
-		LoopComponentsEnable(true);
-		
-		
-		SnapComponents(false);
-		
-		
-		ProcessEffectPlayFXs(false);
-		
-		
-		AddTimer('OnTimeEnded', loopDuration, false, , , true);
-		AddTimer('Loop', 0.1f, true, , , true);	
-	}
-	
-	protected function LoopComponentsEnable(enable : bool)
-	{
-		var i : int;
-		var component : CComponent;
-		
-		for(i=0; i<componentsEnabledOnLoop.Size(); i+=1)
-		{
-			component = GetComponent(componentsEnabledOnLoop[i]);
-			if(component)
-				component.SetEnabled(enable);
-		}
-	}
-	
-	timer function Loop(dt : float, id : int)
-	{
-		LoopFunction(dt);
-	}
-	
-	protected function ProcessPetardDestruction ()
-	{
-		var i : int;
-		
-		for(i=0; i<previousTargets.Size(); i+=1)
-			ProcessTargetOutOfArea(previousTargets[i]);		
-	}
-	
-	protected function LoopFunction(dt : float)
-	{
-		var i : int;
-		var targets : array<CGameplayEntity>;
-		var pos : Vector;
-	
-		pos = GetWorldPosition();
-		pos.Z += loopParams.cylinderOffsetZ;
-		targetsSinceLastCheck.Clear();
-		FindGameplayEntitiesInCylinder(targets, pos, loopParams.range, loopParams.cylinderHeight, 100000);
-		
-		
-		targets.Remove(this);
-		
-		
-		targetsSinceLastCheck.Resize(targets.Size());
-		for(i=0; i<targetsSinceLastCheck.Size(); i+=1)
-		{
-			targetsSinceLastCheck[i] = targets[i];
-		}
-		
-		
-		ProcessMechanicalEffect( targetsSinceLastCheck, false, dt );
-		
-		
-		for(i=0; i<previousTargets.Size(); i+=1)
-		{
-			if(!targetsSinceLastCheck.Contains( previousTargets[i] ))
-			{
-				ProcessTargetOutOfArea( previousTargets[i] );
-			}
-		}
-		
-		previousTargets.Clear();
-		previousTargets = targetsSinceLastCheck;
-		
-		
-		
-	}
-	
-	
-	protected function ProcessTargetOutOfArea(entity : CGameplayEntity)
-	{
-		var dm : CDefinitionsManagerAccessor;
-		var j, k : int;
-		var skill : ESkill;
-		var successfullUnblock : bool;
-		var actor : CActor;
 
-		actor = (CActor)entity;
-		if(!actor || !actor.IsAlive())
-			return;
-			
-		
-		dm = theGame.GetDefinitionsManager();
-		successfullUnblock = false;
-		for(j=0; j<loopParams.disabledAbilities.Size(); j+=1)
-		{			
-			if(loopParams.disabledAbilities[j].timeWhenEnabledd == -1 && dm.IsAbilityDefined(loopParams.disabledAbilities[j].abilityName))
-			{
-				
-				skill = S_SUndefined;
-				if(actor == GetWitcherPlayer())
-					skill = SkillNameToEnum(loopParams.disabledAbilities[j].abilityName);						 
-				
-				
-				if(skill != S_SUndefined)
-					successfullUnblock = GetWitcherPlayer().BlockSkill(skill, false) || successfullUnblock;
-				else
-					successfullUnblock = actor.BlockAbility(loopParams.disabledAbilities[j].abilityName, false) || successfullUnblock;
-			}
-		}
-		
-		if(successfullUnblock)
-		{
-			
-			for(k=0; k<loopParams.fxPlayedWhenAbilityDisabled.Size(); k+=1)						
-				actor.StopEffect(loopParams.fxPlayedWhenAbilityDisabled[k]);
-				
-			for(k=0; k<loopParams.fxStoppedWhenAbilityDisabled.Size(); k+=1)						
-				actor.PlayEffectSingle(loopParams.fxStoppedWhenAbilityDisabled[k]);
-		}
-	}
-		
-	timer function OnTimeEnded(dt : float, id : int)
-	{
-		OnTimeEndedFunction(dt);		
-	}
-	
-	protected function OnTimeEndedFunction(dt : float)
-	{
-		LoopComponentsEnable(false);
-		StopAllEffects();
-		AddTimer('DestroyWhenNoFXPlayed', 1, true, , , true);
-		RemoveTimer('Loop');
-	}
-	
-	
 	protected function ProcessEffectPlayFXs(isImpact : bool)
 	{
 		var params : SPetardParams;
@@ -992,41 +470,6 @@ class W3ACSPetard extends CThrowable
 			decalComp.SetVisible( true ) ;
 			decalRemainingTimes[ decalID ].remainingShowTime = params.decalComponentVisibleTimes[ decalID ];
 			decalRemainingTimes[ decalID ].componentName = params.decalComponentNames[ decalID ];
-		}
-	}
-	
-	 event OnImpact()
-	{
-		var j : int;
-		
-		
-		for(j=0; j<impactParams.damages.Size(); j+=1)
-		{
-			if(impactParams.damages[j].dmgVal > 0)
-			{
-				if(impactParams.damages[j].dmgType == theGame.params.DAMAGE_NAME_FIRE)
-				{
-					hasImpactFireDamage = true;
-				}
-				else if(impactParams.damages[j].dmgType == theGame.params.DAMAGE_NAME_FROST)						
-				{
-					hasImpactFrostDamage = true;
-				}
-			}
-		}
-		for(j=0; j<loopParams.damages.Size(); j+=1)
-		{
-			if(loopParams.damages[j].dmgVal > 0)
-			{
-				if(loopParams.damages[j].dmgType == theGame.params.DAMAGE_NAME_FIRE)
-				{
-					hasLoopFireDamage = true;
-				}
-				else if(loopParams.damages[j].dmgType == theGame.params.DAMAGE_NAME_FROST)						
-				{
-					hasLoopFrostDamage = true;
-				}
-			}
 		}
 	}
 
@@ -1219,12 +662,15 @@ class W3ACSPetard extends CThrowable
 					action.AddEffectInfo(params.buffs[j].effectType, params.buffs[j].effectDuration, params.buffs[j].effectCustomValue, params.buffs[j].effectAbilityName, params.buffs[j].effectCustomParam, params.buffs[j].applyChance);
 				}
 				
-				if (!GetWitcherPlayer().IsAnyQuenActive())
+				if (!GetWitcherPlayer().IsAnyQuenActive()
+				&& !GetWitcherPlayer().IsCurrentlyDodging()
+				&& !GetWitcherPlayer().IsInAir()
+				&& GetWitcherPlayer().IsOnGround()
+				&& !thePlayer.HasTag('ACS_Is_Currently_Dodging')
+				&& !thePlayer.HasTag('ACS_IsPerformingFinisher')
+				&& !thePlayer.HasTag('ACS_IsPerformingCombatDismember')
+				)
 				{
-					GetWitcherPlayer().ClearAnimationSpeedMultipliers();	
-
-					GetWitcherPlayer().GetMovingAgentComponent().GetMovementAdjustor().CancelAll();
-
 					if (thePlayer.HasTag('ACS_IsSwordWalking')){thePlayer.RemoveTag('ACS_IsSwordWalking');}
 					GetWitcherPlayer().RaiseEvent( 'AttackInterrupt' );
 
@@ -1278,194 +724,13 @@ class W3ACSPetard extends CThrowable
 			delete action;
 						
 			
-			successfullBlock = false;
-			for(j=0; j<params.disabledAbilities.Size(); j+=1)
-				if(dm.IsAbilityDefined(params.disabledAbilities[j].abilityName))
-					successfullBlock = BlockTargetsAbility(actorTarget, params.disabledAbilities[j].abilityName, params.disabledAbilities[j].timeWhenEnabledd) || successfullBlock;					
-			
-			
-			for(k=0; k<params.fxPlayedOnHit.Size(); k+=1)
-				actorTarget.PlayEffectSingle(params.fxPlayedOnHit[k]);
-			
-			
-			if(successfullBlock)
-			{
-				
-				for(k=0; k<params.fxPlayedWhenAbilityDisabled.Size(); k+=1)						
-					actorTarget.PlayEffectSingle(params.fxPlayedWhenAbilityDisabled[k]);
-					
-				for(k=0; k<params.fxStoppedWhenAbilityDisabled.Size(); k+=1)						
-					actorTarget.StopEffect(params.fxStoppedWhenAbilityDisabled[k]);
-			}
-				
-			
 			npc = (CNewNPC)actorTarget;
 			if(npc && npc.GetNPCType() == ENGT_Guard && !npc.IsInCombat() )
 			{
 				npc.SignalGameplayEventParamObject('BeingHitAction', GetOwner());
 				theGame.GetBehTreeReactionManager().CreateReactionEventIfPossible( npc, 'BeingHitAction', 8.0, 1.0f, 999.0f, 1, false); 
 			}
-		}
-
-		
-		if(allVictimsTags.Size() > 0)
-		{
-			attackerTags = GetOwner().GetTags();
-			
-			AddHitFacts( allVictimsTags, attackerTags, "_weapon_hit" );
-			AddHitFacts( allVictimsTags, attackerTags, "_bomb_hit" );
-			AddHitFacts( allVictimsTags, attackerTags, "_bomb_hit_type_" + PrintFactFriendlyPetardName() );
-		}		
-	}
-	
-	
-	protected function BlockTargetsAbility(target : CActor, abilityName : name, blockDuration : float, optional unlock : bool) : bool
-	{
-		var skill : ESkill;
-	
-		
-		skill = S_SUndefined;
-		if(target == GetWitcherPlayer())					
-			skill = SkillNameToEnum(abilityName);						 
-		
-		
-		if(skill != S_SUndefined)
-			return GetWitcherPlayer().BlockSkill(skill, !unlock, blockDuration);
-		else
-			return target.BlockAbility(abilityName, true, blockDuration);
-	}
-	
-	timer function DelayedRestoreCollisions(dt : float, id : int)
-	{
-		stopCollisions = false;
-	}
-	
-	
-	private function ProcessClusterBombs()
-	{
-		var target : CActor = GetWitcherPlayer().GetTarget();
-		var i, clusterNbr : int;
-		var cluster : W3ACSPetard;
-		var targetPosCluster, clusterInitPos : Vector;
-		var angle, velocity, distLen : float;
-		var clusterTemplate : CEntityTemplate;
-		var dmgRaw : SRawDamage;
-		var cachedDamages : array<SRawDamage>;
-		var atts : array<name>;
-		var distanceToTarget : float;
-		var projectileFlightTime : float;
-		var collisionGroups : array<name>;
-	
-		clusterInitPos = GetWorldPosition();
-		clusterInitPos.Z += radius + 0.15;
-		
-		clusterNbr = GetWitcherPlayer().GetSkillLevel(S_Alchemy_s11) + 1;
-		
-		for(i=0; i<clusterNbr; i+=1)
-		{			
-			cluster = (W3ACSPetard)Duplicate();
-			cluster.Init(GetOwner());
-			cluster.isCluster = true;
-			cluster.isProximity = false;					
-			cluster.AddTimer('DelayedRestoreCollisions', 0.2);	
-			
-			
-			targetPosCluster.X = SgnF(RandF()-0.5) * (1+RandF()*3);
-			targetPosCluster.Y = SgnF(RandF()-0.5) * (1+RandF()*3);
-			targetPosCluster.Z = 0;
-			
-			distLen = VecLength2D(targetPosCluster);	
-			
-			targetPosCluster += GetWorldPosition();		
-			
-			angle = (9 - distLen) * 10;					
-			velocity = 4 + distLen/2;					
-			
-			
-			if( target.HasTag('AddRagdollCollision'))
-			{
-				collisionGroups.PushBack('Ragdoll');
-				collisionGroups.PushBack('Terrain');
-				collisionGroups.PushBack('Static');
-				collisionGroups.PushBack('Water');
-				collisionGroups.PushBack('Destructible');
-				cluster.ShootProjectileAtPosition( angle, velocity, targetPosCluster, theGame.params.MAX_THROW_RANGE, collisionGroups );
-			}
-			else
-			{
-				cluster.ShootProjectileAtPosition( angle, velocity, targetPosCluster, theGame.params.MAX_THROW_RANGE );
-			}
-			cluster.PlayEffectSingle(FX_TRAIL);
-			
-			if ( dodgeable )
-			{
-				distanceToTarget = VecDistance( GetWitcherPlayer().GetWorldPosition(), target.GetWorldPosition() );		
-				
-				
-				projectileFlightTime = distanceToTarget / velocity;
-				target.SignalGameplayEventParamFloat('Time2DodgeBomb', projectileFlightTime );
-			}
-		}
-		
-		
-		PlayEffectSingle(FX_CLUSTER);		
-		justPlayingFXs.PushBack(FX_CLUSTER);
-		
-		AddTimer('DestroyWhenNoFXPlayed', 1, true, , , true);
-		stopCollisions = true;
-	}
-	
-	timer function DestroyWhenNoFXPlayed(dt : float, id : int)
-	{
-		DestroyWhenNoFXPlayedFunction(dt);
-	}
-	
-	
-	protected function DestroyWhenNoFXPlayedFunction(dt : float) : bool
-	{
-		var i : int;
-		var decalComp : CDecalComponent;
-		var stillHasDecalToShow : bool;
-	
-		for(i=0; i<justPlayingFXs.Size(); i+=1)
-		{
-			if(IsEffectActive(justPlayingFXs[i]))
-			{
-				return false;
-			}
-		}
-		
-		
-		stillHasDecalToShow = false;
-		for( i = 0; i < decalRemainingTimes.Size(); i += 1 )
-		{
-			if( decalRemainingTimes[ i ].remainingShowTime > 0.f )
-			{
-				decalRemainingTimes[ i ].remainingShowTime -= dt;
-				
-				if( decalRemainingTimes[ i ].remainingShowTime > 0.f )
-				{
-					stillHasDecalToShow = true;
-				}
-				else
-				{
-					decalComp = ( CDecalComponent ) GetComponent( decalRemainingTimes[ i ].componentName );
-					if( decalComp )
-					{
-						decalComp.SetVisible( false ) ;
-					}
-				}
-			}
-		}
-		
-		if( stillHasDecalToShow )
-		{
-			return false;
-		}
-		
-		RemoveTimer('DestroyWhenNoFXPlayed');
-		DestroyAfter( 0.1f ); 
-		return true;
+		}	
 	}
 	
 	protected function PlayEffectInternal(fx : name)
@@ -1475,24 +740,6 @@ class W3ACSPetard extends CThrowable
 		
 		
 		justPlayingFXs.PushBack(fx);
-	}
-	
-	public function DismembersOnKill() : bool
-	{
-		return dismemberOnKill;
-	}
-	
-	public function GetImpactRange() : float			{return impactParams.range;}
-	public function GetAoERange() : float				{return loopParams.range;}
-	public function IsStuck() : bool					{return isStuck;}
-	public function DisableProximity()					{isProximity = false;}
-	public function IsProximity() : bool				{return isProximity;}
-	
-	
-	
-	private function PrintFactFriendlyPetardName() : string
-	{
-		return StrLower(StrReplaceAll( NameToString(itemName) , " ", "_" ));
 	}
 	
 	
@@ -1512,14 +759,6 @@ class W3ACSEnemyDimeritium extends W3ACSPetard
 		
 		default disableTimerCalled = false;
 		default DISABLED_FX_CHECK_DELAY = 1.f;
-
-	 event OnImpact()
-	{
-		super.OnImpact();
-		
-		
-		disabledFxDT = DISABLED_FX_CHECK_DELAY;
-	}
 	
 	protected function ProcessMechanicalEffect(targets : array<CGameplayEntity>, isImpact : bool, optional dt : float)
 	{
@@ -1531,40 +770,45 @@ class W3ACSEnemyDimeritium extends W3ACSPetard
 			
 		
 		witcher = GetWitcherPlayer();
+
 		if(targets.Contains(witcher) )
 		{
-			witcher.CastSignAbort();
-
-			GetWitcherPlayer().BlockAction( EIAB_Signs, 				'ACS_Dimeritium');
-
-			if (witcher.IsAnyQuenActive())
+			if (!thePlayer.HasTag('ACS_Player_Hit_By_Dimeritium'))
 			{
-				GetWitcherPlayer().PlayEffectSingle('quen_lasting_shield_hit');
+				witcher.CastSignAbort();
 
-				GetWitcherPlayer().StopEffect('quen_lasting_shield_hit');
+				GetWitcherPlayer().BlockAction( EIAB_Signs, 				'ACS_Dimeritium');
 
-				GetWitcherPlayer().PlayEffectSingle('lasting_shield_discharge');
+				if (witcher.IsAnyQuenActive())
+				{
+					GetWitcherPlayer().PlayEffectSingle('quen_lasting_shield_hit');
 
-				GetWitcherPlayer().StopEffect('lasting_shield_discharge');
+					GetWitcherPlayer().StopEffect('quen_lasting_shield_hit');
 
-				witcher.FinishQuen(false);
+					GetWitcherPlayer().PlayEffectSingle('lasting_shield_discharge');
+
+					GetWitcherPlayer().StopEffect('lasting_shield_discharge');
+
+					witcher.FinishQuen(false);
+				}
+
+				ACS_Bruxa_Camo_Decoy_Deactivate();
+
+				//GetWitcherPlayer().StopAllEffects();
+
+				GetWitcherPlayer().StopEffect('dimeritium_hit_electricity');
+
+				GetWitcherPlayer().StopEffect('dimeritium_hit');
+
+				GetWitcherPlayer().PlayEffectSingle('dimeritium_hit_electricity');
+
+				GetWitcherPlayer().PlayEffectSingle('dimeritium_hit');
+
+				GetACSWatcher().RemoveTimer('DimeritiumHitRestore');
+				GetACSWatcher().AddTimer('DimeritiumHitRestore', 3 , false);
+
+				thePlayer.AddTag('ACS_Player_Hit_By_Dimeritium');
 			}
-
-			ACS_Bruxa_Camo_Decoy_Deactivate();
-
-			//GetWitcherPlayer().StopAllEffects();
-
-			GetWitcherPlayer().StopEffect('dimeritium_hit_electricity');
-
-			GetWitcherPlayer().PlayEffectSingle('dimeritium_hit_electricity');
-
-			GetWitcherPlayer().StopEffect('dimeritium_hit');
-
-			GetWitcherPlayer().PlayEffectSingle('dimeritium_hit');
-
-			GetACSWatcher().RemoveTimer('Witch_Hunter_Dimeritium_Sign_Restore');
-
-			GetACSWatcher().AddTimer('Witch_Hunter_Dimeritium_Sign_Restore', 3, false);
 		}
 			
 		
@@ -1575,121 +819,6 @@ class W3ACSEnemyDimeritium extends W3ACSPetard
 			{	
 				rift.PlayEffectSingle( 'rift_dimeritium' );
 				rift.DeactivateRiftIfPossible();
-			}
-		}
-	}
-	
-	protected function LoopFunction(dt : float)
-	{
-		var skill : ESkill;
-		var i, j : int;
-		var blocked, isPlayer : bool;
-		var actor : CActor;
-		
-		super.LoopFunction(dt);
-		
-		
-		disabledFxDT -= dt;
-		if( disabledFxDT > 0.f )
-		{
-			return;
-		}
-		disabledFxDT = DISABLED_FX_CHECK_DELAY;
-		
-		
-		blocked = false;
-		for(i=0; i<targetsSinceLastCheck.Size(); i+=1)
-		{
-			actor = (CActor)targetsSinceLastCheck[i];
-			if(!actor)
-				continue;
-				
-			if(actor == GetWitcherPlayer())
-				isPlayer = true;
-			else
-				isPlayer = false;
-				
-			for(j=0; j<loopParams.disabledAbilities.Size(); j+=1)
-			{
-				
-				if(isPlayer)
-				{
-					skill = SkillNameToEnum(loopParams.disabledAbilities[j].abilityName);
-					blocked = GetWitcherPlayer().IsSkillBlocked(skill);
-				}
-				else
-				{
-					blocked = actor.IsAbilityBlocked(loopParams.disabledAbilities[j].abilityName);
-				}
-	
-				if(blocked)
-					break;
-			}
-			
-			if(blocked)
-				break;
-		}	
-		
-		
-		if(blocked)
-		{
-			if(isCluster && IsNameValid(affectedFXCluster))
-				PlayEffectInternal(affectedFXCluster);
-			else
-				PlayEffectInternal(affectedFX);
-				
-			RemoveTimer('DisableAffectedFx');
-			disableTimerCalled = false;
-		}
-		else if(!disableTimerCalled)
-		{
-			disableTimerCalled = true;
-			AddTimer('DisableAffectedFx', 0.5);
-		}
-	}
-	
-	timer function DisableAffectedFx(dt : float, id : int)
-	{
-		StopEffect(affectedFXCluster);
-		StopEffect(affectedFX);
-	}
-	
-	
-	protected function ProcessTargetOutOfArea(entity : CGameplayEntity)
-	{
-		var bombLevel, i : int;
-		var duration : float;
-		var target : CActor;
-		var min, max : SAbilityAttributeValue;
-		
-		if(GetOwner() == GetWitcherPlayer())
-		{
-			target = (CActor)entity;
-			
-			if(target && target.IsAlive())
-			{
-				theGame.GetDefinitionsManager().GetItemAttributeValueNoRandom(itemName, true, 'level', min, max);
-				bombLevel = RoundMath(CalculateAttributeValue(min));
-				
-				
-				if(GetAttitudeBetween(GetOwner(), target) == AIA_Friendly && !friendlyFire)
-				{
-					for(i=0; i<loopParams.disabledAbilities.Size(); i+=1)
-					{
-						BlockTargetsAbility(target, loopParams.disabledAbilities[i].abilityName, 0.f, true);
-					}
-				}
-				
-				else if(bombLevel == 3)
-				{
-					theGame.GetDefinitionsManager().GetItemAttributeValueNoRandom(itemName, true, 'duration_out_of_cloud', min, max);
-					duration = CalculateAttributeValue(min);
-					
-					for(i=0; i<loopParams.disabledAbilities.Size(); i+=1)
-					{
-						target.BlockAbility(loopParams.disabledAbilities[i].abilityName, true, duration);
-					}
-				}					
 			}
 		}
 	}

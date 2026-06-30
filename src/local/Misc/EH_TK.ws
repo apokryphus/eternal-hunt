@@ -1,14 +1,3 @@
-function ACS_TKInit()
-{
-	var vACS_TK : cACS_TK;
-	vACS_TK = new cACS_TK in theGame;
-
-	ACS_Tutorial_Display_Check('ACS_Caressing_Moon_Tutorial_Shown');
-
-	vACS_TK.ACS_TK_Engage();
-	ACS_Yrden_Sidearm_Summon();
-}
-
 statemachine class cACS_TK
 {
     function ACS_TK_Engage()
@@ -50,54 +39,38 @@ state ACS_TK_Engage in cACS_TK
 	{
 		if (GetWitcherPlayer().IsHardLockEnabled())
 		{
-			Pull_Single();
-		}
-		else
-		{
-			Pull_Mult();
-		}
-	}
-	
-	latent function Pull_Mult()
-	{
-		ACSGetCEntity('ACS_pull_anchor1').Destroy();
-		ACSGetCEntity('ACS_pull_anchor2').Destroy();
-		ACSGetCEntity('ACS_pull_anchor3').Destroy();
-		ACSGetCEntity('ACS_pull_anchor4').Destroy();
-		ACSGetCEntity('ACS_pull_anchor5').Destroy();
+			ACSGetCEntity('ACS_pull_anchor1').Destroy();
+			ACSGetCEntity('ACS_pull_anchor2').Destroy();
+			ACSGetCEntity('ACS_pull_anchor3').Destroy();
 
-		ACSGetCEntity('ACS_TK_Mark').Destroy();
+			ACSGetCEntity('ACS_TK_Mark').Destroy();
 
-		ent_2 = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( 
+			ent_2 = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( 
 
-		"dlc\dlc_acs\data\fx\acs_ice_breathe_old.w2ent"
+			"dlc\dlc_acs\data\fx\acs_ice_breathe_old.w2ent"
 
-		, true ), thePlayer.GetWorldPosition() );
+			, true ), thePlayer.GetWorldPosition() );
 
-		ent_2.AddTag('ACS_TK_Mark');
+			ent_2.AddTag('ACS_TK_Mark');
 
-		ent_2.CreateAttachment( GetWitcherPlayer(), 'l_weapon' );
+			ent_2.CreateAttachment( GetWitcherPlayer(), 'l_weapon' );
 
-		ent_2.DestroyAfter(10);
-		
-		settings.blendIn = 0.175f;
-		settings.blendOut = 1.f;
-
-		GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_gabriel_aim_idle_lp', 'PLAYER_SLOT', settings);
-		
-		victimsarray = GetActorsInRange(GetWitcherPlayer(), 25, 25);
-		
-		for( i = 0; i < victimsarray.Size(); i += 1 )
-		{		
-			npc = (CActor)victimsarray[i];
+			ent_2.DestroyAfter(10);
 			
+			settings.blendIn = 0.175f;
+			settings.blendOut = 1.f;
+
+			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_gabriel_aim_idle_lp', 'PLAYER_SLOT', settings);
+			
+			npc = (CActor)( GetWitcherPlayer().GetDisplayTarget() );
+				
 			dest = GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * -1.1;
 			dest_adjusted = dest + Vector(0, 0, 1.25, 0);
 			initial_dist = VecDistance2D(npc.GetWorldPosition(), dest);
-			
+				
 			dist = (((CMovingPhysicalAgentComponent)actor.GetMovingAgentComponent()).GetCapsuleRadius() 
 			+ ((CMovingPhysicalAgentComponent)GetWitcherPlayer().GetMovingAgentComponent()).GetCapsuleRadius()) * 2.125;
-			
+				
 			prev_time = theGame.GetEngineTimeAsSeconds();
 			stuck_time = 0;
 
@@ -109,12 +82,12 @@ state ACS_TK_Engage in cACS_TK
 			slide = false;
 
 			prev_pos = npc.GetWorldPosition();
-			
+				
 			movementAdjustor1 = GetWitcherPlayer().GetMovingAgentComponent().GetMovementAdjustor();
 			movementAdjustor1.CancelByName( 'ACS_TK_turn' );
 			ticket1 = movementAdjustor1.CreateNewRequest( 'ACS_TK_turn' );
 			movementAdjustor1.AdjustmentDuration( ticket1, 0.5 );
-			
+				
 			movementAdjustor2 = npc.GetMovingAgentComponent().GetMovementAdjustor();
 			movementAdjustor2.CancelByName( 'ACS_pull_mult' );
 			ticket2 = movementAdjustor2.CreateNewRequest( 'ACS_pull_mult' );
@@ -124,514 +97,60 @@ state ACS_TK_Engage in cACS_TK
 			movementAdjustor2.AdjustLocationVertically( ticket2, true );
 			movementAdjustor2.ScaleAnimationLocationVertically( ticket2, true );
 			movementAdjustor2.MaxLocationAdjustmentSpeed( ticket2, 10000000 );
-			
-			SleepOneFrame();
-			
-			if ( victimsarray.Size() >0 )
-			{
-				if (GetWitcherPlayer().IsInCombat())
-				{
-					if( npc.GetAttitude(GetWitcherPlayer()) == AIA_Hostile && npc.IsAlive() )
-					{	
-						markerTemplate = (CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\fx\acs_ice_breathe_old.w2ent", true );
-						
-						pull_anchor1 = (CEntity)theGame.CreateEntity( markerTemplate, npc.GetWorldPosition(), npc.GetWorldRotation() );
-						pull_anchor2 = (CEntity)theGame.CreateEntity( markerTemplate, npc.GetWorldPosition(), npc.GetWorldRotation() );
-						pull_anchor3 = (CEntity)theGame.CreateEntity( markerTemplate, npc.GetWorldPosition(), npc.GetWorldRotation() );
-						pull_anchor4 = (CEntity)theGame.CreateEntity( markerTemplate, npc.GetWorldPosition(), npc.GetWorldRotation() );
-						pull_anchor5 = (CEntity)theGame.CreateEntity( markerTemplate, npc.GetWorldPosition(), npc.GetWorldRotation() );
-
-						/*
-						pull_anchor1 = npc.CreateFXEntityAtPelvis('runeword_4', false);
-						pull_anchor2 = npc.CreateFXEntityAtPelvis('runeword_4', false);
-						pull_anchor3 = npc.CreateFXEntityAtPelvis('runeword_4', false);
-						*/
-
-						pull_anchor1.CreateAttachment( npc, , Vector( 0, 0, 1.5 ) );	
-						pull_anchor2.CreateAttachment( npc, , Vector( 0.25, 0, 1 ) );				
-						pull_anchor3.CreateAttachment( npc, , Vector( -0.25, 0, 1 ) );
-						pull_anchor4.CreateAttachment( npc, , Vector( 0.25, 0, 0 ) );
-						pull_anchor5.CreateAttachment( npc, , Vector( -0.25, 0, 0 ) );
-						pull_anchor1.DestroyAfter(10);
-						pull_anchor2.DestroyAfter(10);
-						pull_anchor3.DestroyAfter(10);
-						pull_anchor4.DestroyAfter(10);
-						pull_anchor5.DestroyAfter(10);
-						
-						SleepOneFrame();
-
-						ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor1 );
-						ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor2 );
-						ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor3 );
-						ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor4 );
-						ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor5 );
-						ACSGetCEntity('ACS_TK_Mark').StopEffect('lightning_red_no_sound');
-						
-						if (!theGame.IsDialogOrCutscenePlaying() 
-						|| !GetWitcherPlayer().IsInNonGameplayCutscene() 
-						|| !GetWitcherPlayer().IsInGameplayScene()
-						//&& !GetWitcherPlayer().IsSwimming()
-						|| !GetWitcherPlayer().IsUsingHorse()
-						|| !GetWitcherPlayer().IsUsingVehicle()
-						)
-						{
-							movementAdjustor1.RotateTowards( ticket1, npc );
-						}
-						
-						npc.RemoveAllBuffsOfType( EET_HeavyKnockdown );
-					
-						npc.RemoveAllBuffsOfType( EET_Knockdown );
-					
-						npc.RemoveAllBuffsOfType( EET_LongStagger );
-					
-						npc.RemoveAllBuffsOfType( EET_Ragdoll );
-						
-						npc.RemoveAllBuffsOfType( EET_Stagger );
-						
-						npc.RemoveAllBuffsOfType( EET_Paralyzed );
-
-						Sleep(0.1);
-					
-						if (npc.UsesEssence())
-						{
-							if (npc.IsAnimal())
-							{
-								npc.EnableCharacterCollisions(false);
-								npc.AddEffectDefault( EET_Paralyzed, npc, 'console' );
-							}
-							else
-							{
-								if (!npc.IsImmuneToBuff(EET_LongStagger) && !npc.HasAbility('Flying') && ( (CMovingPhysicalAgentComponent)( npc.GetMovingAgentComponent() ) ).HasRagdoll())
-								//if (!npc.IsImmuneToBuff(EET_HeavyKnockdown) && !npc.HasAbility('Flying') && ( (CMovingPhysicalAgentComponent)( npc.GetMovingAgentComponent() ) ).HasRagdoll())
-								{
-									//npc.AddEffectDefault( EET_Ragdoll, npc, 'console' );
-									npc.AddEffectDefault( EET_LongStagger, npc, 'console' );
-									//npc.AddEffectDefault( EET_HeavyKnockdown, npc, 'console' );
-								}
-								else
-								{
-									npc.AddEffectDefault( EET_Paralyzed, npc, 'console' );
-								}
-							}
-						}
-						else if (!npc.UsesEssence())
-						{
-							if (npc.IsUsingVehicle()) 
-							{
-								npc.SignalGameplayEventParamInt( 'RidingManagerDismountHorse', DT_instant | DT_fromScript );
-								//npc.AddEffectDefault( EET_Paralyzed, npc, 'console' );
-								//npc.AddEffectDefault( EET_Ragdoll, npc, 'console' );
-								npc.AddEffectDefault( EET_LongStagger, npc, 'console' );
-							}
-							else
-							{
-								if (npc.IsAnimal())
-								{
-									npc.EnableCharacterCollisions(false);
-									npc.AddEffectDefault( EET_Paralyzed, npc, 'console' );
-								}
-								else
-								{
-									if (!npc.IsImmuneToBuff(EET_LongStagger) && !npc.HasAbility('Flying') && ( (CMovingPhysicalAgentComponent)( npc.GetMovingAgentComponent() ) ).HasRagdoll())
-									//if (!npc.IsImmuneToBuff(EET_HeavyKnockdown) && !npc.HasAbility('Flying') && ( (CMovingPhysicalAgentComponent)( npc.GetMovingAgentComponent() ) ).HasRagdoll())
-									{
-										//npc.AddEffectDefault( EET_Ragdoll, npc, 'console' );
-										npc.AddEffectDefault( EET_LongStagger, npc, 'console' );
-										//npc.AddEffectDefault( EET_HeavyKnockdown, npc, 'console' );
-									}
-									else
-									{
-										npc.AddEffectDefault( EET_Paralyzed, npc, 'console' );
-									}
-								}
-							}
-						}
-								
-						while (true) 
-						{
-							//animatedComponent.PlaySlotAnimationAsync ( 'man_geralt_gabriel_aim_idle_lp', 'PLAYER_SLOT', settings);
-							
-							new_time = theGame.GetEngineTimeAsSeconds();
-							delta_time = new_time - prev_time;
-
-							new_pos = npc.GetWorldPosition();
-							delta_dist = VecDistance2D(prev_pos, new_pos);
-
-							if (delta_dist <= 0.1) 
-							{
-								if (stuck_time == 0) stuck_time = new_time;
-							}
-							else stuck_time = 0;
-
-							if (!slide && VecDistance2D(prev_pos, dest) <= 2.5 && dest_adjusted.Z - prev_pos.Z <= 2 ) 
-							{
-								GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_gabriel_aim_idle_lp', 'PLAYER_SLOT', settings);
-								
-								ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor1 );
-								ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor2 );
-								ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor3 );
-								ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor4 );
-								ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor5 );
-								ACSGetCEntity('ACS_TK_Mark').StopEffect('lightning_red_no_sound');
-
-								movementAdjustor2.SlideTowards( ticket2, GetWitcherPlayer(), dist, dist );	
-								teleport = false;
-								slide = true;
-								slide_time = new_time;
-							}
-									
-							if (teleport) 
-							{
-								GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_gabriel_aim_idle_lp', 'PLAYER_SLOT', settings);
-								
-								ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor1 );
-								ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor2 );
-								ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor3 );
-								ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor4 );
-								ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor5 );
-								ACSGetCEntity('ACS_TK_Mark').StopEffect('lightning_red_no_sound');
-								
-								progress += progress_inc*delta_time;
-										
-								npc.Teleport( LerpV(new_pos, dest_adjusted, progress) );
-							}	
-									
-							prev_pos = new_pos;
-							prev_time = new_time;
-							SleepOneFrame();
-						}
-						
-						GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( '', 'PLAYER_SLOT', settings);
-					}
-				}
-				else 
-				{
-					if( npc.GetAttitude(GetWitcherPlayer()) == AIA_Hostile && npc.IsAlive() )
-					{	
-						markerTemplate = (CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\fx\acs_ice_breathe_old.w2ent", true );
-						
-						pull_anchor1 = (CEntity)theGame.CreateEntity( markerTemplate, npc.GetWorldPosition(), npc.GetWorldRotation() );
-						pull_anchor2 = (CEntity)theGame.CreateEntity( markerTemplate, npc.GetWorldPosition(), npc.GetWorldRotation() );
-						pull_anchor3 = (CEntity)theGame.CreateEntity( markerTemplate, npc.GetWorldPosition(), npc.GetWorldRotation() );
-						pull_anchor4 = (CEntity)theGame.CreateEntity( markerTemplate, npc.GetWorldPosition(), npc.GetWorldRotation() );
-						pull_anchor5 = (CEntity)theGame.CreateEntity( markerTemplate, npc.GetWorldPosition(), npc.GetWorldRotation() );
-
-						/*
-						pull_anchor1 = npc.CreateFXEntityAtPelvis('runeword_4', false);
-						pull_anchor2 = npc.CreateFXEntityAtPelvis('runeword_4', false);
-						pull_anchor3 = npc.CreateFXEntityAtPelvis('runeword_4', false);
-						*/
-
-						pull_anchor1.CreateAttachment( npc, , Vector( 0, 0, 1.5 ) );	
-						pull_anchor2.CreateAttachment( npc, , Vector( 0.25, 0, 1 ) );				
-						pull_anchor3.CreateAttachment( npc, , Vector( -0.25, 0, 1 ) );
-						pull_anchor4.CreateAttachment( npc, , Vector( 0.25, 0, 0 ) );
-						pull_anchor5.CreateAttachment( npc, , Vector( -0.25, 0, 0 ) );
-						pull_anchor1.DestroyAfter(10);
-						pull_anchor2.DestroyAfter(10);
-						pull_anchor3.DestroyAfter(10);
-						pull_anchor4.DestroyAfter(10);
-						pull_anchor5.DestroyAfter(10);
-						
-						SleepOneFrame();
-
-						ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor1 );
-						ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor2 );
-						ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor3 );
-						ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor4 );
-						ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor5 );
-						ACSGetCEntity('ACS_TK_Mark').StopEffect('lightning_red_no_sound');
-						
-						if (!theGame.IsDialogOrCutscenePlaying() 
-						|| !GetWitcherPlayer().IsInNonGameplayCutscene() 
-						|| !GetWitcherPlayer().IsInGameplayScene()
-						//&& !GetWitcherPlayer().IsSwimming()
-						|| !GetWitcherPlayer().IsUsingHorse()
-						|| !GetWitcherPlayer().IsUsingVehicle()
-						)
-						{
-							movementAdjustor1.RotateTowards( ticket1, npc );
-						}
-						
-						npc.RemoveAllBuffsOfType( EET_HeavyKnockdown );
-					
-						npc.RemoveAllBuffsOfType( EET_Knockdown );
-					
-						npc.RemoveAllBuffsOfType( EET_LongStagger );
-					
-						npc.RemoveAllBuffsOfType( EET_Ragdoll );
-						
-						npc.RemoveAllBuffsOfType( EET_Stagger );
-						
-						npc.RemoveAllBuffsOfType( EET_Paralyzed );
-						
-						npc.EnableCollisions(false);
-
-						Sleep(0.1);
-						
-						if (npc.UsesEssence())
-						{
-							if (npc.IsAnimal())
-							{
-								npc.EnableCharacterCollisions(false);
-								npc.AddEffectDefault( EET_Paralyzed, npc, 'console' );
-							}
-							else
-							{
-								if (!npc.IsImmuneToBuff(EET_LongStagger) && !npc.HasAbility('Flying') && ( (CMovingPhysicalAgentComponent)( npc.GetMovingAgentComponent() ) ).HasRagdoll())
-								//if (!npc.IsImmuneToBuff(EET_HeavyKnockdown) && !npc.HasAbility('Flying') && ( (CMovingPhysicalAgentComponent)( npc.GetMovingAgentComponent() ) ).HasRagdoll())
-								{
-									//npc.AddEffectDefault( EET_Ragdoll, npc, 'console' );
-									npc.AddEffectDefault( EET_LongStagger, npc, 'console' );
-									//npc.AddEffectDefault( EET_HeavyKnockdown, npc, 'console' );
-								}
-								else
-								{
-									npc.AddEffectDefault( EET_Paralyzed, npc, 'console' );
-								}
-							}
-						}
-						else if (!npc.UsesEssence())
-						{
-							if (npc.IsUsingVehicle()) 
-							{
-								npc.SignalGameplayEventParamInt( 'RidingManagerDismountHorse', DT_instant | DT_fromScript );
-								//npc.AddEffectDefault( EET_Paralyzed, npc, 'console' );
-								//npc.AddEffectDefault( EET_Ragdoll, npc, 'console' );
-								npc.AddEffectDefault( EET_LongStagger, npc, 'console' );
-							}
-							else
-							{
-								if (npc.IsAnimal())
-								{
-									npc.EnableCharacterCollisions(false);
-									npc.AddEffectDefault( EET_Paralyzed, npc, 'console' );
-								}
-								else
-								{
-									if (!npc.IsImmuneToBuff(EET_LongStagger) && !npc.HasAbility('Flying') && ( (CMovingPhysicalAgentComponent)( npc.GetMovingAgentComponent() ) ).HasRagdoll())
-									//if (!npc.IsImmuneToBuff(EET_HeavyKnockdown) && !npc.HasAbility('Flying') && ( (CMovingPhysicalAgentComponent)( npc.GetMovingAgentComponent() ) ).HasRagdoll())
-									{
-										//npc.AddEffectDefault( EET_Ragdoll, npc, 'console' );
-										npc.AddEffectDefault( EET_LongStagger, npc, 'console' );
-										//npc.AddEffectDefault( EET_HeavyKnockdown, npc, 'console' );
-									}
-									else
-									{
-										npc.AddEffectDefault( EET_Paralyzed, npc, 'console' );
-									}
-								}
-							}
-						}
-						
-						while (true) 
-						{
-							//animatedComponent.PlaySlotAnimationAsync ( 'man_geralt_gabriel_aim_idle_lp', 'PLAYER_SLOT', settings);
-							
-							new_time = theGame.GetEngineTimeAsSeconds();
-							delta_time = new_time - prev_time;
-
-							new_pos = npc.GetWorldPosition();
-							delta_dist = VecDistance2D(prev_pos, new_pos);
-
-							if (delta_dist <= 0.1) 
-							{
-								if (stuck_time == 0) stuck_time = new_time;
-							}
-							else stuck_time = 0;
-
-							if (!slide && VecDistance2D(prev_pos, dest) <= 2.5 && dest_adjusted.Z - prev_pos.Z <= 2 ) 
-							{	
-								GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_gabriel_aim_idle_lp', 'PLAYER_SLOT', settings);
-								
-								ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor1 );
-								ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor2 );
-								ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor3 );
-								ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor4 );
-								ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor5 );
-								ACSGetCEntity('ACS_TK_Mark').StopEffect('lightning_red_no_sound');
-
-								//movementAdjustor2.SlideTo( ticket2, dest );	
-								movementAdjustor2.SlideTowards( ticket2, GetWitcherPlayer(), dist, dist );	
-								teleport = false;
-								slide = true;
-								slide_time = new_time;
-							}
-									
-							if (teleport) 
-							{
-								GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_gabriel_aim_idle_lp', 'PLAYER_SLOT', settings);
-								
-								ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor1 );
-								ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor2 );
-								ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor3 );
-								ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor4 );
-								ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor5 );
-								ACSGetCEntity('ACS_TK_Mark').StopEffect('lightning_red_no_sound');
-								
-								progress += progress_inc*delta_time;
-									
-								npc.Teleport( LerpV(new_pos, dest_adjusted, progress) );
-							}	
-									
-							prev_pos = new_pos;
-							prev_time = new_time;
-							
-							SleepOneFrame();
-						}					
-						GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( '', 'PLAYER_SLOT', settings);
-					}
-				}
-			}
-		}
-	}
-	
-
-	latent function Pull_Single()
-	{
-		ACSGetCEntity('ACS_pull_anchor1').Destroy();
-		ACSGetCEntity('ACS_pull_anchor2').Destroy();
-		ACSGetCEntity('ACS_pull_anchor3').Destroy();
-
-		ACSGetCEntity('ACS_TK_Mark').Destroy();
-
-		ent_2 = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( 
-
-		"dlc\dlc_acs\data\fx\acs_ice_breathe_old.w2ent"
-
-		, true ), thePlayer.GetWorldPosition() );
-
-		ent_2.AddTag('ACS_TK_Mark');
-
-		ent_2.CreateAttachment( GetWitcherPlayer(), 'l_weapon' );
-
-		ent_2.DestroyAfter(10);
-		
-		settings.blendIn = 0.175f;
-		settings.blendOut = 1.f;
-
-		GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_gabriel_aim_idle_lp', 'PLAYER_SLOT', settings);
-		
-		npc = (CActor)( GetWitcherPlayer().GetDisplayTarget() );
-			
-		dest = GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * -1.1;
-		dest_adjusted = dest + Vector(0, 0, 1.25, 0);
-		initial_dist = VecDistance2D(npc.GetWorldPosition(), dest);
-			
-		dist = (((CMovingPhysicalAgentComponent)actor.GetMovingAgentComponent()).GetCapsuleRadius() 
-		+ ((CMovingPhysicalAgentComponent)GetWitcherPlayer().GetMovingAgentComponent()).GetCapsuleRadius()) * 2.125;
-			
-		prev_time = theGame.GetEngineTimeAsSeconds();
-		stuck_time = 0;
-
-		speed = 4;
-		progress = 0;
-		progress_inc = (speed / VecDistance2D(npc.GetWorldPosition(), dest_adjusted)) / 2.3;
-
-		teleport = true;
-		slide = false;
-
-		prev_pos = npc.GetWorldPosition();
-			
-		movementAdjustor1 = GetWitcherPlayer().GetMovingAgentComponent().GetMovementAdjustor();
-		movementAdjustor1.CancelByName( 'ACS_TK_turn' );
-		ticket1 = movementAdjustor1.CreateNewRequest( 'ACS_TK_turn' );
-		movementAdjustor1.AdjustmentDuration( ticket1, 0.5 );
-			
-		movementAdjustor2 = npc.GetMovingAgentComponent().GetMovementAdjustor();
-		movementAdjustor2.CancelByName( 'ACS_pull_mult' );
-		ticket2 = movementAdjustor2.CreateNewRequest( 'ACS_pull_mult' );
-		slideDuration = VecDistance2D( prev_pos, dest ) / speed;
-		movementAdjustor2.AdjustmentDuration( ticket2, slideDuration );
-		movementAdjustor2.ShouldStartAt(ticket2, prev_pos);
-		movementAdjustor2.AdjustLocationVertically( ticket2, true );
-		movementAdjustor2.ScaleAnimationLocationVertically( ticket2, true );
-		movementAdjustor2.MaxLocationAdjustmentSpeed( ticket2, 10000000 );
-			
-		SleepOneFrame();
-
-		if (GetWitcherPlayer().IsInCombat())
-		{
-			if( npc.GetAttitude(GetWitcherPlayer()) == AIA_Hostile && npc.IsAlive() )
-			{	
-				markerTemplate = (CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\fx\acs_ice_breathe_old.w2ent", true );
-						
-						pull_anchor1 = (CEntity)theGame.CreateEntity( markerTemplate, npc.GetWorldPosition(), npc.GetWorldRotation() );
-						pull_anchor2 = (CEntity)theGame.CreateEntity( markerTemplate, npc.GetWorldPosition(), npc.GetWorldRotation() );
-						pull_anchor3 = (CEntity)theGame.CreateEntity( markerTemplate, npc.GetWorldPosition(), npc.GetWorldRotation() );
-
-						/*
-						pull_anchor1 = npc.CreateFXEntityAtPelvis('runeword_4', false);
-						pull_anchor2 = npc.CreateFXEntityAtPelvis('runeword_4', false);
-						pull_anchor3 = npc.CreateFXEntityAtPelvis('runeword_4', false);
-						*/
-				pull_anchor1.AddTag('ACS_pull_anchor1');
-				pull_anchor2.AddTag('ACS_pull_anchor2');
-				pull_anchor3.AddTag('ACS_pull_anchor3');
-				pull_anchor1.CreateAttachment( npc, , Vector( 0, 0, 1.5 ) );	
-				pull_anchor2.CreateAttachment( npc, , Vector( 0.25, 0, 1 ) );				
-				pull_anchor3.CreateAttachment( npc, , Vector( -0.25, 0, 1 ) );
-				pull_anchor1.DestroyAfter(10);
-				pull_anchor2.DestroyAfter(10);
-				pull_anchor3.DestroyAfter(10);
-						
-				if (!theGame.IsDialogOrCutscenePlaying() 
-				|| !GetWitcherPlayer().IsInNonGameplayCutscene() 
-				|| !GetWitcherPlayer().IsInGameplayScene()
-				//&& !GetWitcherPlayer().IsSwimming()
-				|| !GetWitcherPlayer().IsUsingHorse()
-				|| !GetWitcherPlayer().IsUsingVehicle()
-				)
-				{
-					movementAdjustor1.RotateTowards( ticket1, npc );
-				}
-						
-				npc.RemoveAllBuffsOfType( EET_HeavyKnockdown );
-					
-				npc.RemoveAllBuffsOfType( EET_Knockdown );
-					
-				npc.RemoveAllBuffsOfType( EET_LongStagger );
-					
-				npc.RemoveAllBuffsOfType( EET_Ragdoll );
 				
-				npc.RemoveAllBuffsOfType( EET_Stagger );
-						
-				npc.RemoveAllBuffsOfType( EET_Paralyzed );
+			SleepOneFrame();
 
-				Sleep(0.1);
+			if (GetWitcherPlayer().IsInCombat())
+			{
+				if( npc.GetAttitude(GetWitcherPlayer()) == AIA_Hostile && npc.IsAlive() )
+				{	
+					markerTemplate = (CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\fx\acs_ice_breathe_old.w2ent", true );
+							
+							pull_anchor1 = (CEntity)theGame.CreateEntity( markerTemplate, npc.GetWorldPosition(), npc.GetWorldRotation() );
+							pull_anchor2 = (CEntity)theGame.CreateEntity( markerTemplate, npc.GetWorldPosition(), npc.GetWorldRotation() );
+							pull_anchor3 = (CEntity)theGame.CreateEntity( markerTemplate, npc.GetWorldPosition(), npc.GetWorldRotation() );
+
+							/*
+							pull_anchor1 = npc.CreateFXEntityAtPelvis('runeword_4', false);
+							pull_anchor2 = npc.CreateFXEntityAtPelvis('runeword_4', false);
+							pull_anchor3 = npc.CreateFXEntityAtPelvis('runeword_4', false);
+							*/
+					pull_anchor1.AddTag('ACS_pull_anchor1');
+					pull_anchor2.AddTag('ACS_pull_anchor2');
+					pull_anchor3.AddTag('ACS_pull_anchor3');
+					pull_anchor1.CreateAttachment( npc, , Vector( 0, 0, 1.5 ) );	
+					pull_anchor2.CreateAttachment( npc, , Vector( 0.25, 0, 1 ) );				
+					pull_anchor3.CreateAttachment( npc, , Vector( -0.25, 0, 1 ) );
+					pull_anchor1.DestroyAfter(10);
+					pull_anchor2.DestroyAfter(10);
+					pull_anchor3.DestroyAfter(10);
+							
+					if (!theGame.IsDialogOrCutscenePlaying() 
+					|| !GetWitcherPlayer().IsInNonGameplayCutscene() 
+					|| !GetWitcherPlayer().IsInGameplayScene()
+					//&& !GetWitcherPlayer().IsSwimming()
+					|| !GetWitcherPlayer().IsUsingHorse()
+					|| !GetWitcherPlayer().IsUsingVehicle()
+					)
+					{
+						movementAdjustor1.RotateTowards( ticket1, npc );
+					}
+							
+					npc.RemoveAllBuffsOfType( EET_HeavyKnockdown );
+						
+					npc.RemoveAllBuffsOfType( EET_Knockdown );
+						
+					npc.RemoveAllBuffsOfType( EET_LongStagger );
+						
+					npc.RemoveAllBuffsOfType( EET_Ragdoll );
 					
-				if (npc.UsesEssence())
-				{
-					if (npc.IsAnimal())
-					{
-						npc.EnableCharacterCollisions(false);
-						npc.AddEffectDefault( EET_Paralyzed, npc, 'console' );
-					}
-					else
-					{
-						if (!npc.IsImmuneToBuff(EET_LongStagger) && !npc.HasAbility('Flying') && ( (CMovingPhysicalAgentComponent)( npc.GetMovingAgentComponent() ) ).HasRagdoll())
-						//if (!npc.IsImmuneToBuff(EET_HeavyKnockdown) && !npc.HasAbility('Flying') && ( (CMovingPhysicalAgentComponent)( npc.GetMovingAgentComponent() ) ).HasRagdoll())
-						{
-							//npc.AddEffectDefault( EET_Ragdoll, npc, 'console' );
-							npc.AddEffectDefault( EET_LongStagger, npc, 'console' );
-							//npc.AddEffectDefault( EET_HeavyKnockdown, npc, 'console' );
-						}
-						else
-						{
-							npc.AddEffectDefault( EET_Paralyzed, npc, 'console' );
-						}
-					}
-				}
-				else if (!npc.UsesEssence())
-				{
-					if (npc.IsUsingVehicle()) 
-					{
-						npc.SignalGameplayEventParamInt( 'RidingManagerDismountHorse', DT_instant | DT_fromScript );
-						//npc.AddEffectDefault( EET_Paralyzed, npc, 'console' );
-						//npc.AddEffectDefault( EET_Ragdoll, npc, 'console' );
-						npc.AddEffectDefault( EET_LongStagger, npc, 'console' );
-					}
-					else
+					npc.RemoveAllBuffsOfType( EET_Stagger );
+							
+					npc.RemoveAllBuffsOfType( EET_Paralyzed );
+
+					Sleep(0.1);
+						
+					if (npc.UsesEssence())
 					{
 						if (npc.IsAnimal())
 						{
@@ -653,220 +172,679 @@ state ACS_TK_Engage in cACS_TK
 							}
 						}
 					}
-				}							
-				while (true) 
-				{
-					//animatedComponent.PlaySlotAnimationAsync ( 'man_geralt_gabriel_aim_idle_lp', 'PLAYER_SLOT', settings);
-							
-					new_time = theGame.GetEngineTimeAsSeconds();
-					delta_time = new_time - prev_time;
-
-					new_pos = npc.GetWorldPosition();
-					delta_dist = VecDistance2D(prev_pos, new_pos);
-
-					if (delta_dist <= 0.1) 
+					else if (!npc.UsesEssence())
 					{
-						if (stuck_time == 0) stuck_time = new_time;
-					}
-					else stuck_time = 0;
-
-					if (!slide && VecDistance2D(prev_pos, dest) <= 2.5 && dest_adjusted.Z - prev_pos.Z <= 2 ) 
+						if (npc.IsUsingVehicle()) 
+						{
+							npc.SignalGameplayEventParamInt( 'RidingManagerDismountHorse', DT_instant | DT_fromScript );
+							//npc.AddEffectDefault( EET_Paralyzed, npc, 'console' );
+							//npc.AddEffectDefault( EET_Ragdoll, npc, 'console' );
+							npc.AddEffectDefault( EET_LongStagger, npc, 'console' );
+						}
+						else
+						{
+							if (npc.IsAnimal())
+							{
+								npc.EnableCharacterCollisions(false);
+								npc.AddEffectDefault( EET_Paralyzed, npc, 'console' );
+							}
+							else
+							{
+								if (!npc.IsImmuneToBuff(EET_LongStagger) && !npc.HasAbility('Flying') && ( (CMovingPhysicalAgentComponent)( npc.GetMovingAgentComponent() ) ).HasRagdoll())
+								//if (!npc.IsImmuneToBuff(EET_HeavyKnockdown) && !npc.HasAbility('Flying') && ( (CMovingPhysicalAgentComponent)( npc.GetMovingAgentComponent() ) ).HasRagdoll())
+								{
+									//npc.AddEffectDefault( EET_Ragdoll, npc, 'console' );
+									npc.AddEffectDefault( EET_LongStagger, npc, 'console' );
+									//npc.AddEffectDefault( EET_HeavyKnockdown, npc, 'console' );
+								}
+								else
+								{
+									npc.AddEffectDefault( EET_Paralyzed, npc, 'console' );
+								}
+							}
+						}
+					}							
+					while (true) 
 					{
-						GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_gabriel_aim_idle_lp', 'PLAYER_SLOT', settings);
+						//animatedComponent.PlaySlotAnimationAsync ( 'man_geralt_gabriel_aim_idle_lp', 'PLAYER_SLOT', settings);
 								
-						ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor1 );
-						ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor2 );
-						ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor3 );
-						ACSGetCEntity('ACS_TK_Mark').StopEffect('lightning_red_no_sound');
+						new_time = theGame.GetEngineTimeAsSeconds();
+						delta_time = new_time - prev_time;
 
-						movementAdjustor2.SlideTowards( ticket2, GetWitcherPlayer(), dist, dist );	
-						teleport = false;
-						slide = true;
-						slide_time = new_time;
-					}
+						new_pos = npc.GetWorldPosition();
+						delta_dist = VecDistance2D(prev_pos, new_pos);
+
+						if (delta_dist <= 0.1) 
+						{
+							if (stuck_time == 0) stuck_time = new_time;
+						}
+						else stuck_time = 0;
+
+						if (!slide && VecDistance2D(prev_pos, dest) <= 2.5 && dest_adjusted.Z - prev_pos.Z <= 2 ) 
+						{
+							GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_gabriel_aim_idle_lp', 'PLAYER_SLOT', settings);
 									
-					if (teleport) 
-					{
-						GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_gabriel_aim_idle_lp', 'PLAYER_SLOT', settings);
+							ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor1 );
+							ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor2 );
+							ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor3 );
+							ACSGetCEntity('ACS_TK_Mark').StopEffect('lightning_red_no_sound');
 
-						ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor1 );
-						ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor2 );
-						ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor3 );
-						ACSGetCEntity('ACS_TK_Mark').StopEffect('lightning_red_no_sound');
-
-						progress += progress_inc*delta_time;
+							movementAdjustor2.SlideTowards( ticket2, GetWitcherPlayer(), dist, dist );	
+							teleport = false;
+							slide = true;
+							slide_time = new_time;
+						}
 										
-						npc.Teleport( LerpV(new_pos, dest_adjusted, progress) );
-					}	
-									
-					prev_pos = new_pos;
-					prev_time = new_time;
+						if (teleport) 
+						{
+							GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_gabriel_aim_idle_lp', 'PLAYER_SLOT', settings);
+
+							ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor1 );
+							ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor2 );
+							ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor3 );
+							ACSGetCEntity('ACS_TK_Mark').StopEffect('lightning_red_no_sound');
+
+							progress += progress_inc*delta_time;
+											
+							npc.Teleport( LerpV(new_pos, dest_adjusted, progress) );
+						}	
+										
+						prev_pos = new_pos;
+						prev_time = new_time;
+								
+						SleepOneFrame();
+					}
 							
-					SleepOneFrame();
+					GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( '', 'PLAYER_SLOT', settings);
 				}
+			}
+			else 
+			{
+				if( npc.GetAttitude(GetWitcherPlayer()) == AIA_Hostile && npc.IsAlive() )
+				{	
+					markerTemplate = (CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\fx\acs_ice_breathe_old.w2ent", true );
+							
+							pull_anchor1 = (CEntity)theGame.CreateEntity( markerTemplate, npc.GetWorldPosition(), npc.GetWorldRotation() );
+							pull_anchor2 = (CEntity)theGame.CreateEntity( markerTemplate, npc.GetWorldPosition(), npc.GetWorldRotation() );
+							pull_anchor3 = (CEntity)theGame.CreateEntity( markerTemplate, npc.GetWorldPosition(), npc.GetWorldRotation() );
+
+							/*
+							pull_anchor1 = npc.CreateFXEntityAtPelvis('runeword_4', false);
+							pull_anchor2 = npc.CreateFXEntityAtPelvis('runeword_4', false);
+							pull_anchor3 = npc.CreateFXEntityAtPelvis('runeword_4', false);
+							*/
+					pull_anchor1.AddTag('ACS_pull_anchor1');
+					pull_anchor2.AddTag('ACS_pull_anchor2');
+					pull_anchor3.AddTag('ACS_pull_anchor3');
+					pull_anchor1.CreateAttachment( npc, , Vector( 0, 0, 1.5 ) );	
+					pull_anchor2.CreateAttachment( npc, , Vector( 0.25, 0, 1 ) );				
+					pull_anchor3.CreateAttachment( npc, , Vector( -0.25, 0, 1 ) );
+					pull_anchor1.DestroyAfter(10);
+					pull_anchor2.DestroyAfter(10);
+					pull_anchor3.DestroyAfter(10);
+
+					if (!theGame.IsDialogOrCutscenePlaying() 
+					|| !GetWitcherPlayer().IsInNonGameplayCutscene() 
+					|| !GetWitcherPlayer().IsInGameplayScene()
+					//&& !GetWitcherPlayer().IsSwimming()
+					|| !GetWitcherPlayer().IsUsingHorse()
+					|| !GetWitcherPlayer().IsUsingVehicle()
+					)
+					{
+						movementAdjustor1.RotateTowards( ticket1, npc );
+					}
+							
+					npc.RemoveAllBuffsOfType( EET_HeavyKnockdown );
 						
-				GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( '', 'PLAYER_SLOT', settings);
+					npc.RemoveAllBuffsOfType( EET_Knockdown );
+						
+					npc.RemoveAllBuffsOfType( EET_LongStagger );
+						
+					npc.RemoveAllBuffsOfType( EET_Ragdoll );
+							
+					npc.RemoveAllBuffsOfType( EET_Stagger );
+							
+					npc.RemoveAllBuffsOfType( EET_Paralyzed );
+							
+					npc.EnableCollisions(false);
+
+					Sleep(0.1);
+							
+					if (npc.UsesEssence())
+					{
+						if (npc.IsAnimal())
+						{
+							npc.EnableCharacterCollisions(false);
+							npc.AddEffectDefault( EET_Paralyzed, npc, 'console' );
+						}
+						else
+						{
+							if (!npc.IsImmuneToBuff(EET_LongStagger) && !npc.HasAbility('Flying') && ( (CMovingPhysicalAgentComponent)( npc.GetMovingAgentComponent() ) ).HasRagdoll())
+							//if (!npc.IsImmuneToBuff(EET_HeavyKnockdown) && !npc.HasAbility('Flying') && ( (CMovingPhysicalAgentComponent)( npc.GetMovingAgentComponent() ) ).HasRagdoll())
+							{
+								//npc.AddEffectDefault( EET_Ragdoll, npc, 'console' );
+								npc.AddEffectDefault( EET_LongStagger, npc, 'console' );
+								//npc.AddEffectDefault( EET_HeavyKnockdown, npc, 'console' );
+							}
+							else
+							{
+								npc.AddEffectDefault( EET_Paralyzed, npc, 'console' );
+							}
+						}
+					}
+					else if (!npc.UsesEssence())
+					{
+						if (npc.IsUsingVehicle()) 
+						{
+							npc.SignalGameplayEventParamInt( 'RidingManagerDismountHorse', DT_instant | DT_fromScript );
+							//npc.AddEffectDefault( EET_Paralyzed, npc, 'console' );
+							//npc.AddEffectDefault( EET_Ragdoll, npc, 'console' );
+							npc.AddEffectDefault( EET_LongStagger, npc, 'console' );
+						}
+						else
+						{
+							if (npc.IsAnimal())
+							{
+								npc.EnableCharacterCollisions(false);
+								npc.AddEffectDefault( EET_Paralyzed, npc, 'console' );
+							}
+							else
+							{
+								if (!npc.IsImmuneToBuff(EET_LongStagger) && !npc.HasAbility('Flying') && ( (CMovingPhysicalAgentComponent)( npc.GetMovingAgentComponent() ) ).HasRagdoll())
+								//if (!npc.IsImmuneToBuff(EET_HeavyKnockdown) && !npc.HasAbility('Flying') && ( (CMovingPhysicalAgentComponent)( npc.GetMovingAgentComponent() ) ).HasRagdoll())
+								{
+									//npc.AddEffectDefault( EET_Ragdoll, npc, 'console' );
+									npc.AddEffectDefault( EET_LongStagger, npc, 'console' );
+									//npc.AddEffectDefault( EET_HeavyKnockdown, npc, 'console' );
+								}
+								else
+								{
+									npc.AddEffectDefault( EET_Paralyzed, npc, 'console' );
+								}
+							}
+						}
+					}
+							
+					while (true) 
+					{
+						//animatedComponent.PlaySlotAnimationAsync ( 'man_geralt_gabriel_aim_idle_lp', 'PLAYER_SLOT', settings);
+								
+						new_time = theGame.GetEngineTimeAsSeconds();
+						delta_time = new_time - prev_time;
+
+						new_pos = npc.GetWorldPosition();
+						delta_dist = VecDistance2D(prev_pos, new_pos);
+
+						if (delta_dist <= 0.1) 
+						{
+							if (stuck_time == 0) stuck_time = new_time;
+						}
+						else stuck_time = 0;
+
+						if (!slide && VecDistance2D(prev_pos, dest) <= 2.5 && dest_adjusted.Z - prev_pos.Z <= 2 ) 
+						{	
+							GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_gabriel_aim_idle_lp', 'PLAYER_SLOT', settings);
+
+							ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor1 );
+							ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor2 );
+							ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor3 );
+							ACSGetCEntity('ACS_TK_Mark').StopEffect('lightning_red_no_sound');
+		
+							//movementAdjustor2.SlideTo( ticket2, dest );	
+							movementAdjustor2.SlideTowards( ticket2, GetWitcherPlayer(), dist, dist );	
+							teleport = false;
+							slide = true;
+							slide_time = new_time;
+						}
+										
+						if (teleport) 
+						{
+							GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_gabriel_aim_idle_lp', 'PLAYER_SLOT', settings);
+
+							ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor1 );
+							ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor2 );
+							ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor3 );
+							ACSGetCEntity('ACS_TK_Mark').StopEffect('lightning_red_no_sound');
+									
+							progress += progress_inc*delta_time;
+										
+							npc.Teleport( LerpV(new_pos, dest_adjusted, progress) );
+						}	
+										
+						prev_pos = new_pos;
+						prev_time = new_time;
+								
+						SleepOneFrame();
+					}					
+					GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( '', 'PLAYER_SLOT', settings);
+				}
 			}
 		}
-		else 
+		else
 		{
-			if( npc.GetAttitude(GetWitcherPlayer()) == AIA_Hostile && npc.IsAlive() )
-			{	
-				markerTemplate = (CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\fx\acs_ice_breathe_old.w2ent", true );
-						
-						pull_anchor1 = (CEntity)theGame.CreateEntity( markerTemplate, npc.GetWorldPosition(), npc.GetWorldRotation() );
-						pull_anchor2 = (CEntity)theGame.CreateEntity( markerTemplate, npc.GetWorldPosition(), npc.GetWorldRotation() );
-						pull_anchor3 = (CEntity)theGame.CreateEntity( markerTemplate, npc.GetWorldPosition(), npc.GetWorldRotation() );
+			ACSGetCEntity('ACS_pull_anchor1').Destroy();
+			ACSGetCEntity('ACS_pull_anchor2').Destroy();
+			ACSGetCEntity('ACS_pull_anchor3').Destroy();
+			ACSGetCEntity('ACS_pull_anchor4').Destroy();
+			ACSGetCEntity('ACS_pull_anchor5').Destroy();
 
-						/*
-						pull_anchor1 = npc.CreateFXEntityAtPelvis('runeword_4', false);
-						pull_anchor2 = npc.CreateFXEntityAtPelvis('runeword_4', false);
-						pull_anchor3 = npc.CreateFXEntityAtPelvis('runeword_4', false);
-						*/
-				pull_anchor1.AddTag('ACS_pull_anchor1');
-				pull_anchor2.AddTag('ACS_pull_anchor2');
-				pull_anchor3.AddTag('ACS_pull_anchor3');
-				pull_anchor1.CreateAttachment( npc, , Vector( 0, 0, 1.5 ) );	
-				pull_anchor2.CreateAttachment( npc, , Vector( 0.25, 0, 1 ) );				
-				pull_anchor3.CreateAttachment( npc, , Vector( -0.25, 0, 1 ) );
-				pull_anchor1.DestroyAfter(10);
-				pull_anchor2.DestroyAfter(10);
-				pull_anchor3.DestroyAfter(10);
+			ACSGetCEntity('ACS_TK_Mark').Destroy();
 
-				if (!theGame.IsDialogOrCutscenePlaying() 
-				|| !GetWitcherPlayer().IsInNonGameplayCutscene() 
-				|| !GetWitcherPlayer().IsInGameplayScene()
-				//&& !GetWitcherPlayer().IsSwimming()
-				|| !GetWitcherPlayer().IsUsingHorse()
-				|| !GetWitcherPlayer().IsUsingVehicle()
-				)
-				{
-					movementAdjustor1.RotateTowards( ticket1, npc );
-				}
-						
-				npc.RemoveAllBuffsOfType( EET_HeavyKnockdown );
-					
-				npc.RemoveAllBuffsOfType( EET_Knockdown );
-					
-				npc.RemoveAllBuffsOfType( EET_LongStagger );
-					
-				npc.RemoveAllBuffsOfType( EET_Ragdoll );
-						
-				npc.RemoveAllBuffsOfType( EET_Stagger );
-						
-				npc.RemoveAllBuffsOfType( EET_Paralyzed );
-						
-				npc.EnableCollisions(false);
+			ent_2 = theGame.CreateEntity( (CEntityTemplate)LoadResourceAsync( 
 
-				Sleep(0.1);
-						
-				if (npc.UsesEssence())
+			"dlc\dlc_acs\data\fx\acs_ice_breathe_old.w2ent"
+
+			, true ), thePlayer.GetWorldPosition() );
+
+			ent_2.AddTag('ACS_TK_Mark');
+
+			ent_2.CreateAttachment( GetWitcherPlayer(), 'l_weapon' );
+
+			ent_2.DestroyAfter(10);
+			
+			settings.blendIn = 0.175f;
+			settings.blendOut = 1.f;
+
+			GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_gabriel_aim_idle_lp', 'PLAYER_SLOT', settings);
+			
+			victimsarray = GetActorsInRange(GetWitcherPlayer(), 25, 25);
+			
+			for( i = 0; i < victimsarray.Size(); i += 1 )
+			{		
+				npc = (CActor)victimsarray[i];
+				
+				dest = GetWitcherPlayer().GetWorldPosition() + GetWitcherPlayer().GetWorldForward() * -1.1;
+				dest_adjusted = dest + Vector(0, 0, 1.25, 0);
+				initial_dist = VecDistance2D(npc.GetWorldPosition(), dest);
+				
+				dist = (((CMovingPhysicalAgentComponent)actor.GetMovingAgentComponent()).GetCapsuleRadius() 
+				+ ((CMovingPhysicalAgentComponent)GetWitcherPlayer().GetMovingAgentComponent()).GetCapsuleRadius()) * 2.125;
+				
+				prev_time = theGame.GetEngineTimeAsSeconds();
+				stuck_time = 0;
+
+				speed = 4;
+				progress = 0;
+				progress_inc = (speed / VecDistance2D(npc.GetWorldPosition(), dest_adjusted)) / 2.3;
+
+				teleport = true;
+				slide = false;
+
+				prev_pos = npc.GetWorldPosition();
+				
+				movementAdjustor1 = GetWitcherPlayer().GetMovingAgentComponent().GetMovementAdjustor();
+				movementAdjustor1.CancelByName( 'ACS_TK_turn' );
+				ticket1 = movementAdjustor1.CreateNewRequest( 'ACS_TK_turn' );
+				movementAdjustor1.AdjustmentDuration( ticket1, 0.5 );
+				
+				movementAdjustor2 = npc.GetMovingAgentComponent().GetMovementAdjustor();
+				movementAdjustor2.CancelByName( 'ACS_pull_mult' );
+				ticket2 = movementAdjustor2.CreateNewRequest( 'ACS_pull_mult' );
+				slideDuration = VecDistance2D( prev_pos, dest ) / speed;
+				movementAdjustor2.AdjustmentDuration( ticket2, slideDuration );
+				movementAdjustor2.ShouldStartAt(ticket2, prev_pos);
+				movementAdjustor2.AdjustLocationVertically( ticket2, true );
+				movementAdjustor2.ScaleAnimationLocationVertically( ticket2, true );
+				movementAdjustor2.MaxLocationAdjustmentSpeed( ticket2, 10000000 );
+				
+				SleepOneFrame();
+				
+				if ( victimsarray.Size() >0 )
 				{
-					if (npc.IsAnimal())
+					if (GetWitcherPlayer().IsInCombat())
 					{
-						npc.EnableCharacterCollisions(false);
-						npc.AddEffectDefault( EET_Paralyzed, npc, 'console' );
-					}
-					else
-					{
-						if (!npc.IsImmuneToBuff(EET_LongStagger) && !npc.HasAbility('Flying') && ( (CMovingPhysicalAgentComponent)( npc.GetMovingAgentComponent() ) ).HasRagdoll())
-						//if (!npc.IsImmuneToBuff(EET_HeavyKnockdown) && !npc.HasAbility('Flying') && ( (CMovingPhysicalAgentComponent)( npc.GetMovingAgentComponent() ) ).HasRagdoll())
-						{
-							//npc.AddEffectDefault( EET_Ragdoll, npc, 'console' );
-							npc.AddEffectDefault( EET_LongStagger, npc, 'console' );
-							//npc.AddEffectDefault( EET_HeavyKnockdown, npc, 'console' );
-						}
-						else
-						{
-							npc.AddEffectDefault( EET_Paralyzed, npc, 'console' );
-						}
-					}
-				}
-				else if (!npc.UsesEssence())
-				{
-					if (npc.IsUsingVehicle()) 
-					{
-						npc.SignalGameplayEventParamInt( 'RidingManagerDismountHorse', DT_instant | DT_fromScript );
-						//npc.AddEffectDefault( EET_Paralyzed, npc, 'console' );
-						//npc.AddEffectDefault( EET_Ragdoll, npc, 'console' );
-						npc.AddEffectDefault( EET_LongStagger, npc, 'console' );
-					}
-					else
-					{
-						if (npc.IsAnimal())
-						{
-							npc.EnableCharacterCollisions(false);
-							npc.AddEffectDefault( EET_Paralyzed, npc, 'console' );
-						}
-						else
-						{
-							if (!npc.IsImmuneToBuff(EET_LongStagger) && !npc.HasAbility('Flying') && ( (CMovingPhysicalAgentComponent)( npc.GetMovingAgentComponent() ) ).HasRagdoll())
-							//if (!npc.IsImmuneToBuff(EET_HeavyKnockdown) && !npc.HasAbility('Flying') && ( (CMovingPhysicalAgentComponent)( npc.GetMovingAgentComponent() ) ).HasRagdoll())
-							{
-								//npc.AddEffectDefault( EET_Ragdoll, npc, 'console' );
-								npc.AddEffectDefault( EET_LongStagger, npc, 'console' );
-								//npc.AddEffectDefault( EET_HeavyKnockdown, npc, 'console' );
-							}
-							else
-							{
-								npc.AddEffectDefault( EET_Paralyzed, npc, 'console' );
-							}
-						}
-					}
-				}
-						
-				while (true) 
-				{
-					//animatedComponent.PlaySlotAnimationAsync ( 'man_geralt_gabriel_aim_idle_lp', 'PLAYER_SLOT', settings);
+						if( npc.GetAttitude(GetWitcherPlayer()) == AIA_Hostile && npc.IsAlive() )
+						{	
+							markerTemplate = (CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\fx\acs_ice_breathe_old.w2ent", true );
 							
-					new_time = theGame.GetEngineTimeAsSeconds();
-					delta_time = new_time - prev_time;
+							pull_anchor1 = (CEntity)theGame.CreateEntity( markerTemplate, npc.GetWorldPosition(), npc.GetWorldRotation() );
+							pull_anchor2 = (CEntity)theGame.CreateEntity( markerTemplate, npc.GetWorldPosition(), npc.GetWorldRotation() );
+							pull_anchor3 = (CEntity)theGame.CreateEntity( markerTemplate, npc.GetWorldPosition(), npc.GetWorldRotation() );
+							pull_anchor4 = (CEntity)theGame.CreateEntity( markerTemplate, npc.GetWorldPosition(), npc.GetWorldRotation() );
+							pull_anchor5 = (CEntity)theGame.CreateEntity( markerTemplate, npc.GetWorldPosition(), npc.GetWorldRotation() );
 
-					new_pos = npc.GetWorldPosition();
-					delta_dist = VecDistance2D(prev_pos, new_pos);
+							/*
+							pull_anchor1 = npc.CreateFXEntityAtPelvis('runeword_4', false);
+							pull_anchor2 = npc.CreateFXEntityAtPelvis('runeword_4', false);
+							pull_anchor3 = npc.CreateFXEntityAtPelvis('runeword_4', false);
+							*/
 
-					if (delta_dist <= 0.1) 
-					{
-						if (stuck_time == 0) stuck_time = new_time;
-					}
-					else stuck_time = 0;
+							pull_anchor1.CreateAttachment( npc, , Vector( 0, 0, 1.5 ) );	
+							pull_anchor2.CreateAttachment( npc, , Vector( 0.25, 0, 1 ) );				
+							pull_anchor3.CreateAttachment( npc, , Vector( -0.25, 0, 1 ) );
+							pull_anchor4.CreateAttachment( npc, , Vector( 0.25, 0, 0 ) );
+							pull_anchor5.CreateAttachment( npc, , Vector( -0.25, 0, 0 ) );
+							pull_anchor1.DestroyAfter(10);
+							pull_anchor2.DestroyAfter(10);
+							pull_anchor3.DestroyAfter(10);
+							pull_anchor4.DestroyAfter(10);
+							pull_anchor5.DestroyAfter(10);
+							
+							SleepOneFrame();
 
-					if (!slide && VecDistance2D(prev_pos, dest) <= 2.5 && dest_adjusted.Z - prev_pos.Z <= 2 ) 
-					{	
-						GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_gabriel_aim_idle_lp', 'PLAYER_SLOT', settings);
+							ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor1 );
+							ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor2 );
+							ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor3 );
+							ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor4 );
+							ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor5 );
+							ACSGetCEntity('ACS_TK_Mark').StopEffect('lightning_red_no_sound');
+							
+							if (!theGame.IsDialogOrCutscenePlaying() 
+							|| !GetWitcherPlayer().IsInNonGameplayCutscene() 
+							|| !GetWitcherPlayer().IsInGameplayScene()
+							//&& !GetWitcherPlayer().IsSwimming()
+							|| !GetWitcherPlayer().IsUsingHorse()
+							|| !GetWitcherPlayer().IsUsingVehicle()
+							)
+							{
+								movementAdjustor1.RotateTowards( ticket1, npc );
+							}
+							
+							npc.RemoveAllBuffsOfType( EET_HeavyKnockdown );
+						
+							npc.RemoveAllBuffsOfType( EET_Knockdown );
+						
+							npc.RemoveAllBuffsOfType( EET_LongStagger );
+						
+							npc.RemoveAllBuffsOfType( EET_Ragdoll );
+							
+							npc.RemoveAllBuffsOfType( EET_Stagger );
+							
+							npc.RemoveAllBuffsOfType( EET_Paralyzed );
 
-						ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor1 );
-						ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor2 );
-						ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor3 );
-						ACSGetCEntity('ACS_TK_Mark').StopEffect('lightning_red_no_sound');
-	
-						//movementAdjustor2.SlideTo( ticket2, dest );	
-						movementAdjustor2.SlideTowards( ticket2, GetWitcherPlayer(), dist, dist );	
-						teleport = false;
-						slide = true;
-						slide_time = new_time;
-					}
+							Sleep(0.1);
+						
+							if (npc.UsesEssence())
+							{
+								if (npc.IsAnimal())
+								{
+									npc.EnableCharacterCollisions(false);
+									npc.AddEffectDefault( EET_Paralyzed, npc, 'console' );
+								}
+								else
+								{
+									if (!npc.IsImmuneToBuff(EET_LongStagger) && !npc.HasAbility('Flying') && ( (CMovingPhysicalAgentComponent)( npc.GetMovingAgentComponent() ) ).HasRagdoll())
+									//if (!npc.IsImmuneToBuff(EET_HeavyKnockdown) && !npc.HasAbility('Flying') && ( (CMovingPhysicalAgentComponent)( npc.GetMovingAgentComponent() ) ).HasRagdoll())
+									{
+										//npc.AddEffectDefault( EET_Ragdoll, npc, 'console' );
+										npc.AddEffectDefault( EET_LongStagger, npc, 'console' );
+										//npc.AddEffectDefault( EET_HeavyKnockdown, npc, 'console' );
+									}
+									else
+									{
+										npc.AddEffectDefault( EET_Paralyzed, npc, 'console' );
+									}
+								}
+							}
+							else if (!npc.UsesEssence())
+							{
+								if (npc.IsUsingVehicle()) 
+								{
+									npc.SignalGameplayEventParamInt( 'RidingManagerDismountHorse', DT_instant | DT_fromScript );
+									//npc.AddEffectDefault( EET_Paralyzed, npc, 'console' );
+									//npc.AddEffectDefault( EET_Ragdoll, npc, 'console' );
+									npc.AddEffectDefault( EET_LongStagger, npc, 'console' );
+								}
+								else
+								{
+									if (npc.IsAnimal())
+									{
+										npc.EnableCharacterCollisions(false);
+										npc.AddEffectDefault( EET_Paralyzed, npc, 'console' );
+									}
+									else
+									{
+										if (!npc.IsImmuneToBuff(EET_LongStagger) && !npc.HasAbility('Flying') && ( (CMovingPhysicalAgentComponent)( npc.GetMovingAgentComponent() ) ).HasRagdoll())
+										//if (!npc.IsImmuneToBuff(EET_HeavyKnockdown) && !npc.HasAbility('Flying') && ( (CMovingPhysicalAgentComponent)( npc.GetMovingAgentComponent() ) ).HasRagdoll())
+										{
+											//npc.AddEffectDefault( EET_Ragdoll, npc, 'console' );
+											npc.AddEffectDefault( EET_LongStagger, npc, 'console' );
+											//npc.AddEffectDefault( EET_HeavyKnockdown, npc, 'console' );
+										}
+										else
+										{
+											npc.AddEffectDefault( EET_Paralyzed, npc, 'console' );
+										}
+									}
+								}
+							}
 									
-					if (teleport) 
-					{
-						GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_gabriel_aim_idle_lp', 'PLAYER_SLOT', settings);
-
-						ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor1 );
-						ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor2 );
-						ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor3 );
-						ACSGetCEntity('ACS_TK_Mark').StopEffect('lightning_red_no_sound');
+							while (true) 
+							{
+								//animatedComponent.PlaySlotAnimationAsync ( 'man_geralt_gabriel_aim_idle_lp', 'PLAYER_SLOT', settings);
 								
-						progress += progress_inc*delta_time;
+								new_time = theGame.GetEngineTimeAsSeconds();
+								delta_time = new_time - prev_time;
+
+								new_pos = npc.GetWorldPosition();
+								delta_dist = VecDistance2D(prev_pos, new_pos);
+
+								if (delta_dist <= 0.1) 
+								{
+									if (stuck_time == 0) stuck_time = new_time;
+								}
+								else stuck_time = 0;
+
+								if (!slide && VecDistance2D(prev_pos, dest) <= 2.5 && dest_adjusted.Z - prev_pos.Z <= 2 ) 
+								{
+									GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_gabriel_aim_idle_lp', 'PLAYER_SLOT', settings);
 									
-						npc.Teleport( LerpV(new_pos, dest_adjusted, progress) );
-					}	
+									ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor1 );
+									ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor2 );
+									ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor3 );
+									ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor4 );
+									ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor5 );
+									ACSGetCEntity('ACS_TK_Mark').StopEffect('lightning_red_no_sound');
+
+									movementAdjustor2.SlideTowards( ticket2, GetWitcherPlayer(), dist, dist );	
+									teleport = false;
+									slide = true;
+									slide_time = new_time;
+								}
+										
+								if (teleport) 
+								{
+									GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_gabriel_aim_idle_lp', 'PLAYER_SLOT', settings);
 									
-					prev_pos = new_pos;
-					prev_time = new_time;
+									ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor1 );
+									ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor2 );
+									ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor3 );
+									ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor4 );
+									ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor5 );
+									ACSGetCEntity('ACS_TK_Mark').StopEffect('lightning_red_no_sound');
+									
+									progress += progress_inc*delta_time;
+											
+									npc.Teleport( LerpV(new_pos, dest_adjusted, progress) );
+								}	
+										
+								prev_pos = new_pos;
+								prev_time = new_time;
+								SleepOneFrame();
+							}
 							
-					SleepOneFrame();
-				}					
-				GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( '', 'PLAYER_SLOT', settings);
+							GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( '', 'PLAYER_SLOT', settings);
+						}
+					}
+					else 
+					{
+						if( npc.GetAttitude(GetWitcherPlayer()) == AIA_Hostile && npc.IsAlive() )
+						{	
+							markerTemplate = (CEntityTemplate)LoadResourceAsync( "dlc\dlc_acs\data\fx\acs_ice_breathe_old.w2ent", true );
+							
+							pull_anchor1 = (CEntity)theGame.CreateEntity( markerTemplate, npc.GetWorldPosition(), npc.GetWorldRotation() );
+							pull_anchor2 = (CEntity)theGame.CreateEntity( markerTemplate, npc.GetWorldPosition(), npc.GetWorldRotation() );
+							pull_anchor3 = (CEntity)theGame.CreateEntity( markerTemplate, npc.GetWorldPosition(), npc.GetWorldRotation() );
+							pull_anchor4 = (CEntity)theGame.CreateEntity( markerTemplate, npc.GetWorldPosition(), npc.GetWorldRotation() );
+							pull_anchor5 = (CEntity)theGame.CreateEntity( markerTemplate, npc.GetWorldPosition(), npc.GetWorldRotation() );
+
+							/*
+							pull_anchor1 = npc.CreateFXEntityAtPelvis('runeword_4', false);
+							pull_anchor2 = npc.CreateFXEntityAtPelvis('runeword_4', false);
+							pull_anchor3 = npc.CreateFXEntityAtPelvis('runeword_4', false);
+							*/
+
+							pull_anchor1.CreateAttachment( npc, , Vector( 0, 0, 1.5 ) );	
+							pull_anchor2.CreateAttachment( npc, , Vector( 0.25, 0, 1 ) );				
+							pull_anchor3.CreateAttachment( npc, , Vector( -0.25, 0, 1 ) );
+							pull_anchor4.CreateAttachment( npc, , Vector( 0.25, 0, 0 ) );
+							pull_anchor5.CreateAttachment( npc, , Vector( -0.25, 0, 0 ) );
+							pull_anchor1.DestroyAfter(10);
+							pull_anchor2.DestroyAfter(10);
+							pull_anchor3.DestroyAfter(10);
+							pull_anchor4.DestroyAfter(10);
+							pull_anchor5.DestroyAfter(10);
+							
+							SleepOneFrame();
+
+							ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor1 );
+							ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor2 );
+							ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor3 );
+							ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor4 );
+							ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor5 );
+							ACSGetCEntity('ACS_TK_Mark').StopEffect('lightning_red_no_sound');
+							
+							if (!theGame.IsDialogOrCutscenePlaying() 
+							|| !GetWitcherPlayer().IsInNonGameplayCutscene() 
+							|| !GetWitcherPlayer().IsInGameplayScene()
+							//&& !GetWitcherPlayer().IsSwimming()
+							|| !GetWitcherPlayer().IsUsingHorse()
+							|| !GetWitcherPlayer().IsUsingVehicle()
+							)
+							{
+								movementAdjustor1.RotateTowards( ticket1, npc );
+							}
+							
+							npc.RemoveAllBuffsOfType( EET_HeavyKnockdown );
+						
+							npc.RemoveAllBuffsOfType( EET_Knockdown );
+						
+							npc.RemoveAllBuffsOfType( EET_LongStagger );
+						
+							npc.RemoveAllBuffsOfType( EET_Ragdoll );
+							
+							npc.RemoveAllBuffsOfType( EET_Stagger );
+							
+							npc.RemoveAllBuffsOfType( EET_Paralyzed );
+							
+							npc.EnableCollisions(false);
+
+							Sleep(0.1);
+							
+							if (npc.UsesEssence())
+							{
+								if (npc.IsAnimal())
+								{
+									npc.EnableCharacterCollisions(false);
+									npc.AddEffectDefault( EET_Paralyzed, npc, 'console' );
+								}
+								else
+								{
+									if (!npc.IsImmuneToBuff(EET_LongStagger) && !npc.HasAbility('Flying') && ( (CMovingPhysicalAgentComponent)( npc.GetMovingAgentComponent() ) ).HasRagdoll())
+									//if (!npc.IsImmuneToBuff(EET_HeavyKnockdown) && !npc.HasAbility('Flying') && ( (CMovingPhysicalAgentComponent)( npc.GetMovingAgentComponent() ) ).HasRagdoll())
+									{
+										//npc.AddEffectDefault( EET_Ragdoll, npc, 'console' );
+										npc.AddEffectDefault( EET_LongStagger, npc, 'console' );
+										//npc.AddEffectDefault( EET_HeavyKnockdown, npc, 'console' );
+									}
+									else
+									{
+										npc.AddEffectDefault( EET_Paralyzed, npc, 'console' );
+									}
+								}
+							}
+							else if (!npc.UsesEssence())
+							{
+								if (npc.IsUsingVehicle()) 
+								{
+									npc.SignalGameplayEventParamInt( 'RidingManagerDismountHorse', DT_instant | DT_fromScript );
+									//npc.AddEffectDefault( EET_Paralyzed, npc, 'console' );
+									//npc.AddEffectDefault( EET_Ragdoll, npc, 'console' );
+									npc.AddEffectDefault( EET_LongStagger, npc, 'console' );
+								}
+								else
+								{
+									if (npc.IsAnimal())
+									{
+										npc.EnableCharacterCollisions(false);
+										npc.AddEffectDefault( EET_Paralyzed, npc, 'console' );
+									}
+									else
+									{
+										if (!npc.IsImmuneToBuff(EET_LongStagger) && !npc.HasAbility('Flying') && ( (CMovingPhysicalAgentComponent)( npc.GetMovingAgentComponent() ) ).HasRagdoll())
+										//if (!npc.IsImmuneToBuff(EET_HeavyKnockdown) && !npc.HasAbility('Flying') && ( (CMovingPhysicalAgentComponent)( npc.GetMovingAgentComponent() ) ).HasRagdoll())
+										{
+											//npc.AddEffectDefault( EET_Ragdoll, npc, 'console' );
+											npc.AddEffectDefault( EET_LongStagger, npc, 'console' );
+											//npc.AddEffectDefault( EET_HeavyKnockdown, npc, 'console' );
+										}
+										else
+										{
+											npc.AddEffectDefault( EET_Paralyzed, npc, 'console' );
+										}
+									}
+								}
+							}
+							
+							while (true) 
+							{
+								//animatedComponent.PlaySlotAnimationAsync ( 'man_geralt_gabriel_aim_idle_lp', 'PLAYER_SLOT', settings);
+								
+								new_time = theGame.GetEngineTimeAsSeconds();
+								delta_time = new_time - prev_time;
+
+								new_pos = npc.GetWorldPosition();
+								delta_dist = VecDistance2D(prev_pos, new_pos);
+
+								if (delta_dist <= 0.1) 
+								{
+									if (stuck_time == 0) stuck_time = new_time;
+								}
+								else stuck_time = 0;
+
+								if (!slide && VecDistance2D(prev_pos, dest) <= 2.5 && dest_adjusted.Z - prev_pos.Z <= 2 ) 
+								{	
+									GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_gabriel_aim_idle_lp', 'PLAYER_SLOT', settings);
+									
+									ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor1 );
+									ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor2 );
+									ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor3 );
+									ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor4 );
+									ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor5 );
+									ACSGetCEntity('ACS_TK_Mark').StopEffect('lightning_red_no_sound');
+
+									//movementAdjustor2.SlideTo( ticket2, dest );	
+									movementAdjustor2.SlideTowards( ticket2, GetWitcherPlayer(), dist, dist );	
+									teleport = false;
+									slide = true;
+									slide_time = new_time;
+								}
+										
+								if (teleport) 
+								{
+									GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( 'man_geralt_gabriel_aim_idle_lp', 'PLAYER_SLOT', settings);
+									
+									ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor1 );
+									ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor2 );
+									ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor3 );
+									ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor4 );
+									ACSGetCEntity('ACS_TK_Mark').PlayEffect('lightning_red_no_sound', pull_anchor5 );
+									ACSGetCEntity('ACS_TK_Mark').StopEffect('lightning_red_no_sound');
+									
+									progress += progress_inc*delta_time;
+										
+									npc.Teleport( LerpV(new_pos, dest_adjusted, progress) );
+								}	
+										
+								prev_pos = new_pos;
+								prev_time = new_time;
+								
+								SleepOneFrame();
+							}					
+							GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync ( '', 'PLAYER_SLOT', settings);
+						}
+					}
+				}
 			}
 		}
 	}

@@ -1,15 +1,30 @@
 function ACS_Jump_Extend_Init( type : EJumpType )
 {
-	var vACS_JumpExtend : cACS_JumpExtend;
-	vACS_JumpExtend = new cACS_JumpExtend in theGame;
-	
+	var camera 														: CCustomCamera;
+	var dest, prev_pos				 								: Vector;
+	var ticket 														: SMovementAdjustmentRequestTicket;
+	var movementAdjustor											: CMovementAdjustor;
+	var slideDuration												: float;
+
+	if (FactsQuerySum("ACS_In_Meditation") > 0
+	|| GetACSWatcher().meditation_block 
+	|| FactsQuerySum("ACS_Study_Target_Active") > 0
+	)
+	{
+		return;
+	}
+
+
 	if ( 
-	ACS_Enabled() 
-	&& (ACS_Settings_Main_Bool('EHmodJumpSettings','EHmodJumpExtend', false) || ACS_Armor_Equipped_Check())
+	ACS_Settings_Main_Bool('acs_main_settings','acs_mod_enabled', true) && !thePlayer.IsCiri() 
+	&& (ACS_Settings_Main_Bool('acs_jump_settings','acs_jump_extend', false) || ACS_Armor_Set_Check('acs_armor', false) )
 	&& !GetWitcherPlayer().HasTag('acs_in_wraith') 
-	&& !ACS_Transformation_Activated_Check()
+	&& FactsQuerySum("acs_transformation_activated") <= 0
 	&& GetWitcherPlayer().IsAlive()
 	&& !GetWitcherPlayer().IsInAir()
+	&& GetWitcherPlayer().IsOnGround()
+	&& thePlayer.IsActionAllowed(EIAB_Movement)
+	&& thePlayer.IsActionAllowed(EIAB_Jump)
 	&& (type == EJT_Idle 
 	|| type == EJT_IdleToWalk 
 	|| type == EJT_Walk 
@@ -20,66 +35,10 @@ function ACS_Jump_Extend_Init( type : EJumpType )
 	)
 	)
 	{	
-		ACS_ThingsThatShouldBeRemoved(true);
-		vACS_JumpExtend.ACS_JumpExtend();
-	}
-}
-
-function ACS_UpdateJumpCamera( out moveData : SCameraMovementData, dt : float ) : bool
-{
-	var camera								: CCustomCamera;
-	var cameraPreset						: SCustomCameraPreset;
-	
-	camera = (CCustomCamera)theCamera.GetTopmostCameraObject();
-	cameraPreset = camera.GetActivePreset();
-
-	camera.ChangePivotDistanceController( 'Default' );
-	camera.ChangePivotPositionController( 'Default' );
-	
-	moveData.pivotDistanceController = camera.GetActivePivotDistanceController();
-	moveData.pivotPositionController = camera.GetActivePivotPositionController();
-
-	moveData.pivotDistanceController.SetDesiredDistance(cameraPreset.distance + 1.0f);
-	moveData.pivotPositionController.SetDesiredPosition(GetWitcherPlayer().GetWorldPosition());
-	moveData.pivotPositionController.offsetZ = -0.25f;
-
-	return true;
-}
-
-statemachine class cACS_JumpExtend 
-{
-    function ACS_JumpExtend()
-	{
-		this.PushState('ACS_JumpExtendState');
-	}
-}
-
-state ACS_JumpExtendState in cACS_JumpExtend
-{
-	private var camera 														: CCustomCamera;
-	private var dest, prev_pos				 								: Vector;
-	private var ticket 														: SMovementAdjustmentRequestTicket;
-	private var movementAdjustor											: CMovementAdjustor;
-	private var slideDuration												: float;
-	private var settings_interrupt											: SAnimatedComponentSlotAnimationSettings;
-	private var mass, velocity, momentum 									: float;
-	
-	event OnEnterState(prevStateName : name)
-	{
-		JumpExtend_Entry();
-	}
-	
-	entry function JumpExtend_Entry()
-	{
-		settings_interrupt.blendIn = 0;
-		settings_interrupt.blendOut = 0;
-
-		mass = ((CMovingPhysicalAgentComponent)GetWitcherPlayer().GetComponentByClassName( 'CMovingPhysicalAgentComponent' ) ).GetPhysicalObjectMass();
-		velocity = VecLength( ((CMovingPhysicalAgentComponent)GetWitcherPlayer().GetComponentByClassName( 'CMovingPhysicalAgentComponent' ) ).GetPhysicalObjectLinearVelocity() );
-		momentum = mass * velocity;
+		ACS_ThingsThatShouldBeRemoved();
 		
 		if (!GetWitcherPlayer().HasTag('acs_in_wraith')
-		&& ACS_Settings_Main_Bool('EHmodJumpSettings','EHmodJumpExtendEffect', false))
+		&& ACS_Settings_Main_Bool('acs_jump_settings','acs_jump_extend_effect', false))
 		{
 			GetWitcherPlayer().PlayEffect( 'bruxa_dash_trails_backup' );
 			GetWitcherPlayer().StopEffect( 'bruxa_dash_trails_backup' );
@@ -103,9 +62,7 @@ state ACS_JumpExtendState in cACS_JumpExtend
 			GetACSWatcher().dodge_timer_slideback_actual();
 		}	
 
-		GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync( '', 'PLAYER_SLOT', settings_interrupt );
-
-		//Sleep(0.025);
+		GetWitcherPlayer().GetRootAnimatedComponent().PlaySlotAnimationAsync( '', 'PLAYER_SLOT', SAnimatedComponentSlotAnimationSettings(0, 0) );
 
 		prev_pos = GetWitcherPlayer().GetWorldPosition();
 						
@@ -122,17 +79,17 @@ state ACS_JumpExtendState in cACS_JumpExtend
 		
 		if (GetWitcherPlayer().GetIsSprinting())
 		{
-			dest = GetWitcherPlayer().PredictWorldPosition(1.0) + (GetWitcherPlayer().GetHeadingVector() * (ACS_Settings_Main_Int('EHmodJumpSettings','EHmodJumpExtendSprintingDistance', 12)  ));
+			dest = GetWitcherPlayer().PredictWorldPosition(1.0) + (GetWitcherPlayer().GetHeadingVector() * (ACS_Settings_Main_Int('acs_jump_settings','acs_jump_extend_sprinting_distance', 12)  ));
 			
-			dest.Z += ACS_Settings_Main_Int('EHmodJumpSettings','EHmodJumpExtendSprintingHeight', 7);
+			dest.Z += ACS_Settings_Main_Int('acs_jump_settings','acs_jump_extend_sprinting_height', 7);
 			
-			movementAdjustor.MaxLocationAdjustmentDistance(ticket, true, ACS_Settings_Main_Int('EHmodJumpSettings','EHmodJumpExtendSprintingDistance', 12) + 5, ACS_Settings_Main_Int('EHmodJumpSettings','EHmodJumpExtendSprintingHeight', 7) + 5);
+			movementAdjustor.MaxLocationAdjustmentDistance(ticket, true, ACS_Settings_Main_Int('acs_jump_settings','acs_jump_extend_sprinting_distance', 12) + 5, ACS_Settings_Main_Int('acs_jump_settings','acs_jump_extend_sprinting_height', 7) + 5);
 
 			if (
-			(ACS_Settings_Main_Int('EHmodJumpSettings','EHmodJumpExtendSprintingDistance', 12) >= 15 
-			|| ACS_Settings_Main_Int('EHmodJumpSettings','EHmodJumpExtendSprintingHeight', 7) >= 15)
+			(ACS_Settings_Main_Int('acs_jump_settings','acs_jump_extend_sprinting_distance', 12) >= 15 
+			|| ACS_Settings_Main_Int('acs_jump_settings','acs_jump_extend_sprinting_height', 7) >= 15)
 			&& !GetWitcherPlayer().HasTag('acs_in_wraith')
-			&& ACS_Settings_Main_Bool('EHmodJumpSettings','EHmodJumpExtendEffect', false)
+			&& ACS_Settings_Main_Bool('acs_jump_settings','acs_jump_extend_effect', false)
 			)
 			{
 				GetWitcherPlayer().StopEffect('smoke_explosion');
@@ -144,17 +101,17 @@ state ACS_JumpExtendState in cACS_JumpExtend
 		}
 		else
 		{
-			dest = GetWitcherPlayer().PredictWorldPosition(1.0) + (GetWitcherPlayer().GetHeadingVector() * (ACS_Settings_Main_Int('EHmodJumpSettings','EHmodJumpExtendNormalDistance', 10) ));
+			dest = GetWitcherPlayer().PredictWorldPosition(1.0) + (GetWitcherPlayer().GetHeadingVector() * (ACS_Settings_Main_Int('acs_jump_settings','acs_jump_extend_normal_distance', 10) ));
 			
-			dest.Z += ACS_Settings_Main_Int('EHmodJumpSettings','EHmodJumpExtendNormalHeight', 5) ;
+			dest.Z += ACS_Settings_Main_Int('acs_jump_settings','acs_jump_extend_normal_height', 5) ;
 			
-			movementAdjustor.MaxLocationAdjustmentDistance(ticket, true, ACS_Settings_Main_Int('EHmodJumpSettings','EHmodJumpExtendNormalDistance', 10) + 5, ACS_Settings_Main_Int('EHmodJumpSettings','EHmodJumpExtendNormalHeight', 5) + 5);
+			movementAdjustor.MaxLocationAdjustmentDistance(ticket, true, ACS_Settings_Main_Int('acs_jump_settings','acs_jump_extend_normal_distance', 10) + 5, ACS_Settings_Main_Int('acs_jump_settings','acs_jump_extend_normal_height', 5) + 5);
 
 			if (
-			(ACS_Settings_Main_Int('EHmodJumpSettings','EHmodJumpExtendNormalDistance', 10) >= 15 
-			|| ACS_Settings_Main_Int('EHmodJumpSettings','EHmodJumpExtendNormalHeight', 5) >= 15)
+			(ACS_Settings_Main_Int('acs_jump_settings','acs_jump_extend_normal_distance', 10) >= 15 
+			|| ACS_Settings_Main_Int('acs_jump_settings','acs_jump_extend_normal_height', 5) >= 15)
 			&& !GetWitcherPlayer().HasTag('acs_in_wraith')
-			&& ACS_Settings_Main_Bool('EHmodJumpSettings','EHmodJumpExtendEffect', false)
+			&& ACS_Settings_Main_Bool('acs_jump_settings','acs_jump_extend_effect', false)
 			)
 			{
 				GetWitcherPlayer().StopEffect('smoke_explosion');
@@ -167,9 +124,25 @@ state ACS_JumpExtendState in cACS_JumpExtend
 		
 		movementAdjustor.SlideTo(ticket, dest);
 	}
+}
+
+function ACS_UpdateJumpCamera( out moveData : SCameraMovementData, dt : float ) : bool
+{
+	var camera								: CCustomCamera;
+	var cameraPreset						: SCustomCameraPreset;
 	
-	event OnLeaveState( nextStateName : name ) 
-	{
-		super.OnLeaveState(nextStateName);
-	}
+	camera = (CCustomCamera)theCamera.GetTopmostCameraObject();
+	cameraPreset = camera.GetActivePreset();
+
+	camera.ChangePivotDistanceController( 'Default' );
+	camera.ChangePivotPositionController( 'Default' );
+	
+	moveData.pivotDistanceController = camera.GetActivePivotDistanceController();
+	moveData.pivotPositionController = camera.GetActivePivotPositionController();
+
+	moveData.pivotDistanceController.SetDesiredDistance(cameraPreset.distance + 1.0f);
+	moveData.pivotPositionController.SetDesiredPosition(GetWitcherPlayer().GetWorldPosition());
+	moveData.pivotPositionController.offsetZ = -0.25f;
+
+	return true;
 }
